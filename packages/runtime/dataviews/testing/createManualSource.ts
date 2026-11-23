@@ -13,6 +13,9 @@ import type { ManualCall, ManualSource, ManualSourceConfig } from "./types.js";
  *
  * @note Impure by design: it records every execution and counts every
  * release, into the lists it hands back for a test to read.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createManualSource<TRow extends object = RowRecord>(
   config: ManualSourceConfig<TRow> = {},
@@ -21,7 +24,9 @@ export default function createManualSource<TRow extends object = RowRecord>(
   const { answer } = config;
   const source: Source<TRow> = {
     capabilities: config.capabilities ?? NOTHING_DECLARED,
-    ...(config.refusals === undefined ? {} : { refusals: config.refusals }),
+    ...(config.listRefusals === undefined
+      ? {}
+      : { listRefusals: config.listRefusals }),
     ...(config.runAction === undefined ? {} : { runAction: config.runAction }),
     ...(answer === undefined
       ? {}
@@ -53,6 +58,6 @@ export default function createManualSource<TRow extends object = RowRecord>(
     source,
     calls,
     callAt,
-    latest: () => callAt(calls.length - 1),
+    readLatest: () => callAt(calls.length - 1),
   };
 }

@@ -93,6 +93,12 @@ A choices field is filtered by the options a record is any of — the checkboxes
 
 <Canvas of={Stories.NoneOfApplied} sourceState="none" />
 
+## Several restrictions on one field
+
+A link can AND several restrictions on one field; the control edits one and shows each other as a read-only row with its own Clear.
+
+<Canvas of={Stories.FurtherConjunctsApplied} sourceState="none" />
+
 ## An invalid edit keeps the restriction
 
 A bound outside the schema's bounds is refused, not applied — by the schema, and natively by the browser, since a number bound is a native number input carrying the schema's `min` and `max`. The restriction already in force stays in force, and the message beside the input says so, because the value on screen is no longer what filters the rows. A valid edit the source refuses is kept out the same way, with the source's reason beside the input. Emptying a bound is incomplete rather than a removal; the clear button removes it.

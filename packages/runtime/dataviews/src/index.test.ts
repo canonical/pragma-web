@@ -8,7 +8,7 @@ import * as virtualization from "./lib/virtualization/index.js";
 const EMPTY_SLICE = dataviews.EMPTY_SLICE;
 
 /** The package manifest, whose `exports` map names every entry point. */
-const manifest = (): { readonly exports: Record<string, unknown> } =>
+const readManifest = (): { readonly exports: Record<string, unknown> } =>
   JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 describe("public surface", () => {
@@ -54,7 +54,7 @@ describe("public surface", () => {
       source,
     });
     expect(
-      provider.refusals({
+      provider.listRefusals({
         slice: EMPTY_SLICE,
         window: dataviews.DEFAULT_WINDOW,
       }),
@@ -107,18 +107,23 @@ describe("public surface", () => {
   });
 
   it("names every entry point in the manifest, and no other", () => {
-    expect(Object.keys(manifest().exports).sort()).toEqual([
+    expect(Object.keys(readManifest().exports).sort()).toEqual([
       ".",
       "./bindings",
       "./indexeddb",
+      "./testing",
       "./virtualization",
     ]);
     for (const entry of ["bindings", "indexeddb", "virtualization"]) {
-      expect(manifest().exports[`./${entry}`]).toEqual({
+      expect(readManifest().exports[`./${entry}`]).toEqual({
         types: `./dist/types/lib/${entry}/index.d.ts`,
         import: `./dist/esm/lib/${entry}/index.js`,
       });
     }
+    expect(readManifest().exports["./testing"]).toEqual({
+      types: "./dist/types/testing/index.d.ts",
+      import: "./dist/esm/testing/index.js",
+    });
   });
 
   it("hands framework bindings their shared machinery from ./bindings", () => {
@@ -130,6 +135,7 @@ describe("public surface", () => {
       "areFieldFacetsEqual",
       "areListsEqual",
       "areSizingsEqual",
+      "assertInvariant",
       "buildColumnTemplate",
       "createColumnLayout",
       "createFilterInputs",
@@ -154,6 +160,7 @@ describe("public surface", () => {
       "showColumn",
       "spellColumnArrangement",
       "spellWireKey",
+      "spellWireValues",
     ]);
     for (const name of Object.keys(bindings)) {
       expect(dataviews).not.toHaveProperty(name);

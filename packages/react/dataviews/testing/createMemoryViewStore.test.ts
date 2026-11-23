@@ -1,5 +1,5 @@
+import { buildStoredView } from "@canonical/dataviews-core/testing";
 import { describe, expect, it, vi } from "vitest";
-import buildStoredView from "./buildStoredView.js";
 import createMemoryViewStore from "./createMemoryViewStore.js";
 
 describe("createMemoryViewStore", () => {

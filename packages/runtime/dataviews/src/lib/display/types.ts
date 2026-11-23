@@ -63,16 +63,16 @@ type DisplayEntryBase = {
    * header row is 1 and the entries follow in display order. Worked out
    * once, here, so every binding reports the same position.
    *
-   * @seam grouping — read by the group header row; the rows of a collapsed
-   * group are not displayed, so they take no position
+   * The group header row reads this. The rows of a collapsed group are not
+   * displayed, so they take no position.
    */
   readonly index: number;
   /**
    * The entry id of the group the entry belongs to, or null at the top
    * level. Every entry is top-level until grouping lands.
    *
-   * @seam grouping — read by the group header row, so an entry's owning
-   * group is read from here and never recomputed
+   * The group header row reads an entry's owning group from here and never
+   * recomputes it.
    */
   readonly parent: string | null;
 };
@@ -82,8 +82,8 @@ type DisplayEntryBase = {
  * row. An open union: the virtual range's estimates are keyed by its kinds,
  * so a kind added here is a compile error until every reader knows it.
  *
- * @seam grouping — read by the group header row, which joins this union
- * as `"group"` with its path and nesting level
+ * The group header row will join this union as `"group"`, with its path
+ * and nesting level.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -100,8 +100,8 @@ export type DisplayEntry =
        * Why there are no rows, or what stands over the rows after it. The
        * table's own status is the only one today.
        *
-       * @seam grouping — read by the group header row: a group still
-       * pending is another entry of this kind, whose parent is that group
+       * The group header row reads this: a group still pending is another
+       * entry of this kind, whose parent is that group.
        */
       readonly status: DisplayStatus;
     });

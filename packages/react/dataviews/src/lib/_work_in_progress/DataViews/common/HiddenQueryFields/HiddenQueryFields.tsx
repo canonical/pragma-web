@@ -9,13 +9,15 @@ import type { HiddenQueryFieldsProps } from "./types.js";
  * form's own controls submit. A leaf of its own, so the form around it —
  * with every control in it — does not redraw each time the destination
  * moves: only this list does.
+ *
+ * @implements ds:apps.subcomponent.data_views-hidden_query_fields
  */
 export default function HiddenQueryFields({
   provider,
-  destinationOf,
+  readDestination,
   omit,
 }: HiddenQueryFieldsProps): ReactElement {
-  const spelled = useDestination({ provider, destinationOf });
+  const spelled = useDestination({ provider, readDestination });
   const fields = useMemo(
     () =>
       listHiddenFields(

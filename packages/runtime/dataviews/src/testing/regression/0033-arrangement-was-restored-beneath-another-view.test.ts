@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
-import { createStandInViewStore } from "../../../testing/createStandInStores.js";
+import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import declare from "../../../testing/declare.js";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";

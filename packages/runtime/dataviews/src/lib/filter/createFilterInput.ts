@@ -28,7 +28,7 @@ import type {
 export default function createFilterInput(
   config: FilterInputConfig,
 ): FilterInput {
-  const { schema, field, operator, host } = config;
+  const { schema, field, operator, host, readConjuncts } = config;
   const definition = schema.findField(field);
   if (definition === undefined) {
     throw new Error(`the schema has no field "${field}" to filter`);
@@ -44,11 +44,23 @@ export default function createFilterInput(
   let applied: Predicate | null = null;
   /**
    * The predicate on its way to the host. The host publishes before
-   * `setPredicate` returns, and the records' sync then offers this record
-   * the canonical copy of its own edit as if the query had moved under it;
-   * the copy is recognised here and left alone.
+   * `setPredicate` returns, and the records' sync reads this record's
+   * predicate while it does: reading the one on its way, the sync finds the
+   * record's own edit standing and leaves the input and feedback alone.
    */
   let applying: Predicate | null = null;
+  /**
+   * The place of the record's conjunct among those at its address as the
+   * query stands, or 0 — the first, or the one added where there is none —
+   * when it edits none that stands.
+   */
+  const readNth = (): number =>
+    Math.max(
+      0,
+      readConjuncts().findIndex((conjunct) =>
+        isSamePredicate(conjunct, applied),
+      ),
+    );
   /**
    * Whether a typed edit has applied since the input session began. The
    * session's first applied edit enters history as the policy says; every
@@ -88,7 +100,7 @@ export default function createFilterInput(
     applying = predicate;
     let refusals: readonly SourceRefusal[];
     try {
-      refusals = host.setPredicate(predicate, undefined, history);
+      refusals = host.setPredicate(predicate, readNth(), history);
     } finally {
       applying = null;
     }
@@ -108,7 +120,7 @@ export default function createFilterInput(
 
   return {
     get predicate(): Predicate | null {
-      return applied;
+      return applying ?? applied;
     },
     state: protectChannel(state),
     applied: protectChannel(appliedValue),
@@ -142,7 +154,7 @@ export default function createFilterInput(
       publish();
     },
     set(operands: readonly PredicateOperand[]): readonly SourceRefusal[] {
-      const built = schema.predicateFor(field, operator, operands);
+      const built = schema.buildPredicate(field, operator, operands);
       if (built.status !== "valid") {
         feedback = {
           status: "invalid",
@@ -159,10 +171,14 @@ export default function createFilterInput(
     },
     clear(): readonly SourceRefusal[] {
       endSession();
-      const refusals = host.removePredicate(field, operator);
+      const nth = readNth();
+      // Emptied before the host hears it: the host publishes before it
+      // returns, and a conjunct the removal promotes to this place is
+      // adopted then and must not be emptied after.
       input = "";
       feedback = { status: "none" };
       applied = null;
+      const refusals = host.removePredicate(field, operator, nth);
       publish();
       return refusals;
     },
@@ -174,11 +190,6 @@ export default function createFilterInput(
         throw new Error(
           `setApplied received a predicate for ${next.field}/${next.operator} on a ${field}/${operator} record`,
         );
-      }
-      if (applying !== null && isSamePredicate(next, applying)) {
-        // The record's own edit, coming back as the provider's copy: the
-        // input under the cursor and the feedback are what the edit made.
-        return;
       }
       applied = next;
       input = next === null ? "" : String(next.operands.at(0) ?? "");

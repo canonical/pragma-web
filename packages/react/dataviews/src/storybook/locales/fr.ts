@@ -25,15 +25,16 @@ const NUMBERS = new Intl.NumberFormat("fr");
 const count = (value: number): string => NUMBERS.format(value);
 
 /** The singular or the plural form, as French chooses it for `value`. */
-const plural = (value: number, one: string, other: string): string =>
+const choosePlural = (value: number, one: string, other: string): string =>
   PLURALS.select(value) === "one" ? one : other;
 
 /** A position as a French masculine ordinal: 1er, 2e, 3e. */
-const ordinal = (value: number): string =>
+const spellOrdinal = (value: number): string =>
   `${value}${ORDINALS.select(value) === "one" ? "er" : "e"}`;
 
 /** A reason without the full stops it came with. */
-const clause = (reason: string): string => reason.trim().replace(/\.+$/, "");
+const trimClause = (reason: string): string =>
+  reason.trim().replace(/\.+$/, "");
 
 const DIRECTIONS: Readonly<Record<SortDirection, string>> = {
   asc: "croissant",
@@ -57,22 +58,24 @@ const PENDING: Readonly<Record<ViewCommand, string>> = {
 };
 
 /** A total as French states it: exact, or "au moins". */
-const total = (counted: Exclude<Count, { readonly kind: "unknown" }>): string =>
+const spellTotal = (
+  counted: Exclude<Count, { readonly kind: "unknown" }>,
+): string =>
   `${counted.kind === "at-least" ? "au moins " : ""}${count(counted.value)}`;
 
 /** Every DataViews message, in French. */
-export const FRENCH: DataViewsMessages = {
+const fr: DataViewsMessages = {
   statusPending: "Chargement…",
   statusFailed: (reason) =>
-    `Ces lignes n’ont pas pu être chargées : ${clause(reason)}`,
+    `Ces lignes n’ont pas pu être chargées : ${trimClause(reason)}`,
   statusRefused: (reason) =>
-    clause(reason) === ""
+    trimClause(reason) === ""
       ? "Ce lien n’a pas pu être suivi."
-      : `Ce lien n’a pas pu être suivi : ${clause(reason)}.`,
+      : `Ce lien n’a pas pu être suivi : ${trimClause(reason)}.`,
   statusRefreshFailed: (reason) =>
-    `Ces lignes n’ont pas pu être actualisées : ${clause(reason)}`,
+    `Ces lignes n’ont pas pu être actualisées : ${trimClause(reason)}`,
   statusStale: (reason) =>
-    `Ces lignes ne correspondent pas à la requête actuelle : ${clause(reason)}`,
+    `Ces lignes ne correspondent pas à la requête actuelle : ${trimClause(reason)}`,
   statusNoAccess: "Vous n’avez pas l’autorisation de voir ces lignes.",
   statusNoResults: "Aucune ligne ne correspond à cette requête.",
   statusNoData: "Il n’y a encore rien ici.",
@@ -80,18 +83,18 @@ export const FRENCH: DataViewsMessages = {
   selectAllRows: "Sélectionner toutes les lignes affichées",
   selectRow: (name) => `Sélectionner ${name}`,
   columnWidth: (pixels) =>
-    `${count(pixels)} ${plural(pixels, "pixel", "pixels")}`,
+    `${count(pixels)} ${choosePlural(pixels, "pixel", "pixels")}`,
   columnEndPlacement: (name) =>
     `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
   sortPrecedence: (direction, position, terms) =>
     terms === 1
       ? DIRECTIONS[direction]
-      : `${DIRECTIONS[direction]}, ${ordinal(position)} critère sur ${count(terms)}`,
+      : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} critère sur ${count(terms)}`,
   sortRefused: (reasons) =>
     reasons.length === 0
       ? "Tri inchangé."
-      : `Tri inchangé : ${reasons.map(clause).join(" ; ")}.`,
+      : `Tri inchangé : ${reasons.map(trimClause).join(" ; ")}.`,
   sortApplied: (terms) =>
     `Trié par ${terms
       .map(({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`)
@@ -139,14 +142,15 @@ export const FRENCH: DataViewsMessages = {
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
+  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Non appliqué depuis le lien",
-  clauseRefused: (name, reason) => `${name} : ${clause(reason)}.`,
+  clauseRefused: (name, reason) => `${name} : ${trimClause(reason)}.`,
   grouping: "Regroupement",
   filterIsAnyOf: (label) => `${label} est l’une des valeurs`,
   filterIsNoneOf: (label) => `${label} n’est aucune des valeurs`,
   matchAnyInstead: "Correspondre plutôt à l’une d’elles",
   matchNoneInstead: "Correspondre plutôt à aucune d’elles",
-  facetCount: total,
+  facetCount: spellTotal,
   filterContains: (label) => `${label} contient`,
   filterStartsWith: (label) => `${label} commence par`,
   filterIncomplete: (retained) =>
@@ -154,7 +158,7 @@ export const FRENCH: DataViewsMessages = {
       ? "Saisissez une valeur pour modifier cette restriction. La restriction précédente s’applique toujours."
       : "Saisissez une valeur pour appliquer cette restriction.",
   filterRefused: (reasons, retained) => {
-    const refused = reasons.map((reason) => `${clause(reason)}.`).join(" ");
+    const refused = reasons.map((reason) => `${trimClause(reason)}.`).join(" ");
     return retained
       ? `${refused} La restriction précédente s’applique toujours.`
       : refused;
@@ -175,11 +179,12 @@ export const FRENCH: DataViewsMessages = {
         : `Lignes ${range} affichées`;
     }
     return shown === 1
-      ? `Ligne ${count(first)} sur ${total(counted)}`
-      : `Lignes ${range} sur ${total(counted)}`;
+      ? `Ligne ${count(first)} sur ${spellTotal(counted)}`
+      : `Lignes ${range} sur ${spellTotal(counted)}`;
   },
   page: "Page",
-  pageCount: (pages) => `sur ${count(pages)} ${plural(pages, "page", "pages")}`,
+  pageCount: (pages) =>
+    `sur ${count(pages)} ${choosePlural(pages, "page", "pages")}`,
   submitPage: "Aller à la page",
   goToFirstPage: "Première page",
   goToPreviousPage: "Page précédente",
@@ -210,12 +215,12 @@ export const FRENCH: DataViewsMessages = {
   submitDelete: "Supprimer la vue",
   viewsPending: "Chargement des vues enregistrées…",
   viewsUnavailable: (reason) =>
-    `Les vues enregistrées sont indisponibles : ${clause(reason)}.`,
+    `Les vues enregistrées sont indisponibles : ${trimClause(reason)}.`,
   viewsUnreadable: (views) =>
-    `${count(views)} ${plural(views, "vue enregistrée est illisible", "vues enregistrées sont illisibles")}.`,
+    `${count(views)} ${choosePlural(views, "vue enregistrée est illisible", "vues enregistrées sont illisibles")}.`,
   arrangementUnsaved: (reason) =>
-    `La disposition n’est pas enregistrée : ${clause(reason)}.`,
-  viewNameRefused: (reason) => `${clause(reason)}.`,
+    `La disposition n’est pas enregistrée : ${trimClause(reason)}.`,
+  viewNameRefused: (reason) => `${trimClause(reason)}.`,
   viewPending: (command) => PENDING[command],
   viewOpened: (name) => `« ${name} » ouverte.`,
   viewSaved: (name) => `« ${name} » enregistrée.`,
@@ -223,7 +228,7 @@ export const FRENCH: DataViewsMessages = {
   viewDeleted: "Vue supprimée.",
   viewRefused: (name, reasons) =>
     `Non ouverte : « ${name} » demande ce que cette collection ne peut pas afficher — ${reasons
-      .map(clause)
+      .map(trimClause)
       .join(" ; ")}. La requête est inchangée.`,
   viewConflicted: (command, name) =>
     command === "save-as"
@@ -231,14 +236,15 @@ export const FRENCH: DataViewsMessages = {
       : `${NOT_DONE[command]} : « ${name} » a été modifiée ailleurs.`,
   viewMissing: (command) => `${NOT_DONE[command]} : la vue n’existe plus.`,
   viewUnreadable: (command, reason) =>
-    `${NOT_DONE[command]} : la vue stockée est illisible (${clause(reason)}).`,
-  viewFailed: (command, reason) => `${NOT_DONE[command]} : ${clause(reason)}.`,
+    `${NOT_DONE[command]} : la vue stockée est illisible (${trimClause(reason)}).`,
+  viewFailed: (command, reason) =>
+    `${NOT_DONE[command]} : ${trimClause(reason)}.`,
 
   selectionActions: "Actions sur la sélection",
   rowsSelected: (rows) =>
-    `${count(rows)} ${plural(rows, "sélectionnée", "sélectionnées")}`,
+    `${count(rows)} ${choosePlural(rows, "sélectionnée", "sélectionnées")}`,
   deselectRows: (rows) =>
-    `Désélectionner ${count(rows)} ${plural(rows, "ligne", "lignes")}`,
+    `Désélectionner ${count(rows)} ${choosePlural(rows, "ligne", "lignes")}`,
 
   facetCountsAbsent: "La source n’a fourni aucun décompte pour ce champ.",
   facetRangeAbsent: "La source n’a fourni aucune plage pour ce champ.",
@@ -259,3 +265,6 @@ export const FRENCH: DataViewsMessages = {
   chartRenderer: "Graphique",
   tableRenderer: "Tableau",
 };
+
+/** The record, frozen: a story cannot change it for the next. */
+export default Object.freeze(fr);

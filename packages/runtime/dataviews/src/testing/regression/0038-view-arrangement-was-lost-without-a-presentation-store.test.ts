@@ -20,7 +20,7 @@ import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
 import readId from "../../../testing/readId.js";
 import settleCalls from "../../../testing/settleCalls.js";
 import { createCollection } from "../../lib/collection/index.js";
-import createMemoryPresentationStore from "../../lib/presentation/createMemoryPresentationStore.js";
+import { createMemoryPresentationStore } from "../../lib/presentation/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const collection = createCollection({

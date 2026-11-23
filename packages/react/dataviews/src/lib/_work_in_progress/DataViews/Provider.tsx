@@ -6,7 +6,7 @@ import type { ReactElement } from "react";
 import { Announcer } from "../../common/index.js";
 import Context from "./Context.js";
 import {
-  Actions,
+  ActionBar,
   DataTable,
   Filters,
   Pagination,
@@ -31,46 +31,45 @@ import type { DataViewsProps } from "./types.js";
  * root over the same provider has its own and says nothing of this one's
  * commands.
  *
- * No single root element (AGENTS.md rule 6): the root is a context mount
- * and its announcer's region, not a DOM node wrapping its children.
+ * No single root element: the root is a context mount and its announcer's
+ * region, not a DOM node wrapping its children.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.pattern.data_views
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function DataViews<
-  TFields extends readonly SchemaFieldDefinition[],
-  TRow extends object = RowRecord,
->({
-  provider,
-  messages,
-  children,
-}: DataViewsProps<TFields, TRow>): ReactElement {
-  const { value, announcer } = useProviderState(
-    messages === undefined ? { provider } : { provider, messages },
-  );
-  return (
-    <Context value={value}>
-      {children}
-      <Announcer ref={announcer} />
-    </Context>
-  );
-}
+const Provider = Object.assign(
+  function DataViews<
+    TFields extends readonly SchemaFieldDefinition[],
+    TRow extends object = RowRecord,
+  >({
+    provider,
+    messages,
+    children,
+  }: DataViewsProps<TFields, TRow>): ReactElement {
+    const value = useProviderState(
+      messages === undefined ? { provider } : { provider, messages },
+    );
+    return (
+      <Context value={value}>
+        {children}
+        <Announcer ref={value.announcer} />
+      </Context>
+    );
+  },
+  {
+    ActionBar,
+    DataTable,
+    Filters,
+    Pagination,
+    SavedViews,
+    Search,
+    Settings,
+    SortPanel,
+  },
+);
 
-/** The connected action bar, over the current selection. */
-DataViews.Actions = Actions;
-/** The collection's rows, bound to this root. */
-DataViews.DataTable = DataTable;
-/** The connected query-editing part of the composition. */
-DataViews.Filters = Filters;
-/** The connected window-navigation part of the composition. */
-DataViews.Pagination = Pagination;
-/** The connected saved-view control, over the store the provider was given. */
-DataViews.SavedViews = SavedViews;
-/** The connected search part, over the applied search. */
-DataViews.Search = Search;
-/** The table's column settings, given to a table as its `settings`. */
-DataViews.Settings = Settings;
-/** The connected sort panel, over the applied ordering. */
-DataViews.SortPanel = SortPanel;
+export default Provider;

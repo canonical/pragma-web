@@ -16,6 +16,9 @@ const resolve = (input: string | URL): URL => {
  * — and writes navigate the raw href, so the host's own subscription loop
  * picks the change up like any other navigation.
  *
+ * @note Impure by design: reads and writes the platform's history and
+ * subscribes to its navigations.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

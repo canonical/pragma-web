@@ -18,7 +18,7 @@ const answerWithoutFacets = (
   source: ReturnType<typeof createFacetedManual>["source"],
 ): void => {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: createPage({
         rows: [buildMachine("m-1", "alpha")],

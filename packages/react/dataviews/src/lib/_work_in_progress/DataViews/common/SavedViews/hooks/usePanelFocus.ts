@@ -1,26 +1,22 @@
-import { type FocusEvent, useLayoutEffect, useRef, useState } from "react";
-import type {
-  SavedViewsPanel,
-  UsePanelFocusProps,
-  UsePanelFocusResult,
-} from "./types.js";
+import { useLayoutEffect, useRef, useState } from "react";
+import type { UsePanelFocusProps, UsePanelFocusResult } from "./types.js";
 
 /**
- * The panel beneath the saved-view commands, and where the focus goes when
- * it closes or is stranded.
+ * Where the focus goes when a saved-views dialog closes or the focus is
+ * stranded.
  *
- * Once nothing is pending, a closed panel returns the focus to the command
- * that opened it, and a control that became unavailable or went away under
- * the focus hands it to the view select — or, while the views are
- * unavailable and the select with them, to Try again. Only focus that was
- * lost is taken back, never from another element the user moved it to. A
- * rename or delete panel closes with the view it was about.
+ * A closing dialog returns the focus to the command that opened it, as the
+ * platform does; while a command is pending, and that command with it, the
+ * return waits for it to settle. A control that became unavailable or went
+ * away under the focus hands it to the view select — or, while the views
+ * are unavailable and the select with them, to Try again. Only focus that
+ * was lost is taken back, never from another element the user moved it to.
+ *
+ * @note Impure: moves the focus in a layout effect.
  */
 export default function usePanelFocus({
   pending,
-  hasView,
 }: UsePanelFocusProps): UsePanelFocusResult {
-  const [panel, setPanel] = useState<SavedViewsPanel>(null);
   const select = useRef<HTMLSelectElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
   // What the focus was last on inside the control, until it leaves. A
@@ -28,7 +24,7 @@ export default function usePanelFocus({
   // finds the focus stranded.
   const focused = useRef<HTMLElement>(null);
   const retry = useRef<HTMLButtonElement>(null);
-  // Where a closing panel sends the focus: state, so closing always renders.
+  // Where a closed dialog sends the focus: state, so closing always renders.
   const [returnTo, setReturnTo] = useState<HTMLElement | null>(null);
 
   // A layout effect, so the focus moves in the commit that stranded it,
@@ -57,33 +53,22 @@ export default function usePanelFocus({
     }
   });
 
-  if (!hasView && (panel === "rename" || panel === "remove")) {
-    setPanel(null);
-  }
-
-  const closePanel = (focus: HTMLElement | null = opener.current): void => {
-    setReturnTo(focus);
-    setPanel(null);
-  };
-
   return {
-    panel,
-    openPanel(next, from) {
-      opener.current = from;
-      setPanel(next);
-    },
-    closePanel,
-    // Never `closePanel` itself as a handler: an event is no focus target.
-    cancelPanel() {
-      closePanel();
-    },
     select,
-    opener,
     retry,
-    recordFocus(event: FocusEvent<HTMLElement>) {
+    recordOpener(event) {
+      opener.current = event.currentTarget;
+    },
+    restoreFocus(event) {
+      const { activeElement, body } = event.currentTarget.ownerDocument;
+      if (activeElement === null || activeElement === body) {
+        setReturnTo(opener.current);
+      }
+    },
+    recordFocus(event) {
       focused.current = event.target;
     },
-    recordBlur(event: FocusEvent<HTMLElement>) {
+    recordBlur(event) {
       // Focus leaving for nowhere may be its control going away.
       if (event.relatedTarget !== null) {
         focused.current = null;

@@ -1,10 +1,10 @@
+import type { FacetValue } from "@canonical/dataviews-core";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import BarDrawing from "./BarDrawing.js";
-import type { DrawnValue } from "./types.js";
 
 /** Two values, counted exactly. */
-const counted: readonly DrawnValue[] = [
+const counted: readonly FacetValue[] = [
   { value: "failed", count: { kind: "exact", value: 4 } },
   { value: "running", count: { kind: "exact", value: 8 } },
 ];
@@ -80,5 +80,16 @@ describe("BarDrawing", () => {
       ),
     ).toEqual(["at least 3", "Not counted"]);
     expect(container.querySelectorAll(".bar")).toHaveLength(1);
+  });
+
+  it("holds its drawing and its table in one root, taking native props", () => {
+    const { container } = render(
+      <BarDrawing label="Machines by status" values={counted} id="probe" />,
+    );
+    const root = container.firstElementChild;
+    expect(container.childElementCount).toBe(1);
+    expect(root).toHaveAttribute("id", "probe");
+    expect(root?.querySelector(":scope > svg.chart")).not.toBeNull();
+    expect(root?.querySelector(":scope > table.data")).not.toBeNull();
   });
 });

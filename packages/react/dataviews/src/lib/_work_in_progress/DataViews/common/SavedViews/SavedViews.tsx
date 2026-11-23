@@ -1,6 +1,7 @@
+import type { ViewOutcome } from "@canonical/dataviews-core";
 import { Button } from "@canonical/react-ds-global";
 import { SelectInput } from "@canonical/react-ds-global-form";
-import { type ReactElement, useEffect, useId } from "react";
+import { type ReactElement, useEffect, useId, useRef } from "react";
 import { useDataViewsValue } from "../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import { DeleteConfirm, NameForm } from "./common/index.js";
@@ -23,12 +24,18 @@ const componentCssClassName = "ds data-views-saved-views";
  *
  * Every outcome is said in a polite status, a conflict or a failure never as
  * saved. After a conflict the stored view is the open one: Save overwrites
- * it and Revert discards the changes. Deleting asks first. A name that is
- * empty or another view's is refused before anything is written, beside the
- * input. The notices also say when the arrangement is not being saved,
- * which the provider's presentation reports.
+ * it and Revert discards the changes. Save as and Rename ask for the name in
+ * a dialog, and Delete asks first in one; each command opens its dialog
+ * natively. A name that is empty, only spaces or another view's is refused
+ * before anything is written, beside the input. The notices also say when
+ * the arrangement is not being saved, which the provider's presentation
+ * reports.
+ *
+ * @note Impure: observes the provider's views from an effect.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views-saved_views
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -56,18 +63,12 @@ export default function SavedViews({
   );
   const { listing, current, modified, command } = state;
   const pending = command?.status === "pending";
-  const {
-    panel,
-    select,
-    opener,
-    retry,
-    openPanel,
-    closePanel,
-    cancelPanel,
-    recordFocus,
-    recordBlur,
-  } = usePanelFocus({ pending, hasView: current !== null });
+  const { select, retry, recordOpener, restoreFocus, recordFocus, recordBlur } =
+    usePanelFocus({ pending });
   const baseId = useId();
+  const saveAsDialog = useRef<HTMLDialogElement>(null);
+  const renameDialog = useRef<HTMLDialogElement>(null);
+  const removeDialog = useRef<HTMLDialogElement>(null);
 
   const listed = listing.status === "ready";
   const conflicted =
@@ -76,19 +77,39 @@ export default function SavedViews({
     command.outcome.status === "conflict";
   const selectId = `${baseId}-view`;
   const modifiedId = `${baseId}-modified`;
+  const saveAsId = `${baseId}-save-as`;
+  const renameId = `${baseId}-rename`;
+  const removeId = `${baseId}-remove`;
   const unreadable = state.unreadable.length;
 
-  const submitName = async (name: string): Promise<string | null> => {
-    const outcome = await (panel === "rename"
-      ? views.rename(name)
-      : views.saveAs(name));
+  /** Why a name was refused, or null; a taken name closes its dialog. */
+  const answerName = async (
+    answer: Promise<ViewOutcome>,
+    dialog: HTMLDialogElement | null,
+  ): Promise<string | null> => {
+    const outcome = await answer;
     if (outcome.status === "invalid") {
       return messages.viewNameRefused(outcome.reason);
     }
     if (outcome.status === "saved") {
-      closePanel();
+      dialog?.close();
     }
     return null;
+  };
+
+  const handleSaveAs = (name: string): Promise<string | null> =>
+    answerName(views.saveAs(name), saveAsDialog.current);
+
+  const handleRename = (name: string): Promise<string | null> =>
+    answerName(views.rename(name), renameDialog.current);
+
+  const handleRemove = (): void => {
+    void views.remove().then((outcome) => {
+      // A removed view takes its dialog with it; the focus is rescued.
+      if (outcome.status !== "removed") {
+        removeDialog.current?.close();
+      }
+    });
   };
 
   return (
@@ -162,27 +183,27 @@ export default function SavedViews({
             <Button
               type="button"
               disabled={pending || !listed}
-              onClick={(event) => {
-                openPanel("save-as", event.currentTarget);
-              }}
+              commandfor={saveAsId}
+              command="show-modal"
+              onClick={recordOpener}
             >
               {messages.saveViewAs}
             </Button>
             <Button
               type="button"
               disabled={pending || current === null || !listed}
-              onClick={(event) => {
-                openPanel("rename", event.currentTarget);
-              }}
+              commandfor={renameId}
+              command="show-modal"
+              onClick={recordOpener}
             >
               {messages.renameView}
             </Button>
             <Button
               type="button"
               disabled={pending || current === null}
-              onClick={(event) => {
-                openPanel("remove", event.currentTarget);
-              }}
+              commandfor={removeId}
+              command="show-modal"
+              onClick={recordOpener}
             >
               {messages.deleteView}
             </Button>
@@ -199,50 +220,46 @@ export default function SavedViews({
               </Button>
             ) : null}
           </div>
-          {panel === "save-as" ? (
-            <NameForm
-              key="save-as"
-              label={messages.saveAsForm}
-              submit={messages.submitSaveAs}
-              nameLabel={messages.viewName}
-              cancel={messages.cancel}
-              initial=""
-              pending={pending}
-              onSubmit={submitName}
-              onCancel={cancelPanel}
-            />
-          ) : null}
-          {panel === "rename" && current !== null ? (
-            <NameForm
-              key={`rename:${current.id}`}
-              label={messages.renameForm(current.name)}
-              submit={messages.submitRename}
-              nameLabel={messages.viewName}
-              cancel={messages.cancel}
-              initial={current.name}
-              pending={pending}
-              onSubmit={submitName}
-              onCancel={cancelPanel}
-            />
-          ) : null}
-          {panel === "remove" && current !== null ? (
-            <DeleteConfirm
-              question={messages.deleteForm(current.name)}
-              submit={messages.submitDelete}
-              cancel={messages.cancel}
-              pending={pending}
-              onSubmit={() => {
-                void views.remove().then((outcome) => {
-                  closePanel(
-                    outcome.status === "removed"
-                      ? select.current
-                      : opener.current,
-                  );
-                });
-              }}
-              onCancel={cancelPanel}
-            />
-          ) : null}
+          <NameForm
+            ref={saveAsDialog}
+            id={saveAsId}
+            label={messages.saveAsForm}
+            submit={messages.submitSaveAs}
+            nameLabel={messages.viewName}
+            cancel={messages.cancel}
+            initial=""
+            pending={pending}
+            onSubmit={handleSaveAs}
+            onClose={restoreFocus}
+          />
+          {current === null ? null : (
+            <>
+              <NameForm
+                key={`rename:${current.id}`}
+                ref={renameDialog}
+                id={renameId}
+                label={messages.renameForm(current.name)}
+                submit={messages.submitRename}
+                nameLabel={messages.viewName}
+                cancel={messages.cancel}
+                initial={current.name}
+                pending={pending}
+                onSubmit={handleRename}
+                onClose={restoreFocus}
+              />
+              <DeleteConfirm
+                key={`remove:${current.id}`}
+                ref={removeDialog}
+                id={removeId}
+                question={messages.deleteForm(current.name)}
+                submit={messages.submitDelete}
+                cancel={messages.cancel}
+                pending={pending}
+                onSubmit={handleRemove}
+                onClose={restoreFocus}
+              />
+            </>
+          )}
           <p role="status" className="status">
             {describeViewStatus(command, modified, messages)}
           </p>

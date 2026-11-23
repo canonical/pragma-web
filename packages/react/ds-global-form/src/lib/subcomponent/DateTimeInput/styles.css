@@ -16,14 +16,31 @@
       display: none;
     }
 
-    /* NOTE (design review) — two native-<input type="datetime-local"> limits
+    &,
+    &::-webkit-datetime-edit-text,
+    &::-webkit-datetime-edit-month-field,
+    &::-webkit-datetime-edit-day-field,
+    &::-webkit-datetime-edit-year-field,
+    &::-webkit-datetime-edit-hour-field,
+    &::-webkit-datetime-edit-minute-field,
+    &::-webkit-datetime-edit-ampm-field {
+      color: var(--form-input-color-mask);
+    }
+
+    &:valid,
+    &:valid::-webkit-datetime-edit-text,
+    &:valid::-webkit-datetime-edit-month-field,
+    &:valid::-webkit-datetime-edit-day-field,
+    &:valid::-webkit-datetime-edit-year-field,
+    &:valid::-webkit-datetime-edit-hour-field,
+    &:valid::-webkit-datetime-edit-minute-field,
+    &:valid::-webkit-datetime-edit-ampm-field {
+      color: var(--form-input-color);
+    }
+
+    /* NOTE (design review) — native-<input type="datetime-local"> limit
      * parked for Diana:
-     * 1. "Suggested" format text → muted: NOT implementable in pure CSS. No
-     *    placeholder attribute (so `:placeholder-shown` never matches), and
-     *    `::-webkit-datetime-edit` colours the whole edit region — mask AND typed
-     *    value — with no empty-state selector, and Firefox ignores it. Needs a
-     *    custom (non-native) control or a JS empty-state hook.
-     * 2. Calendar/clock indicator → pragma icon: no calendar/clock glyph exists in
+     * Calendar/clock indicator → pragma icon: no calendar/clock glyph exists in
      *    @canonical/ds-assets to mask onto `::-webkit-calendar-picker-indicator`,
      *    and that pseudo-element is WebKit/Chromium-only (Firefox draws its own,
      *    unstyleable). Needs a new ds-assets glyph + Chrome/Safari-only styling, or

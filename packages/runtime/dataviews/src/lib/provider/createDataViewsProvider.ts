@@ -15,8 +15,9 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
-  SetOperator,
+  QueryClearPath,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -179,8 +180,8 @@ export default function createDataViewsProvider<
   const transitions = createChannel<Transition | null>(null);
   const history = resolveHistoryPolicy(config.history);
   const {
-    refusals,
-    command,
+    listRefusals,
+    applyCommand,
     adopt,
     refresh: issueRefresh,
   } = createQueryCommands({
@@ -205,14 +206,18 @@ export default function createDataViewsProvider<
     collection,
     capabilities,
     state: protectChannel(state),
-    refusals,
-    setPredicate: (
-      predicate: Predicate,
-      replaces?: SetOperator,
-      history?: HistoryMode,
-    ) => command({ kind: "setPredicate", predicate, replaces }, history),
-    removePredicate: (field: string, operator: PredicateOperator) =>
-      command({ kind: "removePredicate", field, operator }),
+    listRefusals,
+    setPredicate: (predicate: Predicate, nth?: number, history?: HistoryMode) =>
+      applyCommand({ kind: "setPredicate", predicate, nth }, history),
+    removePredicate: (
+      field: string,
+      operator: PredicateOperator,
+      nth?: number,
+    ) => applyCommand({ kind: "removePredicate", field, operator, nth }),
+    editPredicates: (
+      remove: readonly PredicateRef[],
+      add: readonly Predicate[],
+    ) => applyCommand({ kind: "editPredicates", remove, add }),
     refresh: issueRefresh,
     adopt,
     view: protectChannel(openView),
@@ -251,11 +256,11 @@ export default function createDataViewsProvider<
       );
     },
     complete,
-    applicability(field: string, row: TRow): Applicability {
-      return recordTyping?.applicability(field, row) ?? "applies";
+    readApplicability(field: string, row: TRow): Applicability {
+      return recordTyping?.readApplicability(field, row) ?? "applies";
     },
-    recordType(id: string): string | null {
-      return recordTyping?.recordType(id) ?? null;
+    readRecordType(id: string): string | null {
+      return recordTyping?.readRecordType(id) ?? null;
     },
   };
 
@@ -318,7 +323,7 @@ export default function createDataViewsProvider<
   let before = coordinator.state;
   const observation = observePorts({
     ports,
-    afterStart() {
+    runAfterStart() {
       const { pendingRequestId, result } = coordinator.state;
       if (
         pendingRequestId === null &&
@@ -356,13 +361,16 @@ export default function createDataViewsProvider<
       });
     },
     navigateWindow: (window: WindowNavigation) =>
-      command({ kind: "navigateWindow", ...window }),
-    setSort: (sort: readonly SortTerm[]) => command({ kind: "setSort", sort }),
-    setSearch: (search: string) => command({ kind: "setSearch", search }),
+      applyCommand({ kind: "navigateWindow", ...window }),
+    setSort: (sort: readonly SortTerm[]) =>
+      applyCommand({ kind: "setSort", sort }),
+    setSearch: (search: string) => applyCommand({ kind: "setSearch", search }),
+    clear: (paths: readonly [QueryClearPath, ...QueryClearPath[]]) =>
+      applyCommand({ kind: "clear", paths }),
     setGroup: (group: readonly GroupTerm[]) =>
-      command({ kind: "setGroup", group }),
+      applyCommand({ kind: "setGroup", group }),
     setCollapsed: (collapsed: readonly GroupPath[]) =>
-      command({ kind: "setCollapsed", collapsed }),
+      applyCommand({ kind: "setCollapsed", collapsed }),
     refresh(): void {
       // A withheld query is never asked for: its rows would be wider than
       // the link asked for.
@@ -374,10 +382,10 @@ export default function createDataViewsProvider<
       // holds has published before this returns.
       run.completePending();
     },
-    refusals,
+    listRefusals,
     runAction,
     observe(): () => void {
-      // What the state was before the ports started, for `afterStart`.
+      // What the state was before the ports started, for `runAfterStart`.
       before = coordinator.state;
       return observation.observe();
     },

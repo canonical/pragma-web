@@ -13,7 +13,7 @@ type OwnProps<TRow extends object> = {
   /** Whether the row is selected, as the row itself reads it. */
   readonly selected: boolean;
   /** The record's name, which the checkbox's name is built from. */
-  readonly rowLabel: (row: TRow, rowId: string) => string;
+  readonly getRowLabel: (row: TRow, rowId: string) => string;
 };
 
 /**

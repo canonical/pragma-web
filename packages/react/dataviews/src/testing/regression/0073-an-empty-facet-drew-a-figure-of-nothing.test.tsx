@@ -18,7 +18,7 @@ const answer = (
   values: readonly { value: string; count: { kind: "exact"; value: number } }[],
 ): void => {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: createPage({
         rows: [buildMachine("m-1", "alpha")],

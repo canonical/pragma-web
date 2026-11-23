@@ -1,7 +1,8 @@
 import { createPage, type Facet } from "@canonical/dataviews-core";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import buildMachine from "./buildMachine.js";
-import type { Machine, ManualSource } from "./types.js";
+import type { Machine } from "./types.js";
 
 /**
  * Answer a manual source's latest request with one machine and these facets:
@@ -14,7 +15,7 @@ export default function deliverFacets(
   facets: Readonly<Record<string, Facet>>,
 ): void {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: createPage({
         rows: [buildMachine("m-1", "alpha")],

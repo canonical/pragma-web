@@ -34,9 +34,9 @@ describe("DataViews.Pagination", () => {
       </DataViews>,
     );
     // The root observed the provider, which asked for the window it started on.
-    expect(source.latest().request.window).toEqual(firstOfTwo);
+    expect(source.readLatest().request.window).toEqual(firstOfTwo);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
@@ -55,7 +55,10 @@ describe("DataViews.Pagination", () => {
       page: 2,
     });
     // The bar inside the root observes too; one run answers both.
-    expect(source.latest().request.window).toEqual({ ...firstOfTwo, page: 2 });
+    expect(source.readLatest().request.window).toEqual({
+      ...firstOfTwo,
+      page: 2,
+    });
     expect(source.calls).toHaveLength(2);
   });
 
@@ -72,7 +75,7 @@ describe("DataViews.Pagination", () => {
       </DataViews>,
     );
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],

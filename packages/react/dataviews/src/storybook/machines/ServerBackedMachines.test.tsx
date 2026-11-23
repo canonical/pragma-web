@@ -18,4 +18,14 @@ describe("ServerBackedMachines", () => {
     expect(await screen.findAllByRole("row")).toHaveLength(6);
     expect(table).toHaveAttribute("aria-busy", "false");
   });
+
+  it("speaks the messages given", () => {
+    render(
+      <ServerBackedMachines
+        source={createMachineSource}
+        messages={{ filters: "Filtres" }}
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Filtres" })).toBeInTheDocument();
+  });
 });

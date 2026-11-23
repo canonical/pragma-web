@@ -1,0 +1,58 @@
+name: Propose moving a component to a higher tier (upstream)
+description: A component built for one product is needed by others and should move up a tier.
+labels:
+  - "Type: tier promotion"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when a block built for one product or tier is needed by others.
+
+        - Nothing similar exists yet: [propose a new UI block](https://github.com/canonical/pragma-web/issues/new?template=02-propose-ui-block.yml).
+  - type: input
+    id: block
+    attributes:
+      label: UI block
+    validations:
+      required: true
+  - type: input
+    id: current-tier
+    attributes:
+      label: Current tier
+      description: For example Apps, Sites, Stores, or a product such as apps/lxd.
+      placeholder: apps/lxd
+    validations:
+      required: true
+  - type: input
+    id: target-tier
+    attributes:
+      label: Target tier
+      description: A higher tier has more consumers and a stricter review. For example Global, Apps, Sites or Stores.
+      placeholder: Apps
+    validations:
+      required: true
+  - type: textarea
+    id: consumers
+    attributes:
+      label: Other products that need it
+      description: Each product that needs it, with a link to where it would be used. A block moves up a tier only when more than one product needs it.
+    validations:
+      required: true
+  - type: textarea
+    id: differences
+    attributes:
+      label: Differences between products
+      description: Variants, behaviour or styling that differ between products, and how a shared version would handle them. Used to scope the move.
+  - type: input
+    id: implementation
+    attributes:
+      label: Link to the current implementation
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

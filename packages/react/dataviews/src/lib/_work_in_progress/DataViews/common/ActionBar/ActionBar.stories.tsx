@@ -1,0 +1,337 @@
+import {
+  type ActionCapabilities,
+  createArraySource,
+  type Source,
+} from "@canonical/dataviews-core";
+import { Button, type ButtonProps } from "@canonical/react-ds-global";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import type { ReactElement, ReactNode } from "react";
+import { expect, userEvent, waitFor, within } from "storybook/test";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../../../storybook/decorators/index.js";
+import {
+  machineCollection,
+  storyMachines,
+} from "../../../../../storybook/machines/fixtures.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
+import type { Machine } from "../../../../../storybook/machines/types.js";
+import { useDataViewsValue } from "../../../../hooks/index.js";
+import type { DataTableColumn } from "../../../DataTable/index.js";
+import { useDataViews } from "../../hooks/index.js";
+import DataViews from "../../Provider.js";
+import Pagination from "../Pagination/Pagination.js";
+import Component from "./ActionBar.js";
+
+const meta = {
+  title: "_work_in_progress/DataViews/ActionBar",
+  component: Component,
+  decorators: [withAppScope],
+} satisfies Meta<typeof Component>;
+
+export default meta;
+type Story = StoryObj<typeof Component>;
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "owner", header: "Owner" },
+];
+
+/**
+ * A source that can archive and delete machines. Both actions take the
+ * machines out of the collection, and every live request delivers again.
+ */
+const createManagedSource = (): Source<Machine> => {
+  let remaining: readonly Machine[] = storyMachines;
+  const overAnyRows: ActionCapabilities = { targets: "explicit", limit: null };
+  const managed = createArraySource<Machine>({
+    rows: remaining,
+    collection: machineCollection,
+    actions: { archive: overAnyRows, delete: overAnyRows },
+    runAction: async ({ targets }) => {
+      const ids = targets.kind === "explicit" ? targets.ids : [];
+      remaining = remaining.filter((row) => !ids.includes(row.id));
+      managed.setRows(remaining);
+      return ids.map((target) => ({
+        target,
+        status: "succeeded" as const,
+      }));
+    },
+  });
+  return managed;
+};
+
+/**
+ * One action over the selection: pressed, it runs through the provider,
+ * which captures the selection as its targets, calls the source's action
+ * and removes the targets that succeed from the selection.
+ */
+function SelectionAction({
+  action,
+  ...button
+}: Omit<ButtonProps, "onClick"> & {
+  readonly action: string;
+}): ReactElement {
+  const { runAction } = useDataViews(machineCollection);
+  return (
+    <Button
+      {...button}
+      type="button"
+      importance="tertiary"
+      onClick={() => {
+        // Targets left out: the action addresses the selection.
+        void runAction({ action });
+      }}
+    />
+  );
+}
+
+/**
+ * Render the story inside a root over a source that can archive and delete
+ * the machines, five to a page, with the given machines selected.
+ */
+const withManagedMachines = (select: readonly string[] = []): Decorator =>
+  withMachineRoot({
+    source: createManagedSource,
+    query: "page=1&size=5",
+    prepare: (built) => {
+      built.selection.add(select);
+    },
+  });
+
+/** The table, the action bar and the pagination bar, inside the story's root. */
+function ManagedMachines({
+  indicator,
+}: {
+  readonly indicator?: ReactNode;
+}): ReactElement {
+  return (
+    <>
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        selectable
+        getRowLabel={(row) => String(row["name"])}
+      />
+      <Component indicator={indicator}>
+        <SelectionAction action="archive">Archive</SelectionAction>
+        <SelectionAction
+          action="delete"
+          anticipation="destructive"
+          icon="delete"
+        >
+          Delete
+        </SelectionAction>
+      </Component>
+      <Pagination sizes={[5, 10]} />
+    </>
+  );
+}
+
+const selectionActionCode = `const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "owner", header: "Owner" },
+];
+
+// Pressed, it runs through the provider, which captures the selection as
+// its targets, runs the source's action and removes the ones that succeed.
+function SelectionAction({
+  action,
+  ...button
+}: Omit<ButtonProps, "onClick"> & { action: string }) {
+  const { runAction } = useDataViews(machineCollection);
+  return (
+    <Button
+      {...button}
+      type="button"
+      importance="tertiary"
+      onClick={() => {
+        // Targets left out: the action addresses the selection.
+        void runAction({ action });
+      }}
+    />
+  );
+}`;
+
+/** A story's consumer code: the collection, its action bar and its actions. */
+const spellActionsCode = ({
+  prepare,
+  indicator = "",
+  declarations = "",
+}: {
+  readonly prepare?: string | undefined;
+  readonly indicator?: string | undefined;
+  readonly declarations?: string | undefined;
+} = {}) =>
+  showConsumerCode({
+    parts: [
+      "DataTable",
+      "DataViews",
+      "type DataTableColumn",
+      "useDataViews",
+      ...(declarations === "" ? [] : ["useDataViewsValue"]),
+    ],
+    imports: `import { Button, type ButtonProps } from "@canonical/react-ds-global";
+import { archiveMachines, machineCollection, machines } from "./machines.js";`,
+    declarations: `${selectionActionCode}${declarations}`,
+    // Spelled relative to the `source:` line it follows, as the default is.
+    source: `createArraySource({
+  rows: machines,
+  collection: machineCollection,
+  // What each operation may address; nothing else can be run.
+  actions: {
+    archive: { targets: "explicit", limit: null },
+    delete: { targets: "explicit", limit: null },
+  },
+  // Resolves with one outcome per target: { target, status }.
+  runAction: ({ action, targets }) => archiveMachines(action, targets),
+})`,
+    query: "page=1&size=5",
+    prepare,
+    render: `<DataViews provider={provider}>
+  <DataTable
+    provider={provider}
+    columns={columns}
+    label="Machines"
+    selectable
+    getRowLabel={(row) => row.name}
+  />
+  <DataViews.ActionBar${indicator}>
+    <SelectionAction action="archive">Archive</SelectionAction>
+    <SelectionAction action="delete" anticipation="destructive" icon="delete">
+      Delete
+    </SelectionAction>
+  </DataViews.ActionBar>
+  <DataViews.Pagination sizes={[5, 10]} />
+</DataViews>`,
+  });
+
+const selectTwo = `provider.selection.add(["m-02", "m-06"]);`;
+
+/**
+ * Nothing selected: the table and the pagination bar, and no action bar. It
+ * appears with the first selection.
+ */
+export const NothingSelected: Story = {
+  parameters: spellActionsCode(),
+  decorators: [withManagedMachines()],
+  render: () => <ManagedMachines />,
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Showing 1–5 out of 12 rows",
+      ),
+    );
+    await expect(canvas.queryByRole("group")).toBeNull();
+  },
+};
+
+/**
+ * Two selected: the bar counts them, offers the actions placed in it — a
+ * destructive one in the Button's destructive colour — and a deselect named
+ * with what it clears. It renders on the design system's contrasted surface.
+ */
+export const TwoSelected: Story = {
+  parameters: spellActionsCode({ prepare: selectTwo }),
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines />,
+  play: async ({ canvas }) => {
+    const bar = await canvas.findByRole("group", { name: "Selection actions" });
+    await expect(bar).toHaveTextContent("2 selected");
+    await expect(
+      canvas.getByRole("button", { name: "Deselect 2 rows" }),
+    ).toBeEnabled();
+    await expect(canvas.getByRole("button", { name: "Archive" })).toBeEnabled();
+  },
+};
+
+/**
+ * Selected across pages: birch is on this page and ironwood on the second.
+ * The count is the whole selection, not the rows on screen.
+ */
+export const SelectedAcrossPages: Story = {
+  parameters: spellActionsCode({
+    prepare: `provider.selection.add(["m-02", "m-09"]);`,
+  }),
+  decorators: [withManagedMachines(["m-02", "m-09"])],
+  render: () => <ManagedMachines />,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("checkbox", { name: "Select birch.example.com" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole("group", { name: "Selection actions" }),
+    ).toHaveTextContent("2 selected");
+  },
+};
+
+/** A count that names what is selected, following the selection. */
+function MachinesSelected(): ReactElement {
+  const { selection } = useDataViews(machineCollection);
+  const count = useDataViewsValue(selection.state).ids.size;
+  return (
+    <span role="status" className="indicator">
+      {`${count} ${count === 1 ? "machine" : "machines"} selected`}
+    </span>
+  );
+}
+
+const machinesSelectedCode = `
+
+// Follows the selection, and announces it as the default count does.
+function MachinesSelected() {
+  const { selection } = useDataViews(machineCollection);
+  const count = useDataViewsValue(selection.state).ids.size;
+  return (
+    <span role="status" className="indicator">
+      {\`\${count} \${count === 1 ? "machine" : "machines"} selected\`}
+    </span>
+  );
+}`;
+
+/**
+ * A caller's indicator: a count that names what is selected. It reads the
+ * selection itself, and announces it as the default count does. When the
+ * persistent selection panel ships, its trigger takes this place.
+ */
+export const CustomIndicator: Story = {
+  parameters: spellActionsCode({
+    prepare: selectTwo,
+    indicator: " indicator={<MachinesSelected />}",
+    declarations: machinesSelectedCode,
+  }),
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines indicator={<MachinesSelected />} />,
+  play: async ({ canvas }) => {
+    const bar = await canvas.findByRole("group", {
+      name: "Selection actions",
+    });
+    await expect(within(bar).getByRole("status")).toHaveTextContent(
+      "2 machines selected",
+    );
+  },
+};
+
+/**
+ * Archived: two machines were selected and Archive was pressed. The source
+ * archived both, they left the collection and the selection, and with nothing
+ * left selected the bar went with them. Ten machines remain.
+ */
+export const Archived: Story = {
+  parameters: spellActionsCode({ prepare: selectTwo }),
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines />,
+  play: async ({ canvas }) => {
+    const archive = await canvas.findByRole("button", { name: "Archive" });
+    await userEvent.click(archive);
+    await waitFor(() => expect(canvas.queryByRole("group")).toBeNull());
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Showing 1–5 out of 10 rows",
+      ),
+    );
+  },
+};

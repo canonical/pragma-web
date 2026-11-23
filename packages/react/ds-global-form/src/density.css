@@ -48,12 +48,6 @@
     min-block-size: var(--density-box-height);
     align-items: flex-start;
     justify-content: flex-start;
-    /* Kill the UA BOTTOM padding only. Do NOT zero padding-block-start here: this
-       selector is more specific (0,4,0) than the placement rule below (0,2,0), so a
-       `padding-block: 0` shorthand would out-specify and WIPE the placement's
-       `padding-block-start: var(--space-before)` — leaving the label pinned to the
-       box top (off the baseline). The placement rule owns the start. */
-    padding-block-end: 0;
 
     /* Body font tier — what `.p` used to supply. */
     font-size: var(--typography-text-primary-font-size);
@@ -105,18 +99,13 @@
    * so `.editorial` composes with density with no specificity war. `:is()` (not
    * `:where()`) still gives the control seat the specificity to beat a control's own
    * centring (e.g. the Button's `align-items: center`). */
-  /* Body font tier for the field label/description/error plus the toggle control
-     row (its own line metrics must match the label's so the control row centres
-     exactly), which lost `.p`. Scoped to just these (NOT the headings, which
-     keep their own tier). */
+  /* Body font tier for the field label plus the toggle control row (its own
+     line metrics must match the label's so the control row centres exactly),
+     which lost `.p`. The description and the error read the secondary ramp,
+     so they stay out of this seat. Scoped to just these (NOT the headings,
+     which keep their own tier). */
   :is(.comfortable, .dense, .app, .site, .docs)
-    :is(
-      .ds.field-label,
-      .ds.field-description,
-      .ds.field-error,
-      .ds.field-toggle,
-      .ds.option
-    ) {
+    :is(.ds.field-label, .ds.field-toggle, .ds.option) {
     font-size: var(--typography-text-primary-font-size);
     font-family: var(--typography-text-primary-font-family);
   }
@@ -212,12 +201,15 @@
     block-size: auto;
     min-block-size: 0;
     padding-block-end: var(--seat-after);
-    /* Stretch (not the box rule's flex-start): a prefix/suffix — the password's
-       reveal-toggle, the number's unit affix — spans the leaf's column and its
-       own `align-items: center` centres its icon on the TEXT, which is the
-       optical pairing (centring on the box would float it into the asymmetric
-       closing pad). The old fixed-height model needed flex-start to top-pin the
-       crushed leaf; the intrinsic leaf seats itself, so stretch is safe again. */
+    /* Stretch (not the box rule's flex-start): a prefix/suffix spans the
+       leaf's column. An affix that must pair with the VALUE takes the leaf's
+       own seat — the number input's unit slots read --seat-line-floored and
+       --seat-before in NumberInput/styles.css (end pad 0, like the leaf), so
+       their text rides the value's line box; a plain `align-items: center` on
+       the full stretch would float them above the seated text (the pad split
+       is asymmetric: seat-before ≠ seat-after). The old fixed-height model
+       needed flex-start to top-pin the crushed leaf; the intrinsic leaf
+       seats itself, so stretch is safe again. */
     align-items: stretch;
   }
   :is(.comfortable, .dense, .app, .site, .docs)

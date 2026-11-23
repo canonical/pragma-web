@@ -1,16 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import createSourceWithoutCores from "../../../../../storybook/machines/createSourceWithoutCores.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Filters.js";
 import type { DataViewsFiltersProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsFiltersProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/Filters",
@@ -25,10 +30,10 @@ const meta = {
       owner: "Owner",
     },
   },
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -51,18 +56,25 @@ const composition = `<DataViews provider={provider}>
 
 const parts = ["DataTable", "DataViews", "type DataTableColumn"];
 
-/** A composed collection: a root, its filters and its table. */
+/** A composed collection: a root, its filters and its table, in its words. */
 function FilteredMachines({
   options,
+  messages,
   ...args
-}: DataViewsFiltersProps & {
+}: StoryArgs & {
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
   const provider = useMachineProvider(options);
+  const words = pickStoryWords({ messages });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
     </DataViews>
   );
 }
@@ -88,7 +100,7 @@ const atLeastSixteenCores = "cores__gte=16";
  * applied, so every machine shows.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     render: composition,
@@ -107,7 +119,7 @@ export const Default: Story = {
  * not a draft of it — there is no second query to apply or keep in step.
  */
 export const ChoiceApplied: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: onlyFailed,
@@ -124,7 +136,7 @@ export const ChoiceApplied: Story = {
 
 /** A bound applied: machines with at least sixteen cores. */
 export const BoundApplied: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: atLeastSixteenCores,
@@ -143,6 +155,36 @@ export const BoundApplied: Story = {
   },
 };
 
+/** The query the provider starts on: two lower bounds on cores, both in force. */
+const twoLowerBounds = "cores__gte=16&cores__gte__1=4";
+
+/**
+ * Further restrictions applied: the link holds two lower bounds on cores,
+ * and both restrict, so a machine must meet each. The bound's input edits
+ * one; the other is shown read-only after it, with a Clear that removes it
+ * alone. Without scripting, the Clear is a real link and a hidden input
+ * carries the restriction through the form.
+ */
+export const FurtherConjunctsApplied: Story = {
+  parameters: showConsumerCode({
+    parts,
+    declarations: columnsCode,
+    query: twoLowerBounds,
+    render: composition,
+  }),
+  render: renderWith({ query: twoLowerBounds }),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByLabelText("Cores from")).toHaveValue(16);
+    await expect(canvas.getByText("Cores from 4")).toBeVisible();
+    await waitFor(() => expect(recordRows(canvas)).toBe(4));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Clear Cores from 4" }),
+    );
+    await expect(canvas.queryByText("Cores from 4")).toBeNull();
+    await expect(canvas.getByLabelText("Cores from")).toHaveValue(16);
+  },
+};
+
 /**
  * An invalid edit keeps the restriction: sixteen cores was applied, then the
  * bound was edited below the schema's minimum of one. The edit is refused
@@ -152,7 +194,7 @@ export const BoundApplied: Story = {
  * filtering the rows.
  */
 export const InvalidEditKeepsTheRestriction: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: atLeastSixteenCores,
@@ -180,7 +222,7 @@ export const InvalidEditKeepsTheRestriction: Story = {
  * does nothing.
  */
 export const UndeclaredField: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     coreTypes: ["Source"],
     imports: `import { type Machine, machineCollection, machines } from "./machines.js";`,
@@ -229,7 +271,7 @@ const facets = ["status", "cores"] as const;
  * and each end of the range its bound.
  */
 export const CountsBesideOptions: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     facets,
@@ -259,7 +301,7 @@ const noneFailed = "status__isNone=failed";
  * not failed, shown as the none-of set. It moves back to any-of in one step.
  */
 export const NoneOfApplied: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: noneFailed,
@@ -295,7 +337,7 @@ const primaryComposition = `<DataViews provider={provider}>
  */
 export const PrimaryFilters: Story = {
   args: { primary: ["status"] },
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: atLeastSixteenCores,

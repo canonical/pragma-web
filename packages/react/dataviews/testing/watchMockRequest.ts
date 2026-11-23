@@ -14,10 +14,7 @@ export default function watchMockRequest(
 ): MockRequestWatch {
   let followed: string | null = null;
   let ended = false;
-  let arrive = () => {};
-  const received = new Promise<void>((resolve) => {
-    arrive = resolve;
-  });
+  const { promise: received, resolve: arrive } = Promise.withResolvers<void>();
   const onStart = ({
     request,
     requestId,

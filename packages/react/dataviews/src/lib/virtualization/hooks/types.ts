@@ -19,7 +19,7 @@ export type UseVirtualRowsResult = {
    * The ref one entry's row attaches by, to be measured and to keep focus.
    * The same function for as long as the row is mounted.
    */
-  readonly refFor: (id: string) => EntryPlacement["ref"];
+  readonly readRowRef: (id: string) => EntryPlacement["ref"];
   /** Keeps the row focus enters mounted, wherever the viewport goes. */
   readonly onFocus: (event: FocusEvent<HTMLDivElement>) => void;
   /** Lets it go when focus leaves the body, not when it leaves the window. */

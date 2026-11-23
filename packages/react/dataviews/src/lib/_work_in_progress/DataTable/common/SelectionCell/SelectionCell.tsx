@@ -10,15 +10,13 @@ const componentCssClassName = "ds data-table-selection-cell";
  * One row's selection checkbox: the design system's checkbox backed by the
  * provider's selection, named after the record rather than its position.
  *
- * `import { DataTable } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_table-selection_cell
  */
 export default function SelectionCell<TRow extends object>({
   provider,
   channels,
   selected,
-  rowLabel,
+  getRowLabel,
   className,
   ...rest
 }: SelectionCellProps<TRow>): ReactElement {
@@ -33,7 +31,7 @@ export default function SelectionCell<TRow extends object>({
     >
       <CheckboxInput
         checked={selected}
-        aria-label={messages.selectRow(rowLabel(record, channels.id))}
+        aria-label={messages.selectRow(getRowLabel(record, channels.id))}
         onChange={() => {
           provider.selection.toggle(channels.id);
         }}

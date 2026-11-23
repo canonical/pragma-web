@@ -13,6 +13,8 @@ import type { DataViewsDataChartWithTableProps } from "./types.js";
  * Not exported from the package root, nor placed on `DataViews`: a
  * work-in-progress prototype, imported from its own module.
  *
+ * @implements ds:apps.pattern.data_chart_with_table
+ *
  * @experimental Pre-release: a work-in-progress prototype, not admitted to
  * the package root; its shape may change or it may be withdrawn.
  */

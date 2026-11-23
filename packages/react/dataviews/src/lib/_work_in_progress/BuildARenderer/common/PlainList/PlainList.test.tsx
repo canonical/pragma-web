@@ -33,6 +33,6 @@ describe("PlainList", () => {
     );
     expect(source.calls).toHaveLength(1);
     view.unmount();
-    expect(source.latest().releases).toBe(1);
+    expect(source.readLatest().releases).toBe(1);
   });
 });

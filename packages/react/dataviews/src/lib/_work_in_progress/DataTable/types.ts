@@ -93,11 +93,11 @@ type OwnProps<
    * identity. Written as a lambda it costs nothing: the table always calls
    * the latest one and never re-renders a row because the function is new.
    */
-  readonly rowLabel?: (row: TRow, rowId: string) => string;
+  readonly getRowLabel?: (row: TRow, rowId: string) => string;
   /**
    * Replaces the messages' text of a status: no rows to render, or rows that
    * no longer answer the current query. The status is the core's, decided
-   * once from the collection's state. Held the same way as `rowLabel`
+   * once from the collection's state. Held the same way as `getRowLabel`
    * while rows show alone: the latest one is always called, and its
    * identity alone never re-renders a row. While a status shows, the newest
    * renderer is drawn at once.

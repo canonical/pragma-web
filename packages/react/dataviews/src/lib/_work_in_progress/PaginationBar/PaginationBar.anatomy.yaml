@@ -11,13 +11,13 @@
 # Names — one per part, the same in the design, the DOM and here:
 #   pagination bar  design "Table pagination"   graph "DataTable.PaginationBar"
 #                                         DOM `ds data-table-pagination-bar`
-#   leading group   design "Frame 1062"   DOM `.leading`
+#   sizing group    design "Frame 1062"   DOM `.sizing`
 #   page size       design "Items per page:" + "Pagination dropdown"
 #                                         DOM `.page-size`, a GET form
 #   divider         design "Rectangle 1"  DOM `.divider`
 #   result summary  design "Table pagination item indicator"
 #                                         DOM `.summary`
-#   trailing group  design "Frame 1067"   DOM `.trailing`
+#   paging group    design "Frame 1067"   DOM `.paging`
 #   page control    design "Pagination dropdown" + "Total page amount wrapper"
 #                                         DOM `.page`, a GET form
 #   submit          —                     DOM `.submit`, one per form
@@ -35,21 +35,8 @@
 # (`density/padding-inline`, `--density-padding-inline`), as the table's cells
 # do; the DSL cannot name a channel, so the path does and this note records it.
 #
-# The stylesheet binds each of these through the bar's own component tokens,
-# `--data-table-pagination-bar-*`, read by every rule. The static bindings
-# are declared once on the root scope: gap (`dimension/100`), gap-control
-# (`dimension/050`), inset-inline (`dimension/100`), border-width (`dimension/stroke/thickness/medium`),
-# border-color and divider-color (`color/border/muted`), font-family, -size
-# and -weight (`typography/text/primary`), divider-inline-size
-# (`dimension/stroke/thickness/medium`), divider-block-size (`dimension/300`)
-# and control-padding-inline-end (`dimension/100`). The four that read a
-# channel are declared on the bar itself, where the channel is set —
-# padding-inline-start (the density channel), control-size
-# (`density/line-height-effective`), color-text and color-background (the
-# surface channel, falling back to `color/text` and `color/background`) — so
-# they follow the nearest density and surface rather than freezing at the
-# root. The DSL binds design tokens, not a component's own tier, so the
-# styles below name the design tokens and this note records the tier between.
+# The stylesheet binds each path through the bar's own
+# `--data-table-pagination-bar-*` tokens, all declared on the bar.
 #
 # The two selects are the design system's SelectInput, themed through the form
 # layer's own channels on the bar, never restyled:
@@ -89,7 +76,7 @@
 # (`size`, `page`) beside hidden controls carrying the rest of the applied
 # query and the location's other parameters, so a submission is the
 # destination the provider would have written; each form's submit control is
-# the baseline's, hidden once scripting is enabled. Every link is spelled by
+# the baseline's, hidden once the page hydrates. Every link is spelled by
 # the same encoder. Without a location there is no destination a link could
 # lead to, and the page controls are buttons only the enhancement drives,
 # marked `.scripted` and hidden until it runs.
@@ -133,8 +120,8 @@
 #   - The groups wrap onto two lines when the bar is too narrow for both;
 #     the DSL has no wrapping key.
 #   - Conditional display is deferred in the DSL. The submit controls show
-#     only while scripting is not enabled, and the `.scripted` page controls
-#     only once it is.
+#     until the page hydrates, and the `.scripted` page controls only once
+#     scripting is enabled.
 #
 # States:
 #   - first and previous are disabled on the first page; next is disabled
@@ -164,7 +151,7 @@
 #                       where it cannot. A focused control that becomes
 #                       unavailable hands the focus to the page select.
 #   submit              Named for what it applies ("Apply page size", "Go to
-#                       page"); reachable until scripting is enabled.
+#                       page"); reachable until the page hydrates.
 #   result summary      "Summary" (1.3.1, 4.1.3). A polite status: it changes
 #                       only when settled results change what it says, so a
 #                       background refresh with the same answer is silent.
@@ -187,7 +174,7 @@ node:
     appearance.border.top.color: color/border/muted
   edges:
     - node:
-        role: leading group
+        role: sizing group
         styles:
           layout.type: stack
           layout.direction: row
@@ -228,7 +215,7 @@ node:
       relation:
         cardinality: "1"
     - node:
-        role: trailing group
+        role: paging group
         styles:
           layout.type: stack
           layout.direction: row

@@ -18,7 +18,6 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import type { MouseEvent, RefObject, ToggleEvent } from "react";
-import type { AnnouncerHandle } from "../../../common/index.js";
 import type { ContextOptions, DataViewsProps } from "../types.js";
 
 /**
@@ -30,20 +29,15 @@ export type UseProviderStateProps<
   TRow extends object = RowRecord,
 > = Omit<DataViewsProps<TFields, TRow>, "children">;
 
-/**
- * What the root's state hook hands the root: the value its context carries,
- * and the ref its announcer's region is rendered with, which no part reads.
- */
-export type UseProviderStateResult = {
-  readonly value: ContextOptions;
-  readonly announcer: RefObject<AnnouncerHandle | null>;
-};
+/** What the root's state hook hands the root: the value its context carries. */
+export type UseProviderStateResult = ContextOptions;
 
 /** What a connected part reads off the enclosing root: its value. */
 export type UseDataViewsRootResult = ContextOptions;
 
 /** What the applied-search hook takes: the provider whose search it reads. */
 export type UseAppliedSearchProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -52,6 +46,7 @@ export type UseAppliedSearchResult = string;
 
 /** What the applied-sort hook takes: the provider whose ordering it reads. */
 export type UseAppliedSortProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -63,6 +58,7 @@ export type UseAppliedSortResult = readonly SortTerm[];
 
 /** What the restricted-fields hook takes: the provider whose query it reads. */
 export type UseRestrictedFieldsProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -101,9 +97,10 @@ export type UseMoreFiltersPinResult = {
 
 /** What the destination hook takes: the provider, and the query a state leads to. */
 export type UseDestinationProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
   /** The destination's query, from the applied state; held by identity. */
-  readonly destinationOf: (state: DataViewsState<object>) => Query;
+  readonly readDestination: (state: DataViewsState<object>) => Query;
 };
 
 /** What the destination hook returns: the spelled parameters, or null without a location. */
@@ -138,7 +135,7 @@ export type UseDataViewsResult<
   | "setGroup"
   | "setCollapsed"
   | "refresh"
-  | "refusals"
+  | "listRefusals"
   | "runAction"
 > & {
   /** This root's filter handles, one per field and legal operator. */

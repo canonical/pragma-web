@@ -9,7 +9,7 @@ function Detached(): ReactElement {
   useVirtualRows({
     entries: listDisplayEntries({ rowIds: ["a"], status: null }),
     estimatedRowHeight: 32,
-    model: { entries: [], ids: [], byId: () => undefined },
+    model: { entries: [], ids: [], findRecord: () => undefined },
     tracks: undefined,
   });
   return <div />;

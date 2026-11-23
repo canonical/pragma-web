@@ -2,6 +2,9 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
+/** Operating-system media preferences the `emulateMedia` command sets. */
+export type EmulatedMedia = { reducedMotion: "reduce" | "no-preference" };
+
 export default defineConfig({
   plugins: [svelte()],
   test: {
@@ -19,6 +22,13 @@ export default defineConfig({
               { browser: "firefox" },
               { browser: "webkit" },
             ],
+            commands: {
+              // Emulation is page-wide, so it reaches every test file running
+              // in parallel. Keep it to features no other test depends on.
+              emulateMedia: async ({ page }, media: EmulatedMedia) => {
+                await page.emulateMedia(media);
+              },
+            },
           },
           include: ["src/**/*.svelte.test.{js,ts}"],
           setupFiles: ["./vitest-setup-client.ts"],

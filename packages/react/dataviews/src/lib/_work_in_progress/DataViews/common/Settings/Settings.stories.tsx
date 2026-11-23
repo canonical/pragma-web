@@ -1,22 +1,27 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
+import type { ComponentProps, ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Settings.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = ComponentProps<typeof Component> & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/Settings",
   component: Component,
   decorators: [withAppScope],
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", hideable: false, sortable: true },
@@ -48,15 +53,16 @@ const arrangeForTheViewer = (provider: MachineProvider): void => {
   });
 };
 
-/** The table with its settings, over one root. */
+/** The table with its settings, over one root speaking `messages` when given. */
 function Collection({
   prepare,
-}: {
+  ...words
+}: StoryWords & {
   readonly prepare?: (provider: MachineProvider) => void;
 }): ReactElement {
   const provider = useMachineProvider({ prepare });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <DataViews.DataTable
         columns={columns}
         label="Machines"
@@ -73,12 +79,12 @@ function Collection({
  * always shown; the last column shown can never be hidden.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
-  render: () => <Collection />,
+  render: (args) => <Collection {...pickStoryWords(args)} />,
 };
 
 /**
@@ -87,12 +93,12 @@ export const Default: Story = {
  * Nothing is asked of the source: the rows are the same rows.
  */
 export const HideAColumn: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
-  render: () => <Collection />,
+  render: (args) => <Collection {...pickStoryWords(args)} />,
   play: async ({ canvas }) => {
     const trigger = canvas.getByRole("button", { name: "Table settings" });
     await userEvent.click(trigger);
@@ -118,7 +124,7 @@ export const HideAColumn: Story = {
  * Hide; Reset table settings returns the declared arrangement.
  */
 export const ArrangedByTheViewer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
@@ -127,5 +133,7 @@ export const ArrangedByTheViewer: Story = {
 });`,
     render: renderCode,
   }),
-  render: () => <Collection prepare={arrangeForTheViewer} />,
+  render: (args) => (
+    <Collection {...pickStoryWords(args)} prepare={arrangeForTheViewer} />
+  ),
 };

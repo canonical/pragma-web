@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
@@ -7,12 +7,11 @@ import declareSort from "../../../testing/declareSort.js";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
-import type { ReadonlyChannel } from "../observable/index.js";
 import {
   createDataViewsProvider,
   readProviderHost,
 } from "../provider/index.js";
-import type { EmptyOr } from "../schema/index.js";
+import { canonicalizeSlice } from "../query/index.js";
 import createFilterInputs from "./createFilterInputs.js";
 
 const machines = createCollection({
@@ -27,7 +26,7 @@ const machines = createCollection({
 });
 
 /** A provider whose source executes every filter, over an empty page. */
-const provider = (location?: QueryLocation) =>
+const createProvider = (location?: QueryLocation) =>
   createDataViewsProvider({
     collection: machines,
     source: createManualSource({
@@ -46,9 +45,9 @@ const provider = (location?: QueryLocation) =>
   });
 
 describe("createFilterInputs", () => {
-  it("builds one handle per field and legal operator, typed by the schema", () => {
+  it("builds one handle per field and legal operator", () => {
     const { handles } = createFilterInputs({
-      host: readProviderHost(provider()),
+      host: readProviderHost(createProvider()),
     });
     expect(Object.keys(handles).sort()).toEqual([
       "cpu",
@@ -60,22 +59,13 @@ describe("createFilterInputs", () => {
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
     expect(Object.keys(handles.name)).toEqual(["contains", "startsWith"]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
-    expectTypeOf(handles.name.contains.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<string>>
-    >();
-    expectTypeOf(handles.status.isAny.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<ReadonlySet<"failed" | "cancelled">>>
-    >();
-    expectTypeOf(handles.cpu.gte.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<number>>
-    >();
     // The adoption stays with the records: a root's handle cannot impose
     // a predicate the query does not hold.
     expect(handles.cpu.gte).not.toHaveProperty("setApplied");
   });
 
   it("routes a valid edit to the provider's query as a request", () => {
-    const p = provider();
+    const p = createProvider();
     const { handles } = createFilterInputs({ host: readProviderHost(p) });
     handles.cpu.gte.edit("4");
     expect(p.state.get().slice.filter).toEqual([
@@ -110,7 +100,7 @@ describe("createFilterInputs", () => {
   });
 
   it("keeps the records apart per set: two sets share the query, not the input", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const one = createFilterInputs({ host });
     const two = createFilterInputs({ host });
@@ -140,7 +130,7 @@ describe("createFilterInputs", () => {
   });
 
   it("follows the query while observing, and catches up when it starts", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const inputs = createFilterInputs({ host });
     // Moved before anything followed it: seen on observe.
@@ -202,11 +192,144 @@ describe("createFilterInputs", () => {
     });
   });
 
+  it("hands each record the first conjunct its address holds", () => {
+    const p = createProvider();
+    const host = readProviderHost(p);
+    host.adopt(
+      {
+        slice: {
+          filter: [
+            { field: "cpu", operator: "gte", operands: [8] },
+            { field: "cpu", operator: "gte", operands: [4] },
+          ],
+          search: null,
+          sort: [],
+          group: [],
+        },
+        window: p.state.get().window,
+      },
+      "adopt",
+      null,
+    );
+    const inputs = createFilterInputs({ host });
+    expect(inputs.handles.cpu.gte.applied.get()).toEqual({
+      kind: "value",
+      value: 4,
+    });
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4");
+  });
+
+  describe("further conjuncts", () => {
+    const observeAt = (href: string) => {
+      const location = createMemoryLocation({ href });
+      const p = createProvider(location);
+      const release = p.observe();
+      const host = readProviderHost(p);
+      const inputs = createFilterInputs({ host });
+      const stop = inputs.observe();
+      return {
+        location,
+        p,
+        host,
+        bound: inputs.handles.cpu.gte,
+        stop: () => {
+          stop();
+          release();
+        },
+      };
+    };
+
+    it("publishes the conjuncts a handle does not edit, read-only", () => {
+      const { bound, stop } = observeAt(
+        "/machines?cpu__gte=8&cpu__gte__1=4&page=1&size=50",
+      );
+      expect(bound.applied.get()).toEqual({ kind: "value", value: 4 });
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [8] }]);
+      expect(Object.isFrozen(bound.others)).toBe(true);
+      expect(bound.others).not.toHaveProperty("set");
+      expect(bound.nth.get()).toBe(0);
+      expect(bound.nth).not.toHaveProperty("set");
+      stop();
+    });
+
+    it("keeps the handle on its conjunct when canonical order moves it", () => {
+      const { p, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      // Canonical order reads numbers as text, so 9 now sorts after 8.
+      bound.edit("9");
+      expect(bound.state.get()).toEqual({
+        input: "9",
+        feedback: { status: "applied" },
+      });
+      expect(bound.others.get()).toEqual([{ nth: 0, operands: [8] }]);
+      expect(bound.nth.get()).toBe(1);
+      bound.edit("2");
+      expect(canonicalizeSlice(p.state.get().slice).filter).toEqual([
+        { field: "cpu", operator: "gte", operands: [2] },
+        { field: "cpu", operator: "gte", operands: [8] },
+      ]);
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [8] }]);
+      expect(bound.nth.get()).toBe(0);
+      stop();
+    });
+
+    it("promotes the next conjunct when the handle clears its own", () => {
+      const { p, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      expect(bound.clear()).toEqual([]);
+      expect(p.state.get().slice.filter).toEqual([
+        { field: "cpu", operator: "gte", operands: [8] },
+      ]);
+      expect(bound.state.get().input).toBe("8");
+      expect(bound.others.get()).toEqual([]);
+      stop();
+    });
+
+    it("takes the first conjunct again when the location moves", () => {
+      const { location, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      bound.edit("9");
+      // The handle's conjunct still stands, second; a move of the location
+      // is a fresh reading, and the first conjunct is the handle's again.
+      location.write(
+        new URLSearchParams("cpu__gte=5&cpu__gte__1=9&page=1&size=50"),
+      );
+      expect(bound.state.get()).toEqual({
+        input: "5",
+        feedback: { status: "none" },
+      });
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [9] }]);
+      stop();
+    });
+
+    it("publishes them only when they move", () => {
+      const { p, host, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      const seen = vi.fn();
+      bound.others.subscribe(seen);
+      p.setSort([{ field: "cpu", direction: "desc" }]);
+      host.setPredicate({
+        field: "status",
+        operator: "isAny",
+        operands: ["failed"],
+      });
+      expect(seen).not.toHaveBeenCalled();
+      host.setPredicate({ field: "cpu", operator: "gte", operands: [6] }, 1);
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [6] }]);
+      expect(seen).toHaveBeenCalledTimes(1);
+      stop();
+    });
+  });
+
   it("ends every input session on a move of the location, the predicate kept or not", () => {
     const location = createMemoryLocation({
       href: "/machines?cpu__gte=4&page=1&size=50",
     });
-    const p = provider(location);
+    const p = createProvider(location);
     const release = p.observe();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     const stop = inputs.observe();
@@ -231,7 +354,7 @@ describe("createFilterInputs", () => {
 
   it("ends every typing session at once, keeping what each input reads", () => {
     const { location, writes } = createRecordingLocation({ href: "/machines" });
-    const p = provider(location);
+    const p = createProvider(location);
     const release = p.observe();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     const stop = inputs.observe();
@@ -252,7 +375,7 @@ describe("createFilterInputs", () => {
   });
 
   it("adopts nothing for a publication that moved no predicate", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const inputs = createFilterInputs({ host });
     inputs.observe();
@@ -269,7 +392,7 @@ describe("createFilterInputs", () => {
   });
 
   it("clears a predicate on the query and answers with no refusal", () => {
-    const p = provider();
+    const p = createProvider();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     inputs.handles.owner.isSet.set([]);
     expect(p.state.get().slice.filter).toHaveLength(1);

@@ -14,7 +14,7 @@ export type HiddenQueryFieldsProps = {
   /** The provider whose applied query the destination is spelled from. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
   /** The destination the form's submission reaches, from the applied state. */
-  readonly destinationOf: UseDestinationProps["destinationOf"];
+  readonly readDestination: UseDestinationProps["readDestination"];
   /** The names the form's own visible controls submit, left out here. */
   readonly omit: readonly string[];
 };

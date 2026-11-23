@@ -1,6 +1,7 @@
 {
   "extends": "@canonical/typescript-config-react",
   "compilerOptions": {
+    "lib": ["ES2023", "ES2024.Promise", "DOM"],
     "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,

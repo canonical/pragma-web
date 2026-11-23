@@ -34,4 +34,21 @@
       user-select: none;
     }
   }
+
+  /* Under a density context the unit text rides the SAME line box as the
+     value: the leaf's line-height and seat pads are already declared on the
+     wrapper by the composite seat (density.css), so the affixes read them
+     here. Their `align-items: center` then lands on the value's optical
+     centre — centring on the bare box would float the unit above the seated
+     text, because the pad split is asymmetric (seat-before ≠ seat-after).
+     Without a context class the unit spans carry `.p`, seated by the baseline
+     engine exactly like the input leaf. */
+  :is(.comfortable, .dense, .app, .site, .docs)
+    .ds.input.number
+    > :is(.prefix, .suffix) {
+    line-height: var(--seat-line-floored);
+    /* Top pad only, exactly like the leaf (its pad-end is 0 too): the affix
+       box then equals the leaf box, so it can never grow the wrapper. */
+    padding-block: var(--seat-before) 0;
+  }
 }

@@ -51,7 +51,12 @@ const moveTerm = (
  * reader already on a link keeps focus on the button that replaces it.
  * Deliberately rough: its design comes later.
  *
+ * @note Impure: moves the focus in layout effects, as a term leaves or
+ * scripts take over.
+ *
  * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views-sort_panel
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

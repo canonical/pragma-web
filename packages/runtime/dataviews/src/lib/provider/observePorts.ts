@@ -16,7 +16,7 @@ import type { PortsObservation, PortsObservationConfig } from "./types.js";
 export default function observePorts(
   config: PortsObservationConfig,
 ): PortsObservation {
-  const { ports, afterStart } = config;
+  const { ports, runAfterStart } = config;
   let observers = 0;
   let stopAll: (() => void) | null = null;
 
@@ -35,7 +35,7 @@ export default function observePorts(
       stopStarted();
       throw error;
     }
-    afterStart();
+    runAfterStart();
     return stopStarted;
   };
 

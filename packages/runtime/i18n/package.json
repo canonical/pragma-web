@@ -1,6 +1,6 @@
 {
   "name": "@canonical/i18n-core",
-  "description": "Framework-agnostic internationalization core (native Intl): locale negotiation, message catalogs, translators, memoized formatters, and a reactive locale source.",
+  "description": "Framework-agnostic internationalization core (native Intl): locale negotiation, typed message records, memoized formatters, and a reactive locale source.",
   "version": "0.47.0",
   "type": "module",
   "module": "dist/esm/index.js",
@@ -50,8 +50,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
-    "@canonical/typescript-config": "0.44.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@canonical/typescript-config": "0.46.0",
+    "@canonical/webarchitect": "0.46.0",
     "@types/node": "^26.0.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"

@@ -87,6 +87,27 @@ export type FilterHandle<TApplied> = {
   ) => readonly SourceRefusal[];
   /** Remove the predicate, distinct from an empty edit. */
   readonly clear: () => readonly SourceRefusal[];
+  /**
+   * The further conjuncts at the handle's address — those it does not
+   * edit — in canonical order, each with its `nth` there. Empty while the
+   * address holds one conjunct or none.
+   */
+  readonly others: ReadonlyChannel<readonly FurtherConjunct[]>;
+  /** The `nth` of the conjunct the handle edits, 0 while none stands. */
+  readonly nth: ReadonlyChannel<number>;
+};
+
+/**
+ * One conjunct at a filter address that its handle does not edit: its
+ * place among the address's conjuncts in canonical order, what a command
+ * names it by, and its canonical operands.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type FurtherConjunct = {
+  readonly nth: number;
+  readonly operands: readonly PredicateOperand[];
 };
 
 /** Configuration of one filter record. */
@@ -99,11 +120,19 @@ export type FilterInputConfig = {
   readonly operator: PredicateOperator;
   /** Where an applied predicate goes: the provider's two predicate commands. */
   readonly host: Pick<ProviderHost, "setPredicate" | "removePredicate">;
+  /**
+   * The conjuncts at the record's address as the query stands, in canonical
+   * order: where the record finds the place of the conjunct it edits.
+   */
+  readonly readConjuncts: () => readonly Predicate[];
 };
 
 /** One filter record, with what only its owner reads and calls. */
-export type FilterInput = FilterHandle<unknown> & {
-  /** The predicate the record has applied, as it built it. */
+export type FilterInput = Omit<FilterHandle<unknown>, "others" | "nth"> & {
+  /**
+   * The predicate the record has applied, as it built it, or the one it is
+   * applying while the host hears it.
+   */
   readonly predicate: Predicate | null;
   /**
    * Adopt the authoritative applied predicate — the query moved under the

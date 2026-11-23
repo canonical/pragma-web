@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import createDeferred from "../../../testing/createDeferred.js";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import { createPresentation } from "../../lib/presentation/index.js";
 
 describe("regression 0022 — a left view's read reported late", () => {

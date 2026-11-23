@@ -20,15 +20,6 @@ export type PredicateOperator =
   | "startsWith";
 
 /**
- * The set operators: the ones whose operands are a set, and between which a
- * set moves on its field.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type SetOperator = Extract<PredicateOperator, "isAny" | "isNone">;
-
-/**
  * A semantic operand value. Field metadata owns coercion; core never guesses.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -37,7 +28,9 @@ export type SetOperator = Extract<PredicateOperator, "isAny" | "isNone">;
 export type PredicateOperand = string | number | boolean | null;
 
 /**
- * One filter clause, addressed by its field and operator. `isAny` and
+ * One filter clause — a conjunct of the slice's filter — addressed by its
+ * field and operator; an address may hold several, and each restricts the
+ * result. `isAny` and
  * `isNone` operands are a non-empty set; `gte`, `lte`, `contains` and
  * `startsWith` carry exactly one operand; `isSet` carries none. Numbers must
  * be finite.
@@ -50,6 +43,28 @@ export type Predicate = {
   readonly operator: PredicateOperator;
   readonly operands: readonly PredicateOperand[];
 };
+
+/**
+ * One conjunct of a slice's filter, by address and place.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type PredicateRef = {
+  readonly field: string;
+  readonly operator: PredicateOperator;
+  /** Zero-based among the conjuncts at this address, in canonical order. */
+  readonly nth: number;
+};
+
+/**
+ * A part of the query `clear` empties: `filter`, every conjunct of the
+ * filter, or `search`, the search text.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryClearPath = "filter" | "search";
 
 /**
  * Sort direction of a single ordered term.
@@ -101,6 +116,12 @@ export type GroupPath = readonly PredicateOperand[];
  * name may change or move before the first release.
  */
 export type Slice = {
+  /**
+   * The conjuncts every row must match, all of them: two on one address
+   * both restrict, so `tags` any of `a` and `tags` any of `b` asks for rows
+   * holding both. Their order carries no meaning; the canonical form sorts
+   * them.
+   */
   readonly filter: readonly Predicate[];
   readonly search: string | null;
   readonly sort: readonly SortTerm[];
@@ -157,26 +178,48 @@ export type Query = {
 export type WindowNavigation = Partial<Omit<ResultWindow, "collapsed">>;
 
 /**
- * An addressed query command. `set*` replaces a whole value and the caller
- * computes it; `navigateWindow` and `setCollapsed` address the window only.
+ * An addressed query command: a predicate command names one conjunct by
+ * its `nth`, 0 when left out, and `clear` empties whole parts.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export type QueryCommand =
   | {
       readonly kind: "setPredicate";
       readonly predicate: Predicate;
       /**
-       * An operator on the same field whose predicate this one replaces in
-       * the same transition — a set moved from `isAny` to `isNone` — so the
-       * query never stands on both, or on neither.
+       * The conjunct at the predicate's address it replaces, 0 when left
+       * out. Where the address holds none, the 0th is added.
        */
-      readonly replaces?: SetOperator | undefined;
+      readonly nth?: number | undefined;
     }
   | {
       readonly kind: "removePredicate";
       readonly field: string;
       readonly operator: PredicateOperator;
+      /** The conjunct at the address it removes, 0 when left out. */
+      readonly nth?: number | undefined;
+    }
+  | {
+      readonly kind: "editPredicates";
+      /**
+       * The conjuncts removed, each named as the slice stands before the
+       * edit, so removing one never moves the place of another.
+       */
+      readonly remove: readonly PredicateRef[];
+      /** The conjuncts added, beside whatever already stands. */
+      readonly add: readonly Predicate[];
     }
   | { readonly kind: "setSearch"; readonly search: string }
+  | {
+      readonly kind: "clear";
+      /**
+       * The parts emptied, one or more; repeated or reordered, they name
+       * the same clear.
+       */
+      readonly paths: readonly [QueryClearPath, ...QueryClearPath[]];
+    }
   | { readonly kind: "setSort"; readonly sort: readonly SortTerm[] }
   | { readonly kind: "setGroup"; readonly group: readonly GroupTerm[] }
   | {
@@ -185,7 +228,12 @@ export type QueryCommand =
     }
   | ({ readonly kind: "navigateWindow" } & WindowNavigation);
 
-/** Outcome of applying a query command: accepted change or explicit rejection. */
+/**
+ * Outcome of applying a query command: accepted change or explicit rejection.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type QueryCommandResult =
   | (Query & {
       readonly status: "accepted";

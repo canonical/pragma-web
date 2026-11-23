@@ -118,7 +118,7 @@ describe("canonicalizeSlice", () => {
     ]);
   });
 
-  it("collapses duplicate predicate addresses, keeping the last", () => {
+  it("keeps every conjunct an address holds, ordered by their operands", () => {
     const result = canonicalizeSlice(
       slice({
         filter: [
@@ -127,9 +127,43 @@ describe("canonicalizeSlice", () => {
         ],
       }),
     );
+    // Both restrict: a duplicate address is an AND, never the last one.
     expect(result.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["cancelled"] },
+      { field: "status", operator: "isAny", operands: ["failed"] },
     ]);
+  });
+
+  it("collapses only identical conjuncts, as A and A is A", () => {
+    const result = canonicalizeSlice(
+      slice({
+        filter: [
+          { field: "tags", operator: "isAny", operands: ["b", "a"] },
+          { field: "cpu", operator: "gte", operands: [4] },
+          { field: "tags", operator: "isAny", operands: ["a", "b", "a"] },
+          { field: "cpu", operator: "gte", operands: [4] },
+          { field: "cpu", operator: "gte", operands: [8] },
+        ],
+      }),
+    );
+    expect(result.filter).toEqual([
+      { field: "cpu", operator: "gte", operands: [4] },
+      { field: "cpu", operator: "gte", operands: [8] },
+      { field: "tags", operator: "isAny", operands: ["a", "b"] },
+    ]);
+  });
+
+  it("orders conjuncts the same way whatever order they are given in", () => {
+    const conjuncts = [
+      { field: "tags", operator: "isAny", operands: ["ex-nvme"] },
+      { field: "tags", operator: "isAny", operands: ["ex-gpu", "ex-ssd"] },
+      { field: "tags", operator: "isAny", operands: ["ex-gpu"] },
+    ] as const;
+    const once = canonicalizeSlice(slice({ filter: conjuncts }));
+    expect(
+      canonicalizeSlice(slice({ filter: [...conjuncts].reverse() })),
+    ).toEqual(once);
+    expect(canonicalizeSlice(once)).toEqual(once);
   });
 
   it("orders predicates by field then operator", () => {

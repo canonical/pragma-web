@@ -19,9 +19,10 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
+  QueryClearPath,
   QueryCommand,
-  SetOperator,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -124,17 +125,24 @@ export type DataViewsProvider<
   readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
   readonly setSearch: (search: string) => readonly SourceRefusal[];
   /**
+   * Empty the named parts of the query, and their refused clauses, in one
+   * transition from page one. A clear that changes nothing commits nothing.
+   */
+  readonly clear: (
+    paths: readonly [QueryClearPath, ...QueryClearPath[]],
+  ) => readonly SourceRefusal[];
+  /**
    * Replace the grouping levels. Reserved: refused while no source declares
    * a groupable field.
    *
-   * @seam grouping — read by the group header row
+   * The group header row calls this.
    */
   readonly setGroup: (group: readonly GroupTerm[]) => readonly SourceRefusal[];
   /**
    * Replace the collapsed group paths. Reserved: refused while no source
    * honours collapse.
    *
-   * @seam grouping — read by the group header's disclosure
+   * The group header's disclosure calls this.
    */
   readonly setCollapsed: (
     collapsed: readonly GroupPath[],
@@ -157,7 +165,7 @@ export type DataViewsProvider<
    * source's own check. Empty means executable. What a control reads before
    * offering a destination.
    */
-  readonly refusals: (query: Query) => readonly SourceRefusal[];
+  readonly listRefusals: (query: Query) => readonly SourceRefusal[];
   /**
    * Run one declared action over the given identities, or over the
    * selection when none are given. Resolves with the settled run once every
@@ -349,24 +357,39 @@ export type ProviderHost<
   TRow extends object = RowRecord,
 > = Pick<
   DataViewsProvider<TFields, TRow>,
-  "collection" | "capabilities" | "state" | "refusals"
+  "collection" | "capabilities" | "state" | "listRefusals"
 > & {
   /**
-   * Replace the predicate at its address, and the one at the same field
-   * under `replaces` when given, as one transition; the window returns to
-   * page one. Given `history`, the transition enters history that way
-   * rather than as the policy says: a typed value's later edits in one input
-   * session replace the entry its first one entered.
+   * Replace the conjunct at `nth` of the predicate's address, 0 when left
+   * out, or add it where the address holds none, as one transition; the
+   * window returns to page one. Given `history`, the transition enters
+   * history that way rather than as the policy says: a typed value's later
+   * edits in one input session replace the entry its first one entered.
    */
   readonly setPredicate: (
     predicate: Predicate,
-    replaces?: SetOperator,
+    nth?: number,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];
-  /** Remove the predicate at an address; the window returns to page one. */
+  /**
+   * Remove the conjunct at `nth` of an address, 0 when left out; the window
+   * returns to page one. A conjunct already gone is no change.
+   */
   readonly removePredicate: (
     field: string,
     operator: PredicateOperator,
+    nth?: number,
+  ) => readonly SourceRefusal[];
+  /**
+   * Remove the named conjuncts and add others, as one transition: a set
+   * moved to another operator, two bounds merged into one. Each ref names a
+   * conjunct as the query stands before the edit; one naming none, or named
+   * twice, is a stale reading of the query and throws. The window returns to
+   * page one.
+   */
+  readonly editPredicates: (
+    remove: readonly PredicateRef[],
+    add: readonly Predicate[],
   ) => readonly SourceRefusal[];
   /**
    * Request the current query again and name the request. A withheld query
@@ -436,24 +459,24 @@ export type ProviderHost<
    * Always "applies" on a monomorphic collection, and on a field the schema
    * does not scope.
    *
-   * @seam typed cells — read by the body cell, whose not-applicable cell is
-   * the third state beside value and empty
+   * The body cell reads this: a not-applicable cell is the third state
+   * beside value and empty.
    */
-  readonly applicability: (field: string, row: TRow) => Applicability;
+  readonly readApplicability: (field: string, row: TRow) => Applicability;
   /**
    * The type remembered for a selected identity, or null when the provider
    * never modelled it while it was selected — a selection restored by a host
    * over rows this provider has not seen. A remembered type is let go when
    * the rows are next replaced after its identity leaves the selection, so
    * one reselected before then answers as before. It answers from the row on
-   * display whenever there is one, so it never contradicts `applicability`,
+   * display whenever there is one, so it never contradicts `readApplicability`,
    * and it changes only with a `rows` or a `selection` publication: watching
    * those is watching this.
    *
-   * @seam actions — read by `useDataViewsAction`, which decides an action's
-   * applicability to records selected on an earlier page from here
+   * `useDataViewsAction` reads this to decide whether an action applies to
+   * records selected on an earlier page.
    */
-  readonly recordType: (id: string) => string | null;
+  readonly readRecordType: (id: string) => string | null;
 };
 
 /** Configuration of one collection's record typing. */
@@ -472,11 +495,11 @@ export type RecordTypingConfig<
 /** One collection's record typing: what the provider answers about types. */
 export type RecordTyping<TRow extends object = RowRecord> = {
   /** Why a model cannot be displayed, or null when every row is typed. */
-  readonly rejectionOf: (model: RowModel<TRow>) => string | null;
+  readonly readRejection: (model: RowModel<TRow>) => string | null;
   /** Whether a schema field applies to a row. */
-  readonly applicability: (field: string, row: TRow) => Applicability;
+  readonly readApplicability: (field: string, row: TRow) => Applicability;
   /** The remembered type of a selected identity. */
-  readonly recordType: (id: string) => string | null;
+  readonly readRecordType: (id: string) => string | null;
   /** Take the type of every selected row of a model about to be replaced. */
   readonly remember: (model: RowModel<TRow>) => void;
   /** Drop the memory: the generation moved, so nothing displayed survives. */
@@ -575,7 +598,7 @@ export type PortsObservationConfig = {
   /** The ports, in the order they start; they stop in reverse. */
   readonly ports: readonly PortRun[];
   /** Runs once the first observer has started every port. */
-  readonly afterStart: () => void;
+  readonly runAfterStart: () => void;
 };
 
 /** Configuration of the provider's query path. */
@@ -599,14 +622,14 @@ export type QueryCommandsConfig<TRow extends object = RowRecord> = {
  */
 export type QueryCommands = Pick<
   ProviderHost,
-  "refusals" | "adopt" | "refresh"
+  "listRefusals" | "adopt" | "refresh"
 > & {
   /**
    * Apply one command at the boundary; the refusals it incurs, empty when
    * applied. Given `history`, its transition enters history that way rather
    * than as the policy says.
    */
-  readonly command: (
+  readonly applyCommand: (
     command: QueryCommand,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];

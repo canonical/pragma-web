@@ -1,5 +1,5 @@
 import type { SavedView, ViewStore } from "@canonical/dataviews-core";
-import buildStoredView from "./buildStoredView.js";
+import { buildStoredView } from "@canonical/dataviews-core/testing";
 import type { MemoryViewStore } from "./types.js";
 
 /**

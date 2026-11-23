@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import readHostName from "../../../storybook/machines/readHostName.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import type {
   Machine,
@@ -17,11 +20,13 @@ import type {
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
-import {
-  type DisplayField,
-  type DisplayFieldCellProps,
-  RendererSwitch,
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
+import type {
+  DisplayField,
+  DisplayFieldCellProps,
 } from "../../common/index.js";
+import { RendererSwitch } from "../../common/RendererSwitch/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataCards as ConnectedCards } from "../DataViews/common/DataCards/index.js";
 import { DataViews } from "../DataViews/index.js";
@@ -41,7 +46,7 @@ const meta = {
   argTypes: {
     provider: { control: false },
     fields: { control: false },
-    rowLabel: { control: false },
+    getRowLabel: { control: false },
     renderStatus: { control: false },
   },
   // The REST-backed story's endpoint, served through the Storybook MSW
@@ -56,7 +61,7 @@ type Story = StoryObj<typeof Component>;
 /** The cards' own props, less the ones a story's collection supplies. */
 type StoryCardsProps = Omit<
   DataCardsProps<MachineFields, Machine>,
-  "provider" | "fields" | "rowLabel"
+  "provider" | "fields" | "getRowLabel"
 >;
 
 const fields: readonly DisplayField[] = [
@@ -95,7 +100,7 @@ function MachineCards({
       {...args}
       provider={provider}
       fields={cardFields}
-      rowLabel={readHostName}
+      getRowLabel={readHostName}
     />
   );
 }
@@ -107,7 +112,7 @@ function MachineCards({
  */
 export const Default: Story = {
   render: (args) => <MachineCards {...args} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
@@ -127,7 +132,7 @@ export const Default: Story = {
 export const Selectable: Story = {
   args: { selectable: true },
   render: (args) => <MachineCards {...args} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
@@ -137,7 +142,7 @@ export const Selectable: Story = {
   title="name"
   label="Machines"
   selectable
-  rowLabel={(machine) => machine.name}
+  getRowLabel={(machine) => machine.name}
 />`,
   }),
   play: async ({ canvas }) => {
@@ -176,7 +181,7 @@ export const CustomCell: Story = {
       ]}
     />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "useDataViewsCell",
       "useDataViewsValue",
@@ -244,19 +249,18 @@ function SortedAndPagedMachines({
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.SortPanel />
       <ConnectedCards
         fields={fields}
         title="name"
         label={label}
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -266,8 +270,9 @@ function SortedAndPagedMachines({
  * both placed beside the cards in one root, as they are beside a table.
  */
 export const SortedAndPaged: Story = {
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label }) => <SortedAndPagedMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
@@ -290,16 +295,20 @@ import { DataCards } from "./DataViews/DataCards.js";`,
   },
 };
 
-/** A table and cards over one root, through the renderer switch. */
+/**
+ * A table and cards over one root, through the renderer switch, which is its
+ * own root and so takes the story's words itself.
+ */
 function TableOrCardsMachines({
   label,
-}: {
+  ...words
+}: StoryWords & {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
   return (
-    <DataViews provider={provider}>
+    <>
       <RendererSwitch
+        {...words}
         label="Show machines as"
         renderers={[
           {
@@ -310,7 +319,7 @@ function TableOrCardsMachines({
                 columns={fields}
                 label={label}
                 selectable
-                rowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => String(row["name"])}
               />
             ),
           },
@@ -323,14 +332,14 @@ function TableOrCardsMachines({
                 title="name"
                 label={label}
                 selectable
-                rowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => String(row["name"])}
               />
             ),
           },
         ]}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -341,8 +350,11 @@ function TableOrCardsMachines({
  * drawn alone.
  */
 export const TableOrCards: Story = {
-  render: ({ label }) => <TableOrCardsMachines label={label} />,
-  parameters: consumerCode({
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
+  render: ({ label, messages }) => (
+    <TableOrCardsMachines label={label} {...pickStoryWords({ messages })} />
+  ),
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // Internal to the package and not exported: shown for their shape.
@@ -395,20 +407,16 @@ function RestBackedMachines({
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({
-    source: () => createRestMachineSource("live"),
-    query: "page=1&size=5",
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <ConnectedCards
         fields={fields}
         title="name"
         label={label}
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -418,6 +426,12 @@ function RestBackedMachines({
  * and say they are loading until it does.
  */
 export const RestBacked: Story = {
+  decorators: [
+    withMachineRoot({
+      source: () => createRestMachineSource("live"),
+      query: "page=1&size=5",
+    }),
+  ],
   render: ({ label }) => <RestBackedMachines label={label} />,
   play: async ({ canvas }) => {
     await waitFor(() =>

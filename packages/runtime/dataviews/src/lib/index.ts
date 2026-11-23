@@ -33,6 +33,7 @@ export type {
   FilterHandle,
   FilterHandles,
   FilterInputState,
+  FurtherConjunct,
 } from "./filter/index.js";
 export type {
   HistoryMode,
@@ -73,7 +74,9 @@ export type {
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  PredicateRef,
   Query,
+  QueryClearPath,
   ResultWindow,
   Slice,
   SortDirection,
@@ -85,6 +88,7 @@ export type {
   Completion,
   Count,
   Facet,
+  FacetValue,
   GroupSummary,
   PageCursors,
   QueryIssue,

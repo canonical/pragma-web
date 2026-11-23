@@ -207,7 +207,6 @@ export const WithForm: Story = {
           </Form>
         </Component.Content>
         <Component.Footer>
-          <Button>Cancel</Button>
           <Button
             importance="primary"
             anticipation="constructive"
@@ -216,6 +215,7 @@ export const WithForm: Story = {
           >
             Create instance
           </Button>
+          <Button>Cancel</Button>
         </Component.Footer>
       </Component>
     </>
@@ -260,7 +260,6 @@ export const WithForm: Story = {
     </Form>
   </SidePanel.Content>
   <SidePanel.Footer>
-    <Button>Cancel</Button>
     <Button
       importance="primary"
       anticipation="constructive"
@@ -269,6 +268,7 @@ export const WithForm: Story = {
     >
       Create instance
     </Button>
+    <Button>Cancel</Button>
   </SidePanel.Footer>
 </SidePanel>
         `,
@@ -438,10 +438,10 @@ export const RightToLeft: Story = {
           </p>
         </Component.Content>
         <Component.Footer>
-          <Button>إلغاء</Button>
           <Button importance="primary" anticipation="constructive">
             إطلاق
           </Button>
+          <Button>إلغاء</Button>
         </Component.Footer>
       </Component>
     </div>
@@ -461,10 +461,10 @@ export const RightToLeft: Story = {
   <SidePanel.Header>معاينة</SidePanel.Header>
   <SidePanel.Content>…</SidePanel.Content>
   <SidePanel.Footer>
-    <Button>إلغاء</Button>
     <Button importance="primary" anticipation="constructive">
       إطلاق
     </Button>
+    <Button>إلغاء</Button>
   </SidePanel.Footer>
 </SidePanel>
         `,
@@ -554,10 +554,10 @@ export const OverflowingTooltip: Story = {
             <p>End of the content.</p>
           </Component.Content>
           <Component.Footer>
-            <Button>Cancel</Button>
             <Button importance="primary" anticipation="constructive">
               Save
             </Button>
+            <Button>Cancel</Button>
           </Component.Footer>
         </Component>
       </>
@@ -691,6 +691,66 @@ export const FillContent: Story = {
   </SidePanel.Content>
   <SidePanel.Footer>
     <Button importance="primary">Subscribe</Button>
+  </SidePanel.Footer>
+</SidePanel>`,
+      },
+    },
+  },
+};
+
+/**
+ * More actions than fit across the panel wrap onto the next line rather than
+ * overflow it. The primary action still comes first, so it stays at the
+ * start of the first line.
+ */
+export const WrappingActions: Story = {
+  render: () => (
+    <>
+      <style>
+        {`
+          /* Disable animations for visual testing */
+          :root {
+            --side-panel-transition-duration: 0ms;
+          }
+        `}
+      </style>
+      <Component
+        ref={(handle: SidePanelHandle | null) => {
+          handle?.open();
+        }}
+      >
+        <Component.Header>Ubuntu Pro settings</Component.Header>
+        <Component.Content>
+          <p>
+            Choose which Ubuntu Pro services to enable on this instance, then
+            save the changes or apply them straight away.
+          </p>
+        </Component.Content>
+        <Component.Footer>
+          <Button importance="primary" anticipation="constructive">
+            Save and apply
+          </Button>
+          <Button>Save as draft</Button>
+          <Button>Reset to defaults</Button>
+          <Button>Cancel</Button>
+        </Component.Footer>
+      </Component>
+    </>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<SidePanel ref={panelRef}>
+  <SidePanel.Header>Ubuntu Pro settings</SidePanel.Header>
+  <SidePanel.Content>…</SidePanel.Content>
+  {/* Four actions are wider than the panel: they wrap onto a second line. */}
+  <SidePanel.Footer>
+    <Button importance="primary" anticipation="constructive">
+      Save and apply
+    </Button>
+    <Button>Save as draft</Button>
+    <Button>Reset to defaults</Button>
+    <Button>Cancel</Button>
   </SidePanel.Footer>
 </SidePanel>`,
       },

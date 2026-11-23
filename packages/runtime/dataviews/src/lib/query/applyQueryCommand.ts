@@ -1,17 +1,19 @@
 import addressPredicate from "./addressPredicate.js";
 import areListsEqual from "./areListsEqual.js";
+import arePredicatesEqual from "./arePredicatesEqual.js";
 import areSlicesEqual from "./areSlicesEqual.js";
 import collapseSortTerms from "./collapseSortTerms.js";
 import { OPERATOR_ARITY } from "./constants.js";
+import listConjuncts from "./listConjuncts.js";
 import rejectOperandArity from "./rejectOperandArity.js";
 import rejectWindow from "./rejectWindow.js";
 import type {
   GroupPath,
   Predicate,
+  PredicateRef,
   QueryCommand,
   QueryCommandResult,
   ResultWindow,
-  SetOperator,
   Slice,
 } from "./types.js";
 
@@ -22,7 +24,7 @@ type SliceCommand = Exclude<
 >;
 
 /** Validate one predicate against the bounded grammar. */
-const predicateRejection = (predicate: Predicate): string | null => {
+const findPredicateRejection = (predicate: Predicate): string | null => {
   if (predicate.field === "") {
     return "predicate field must not be empty";
   }
@@ -47,36 +49,103 @@ const predicateRejection = (predicate: Predicate): string | null => {
  * start, so a token minted for one page never addresses another. Collapse
  * survives, because a collapsed group is still that group after a filter.
  */
-const firstPage = (window: ResultWindow): ResultWindow => ({
+const moveToFirstPage = (window: ResultWindow): ResultWindow => ({
   ...window,
   page: 1,
   cursor: null,
 });
 
+/** The parts of the query `clear` may empty. */
+const CLEAR_PATHS: ReadonlySet<string> = new Set(["filter", "search"]);
+
+/**
+ * Why a clear's parts are not a list of them, or null when they are. The
+ * type asks for one or more, and a caller past the type is told so.
+ */
+const rejectClearPaths = (paths: readonly string[]): string | null => {
+  if (paths.length === 0) {
+    return "a clear must name at least one part of the query";
+  }
+  const unknown = paths.find((path) => !CLEAR_PATHS.has(path));
+  return unknown === undefined
+    ? null
+    : `a clear cannot empty ${String(unknown)}, only filter or search`;
+};
+
+/** Why a conjunct's place is not one, or null when it is. */
+const rejectNth = (nth: number | undefined): string | null =>
+  nth === undefined || (Number.isSafeInteger(nth) && nth >= 0)
+    ? null
+    : `a conjunct's place must be a whole number from 0, not ${nth}`;
+
+/** Drop every copy of one conjunct from a filter. */
+const dropConjunct = (
+  filter: readonly Predicate[],
+  conjunct: Predicate,
+): readonly Predicate[] =>
+  filter.filter((predicate) => !arePredicatesEqual(predicate, conjunct));
+
+/**
+ * Why a list of refs names no conjuncts of the slice as it stands, or
+ * null: a ref repeated, or past the conjuncts at its address, names a slice
+ * that has moved since it was read.
+ */
+const rejectRefs = (
+  slice: Slice,
+  refs: readonly PredicateRef[],
+): string | null => {
+  const named = new Set<string>();
+  for (const ref of refs) {
+    const rejection = rejectNth(ref.nth);
+    if (rejection !== null) {
+      return rejection;
+    }
+    const key = `${addressPredicate(ref.field, ref.operator)}\u0000${ref.nth}`;
+    if (named.has(key)) {
+      return `conjunct ${ref.nth} of ${ref.field} ${ref.operator} is named twice`;
+    }
+    named.add(key);
+    if (listConjuncts(slice, ref.field, ref.operator).length <= ref.nth) {
+      return `${ref.field} ${ref.operator} holds no conjunct ${ref.nth}`;
+    }
+  }
+  return null;
+};
+
+/** The conjuncts a list of refs names, as the slice stands. */
+const resolveRefs = (
+  slice: Slice,
+  refs: readonly PredicateRef[],
+): readonly Predicate[] =>
+  refs.flatMap((ref) =>
+    listConjuncts(slice, ref.field, ref.operator).filter(
+      (_, nth) => nth === ref.nth,
+    ),
+  );
+
+/**
+ * Replace the conjunct at `nth` of the predicate's address, or add it where
+ * the address holds none.
+ */
 const setPredicate = (
   slice: Slice,
   predicate: Predicate,
-  replaces: SetOperator | undefined,
+  nth: number,
 ): Slice => {
-  const addresses = new Set([
-    addressPredicate(predicate.field, predicate.operator),
-    ...(replaces === undefined
-      ? []
-      : [addressPredicate(predicate.field, replaces)]),
-  ]);
+  const replaced = listConjuncts(slice, predicate.field, predicate.operator).at(
+    nth,
+  );
+  const kept =
+    replaced === undefined
+      ? slice.filter
+      : dropConjunct(slice.filter, replaced);
   return {
     ...slice,
-    filter: [
-      ...slice.filter.filter(
-        (existing) =>
-          !addresses.has(addressPredicate(existing.field, existing.operator)),
-      ),
-      predicate,
-    ],
+    filter: [...kept, predicate],
   };
 };
 
-const collapsedEquals = (
+const areCollapsedPathsEqual = (
   a: readonly GroupPath[],
   b: readonly GroupPath[],
 ): boolean =>
@@ -88,7 +157,11 @@ const collapsedEquals = (
  * query untouched, and a semantically unchanged edit changes nothing.
  * Commands that violate the bounded grammar (empty fields, wrong arities,
  * non-finite numbers, non-positive or fractional window values, an empty
- * cursor token) are rejected with the input state unchanged.
+ * cursor token) are rejected with the input state unchanged, and so is one
+ * naming a conjunct the slice does not hold: a place that is no whole
+ * number, one past the conjuncts at its address, or a conjunct an edit
+ * names twice. A clear naming no part of the query, or one it has not, is
+ * rejected too.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -107,7 +180,7 @@ export default function applyQueryCommand(
       cursor: command.cursor ?? null,
     });
     if (rejection !== null) {
-      return rejected(slice, window, rejection);
+      return buildRejection(slice, window, rejection);
     }
     // A token addresses one page start, so moving without supplying one
     // leaves no token behind to describe the page that was left.
@@ -130,7 +203,7 @@ export default function applyQueryCommand(
   }
 
   if (command.kind === "setCollapsed") {
-    if (collapsedEquals(window.collapsed, command.collapsed)) {
+    if (areCollapsedPathsEqual(window.collapsed, command.collapsed)) {
       return {
         status: "accepted",
         slice,
@@ -145,7 +218,7 @@ export default function applyQueryCommand(
       status: "accepted",
       slice,
       window: {
-        ...firstPage(window),
+        ...moveToFirstPage(window),
         collapsed: command.collapsed.map((path) => [...path]),
       },
       sliceChanged: false,
@@ -153,9 +226,9 @@ export default function applyQueryCommand(
     };
   }
 
-  const rejection = commandRejection(command);
+  const rejection = findCommandRejection(slice, command);
   if (rejection !== null) {
-    return rejected(slice, window, rejection);
+    return buildRejection(slice, window, rejection);
   }
 
   const nextSlice = applyToSlice(slice, command);
@@ -173,8 +246,8 @@ export default function applyQueryCommand(
   // path that still means what it meant.
   const nextWindow =
     command.kind === "setGroup"
-      ? { ...firstPage(window), collapsed: [] }
-      : firstPage(window);
+      ? { ...moveToFirstPage(window), collapsed: [] }
+      : moveToFirstPage(window);
   return {
     status: "accepted",
     slice: nextSlice,
@@ -187,25 +260,47 @@ export default function applyQueryCommand(
   };
 }
 
-const commandRejection = (command: SliceCommand): string | null => {
+const findCommandRejection = (
+  slice: Slice,
+  command: SliceCommand,
+): string | null => {
   switch (command.kind) {
-    case "setPredicate":
-      // A move replaces the other set operator on the field, nothing else:
-      // never itself, and never a restriction of another kind.
-      if (
-        command.replaces !== undefined &&
-        (OPERATOR_ARITY[command.replaces] !== "many" ||
-          OPERATOR_ARITY[command.predicate.operator] !== "many" ||
-          command.replaces === command.predicate.operator)
-      ) {
-        return "a set moves only onto the other set operator on its field";
+    case "setPredicate": {
+      const nth = command.nth ?? 0;
+      const rejection =
+        rejectNth(nth) ?? findPredicateRejection(command.predicate);
+      if (rejection !== null) {
+        return rejection;
       }
-      return predicateRejection(command.predicate);
+      // A conjunct is replaced where it stands, or the first added where
+      // none does; a place past those is a slice that has moved.
+      const { field, operator } = command.predicate;
+      const count = listConjuncts(slice, field, operator).length;
+      return nth < count || nth === 0
+        ? null
+        : `${field} ${operator} holds no conjunct ${nth}`;
+    }
     case "removePredicate":
       // Removal may address out-of-grammar predicates (for example one
       // installed by an unvalidated adopt): it cleans up by exact address
-      // and cannot create a collision.
+      // and cannot create a collision. A conjunct already gone is no
+      // change.
+      return rejectNth(command.nth);
+    case "editPredicates": {
+      const rejection = rejectRefs(slice, command.remove);
+      if (rejection !== null) {
+        return rejection;
+      }
+      for (const predicate of command.add) {
+        const rejection = findPredicateRejection(predicate);
+        if (rejection !== null) {
+          return rejection;
+        }
+      }
       return null;
+    }
+    case "clear":
+      return rejectClearPaths(command.paths);
     case "setSort":
       return command.sort.some((term) => term.field === "")
         ? "sort term field must not be empty"
@@ -222,21 +317,33 @@ const commandRejection = (command: SliceCommand): string | null => {
 const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
   switch (command.kind) {
     case "setPredicate":
-      return setPredicate(slice, command.predicate, command.replaces);
+      return setPredicate(slice, command.predicate, command.nth ?? 0);
     case "removePredicate": {
-      const address = addressPredicate(command.field, command.operator);
+      const removed = listConjuncts(slice, command.field, command.operator).at(
+        command.nth ?? 0,
+      );
+      return removed === undefined
+        ? slice
+        : { ...slice, filter: dropConjunct(slice.filter, removed) };
+    }
+    case "editPredicates": {
+      // Resolved before anything moves.
+      const removed = resolveRefs(slice, command.remove);
       return {
         ...slice,
-        filter: slice.filter.filter(
-          (predicate) =>
-            addressPredicate(predicate.field, predicate.operator) !== address,
-        ),
+        filter: [...removed.reduce(dropConjunct, slice.filter), ...command.add],
       };
     }
     case "setSearch":
       return {
         ...slice,
         search: command.search === "" ? null : command.search,
+      };
+    case "clear":
+      return {
+        ...slice,
+        filter: command.paths.includes("filter") ? [] : slice.filter,
+        search: command.paths.includes("search") ? null : slice.search,
       };
     case "setSort":
       // Collapsed here as well as in canonicalization, so the query the
@@ -250,7 +357,7 @@ const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
   }
 };
 
-const rejected = (
+const buildRejection = (
   slice: Slice,
   window: ResultWindow,
   reason: string,

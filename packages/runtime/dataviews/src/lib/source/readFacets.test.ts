@@ -114,6 +114,21 @@ describe("readFacets", () => {
     });
   });
 
+  it("lifts every conjunct of a field's own, however many it holds", () => {
+    const restricted: Slice = {
+      ...EMPTY_SLICE,
+      filter: [
+        { field: "cpu", operator: "gte", operands: [4] },
+        { field: "cpu", operator: "gte", operands: [16] },
+        { field: "status", operator: "isAny", operands: ["failed"] },
+      ],
+    };
+    // Both bounds are lifted from the cores' facet: over failed machines.
+    expect(readFacetsOver(restricted, "cpu")).toEqual({
+      cpu: { kind: "range", min: 8, max: 16 },
+    });
+  });
+
   it("computes over the records the search selects", () => {
     expect(readFacetsOver({ ...EMPTY_SLICE, search: "TA" }, "status")).toEqual({
       status: {

@@ -14,6 +14,7 @@
  */
 
 import { declareCapabilities } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import {
   act,
   cleanup,
@@ -24,7 +25,6 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
-import buildPage from "../../../testing/buildPage.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { machines } from "../../../testing/machines.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -35,7 +35,7 @@ const columns = [
 ] as const;
 
 /** A source that orders by `name` alone, answered by hand. */
-const sortableByName = () =>
+const createSortableByName = () =>
   createMachineProvider({
     capabilities: declareCapabilities(machines, {
       sort: { fields: ["name"], terms: 1 },
@@ -46,12 +46,12 @@ afterEach(cleanup);
 
 describe("regression 0002 — stale rows reported ready", () => {
   it("keeps the rows in view and says they are stale, and why", () => {
-    const { provider, source } = sortableByName();
+    const { provider, source } = createSortableByName();
     render(
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });
@@ -60,7 +60,7 @@ describe("regression 0002 — stale rows reported ready", () => {
     // The ordering issued a second request, which the source fails.
     expect(source.calls).toHaveLength(2);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: {
           reason: "the inventory is unreachable",
@@ -79,7 +79,7 @@ describe("regression 0002 — stale rows reported ready", () => {
   });
 
   it("offers sorting only on the fields the source declares", () => {
-    const { provider } = sortableByName();
+    const { provider } = createSortableByName();
     render(
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );

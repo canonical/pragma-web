@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import standInDialogs from "./testing/standInDialogs.js";
 
 /**
  * jsdom has no ResizeObserver, and the design system's ContextualMenu fits
@@ -15,3 +16,5 @@ if (typeof globalThis.ResizeObserver === "undefined") {
     disconnect(): void {}
   };
 }
+
+standInDialogs();

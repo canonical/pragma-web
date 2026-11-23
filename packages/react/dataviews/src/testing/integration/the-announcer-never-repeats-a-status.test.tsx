@@ -54,7 +54,7 @@ const renderFirstPage = () => {
   /** Answer the source's latest request with one page of `rows`. */
   const deliver = (rows: readonly Machine[]) => {
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({ rows, matched: 2 }),
       });
@@ -104,7 +104,7 @@ describe("the announcer never repeats a status", () => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: {
           reason: "the server is offline",

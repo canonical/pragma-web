@@ -22,7 +22,7 @@ import {
   EMPTY_SLICE,
   type SortTerm,
 } from "../../lib/query/index.js";
-import { refusalsOf } from "../../lib/source/index.js";
+import { listQueryRefusals } from "../../lib/source/index.js";
 
 const machines = createCollection({
   identify: readId,
@@ -61,7 +61,7 @@ describe("regression 0001 — a repeated sort field keeps one request identity",
 
   it("counts the field once against a source's term limit", () => {
     expect(
-      refusalsOf(declare({ sort: declareSort(["cpu"], 1) }), {
+      listQueryRefusals(declare({ sort: declareSort(["cpu"], 1) }), {
         slice: { ...EMPTY_SLICE, sort: twice },
         window: DEFAULT_WINDOW,
       }),

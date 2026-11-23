@@ -33,7 +33,7 @@ The code shown here is the code in `src/lib/_work_in_progress/BuildARenderer`. I
 A provider, made by `createDataViewsProvider`, carries channels and commands. A channel holds one immutable value and tells its subscribers when it changes. A renderer reads these:
 
 - `provider.state`: the query, the result, and whether a request is in flight (`pendingRequestId`).
-- `provider.rows`: the row model of the current page. It has `entries` (each an `id` and a `record`), `ids`, and `byId(id)`.
+- `provider.rows`: the row model of the current page. It has `entries` (each an `id` and a `record`), `ids`, and `findRecord(id)`.
 - `provider.selection`: the selected identities, with `toggle`, `set`, `add`, `remove` and `clear`.
 - `provider.capabilities`: what the source declares it can do, such as `capabilities.sort.fields`.
 - Commands such as `setSort`, `setSearch` and `navigateWindow`. Each returns the source's refusals, and an empty list means the command applied.

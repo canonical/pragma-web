@@ -220,4 +220,11 @@ describe("Announcer", () => {
     wait(COALESCE_DELAY_MS);
     expect(listSaid()).toEqual(["Status hidden"]);
   });
+
+  it("passes native props to its region", () => {
+    const { container } = render(
+      <Announcer ref={createRef<AnnouncerHandle>()} id="probe" />,
+    );
+    expect(container.firstElementChild).toHaveAttribute("id", "probe");
+  });
 });

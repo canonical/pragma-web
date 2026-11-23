@@ -67,7 +67,7 @@ const Composition = ({
     <DataViews.Filters />
     <DataViews.SortPanel />
     <DataViews.SavedViews />
-    <DataViews.Actions />
+    <DataViews.ActionBar />
     <DataViews.DataTable
       columns={columns}
       label="Machines"

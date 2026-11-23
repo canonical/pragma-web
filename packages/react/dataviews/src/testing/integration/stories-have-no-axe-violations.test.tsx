@@ -40,12 +40,23 @@ const REFUSED_LINK_STORIES: ReadonlySet<string> = new Set([
   "LinkWithARefusedSort",
 ]);
 
+/** The filters' stories checked once played: faceted, or clearing a row. */
+const PLAYED_FILTER_STORIES: ReadonlySet<string> = new Set([
+  ...FACETED_FILTER_STORIES,
+  "FurtherConjunctsApplied",
+]);
+
+const filters = Object.entries(composeStories(filtersStories));
+
 /** The stories checked as first rendered, by the part they show. */
 const rendered = {
   DataViews: composeStories(rootStories),
   DataTable: composeStories(tableStories),
   SortPanel: composeStories(panelStories),
   Settings: composeStories(settingsStories),
+  Filters: Object.fromEntries(
+    filters.filter(([name]) => !PLAYED_FILTER_STORIES.has(name)),
+  ),
 };
 
 /** The stories checked once their play function has run, by part. */
@@ -62,9 +73,7 @@ const played = {
     ),
   ),
   Filters: Object.fromEntries(
-    Object.entries(composeStories(filtersStories)).filter(([name]) =>
-      FACETED_FILTER_STORIES.has(name),
-    ),
+    filters.filter(([name]) => PLAYED_FILTER_STORIES.has(name)),
   ),
 };
 

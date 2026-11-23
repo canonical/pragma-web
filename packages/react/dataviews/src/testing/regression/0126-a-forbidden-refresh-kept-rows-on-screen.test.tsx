@@ -10,12 +10,12 @@
  */
 
 import { createDataViewsProvider, createPage } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
-import createManualSource from "../../../testing/createManualSource.js";
 import { MACHINE_CAPABILITIES, machines } from "../../../testing/machines.js";
 import type { Machine } from "../../../testing/types.js";
 import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
@@ -36,7 +36,7 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
     );
     // More rows match than one page shows, so the bar offers the next one.
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [buildMachine("m-1", "alpha")],
@@ -53,7 +53,9 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({ status: "forbidden", cause: new Error("403") });
+      source
+        .readLatest()
+        .deliver({ status: "forbidden", cause: new Error("403") });
     });
     expect(screen.queryByText("alpha")).toBeNull();
     const table = screen.getByRole("table", { name: "Machines" });

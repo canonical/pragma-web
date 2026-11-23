@@ -3,10 +3,10 @@
  * provider. The table's own behaviour is pinned beside it; this pins the
  * binding, which is the whole of the part.
  */
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
@@ -35,7 +35,7 @@ describe("DataViews.DataTable", () => {
     // The root observed the provider, which asked the source for its page.
     expect(source.calls).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });

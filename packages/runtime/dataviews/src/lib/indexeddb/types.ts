@@ -22,6 +22,7 @@ export type IndexedDBRequest<TResult> = {
   onsuccess: Handler;
 };
 
+/** One object store: the reads, writes and indexes the store uses. */
 export type IndexedDBObjectStore = {
   get(key: unknown): IndexedDBRequest<unknown>;
   put(value: unknown): IndexedDBRequest<unknown>;
@@ -33,6 +34,7 @@ export type IndexedDBObjectStore = {
   };
 };
 
+/** One transaction: its stores, its failure and how it ends. */
 export type IndexedDBTransaction = {
   readonly error: unknown;
   objectStore(name: string): IndexedDBObjectStore;
@@ -41,6 +43,10 @@ export type IndexedDBTransaction = {
   onabort: Handler;
 };
 
+/**
+ * One open database: creating stores on upgrade, starting transactions and
+ * hearing it close.
+ */
 export type IndexedDBDatabase = {
   createObjectStore(
     name: string,
@@ -55,6 +61,7 @@ export type IndexedDBDatabase = {
   onclose: Handler;
 };
 
+/** The request opening a database, which may first ask to upgrade it. */
 export type IndexedDBOpenRequest = IndexedDBRequest<IndexedDBDatabase> & {
   readonly error: unknown;
   onerror: Handler;

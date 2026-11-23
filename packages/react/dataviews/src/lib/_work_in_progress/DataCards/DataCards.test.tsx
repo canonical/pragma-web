@@ -1,21 +1,24 @@
 import {
   createArraySource,
   createDataViewsProvider,
-  type DataViewsProvider,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import buildMachine from "../../../../testing/buildMachine.js";
-import buildPage from "../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import { machines } from "../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type { Machine, MachineFields } from "../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider as Provider,
+} from "../../../../testing/types.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
@@ -24,8 +27,6 @@ import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataTable } from "../DataTable/index.js";
 import DataCards from "./DataCards.js";
 import type { DataCardsProps } from "./types.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 const fields: readonly DisplayField[] = [
   { id: "name", header: "Name" },
@@ -39,7 +40,7 @@ const rows: readonly Machine[] = [
 ];
 
 /** DataCards whose source answers every request at once with `answered`. */
-const loadedCards = (
+const renderLoadedCards = (
   answered: readonly Machine[] = rows,
   extra: Partial<DataCardsProps<MachineFields, Machine>> = {},
 ) => {
@@ -57,7 +58,7 @@ const loadedCards = (
 };
 
 /** A request the source accepted and could not complete. */
-const failure = (reason: string): SourceDelivery<Machine> => ({
+const buildFailure = (reason: string): SourceDelivery<Machine> => ({
   status: "failed",
   failure: { reason, cause: new Error(reason), transient: null },
 });
@@ -99,7 +100,7 @@ describe("DataCards", () => {
   });
 
   it("renders the design system's cards as a list, one item per record, each named by its title", () => {
-    const { view } = loadedCards();
+    const { view } = renderLoadedCards();
     const list = readList();
     // The design system's Cards group lays the list out; each item is its Card.
     expect(list).toHaveClass("ds", "cards");
@@ -120,7 +121,7 @@ describe("DataCards", () => {
   });
 
   it("heads each card with its title, and lists the other fields under their headings", () => {
-    loadedCards();
+    renderLoadedCards();
     const card = within(readList()).getByRole("listitem", { name: "beta" });
     expect(card.querySelector(".header .title")).toHaveTextContent("beta");
     const listed = [...card.querySelectorAll(".content .field")].map(
@@ -136,7 +137,7 @@ describe("DataCards", () => {
   });
 
   it("draws a card with its title alone when it lists no other field", () => {
-    loadedCards(rows, { fields: [{ id: "name", header: "Name" }] });
+    renderLoadedCards(rows, { fields: [{ id: "name", header: "Name" }] });
     const card = within(readList()).getByRole("listitem", { name: "alpha" });
     expect(card.querySelector(".content")).toBeNull();
   });
@@ -151,7 +152,7 @@ describe("DataCards", () => {
         </span>
       );
     };
-    loadedCards(rows, {
+    renderLoadedCards(rows, {
       fields: [
         { id: "name", header: "Name" },
         { id: "state", header: "State", field: "status", cell: Badge },
@@ -161,16 +162,16 @@ describe("DataCards", () => {
   });
 
   it("offers a checkbox per card, and the page's own, only where selectable", () => {
-    const plain = loadedCards();
+    const plain = renderLoadedCards();
     expect(screen.queryAllByRole("checkbox")).toEqual([]);
     plain.view.unmount();
-    loadedCards(rows, { selectable: true });
+    renderLoadedCards(rows, { selectable: true });
     // One per card, and one for the page.
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
   });
 
   it("selects a record from its card's checkbox, named for its title", () => {
-    const { provider } = loadedCards(rows, { selectable: true });
+    const { provider } = renderLoadedCards(rows, { selectable: true });
     const beta = screen.getByRole("checkbox", { name: "Select beta" });
     fireEvent.click(beta);
     expect([...provider.selection.state.get().ids]).toEqual(["m-2"]);
@@ -180,9 +181,9 @@ describe("DataCards", () => {
   });
 
   it("names a card's checkbox by the caller's label over its title", () => {
-    loadedCards(rows, {
+    renderLoadedCards(rows, {
       selectable: true,
-      rowLabel: (row, rowId) => `${row.name} (${rowId})`,
+      getRowLabel: (row, rowId) => `${row.name} (${rowId})`,
     });
     expect(
       screen.getByRole("checkbox", { name: "Select alpha (m-1)" }),
@@ -191,7 +192,7 @@ describe("DataCards", () => {
 
   it("names a card's checkbox by a title that is not a string, spelled", () => {
     const Blank = () => null;
-    loadedCards(rows, {
+    renderLoadedCards(rows, {
       selectable: true,
       fields: [{ id: "name", header: "Name", field: "cores", cell: Blank }],
     });
@@ -202,7 +203,7 @@ describe("DataCards", () => {
 
   it("names a card's checkbox by its identity when its title holds no text", () => {
     const Blank = () => null;
-    loadedCards(rows, {
+    renderLoadedCards(rows, {
       selectable: true,
       fields: [{ id: "name", header: "Name", field: "config", cell: Blank }],
     });
@@ -212,7 +213,7 @@ describe("DataCards", () => {
   });
 
   it("selects every card on the page at once, keeping a selection made elsewhere", () => {
-    const { provider } = loadedCards(rows, { selectable: true });
+    const { provider } = renderLoadedCards(rows, { selectable: true });
     act(() => {
       provider.selection.add(["elsewhere"]);
     });
@@ -233,7 +234,7 @@ describe("DataCards", () => {
   });
 
   it("shows part of the page selected as mixed", () => {
-    const { provider } = loadedCards(rows, { selectable: true });
+    const { provider } = renderLoadedCards(rows, { selectable: true });
     act(() => {
       provider.selection.add(["m-1"]);
     });
@@ -254,14 +255,14 @@ describe("DataCards", () => {
           title="name"
           label="Machines"
           selectable
-          rowLabel={(row) => row.name}
+          getRowLabel={(row) => row.name}
         />
         <DataTable
           provider={provider}
           columns={fields}
           label="Machine table"
           selectable
-          rowLabel={(row) => row.name}
+          getRowLabel={(row) => row.name}
         />
       </>,
     );
@@ -302,7 +303,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be loaded: the inventory is unreachable",
@@ -325,13 +326,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows do not match the current query: the inventory is unreachable",
@@ -344,7 +347,9 @@ describe("DataCards", () => {
   });
 
   it("says the collection holds nothing, in the caller's own words", () => {
-    loadedCards([], { renderStatus: (status) => `nothing: ${status.status}` });
+    renderLoadedCards([], {
+      renderStatus: (status) => `nothing: ${status.status}`,
+    });
     expect(screen.getByRole("status")).toHaveTextContent("nothing: no-data");
   });
 
@@ -363,7 +368,7 @@ describe("DataCards", () => {
       provider.setSearch("nothing-at-all");
     });
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage([]) });
+      source.readLatest().deliver({ status: "succeeded", page: buildPage([]) });
     });
     expect(screen.getByRole("status")).toHaveTextContent("nothing: no-results");
   });
@@ -379,13 +384,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     // The cards still answer the query the reader asked, so they stay.
     expect(screen.getByRole("status")).toHaveTextContent(
@@ -409,13 +416,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     const said = screen.getByRole("status");
     // A re-render while the same status stands keeps the element it stands
@@ -490,7 +499,7 @@ describe("DataCards", () => {
   });
 
   it("has no axe violation, selectable", async () => {
-    const { view } = loadedCards(rows, { selectable: true });
+    const { view } = renderLoadedCards(rows, { selectable: true });
     await expectNoAxeViolations(view.container);
   });
 
@@ -506,66 +515,68 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toBeInTheDocument();
     await expectNoAxeViolations(view.container);
   });
-});
 
-describe("DataCards hydrating what the server drew", () => {
-  it("draws the cards and checkboxes the server drew, with no mismatch", async () => {
-    const errors = vi.spyOn(console, "error");
-    onTestFinished(() => {
-      errors.mockRestore();
-    });
-    const build = () => {
-      const provider = createDataViewsProvider({
-        collection: machines,
-        source: createArraySource({ rows, collection: machines }),
-      });
-      provider.refresh();
-      return (
-        <DataCards
-          provider={provider}
-          fields={fields}
-          title="name"
-          label="Machines"
-          selectable
-        />
-      );
-    };
-    const container = document.createElement("div");
-    container.innerHTML = renderToString(build());
-    document.body.append(container);
-    onTestFinished(() => {
-      container.remove();
-    });
-    const drawn = container.innerHTML;
-    expect(drawn).toContain("alpha");
-    const recovered = vi.fn();
-    await act(async () => {
-      const root = hydrateRoot(container, build(), {
-        onRecoverableError: recovered,
-      });
+  describe("DataCards hydrating what the server drew", () => {
+    it("draws the cards and checkboxes the server drew, with no mismatch", async () => {
+      const errors = vi.spyOn(console, "error");
       onTestFinished(() => {
-        act(() => {
-          root.unmount();
+        errors.mockRestore();
+      });
+      const build = () => {
+        const provider = createDataViewsProvider({
+          collection: machines,
+          source: createArraySource({ rows, collection: machines }),
+        });
+        provider.refresh();
+        return (
+          <DataCards
+            provider={provider}
+            fields={fields}
+            title="name"
+            label="Machines"
+            selectable
+          />
+        );
+      };
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(build());
+      document.body.append(container);
+      onTestFinished(() => {
+        container.remove();
+      });
+      const drawn = container.innerHTML;
+      expect(drawn).toContain("alpha");
+      const recovered = vi.fn();
+      await act(async () => {
+        const root = hydrateRoot(container, build(), {
+          onRecoverableError: recovered,
+        });
+        onTestFinished(() => {
+          act(() => {
+            root.unmount();
+          });
         });
       });
+      expect(recovered).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+      expect(
+        within(container)
+          .getAllByRole("listitem")
+          .map((card) => card.querySelector(".title")?.textContent),
+      ).toEqual(["alpha", "beta"]);
     });
-    expect(recovered).not.toHaveBeenCalled();
-    expect(errors).not.toHaveBeenCalled();
-    expect(
-      within(container)
-        .getAllByRole("listitem")
-        .map((card) => card.querySelector(".title")?.textContent),
-    ).toEqual(["alpha", "beta"]);
   });
 });

@@ -112,7 +112,7 @@ To open on an order, issue it once the provider is built, before anything observ
 
 ## Selection
 
-`selectable` adds a leading 32px column of the design system's `CheckboxInput`, backed by the provider's selection; the column's width is the stylesheet's, and the data columns share what it leaves. Name each record with `rowLabel`, so a checkbox says which machine it selects rather than which position it holds — the row is typed as the collection's record, so its fields need no cast. The header checkbox acts on the rows the reader can see, and leaves a selection made on another page alone.
+`selectable` adds a leading 32px column of the design system's `CheckboxInput`, backed by the provider's selection; the column's width is the stylesheet's, and the data columns share what it leaves. Name each record with `getRowLabel`, so a checkbox says which machine it selects rather than which position it holds — the row is typed as the collection's record, so its fields need no cast. The header checkbox acts on the rows the reader can see, and leaves a selection made on another page alone.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
@@ -128,7 +128,7 @@ const columns: readonly DataTableColumn[] = [
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
 />;
 ```
 
@@ -200,7 +200,7 @@ const columns: readonly DataTableColumn[] = [
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
 />;
 ```
 

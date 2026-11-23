@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
-import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { useDataViewsValue } from "../../hooks/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { useDataViews } from "./hooks/index.js";
@@ -40,7 +42,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
  * table and its pagination. Neither takes a provider; both read the root.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: `import { machineCollection, machines } from "./machines.js";`,
     declarations: columnsCode,
@@ -50,15 +52,13 @@ export const Default: Story = {
   <DataViews.Pagination label="Machines pagination" />
 </DataViews>`,
   }),
-  render: function Render() {
-    const provider = useMachineProvider({ query: "page=1&size=5" });
-    return (
-      <Component provider={provider}>
-        <Component.DataTable columns={columns} label="Machines" />
-        <Component.Pagination label="Machines pagination" />
-      </Component>
-    );
-  },
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
+  render: () => (
+    <>
+      <Component.DataTable columns={columns} label="Machines" />
+      <Component.Pagination label="Machines pagination" />
+    </>
+  ),
 };
 
 /** A child of the application's own, reading the rows the root holds. */
@@ -74,7 +74,7 @@ function MachineCount(): ReactElement {
  * table that shows them.
  */
 export const OwnChild: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "DataViews",
       "type DataTableColumn",
@@ -95,15 +95,13 @@ function MachineCount() {
   <DataViews.DataTable columns={columns} label="Machines" />
 </DataViews>`,
   }),
-  render: function Render() {
-    const provider = useMachineProvider({ query: "page=1&size=5" });
-    return (
-      <Component provider={provider}>
-        <MachineCount />
-        <Component.DataTable columns={columns} label="Machines" />
-      </Component>
-    );
-  },
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
+  render: () => (
+    <>
+      <MachineCount />
+      <Component.DataTable columns={columns} label="Machines" />
+    </>
+  ),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole("table", { name: "Machines" });
     await waitFor(() =>

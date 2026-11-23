@@ -206,6 +206,12 @@ export type DataViewsMessages = {
   readonly filterHighest: (value: string) => string;
   /** The control clearing one restriction, by the restriction's name. */
   readonly clearFilter: (name: string) => string;
+  /**
+   * A further restriction under one of a field's controls, shown read-only
+   * after it: the control's phrase and the values the restriction holds.
+   * What `clearFilter` names it by.
+   */
+  readonly filterAlso: (phrase: string, values: readonly string[]) => string;
   /** The list of a followed link's clauses that were refused, as a place. */
   readonly linkRefusals: string;
   /** One refused clause of a followed link, by its name, and why. */

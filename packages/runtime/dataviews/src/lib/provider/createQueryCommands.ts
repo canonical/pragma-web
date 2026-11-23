@@ -7,9 +7,9 @@ import {
 } from "../query/index.js";
 import type { QueryIssue, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
-import { refusalsOf } from "../source/index.js";
-import { CAUSE_OF_COMMAND } from "./constants.js";
+import { listQueryRefusals } from "../source/index.js";
 import listIncurredRefusals from "./listIncurredRefusals.js";
+import readCommandCause from "./readCommandCause.js";
 import type {
   AdoptionCause,
   QueryCommands,
@@ -77,23 +77,23 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
     announceTransition(cause, history);
   };
 
-  const refusals = (query: Query): readonly SourceRefusal[] => {
-    const declared = refusalsOf(capabilities, query);
+  const listRefusals = (query: Query): readonly SourceRefusal[] => {
+    const declared = listQueryRefusals(capabilities, query);
     if (declared.length > 0) {
       // The source's own check reads state that a refused request never
       // reaches; asking it about one would be asking a question it has no
       // answer for.
       return declared;
     }
-    const own = source.refusals?.(query) ?? NO_REFUSALS;
+    const own = source.listRefusals?.(query) ?? NO_REFUSALS;
     // Copied for the same reason a delivered page is: what a source hands
     // over reaches published state, and must not move under it afterwards.
     return own.length === 0 ? NO_REFUSALS : Object.freeze([...own]);
   };
 
   return {
-    refusals,
-    command(
+    listRefusals,
+    applyCommand(
       next: QueryCommand,
       history?: HistoryMode,
     ): readonly SourceRefusal[] {
@@ -112,18 +112,21 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       }
       // The query the command starts from is checked only when the one it
       // produces is refused at all — the rare path.
-      const after = refusals({ slice: applied.slice, window: applied.window });
+      const after = listRefusals({
+        slice: applied.slice,
+        window: applied.window,
+      });
       const incurred =
         after.length === 0
           ? after
-          : listIncurredRefusals(refusals({ slice, window }), after);
+          : listIncurredRefusals(listRefusals({ slice, window }), after);
       if (incurred.length > 0) {
         return incurred;
       }
       // Applied above to a copy, and here for real: the same command over
       // the same state, so what moved there moves here and issues a request.
       coordinator.dispatch(next);
-      announce(CAUSE_OF_COMMAND[next.kind], history);
+      announce(readCommandCause(next), history);
       return NO_REFUSALS;
     },
     adopt(

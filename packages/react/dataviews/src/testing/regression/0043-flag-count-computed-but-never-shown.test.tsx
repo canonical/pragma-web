@@ -16,13 +16,12 @@ import {
   createPage,
   declareCapabilities,
 } from "@canonical/dataviews-core";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { createManualSource } from "@canonical/dataviews-core/testing";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import type { FacetValue } from "../../../testing/types.js";
+import answerFacetValues from "../../../testing/answerFacetValues.js";
+import type { IdentifiedRecord as Owned } from "../../../testing/types.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
-
-type Owned = { readonly id: string };
 
 const owned = createCollection({
   identify: (row: Owned) => row.id,
@@ -48,25 +47,15 @@ describe("regression 0043 — flag count computed but never shown", () => {
         <DataViews.Filters />
       </DataViews>,
     );
-    /** Answer the latest request with the owner facet's values. */
-    const answerWith = (values: readonly FacetValue[]): void => {
-      act(() => {
-        manual.latest().deliver({
-          status: "succeeded",
-          page: createPage({
-            rows: [],
-            facets: { owner: { kind: "values", values } },
-          }),
-        });
-      });
-    };
-    answerWith([{ value: true, count: { kind: "exact", value: 3 } }]);
+    answerFacetValues(manual, "owner", [
+      { value: true, count: { kind: "exact", value: 3 } },
+    ]);
     const owner = screen.getByRole("checkbox", { name: "owner" });
     expect(owner).toHaveAccessibleDescription("3");
     fireEvent.click(owner);
     // Pending: the count the applied query answers is not yet known.
     expect(owner).not.toHaveAttribute("aria-describedby");
-    answerWith([]);
+    answerFacetValues(manual, "owner", []);
     expect(owner).toHaveAccessibleDescription("0");
   });
 

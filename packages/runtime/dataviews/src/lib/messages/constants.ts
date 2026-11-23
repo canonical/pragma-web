@@ -144,6 +144,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   filterLowest: (value) => `Lowest: ${value}`,
   filterHighest: (value) => `Highest: ${value}`,
   clearFilter: (name) => `Clear ${name}`,
+  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Not applied from the link",
   clauseRefused: (name, reason) => `${name}: ${composeClause(reason)}.`,
   grouping: "Grouping",

@@ -1,93 +1,89 @@
+import { assertInvariant } from "../assertion/index.js";
 import {
   collapseSortTerms,
   DEFAULT_WINDOW,
   EMPTY_SLICE,
   type GroupTerm,
-  OPERATOR_ARITY,
-  type Predicate,
-  type PredicateOperand,
-  type PredicateOperator,
   type ResultWindow,
   type Slice,
   type SortTerm,
 } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
-import {
-  resolveFieldKind,
-  type Schema,
-  type SchemaFieldDefinition,
-  type SchemaPredicateResult,
-} from "../schema/index.js";
-import { refusalsOf, type SourceCapabilities } from "../source/index.js";
+import { listQueryRefusals, type SourceCapabilities } from "../source/index.js";
 import {
   OPERATOR_DELIMITER,
   QUERY_KEYS,
   RESERVED_QUERY_KEYS,
-  SUFFIXED_OPERATORS,
 } from "./constants.js";
+import readKeyPredicate from "./readKeyPredicate.js";
 import readUndeclaredField from "./readUndeclaredField.js";
 import readWireField from "./readWireField.js";
-import type { DecodedQuery, DecodeQueryConfig } from "./types.js";
+import recordConjunct from "./recordConjunct.js";
+import type {
+  DecodedQuery,
+  DecodeQueryConfig,
+  ReadPredicate,
+} from "./types.js";
 
 const DIGITS = /^\d+$/;
 
-const isOperator = (
-  suffix: string,
-): suffix is (typeof SUFFIXED_OPERATORS)[number] =>
-  SUFFIXED_OPERATORS.some((operator) => operator === suffix);
-
-/** Read a parameter the grammar spells once, reporting any extra values. */
-const singletonOf = (
-  key: string,
-  values: readonly string[],
-  issues: QueryIssue[],
-): string => {
-  if (values.length > 1) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${key}" takes one value; the extra values were ignored`,
-    });
-  }
-  // A key read off the parameters has at least the value it was read from.
-  return values[0] as string;
+/** A value read off the parameters, with what reading it reported. */
+type Reading<T> = {
+  readonly value: T;
+  readonly issues: readonly QueryIssue[];
 };
 
-/** Read one window value, falling back rather than paging somewhere absurd. */
-const windowValueOf = (
+/** Read a parameter the grammar spells once, reporting any extra values. */
+const readSingleton = (
   key: string,
   values: readonly string[],
-  issues: QueryIssue[],
+): Reading<string> => ({
+  value: assertInvariant(
+    values.at(0),
+    "a key read off the parameters has the value it was read from",
+  ),
+  issues:
+    values.length > 1
+      ? [
+          {
+            parameter: key,
+            field: null,
+            code: "malformed",
+            reason: `"${key}" takes one value; the extra values were ignored`,
+          },
+        ]
+      : [],
+});
+
+/** Read one window value, falling back rather than paging somewhere absurd. */
+const readWindowValue = (
+  key: string,
+  values: readonly string[],
   fallback: number,
-): number => {
-  const value = singletonOf(key, values, issues);
+): Reading<number> => {
+  const { value, issues } = readSingleton(key, values);
   const parsed = Number(value);
-  if (!DIGITS.test(value) || parsed < 1) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${value}" is not a positive integer`,
-    });
-    return fallback;
-  }
   // Digits alone are not enough: past the safe range a page or size reads
   // as Infinity or as a neighbouring number.
-  if (!Number.isSafeInteger(parsed)) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${value}" is too large`,
-    });
-    return fallback;
-  }
-  return parsed;
+  const reason =
+    !DIGITS.test(value) || parsed < 1
+      ? `"${value}" is not a positive integer`
+      : Number.isSafeInteger(parsed)
+        ? null
+        : `"${value}" is too large`;
+  return reason === null
+    ? { value: parsed, issues }
+    : {
+        value: fallback,
+        issues: [
+          ...issues,
+          { parameter: key, field: null, code: "malformed", reason },
+        ],
+      };
 };
 
 /** Read one ordered sort term, or null when the value is not one. */
-const sortTermOf = (value: string): SortTerm | null => {
+const readSortTerm = (value: string): SortTerm | null => {
   const at = value.indexOf(OPERATOR_DELIMITER);
   if (at < 1) {
     return null;
@@ -100,176 +96,42 @@ const sortTermOf = (value: string): SortTerm | null => {
 };
 
 /**
- * One predicate as the parameters spelled it: the keys it was read from, so
- * a refusal of the predicate is reported under each key the link holds.
- */
-type ReadPredicate = {
-  readonly predicate: Predicate;
-  readonly keys: readonly string[];
-};
-
-/**
- * Keep an enforced predicate, or report why the parameter was refused. A set
- * operator read under a second spelling of its address — `status` and
- * `status__isAny` — is one predicate, holding the operands of both and
- * read from both keys.
- */
-const record = (
-  result: SchemaPredicateResult,
-  key: string,
-  filter: ReadPredicate[],
-  issues: QueryIssue[],
-): void => {
-  if (result.status === "valid") {
-    const { predicate } = result;
-    const kept = filter.find(
-      ({ predicate: candidate }) =>
-        candidate.field === predicate.field &&
-        candidate.operator === predicate.operator,
-    );
-    if (kept === undefined) {
-      filter.push({ predicate, keys: [key] });
-      return;
-    }
-    filter.splice(filter.indexOf(kept), 1, {
-      predicate: {
-        ...predicate,
-        operands: [...kept.predicate.operands, ...predicate.operands],
-      },
-      keys: [...kept.keys, key],
-    });
-    return;
-  }
-  issues.push({
-    parameter: key,
-    field: readWireField(key),
-    code: "invalid",
-    reason: result.reason,
-  });
-};
-
-/** Read one field's parameter into a schema-enforced predicate. */
-const readPredicate = (
-  key: string,
-  values: readonly string[],
-  schema: Schema<readonly SchemaFieldDefinition[]>,
-  definition: SchemaFieldDefinition,
-  filter: ReadPredicate[],
-  issues: QueryIssue[],
-): void => {
-  const { field } = definition;
-  const kind = resolveFieldKind(definition.kind);
-  let operator: PredicateOperator = "isAny";
-  if (key.includes(OPERATOR_DELIMITER)) {
-    const suffix = key.slice(field.length + OPERATOR_DELIMITER.length);
-    if (!isOperator(suffix)) {
-      issues.push({
-        parameter: key,
-        field,
-        code: "malformed",
-        reason: `unknown operator "${suffix}"`,
-      });
-      return;
-    }
-    operator = suffix;
-  }
-  if (
-    !kind.operators.includes(operator) ||
-    OPERATOR_ARITY[operator] === "none" ||
-    kind.input.kind === "none"
-  ) {
-    // An operator the kind does not accept is refused for the operator,
-    // before any value is read. The zero-value operator carries no operands
-    // — its presence is the predicate, never a truthiness test on its value
-    // — and a kind that filters without a text input has none to parse: the
-    // schema answers for the operator alone.
-    record(schema.predicateFor(field, operator, []), key, filter, issues);
-    return;
-  }
-  const operands: PredicateOperand[] = [];
-  for (const value of values) {
-    const parsed = schema.validateInput(field, value);
-    if (parsed.status === "valid") {
-      operands.push(...parsed.operands);
-      continue;
-    }
-    // The schema reads a blank input as incomplete, and no blank reaches
-    // it: the decoder dropped them before parsing.
-    /* v8 ignore next 3 -- unreachable: blanks are dropped above */
-    if (parsed.status === "incomplete") {
-      continue;
-    }
-    issues.push({
-      parameter: key,
-      field,
-      code: "invalid",
-      reason: parsed.reason,
-    });
-  }
-  if (operands.length === 0) {
-    return;
-  }
-  const isSet = OPERATOR_ARITY[operator] === "many";
-  if (!isSet && operands.length > 1) {
-    issues.push({
-      parameter: key,
-      field,
-      code: "malformed",
-      reason: `"${key}" takes one value; the extra values were ignored`,
-    });
-  }
-  record(
-    schema.predicateFor(
-      field,
-      operator,
-      isSet ? operands : operands.slice(0, 1),
-    ),
-    key,
-    filter,
-    issues,
-  );
-};
-
-/**
  * Leave out every clause the source cannot execute, reporting each. Each
  * clause is checked alone, over the default window, so one refusal names the
  * one parameter that caused it — a window the source cannot address is the
  * window's own refusal, not every clause's. An ordering is kept or refused
  * whole, never truncated.
  */
-const executableOf = (
+const keepExecutableSlice = (
   slice: Slice,
   filter: readonly ReadPredicate[],
   capabilities: SourceCapabilities,
-  issues: QueryIssue[],
-): Slice => {
+): Reading<Slice> => {
+  const issues: QueryIssue[] = [];
   const keeps = (
     parameters: readonly string[],
     field: string | null,
     clause: Slice,
   ): boolean => {
-    const refusals = refusalsOf(capabilities, {
+    const refusals = listQueryRefusals(capabilities, {
       slice: clause,
       window: DEFAULT_WINDOW,
     });
-    if (refusals.length === 0) {
-      return true;
-    }
     // Reported under every key the clause was read from, as the link spells
     // it, so carrying or clearing it finds what the URL holds.
-    for (const parameter of parameters) {
-      for (const refusal of refusals) {
-        issues.push({
+    issues.push(
+      ...parameters.flatMap((parameter) =>
+        refusals.map(({ code, reason }) => ({
           parameter,
           field,
-          code: refusal.code,
-          reason: refusal.reason,
-        });
-      }
-    }
-    return false;
+          code,
+          reason,
+        })),
+      ),
+    );
+    return refusals.length === 0;
   };
-  return {
+  const value: Slice = {
     filter: filter
       .filter(({ predicate, keys }) =>
         keeps(keys, predicate.field, { ...EMPTY_SLICE, filter: [predicate] }),
@@ -291,6 +153,7 @@ const executableOf = (
       ? slice.group
       : [],
   };
+  return { value, issues };
 };
 
 /**
@@ -299,27 +162,23 @@ const executableOf = (
  * out of a cursor source's reach is that source's own refusal at execution,
  * which needs the trail this layer does not have.
  */
-const addressableWindow = (
+const keepAddressableWindow = (
   window: ResultWindow,
   capabilities: SourceCapabilities,
-  issues: QueryIssue[],
-): ResultWindow => {
-  const refusals = refusalsOf(capabilities, {
+): Reading<ResultWindow> => {
+  const refusals = listQueryRefusals(capabilities, {
     slice: EMPTY_SLICE,
     window,
   });
-  if (refusals.length === 0) {
-    return window;
-  }
-  for (const refusal of refusals) {
-    issues.push({
+  return {
+    value: refusals.length === 0 ? window : { ...window, cursor: null },
+    issues: refusals.map(({ code, reason }) => ({
       parameter: QUERY_KEYS.cursor,
       field: null,
-      code: refusal.code,
-      reason: refusal.reason,
-    });
-  }
-  return { ...window, cursor: null };
+      code,
+      reason,
+    })),
+  };
 };
 
 /**
@@ -327,8 +186,9 @@ const addressableWindow = (
  *
  * The schema enforces every owned clause: values are parsed to their field's
  * type, operators are checked against the field's kind, and a clause that
- * fails is left out and reported. With the source's capabilities, a clause
- * it cannot execute is refused the same way. A key spelled `name__operator`
+ * fails is left out and reported. A third segment is the conjunct's
+ * ordinal, `tags__isAny__1`. With the source's capabilities, a clause it
+ * cannot execute is refused the same way. A key spelled `name__operator`
  * with one of the grammar's operators is a filter even when the collection
  * declares no such field, and is refused as `undeclared-field`; any other
  * parameter naming no field of this collection belongs to the host and is
@@ -342,7 +202,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   const { schema, params, capabilities } = config;
 
   const issues: QueryIssue[] = [];
-  const filter: ReadPredicate[] = [];
+  let filter: readonly ReadPredicate[] = [];
   let sort: readonly SortTerm[] = [];
   let search: string | null = null;
   let group: GroupTerm[] = [];
@@ -359,13 +219,15 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.search) {
-      search = singletonOf(key, values, issues);
+      const reading = readSingleton(key, values);
+      search = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.sort) {
       const terms: SortTerm[] = [];
       for (const value of values) {
-        const term = sortTermOf(value);
+        const term = readSortTerm(value);
         if (term === null) {
           issues.push({
             parameter: key,
@@ -398,15 +260,21 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.cursor) {
-      cursor = singletonOf(key, values, issues);
+      const reading = readSingleton(key, values);
+      cursor = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.page) {
-      page = windowValueOf(key, values, issues, page);
+      const reading = readWindowValue(key, values, page);
+      page = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.size) {
-      size = windowValueOf(key, values, issues, size);
+      const reading = readWindowValue(key, values, size);
+      size = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (RESERVED_QUERY_KEYS.includes(key)) {
@@ -430,7 +298,20 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       }
       continue;
     }
-    readPredicate(key, values, schema, definition, filter, issues);
+    const reading = readKeyPredicate(
+      key,
+      params.getAll(key),
+      schema,
+      definition,
+    );
+    issues.push(...reading.issues);
+    if (reading.conjunct !== null) {
+      const recorded = recordConjunct(filter, key, reading.conjunct);
+      filter = recorded.filter;
+      if (recorded.issue !== null) {
+        issues.push(recorded.issue);
+      }
+    }
   }
 
   const read: Slice = {
@@ -444,9 +325,11 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   if (capabilities === undefined || capabilities === null) {
     return { slice: read, window: readWindow, issues };
   }
+  const executable = keepExecutableSlice(read, filter, capabilities);
+  const addressable = keepAddressableWindow(readWindow, capabilities);
   return {
-    slice: executableOf(read, filter, capabilities, issues),
-    window: addressableWindow(readWindow, capabilities, issues),
-    issues,
+    slice: executable.value,
+    window: addressable.value,
+    issues: [...issues, ...executable.issues, ...addressable.issues],
   };
 }

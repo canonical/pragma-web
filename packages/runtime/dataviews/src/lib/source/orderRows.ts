@@ -1,3 +1,4 @@
+import { assertInvariant } from "../assertion/index.js";
 import type { RecordTypes } from "../collection/index.js";
 import { collapseSortTerms } from "../query/index.js";
 import { readField } from "../rows/index.js";
@@ -87,14 +88,14 @@ type CompiledTerm = {
  */
 const compareKeys = (
   term: CompiledTerm,
-  left: OrderKey | null,
-  right: OrderKey | null,
+  left: OrderKey | undefined,
+  right: OrderKey | undefined,
 ): number => {
   const empty = term.emptiesFirst ? -1 : 1;
-  if (left === null) {
-    return right === null ? 0 : empty;
+  if (left === undefined) {
+    return right === undefined ? 0 : empty;
   }
-  if (right === null) {
+  if (right === undefined) {
     return -empty;
   }
   const order =
@@ -216,19 +217,18 @@ export default function orderRows<TRow extends object>(
     row,
     keys: terms.map((term) =>
       term.applies === null || term.applies(row)
-        ? term.order.readKey(readField(row, term.field))
-        : null,
+        ? (term.order.readKey(readField(row, term.field)) ?? undefined)
+        : undefined,
     ),
   }));
   keyed.sort((a, b) => {
     // An index loop: a sort calls this for every comparison, and an entries
     // iterator would allocate an iterator and a pair per term each time.
     for (let index = 0; index < terms.length; index += 1) {
-      // Every key list was mapped from `terms`, so each index is in range.
       const order = compareKeys(
-        terms[index] as CompiledTerm,
-        a.keys[index] as OrderKey | null,
-        b.keys[index] as OrderKey | null,
+        assertInvariant(terms.at(index), "the loop holds the term"),
+        a.keys.at(index),
+        b.keys.at(index),
       );
       if (order !== 0) {
         return order;

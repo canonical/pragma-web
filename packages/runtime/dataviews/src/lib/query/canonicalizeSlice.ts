@@ -1,11 +1,11 @@
-import addressPredicate from "./addressPredicate.js";
 import collapseSortTerms from "./collapseSortTerms.js";
+import compareConjuncts from "./compareConjuncts.js";
 import { OPERATOR_ARITY } from "./constants.js";
 import rankOperand from "./rankOperand.js";
 import type { GroupTerm, Predicate, PredicateOperand, Slice } from "./types.js";
 
 /** Canonicalize one predicate: a set operator's operands become an ordered set. */
-const canonicalPredicate = (predicate: Predicate): Predicate => {
+const canonicalizePredicate = (predicate: Predicate): Predicate => {
   if (OPERATOR_ARITY[predicate.operator] !== "many") {
     return {
       field: predicate.field,
@@ -31,17 +31,10 @@ const canonicalPredicate = (predicate: Predicate): Predicate => {
 };
 
 /**
- * Order predicates by address. Addresses are unique after collapse, so this
- * strict comparison is a total order and never returns 0.
- */
-const compareByAddress = (a: Predicate, b: Predicate): number =>
-  addressPredicate(a.field, a.operator) > addressPredicate(b.field, b.operator)
-    ? 1
-    : -1;
-
-/**
- * Normalize a slice to its canonical form: set operands are sets,
- * predicates are ordered by address, sort and group terms keep their order
+ * Normalize a slice to its canonical form: set operands are sets, every
+ * conjunct is kept — two on one address both restrict — ordered by
+ * address and then by operands, and only identical conjuncts collapse,
+ * since `A AND A` is `A`; sort and group terms keep their order
  * with a repeated sort field collapsed to its first occurrence, and an empty
  * search is no search. Idempotent:
  * `canonicalizeSlice(canonicalizeSlice(x))` equals `canonicalizeSlice(x)`.
@@ -50,17 +43,16 @@ const compareByAddress = (a: Predicate, b: Predicate): number =>
  * name may change or move before the first release.
  */
 export default function canonicalizeSlice(slice: Slice): Slice {
-  const byAddress = new Map<string, Predicate>();
-  for (const predicate of slice.filter) {
-    byAddress.set(
-      addressPredicate(predicate.field, predicate.operator),
-      predicate,
-    );
+  const sorted = slice.filter.map(canonicalizePredicate).sort(compareConjuncts);
+  const filter: Predicate[] = [];
+  for (const predicate of sorted) {
+    const last = filter.at(-1);
+    if (last === undefined || compareConjuncts(last, predicate) !== 0) {
+      filter.push(predicate);
+    }
   }
   return {
-    filter: [...byAddress.values()]
-      .map(canonicalPredicate)
-      .sort(compareByAddress),
+    filter,
     search: slice.search === "" ? null : slice.search,
     sort: collapseSortTerms(slice.sort),
     group: slice.group.map((term): GroupTerm => ({ field: term.field })),

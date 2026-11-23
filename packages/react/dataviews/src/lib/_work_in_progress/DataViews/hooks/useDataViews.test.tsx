@@ -4,6 +4,7 @@
  * collection's records; what it is handed is read-only and commands the
  * shared query.
  */
+
 import {
   type ActionRun,
   createCollection,
@@ -11,11 +12,11 @@ import {
   declareCapabilities,
   type SourceActionRunner,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { type ReactNode, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
-import createManualSource from "../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
 import { machines } from "../../../../../testing/machines.js";
 import type { MachineProvider } from "../../../../../testing/types.js";
@@ -24,7 +25,7 @@ import DataViews from "../Provider.js";
 import useDataViews from "./useDataViews.js";
 
 /** A wrapper for renderHook, over one root. */
-const inRoot =
+const withRoot =
   (provider: MachineProvider) =>
   ({ children }: { children: ReactNode }) => (
     <DataViews provider={provider}>{children}</DataViews>
@@ -40,7 +41,7 @@ describe("useDataViews", () => {
   it("returns the stable typed scope for the enclosing provider", () => {
     const { provider } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     expect(result.current.collection).toBe(machines);
     expect(result.current.capabilities).toBe(provider.capabilities);
@@ -74,7 +75,7 @@ describe("useDataViews", () => {
   it("hands out channels that cannot be published on", () => {
     const { provider } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     for (const channel of [
       result.current.state,
@@ -92,7 +93,7 @@ describe("useDataViews", () => {
   it("serves the same scope across re-renders", () => {
     const { provider } = createMachineProvider();
     const { result, rerender } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     const first = result.current;
     rerender();
@@ -109,7 +110,7 @@ describe("useDataViews", () => {
     const { provider } = createMachineProvider();
     expect(() =>
       renderHook(() => useDataViews(racks), {
-        wrapper: inRoot(provider),
+        wrapper: withRoot(provider),
       }),
     ).toThrow(
       "useDataViews was passed a collection that is not the one the enclosing DataViews root's provider was built over",
@@ -133,7 +134,7 @@ describe("useDataViews", () => {
   it("commands the shared query through the scope", () => {
     const { provider, source } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     let refusals: readonly unknown[] = [];
     act(() => {
@@ -153,7 +154,7 @@ describe("useDataViews", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["failed"] },
     ]);
-    expect(source.latest().request.slice.search).toBe("alpha");
+    expect(source.readLatest().request.slice.search).toBe("alpha");
   });
 
   it("runs a declared action over the selection through the source", async () => {
@@ -176,7 +177,7 @@ describe("useDataViews", () => {
       runAction,
     });
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     act(() => {
       provider.selection.add(["m1", "m2"]);
@@ -189,7 +190,7 @@ describe("useDataViews", () => {
       throw new Error("expected the run to settle");
     }
     expect(runAction).toHaveBeenCalledTimes(1);
-    expect(runAction.mock.calls[0]?.[0]).toEqual({
+    expect(runAction.mock.calls.at(0)?.at(0)).toEqual({
       action: "stop",
       targets: { kind: "explicit", ids: ["m1", "m2"] },
       payload: undefined,

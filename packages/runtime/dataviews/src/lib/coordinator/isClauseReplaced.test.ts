@@ -41,6 +41,39 @@ describe("isClauseReplaced", () => {
     ).toBe(false);
   });
 
+  it("replaces a filter's clause by an edit touching its field", () => {
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [{ field: "status", operator: "isAny", nth: 0 }],
+          add: [],
+        },
+        status,
+      ),
+    ).toBe(true);
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [],
+          add: [{ field: "status", operator: "isNone", operands: ["a"] }],
+        },
+        status,
+      ),
+    ).toBe(true);
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [{ field: "cpu", operator: "gte", nth: 0 }],
+          add: [{ field: "cpu", operator: "lte", operands: [8] }],
+        },
+        status,
+      ),
+    ).toBe(false);
+  });
+
   it("replaces a refused search by the search, and nothing else by it", () => {
     expect(isClauseReplaced({ kind: "setSearch", search: "" }, search)).toBe(
       true,
@@ -53,6 +86,21 @@ describe("isClauseReplaced", () => {
   it("replaces nothing by a command addressing no clause", () => {
     expect(isClauseReplaced({ kind: "setSort", sort: [] }, status)).toBe(false);
     expect(isClauseReplaced({ kind: "navigateWindow", page: 2 }, search)).toBe(
+      false,
+    );
+  });
+
+  it("replaces a clause by a clear emptying the part it is in", () => {
+    expect(isClauseReplaced({ kind: "clear", paths: ["filter"] }, status)).toBe(
+      true,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["filter"] }, search)).toBe(
+      false,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["search"] }, search)).toBe(
+      true,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["search"] }, status)).toBe(
       false,
     );
   });
