@@ -21,6 +21,8 @@ import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataV
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
+import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
+import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -57,6 +59,8 @@ const rendered = {
   Filters: Object.fromEntries(
     filters.filter(([name]) => !PLAYED_FILTER_STORIES.has(name)),
   ),
+  QueryChip: composeStories(queryChipStories),
+  QueryChips: composeStories(queryChipsStories),
 };
 
 /** The stories checked once their play function has run, by part. */

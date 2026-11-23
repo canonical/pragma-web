@@ -13,6 +13,10 @@ export type {
   DataViewsSearchProps,
   DataViewsSortPanelProps,
   PaginationBarProps,
+  QueryChipEntryProps,
+  QueryChipProps,
+  QueryChipSegmentProps,
+  QueryChipsProps,
   UseDataViewsFilterResult,
   UseDataViewsResult,
 } from "./_work_in_progress/index.js";
@@ -20,6 +24,8 @@ export {
   DataTable,
   DataViews,
   PaginationBar,
+  QueryChip,
+  QueryChips,
   useDataViews,
   useDataViewsFilter,
 } from "./_work_in_progress/index.js";
