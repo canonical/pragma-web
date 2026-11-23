@@ -66,7 +66,7 @@ const RangeDrawing = ({
       <svg
         className="chart"
         role="img"
-        aria-label={messages.rangeChartSummary(label, min, max)}
+        aria-label={messages.rangeChartSummary({ label, min, max })}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         fontSize={TEXT_SIZE}
       >

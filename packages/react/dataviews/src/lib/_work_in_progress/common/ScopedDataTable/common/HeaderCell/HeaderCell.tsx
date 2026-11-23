@@ -210,11 +210,11 @@ export default function HeaderCell({
       )}
       {precedence === null ? null : (
         <span id={descriptionId} hidden>
-          {messages.sortPrecedence(
-            precedence.direction,
-            precedence.position,
-            precedence.count,
-          )}
+          {messages.sortPrecedence({
+            direction: precedence.direction,
+            position: precedence.position,
+            total: precedence.count,
+          })}
         </span>
       )}
       {drawsReason ? (

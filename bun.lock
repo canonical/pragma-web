@@ -1037,6 +1037,7 @@
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
+        "@canonical/i18n-core": "^0.47.0",
         "@canonical/router-core": "^0.47.0",
         "@canonical/typescript-config": "0.46.0",
         "@canonical/webarchitect": "0.46.0",

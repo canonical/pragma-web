@@ -87,10 +87,10 @@ const fr: DataViewsMessages = {
   columnEndPlacement: (name) =>
     `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
-  sortPrecedence: (direction, position, terms) =>
-    terms === 1
+  sortPrecedence: ({ direction, position, total }) =>
+    total === 1
       ? DIRECTIONS[direction]
-      : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} critère sur ${count(terms)}`,
+      : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} critère sur ${count(total)}`,
   sortRefused: (reasons) =>
     reasons.length === 0
       ? "Tri inchangé."
@@ -122,14 +122,14 @@ const fr: DataViewsMessages = {
   resetTableSettings: "Réinitialiser les paramètres du tableau",
 
   columnHidden: (name) => `${name} masquée`,
-  columnShown: (name, position, shown) =>
-    `${name} affichée, position ${count(position)} sur ${count(shown)}`,
-  columnMoved: (name, position, shown) =>
-    `${name} déplacée en position ${count(position)} sur ${count(shown)}`,
+  columnShown: ({ name, position, total }) =>
+    `${name} affichée, position ${count(position)} sur ${count(total)}`,
+  columnMoved: ({ name, position, total }) =>
+    `${name} déplacée en position ${count(position)} sur ${count(total)}`,
   tableSettingsReset: "Paramètres du tableau réinitialisés",
 
   sortPanel: "Tri",
-  sortTerm: (name, direction) => `${name}, ${DIRECTIONS[direction]}`,
+  sortTerm: ({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`,
   moveSortTermUp: "Monter",
   moveSortTermDown: "Descendre",
   removeSortTerm: "Retirer",
@@ -142,9 +142,9 @@ const fr: DataViewsMessages = {
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
-  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
+  filterAlso: ({ phrase, values }) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Non appliqué depuis le lien",
-  clauseRefused: (name, reason) => `${name} : ${trimClause(reason)}.`,
+  clauseRefused: ({ name, reason }) => `${name} : ${trimClause(reason)}.`,
   grouping: "Regroupement",
   filterIsAnyOf: (label) => `${label} est l’une des valeurs`,
   filterIsNoneOf: (label) => `${label} n’est aucune des valeurs`,
@@ -157,7 +157,7 @@ const fr: DataViewsMessages = {
     retained
       ? "Saisissez une valeur pour modifier cette restriction. La restriction précédente s’applique toujours."
       : "Saisissez une valeur pour appliquer cette restriction.",
-  filterRefused: (reasons, retained) => {
+  filterRefused: ({ reasons, retained }) => {
     const refused = reasons.map((reason) => `${trimClause(reason)}.`).join(" ");
     return retained
       ? `${refused} La restriction précédente s’applique toujours.`
@@ -170,7 +170,7 @@ const fr: DataViewsMessages = {
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",
   submitPageSize: "Appliquer la taille de page",
-  rowsShown: (first, shown, counted) => {
+  rowsShown: ({ first, shown, total: counted }) => {
     const range =
       shown === 0 ? "0" : `${count(first)}–${count(first + shown - 1)}`;
     if (counted.kind === "unknown") {
@@ -226,18 +226,18 @@ const fr: DataViewsMessages = {
   viewSaved: (name) => `« ${name} » enregistrée.`,
   viewRenamed: (name) => `Renommée en « ${name} ».`,
   viewDeleted: "Vue supprimée.",
-  viewRefused: (name, reasons) =>
+  viewRefused: ({ name, reasons }) =>
     `Non ouverte : « ${name} » demande ce que cette collection ne peut pas afficher — ${reasons
       .map(trimClause)
       .join(" ; ")}. La requête est inchangée.`,
-  viewConflicted: (command, name) =>
+  viewConflicted: ({ command, name }) =>
     command === "save-as"
       ? "Non enregistrée : une autre vue est stockée sous la même identité. Réessayez."
       : `${NOT_DONE[command]} : « ${name} » a été modifiée ailleurs.`,
   viewMissing: (command) => `${NOT_DONE[command]} : la vue n’existe plus.`,
-  viewUnreadable: (command, reason) =>
+  viewUnreadable: ({ command, reason }) =>
     `${NOT_DONE[command]} : la vue stockée est illisible (${trimClause(reason)}).`,
-  viewFailed: (command, reason) =>
+  viewFailed: ({ command, reason }) =>
     `${NOT_DONE[command]} : ${trimClause(reason)}.`,
 
   selectionActions: "Actions sur la sélection",
@@ -251,7 +251,7 @@ const fr: DataViewsMessages = {
   facetValuesNone: "Aucun enregistrement correspondant n’a de valeur.",
   barChartSummary: (label) =>
     `${label} : un diagramme en barres du nombre d’enregistrements par valeur`,
-  rangeChartSummary: (label, min, max) =>
+  rangeChartSummary: ({ label, min, max }) =>
     `${label} : une plage de ${count(min)} à ${count(max)}`,
   chartTable: (label) => `${label}, sous forme de tableau`,
   chartValue: "Valeur",

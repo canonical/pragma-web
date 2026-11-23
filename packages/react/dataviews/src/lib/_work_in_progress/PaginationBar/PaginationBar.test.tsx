@@ -776,7 +776,7 @@ describe("PaginationBar", () => {
         rowsPerPage: "Lignes par page",
         page: "Feuille",
         pageCount: (pages) => `sur ${pages}`,
-        rowsShown: (first, shown) => `${first} + ${shown}`,
+        rowsShown: ({ first, shown }) => `${first} + ${shown}`,
         goToFirstPage: "Première",
         goToPreviousPage: "Précédente",
         goToNextPage: "Suivante",

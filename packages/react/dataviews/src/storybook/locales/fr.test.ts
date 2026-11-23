@@ -64,11 +64,15 @@ describe("fr", () => {
   });
 
   it("states sort precedence with French ordinals", () => {
-    expect(fr.sortPrecedence("asc", 1, 1)).toBe("croissant");
-    expect(fr.sortPrecedence("desc", 1, 2)).toBe(
-      "décroissant, 1er critère sur 2",
+    expect(fr.sortPrecedence({ direction: "asc", position: 1, total: 1 })).toBe(
+      "croissant",
     );
-    expect(fr.sortPrecedence("asc", 2, 2)).toBe("croissant, 2e critère sur 2");
+    expect(
+      fr.sortPrecedence({ direction: "desc", position: 1, total: 2 }),
+    ).toBe("décroissant, 1er critère sur 2");
+    expect(fr.sortPrecedence({ direction: "asc", position: 2, total: 2 })).toBe(
+      "croissant, 2e critère sur 2",
+    );
   });
 
   it("states sort outcomes", () => {
@@ -83,7 +87,9 @@ describe("fr", () => {
     expect(fr.sortDefaulted([{ name: "Nom", direction: "asc" }])).toBe(
       "Trié selon l’ordre de la source : Nom, croissant.",
     );
-    expect(fr.sortTerm("Nom", "desc")).toBe("Nom, décroissant");
+    expect(fr.sortTerm({ name: "Nom", direction: "desc" })).toBe(
+      "Nom, décroissant",
+    );
   });
 
   it("names columns and their moves", () => {
@@ -96,8 +102,10 @@ describe("fr", () => {
     expect(fr.moveNamedColumnRight("Nom")).toBe("Déplacer Nom vers la droite");
     expect(fr.columnAlwaysShown("Nom")).toBe("Nom est toujours affichée");
     expect(fr.columnHidden("Nom")).toBe("Nom masquée");
-    expect(fr.columnShown("Nom", 2, 5)).toBe("Nom affichée, position 2 sur 5");
-    expect(fr.columnMoved("Nom", 1, 5)).toBe(
+    expect(fr.columnShown({ name: "Nom", position: 2, total: 5 })).toBe(
+      "Nom affichée, position 2 sur 5",
+    );
+    expect(fr.columnMoved({ name: "Nom", position: 1, total: 5 })).toBe(
       "Nom déplacée en position 1 sur 5",
     );
   });
@@ -108,10 +116,12 @@ describe("fr", () => {
     expect(fr.filterLowest("1")).toBe("Minimum : 1");
     expect(fr.filterHighest("8")).toBe("Maximum : 8");
     expect(fr.clearFilter("Statut")).toBe("Effacer Statut");
-    expect(fr.filterAlso("Cœurs à partir de", ["4", "8"])).toBe(
-      "Cœurs à partir de 4, 8",
+    expect(
+      fr.filterAlso({ phrase: "Cœurs à partir de", values: ["4", "8"] }),
+    ).toBe("Cœurs à partir de 4, 8");
+    expect(fr.clauseRefused({ name: "Statut", reason: "inconnu." })).toBe(
+      "Statut : inconnu.",
     );
-    expect(fr.clauseRefused("Statut", "inconnu.")).toBe("Statut : inconnu.");
     expect(fr.filterIsAnyOf("Statut")).toBe("Statut est l’une des valeurs");
     expect(fr.filterIsNoneOf("Statut")).toBe("Statut n’est aucune des valeurs");
     expect(fr.filterContains("Nom")).toBe("Nom contient");
@@ -132,24 +142,36 @@ describe("fr", () => {
     expect(fr.filterIncomplete(false)).toBe(
       "Saisissez une valeur pour appliquer cette restriction.",
     );
-    expect(fr.filterRefused(["trop grand", "négatif."], true)).toBe(
+    expect(
+      fr.filterRefused({ reasons: ["trop grand", "négatif."], retained: true }),
+    ).toBe(
       "trop grand. négatif. La restriction précédente s’applique toujours.",
     );
-    expect(fr.filterRefused(["trop grand"], false)).toBe("trop grand.");
+    expect(fr.filterRefused({ reasons: ["trop grand"], retained: false })).toBe(
+      "trop grand.",
+    );
   });
 
   it("states the rows shown, counted or not", () => {
-    expect(fr.rowsShown(1, 0, { kind: "unknown" })).toBe("Lignes 0 affichées");
-    expect(fr.rowsShown(3, 1, { kind: "unknown" })).toBe("Ligne 3 affichée");
-    expect(fr.rowsShown(1, 10, { kind: "unknown" })).toBe(
-      "Lignes 1–10 affichées",
-    );
-    expect(fr.rowsShown(3, 1, { kind: "exact", value: 3 })).toBe(
-      "Ligne 3 sur 3",
-    );
-    expect(fr.rowsShown(1, 10, { kind: "at-least", value: 50 })).toBe(
-      "Lignes 1–10 sur au moins 50",
-    );
+    expect(
+      fr.rowsShown({ first: 1, shown: 0, total: { kind: "unknown" } }),
+    ).toBe("Lignes 0 affichées");
+    expect(
+      fr.rowsShown({ first: 3, shown: 1, total: { kind: "unknown" } }),
+    ).toBe("Ligne 3 affichée");
+    expect(
+      fr.rowsShown({ first: 1, shown: 10, total: { kind: "unknown" } }),
+    ).toBe("Lignes 1–10 affichées");
+    expect(
+      fr.rowsShown({ first: 3, shown: 1, total: { kind: "exact", value: 3 } }),
+    ).toBe("Ligne 3 sur 3");
+    expect(
+      fr.rowsShown({
+        first: 1,
+        shown: 10,
+        total: { kind: "at-least", value: 50 },
+      }),
+    ).toBe("Lignes 1–10 sur au moins 50");
   });
 
   it("states saved-view outcomes", () => {
@@ -168,27 +190,29 @@ describe("fr", () => {
     expect(fr.viewOpened("Pannes")).toBe("« Pannes » ouverte.");
     expect(fr.viewSaved("Pannes")).toBe("« Pannes » enregistrée.");
     expect(fr.viewRenamed("Pannes")).toBe("Renommée en « Pannes ».");
-    expect(fr.viewRefused("Pannes", ["a.", "b"])).toBe(
+    expect(fr.viewRefused({ name: "Pannes", reasons: ["a.", "b"] })).toBe(
       "Non ouverte : « Pannes » demande ce que cette collection ne peut pas afficher — a ; b. La requête est inchangée.",
     );
-    expect(fr.viewConflicted("save-as", "Pannes")).toBe(
+    expect(fr.viewConflicted({ command: "save-as", name: "Pannes" })).toBe(
       "Non enregistrée : une autre vue est stockée sous la même identité. Réessayez.",
     );
-    expect(fr.viewConflicted("remove", "Pannes")).toBe(
+    expect(fr.viewConflicted({ command: "remove", name: "Pannes" })).toBe(
       "Non supprimée : « Pannes » a été modifiée ailleurs.",
     );
     expect(fr.viewMissing("open")).toBe("Non ouverte : la vue n’existe plus.");
-    expect(fr.viewUnreadable("save", "JSON.")).toBe(
+    expect(fr.viewUnreadable({ command: "save", reason: "JSON." })).toBe(
       "Non enregistrée : la vue stockée est illisible (JSON).",
     );
-    expect(fr.viewFailed("rename", "quota")).toBe("Non renommée : quota.");
+    expect(fr.viewFailed({ command: "rename", reason: "quota" })).toBe(
+      "Non renommée : quota.",
+    );
   });
 
   it("summarises charts", () => {
     expect(fr.barChartSummary("Statut")).toBe(
       "Statut : un diagramme en barres du nombre d’enregistrements par valeur",
     );
-    expect(fr.rangeChartSummary("Cœurs", 1, 64)).toBe(
+    expect(fr.rangeChartSummary({ label: "Cœurs", min: 1, max: 64 })).toBe(
       "Cœurs : une plage de 1 à 64",
     );
     expect(fr.chartTable("Statut")).toBe("Statut, sous forme de tableau");

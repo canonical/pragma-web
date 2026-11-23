@@ -37,7 +37,7 @@ export default function FurtherConjunct({
   const hydrated = useIsHydrated();
   const { link, button } = useHydrationFocusHandoff({ hydrated });
   const values = spellWireValues({ field, operator, operands });
-  const name = messages.filterAlso(phrase, values);
+  const name = messages.filterAlso({ phrase, values });
   /**
    * Where the Clear leads without scripts: the query the core's own removal
    * makes of the applied one, so the link and the button arrive at the

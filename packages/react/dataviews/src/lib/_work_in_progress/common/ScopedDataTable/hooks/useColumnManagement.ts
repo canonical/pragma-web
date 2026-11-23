@@ -248,7 +248,7 @@ export default function useColumnManagement<
         change === "show" ? messages.columnShown : messages.columnMoved;
       announce(
         composeMessage((place) =>
-          word(place(column.header), position, shown.length),
+          word({ name: place(column.header), position, total: shown.length }),
         ),
       );
     },

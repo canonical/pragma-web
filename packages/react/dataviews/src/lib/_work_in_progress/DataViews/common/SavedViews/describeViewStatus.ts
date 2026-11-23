@@ -34,17 +34,17 @@ export default function describeViewStatus(
     case "removed":
       return messages.viewDeleted;
     case "refused":
-      return messages.viewRefused(
-        outcome.view.name,
-        outcome.issues.map((issue) => issue.reason),
-      );
+      return messages.viewRefused({
+        name: outcome.view.name,
+        reasons: outcome.issues.map((issue) => issue.reason),
+      });
     case "conflict":
-      return messages.viewConflicted(command, outcome.view.name);
+      return messages.viewConflicted({ command, name: outcome.view.name });
     case "missing":
       return messages.viewMissing(command);
     case "unreadable":
-      return messages.viewUnreadable(command, outcome.reason);
+      return messages.viewUnreadable({ command, reason: outcome.reason });
     case "failed":
-      return messages.viewFailed(command, outcome.reason);
+      return messages.viewFailed({ command, reason: outcome.reason });
   }
 }

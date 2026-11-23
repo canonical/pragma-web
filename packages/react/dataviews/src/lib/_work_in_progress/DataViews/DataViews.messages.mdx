@@ -78,7 +78,7 @@ Inside a root, the connected twins (`DataViews.DataTable`, `DataViews.Pagination
 
 ## Messages that state a fact
 
-A message that states a fact is a function of that fact. The part calls it with the fact, and the message words it:
+A message that states facts is a function of one argument. The part calls it with the facts, and the message words them:
 
 | Message | Called with | English |
 | --- | --- | --- |
@@ -86,16 +86,16 @@ A message that states a fact is a function of that fact. The part calls it with 
 | `statusFailed` | the reason | `These rows could not be loaded: the inventory is offline` |
 | `deselectRows` | a count | `Deselect 3 rows` |
 | `pageCount` | a count | `of 1 page`, `of 12 pages` |
-| `rowsShown` | the first row, how many show, and the total as a `Count` | `Showing 1–5 out of 12 rows` |
-| `sortPrecedence` | a direction, a position and a total | `ascending, 2nd of 3` |
-| `columnMoved` | a column's name, its position and how many show | `Host moved to position 2 of 4` |
-| `filterRefused` | every reason, and whether the earlier restriction still applies | `Must be a number. The previous restriction still applies.` |
+| `rowsShown` | `{ first, shown, total }`, the total a `Count` | `Showing 1–5 out of 12 rows` |
+| `sortPrecedence` | `{ direction, position, total }` | `ascending, 2nd of 3` |
+| `columnMoved` | `{ name, position, total }` | `Host moved to position 2 of 4` |
+| `filterRefused` | `{ reasons, retained }` | `Must be a number. The previous restriction still applies.` |
 | `viewPending` | the saved-view command | `Saving…` |
 
 How the facts are passed:
 
-- One fact per argument, the subject first. For a saved-view message, the command comes first.
-- An object only where the core already has that record: the `Count` that `rowsShown` and `facetCount` take is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
+- One argument at most. One fact is passed as is; two or more as one object naming each, so a translation cannot take them in the wrong order.
+- A `Count` is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
 - A list of like facts as an array, such as the reasons `sortRefused` takes.
 - A name is placed where the message puts it and never altered. It may stand for a column heading drawn as an element, not as text.
 

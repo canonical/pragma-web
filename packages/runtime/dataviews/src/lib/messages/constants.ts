@@ -5,6 +5,7 @@
  * cannot apply ends with.
  */
 
+import type { MessageRecord } from "@canonical/i18n-core";
 import type { SortDirection } from "../query/index.js";
 import type { ViewCommand } from "../views/index.js";
 import choosePlural from "./choosePlural.js";
@@ -55,7 +56,8 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
  * through the platform's English rules, counts through its number format,
  * and every reason is stripped of the full stops it came with — those that
  * end a sentence of their own then take one, and those a message runs on
- * from take none.
+ * from take none. It is a `MessageRecord`: each message takes one argument
+ * at most.
  */
 export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   statusPending: "Loading…",
@@ -83,7 +85,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   columnEndPlacement: (name) =>
     `Click or tap in the header row where the ${name} column should end. Press the edge again or Escape to cancel.`,
 
-  sortPrecedence: (direction, position, total) =>
+  sortPrecedence: ({ direction, position, total }) =>
     total === 1
       ? DIRECTIONS[direction]
       : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} of ${formatCount(total)}`,
@@ -124,14 +126,14 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   resetTableSettings: "Reset table settings",
 
   columnHidden: (name) => `${name} hidden`,
-  columnShown: (name, position, total) =>
+  columnShown: ({ name, position, total }) =>
     `${name} shown, position ${formatCount(position)} of ${formatCount(total)}`,
-  columnMoved: (name, position, total) =>
+  columnMoved: ({ name, position, total }) =>
     `${name} moved to position ${formatCount(position)} of ${formatCount(total)}`,
   tableSettingsReset: "Table settings reset",
 
   sortPanel: "Sort",
-  sortTerm: formatSortTerm,
+  sortTerm: ({ name, direction }) => formatSortTerm(name, direction),
   moveSortTermUp: "Move up",
   moveSortTermDown: "Move down",
   removeSortTerm: "Remove",
@@ -144,9 +146,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   filterLowest: (value) => `Lowest: ${value}`,
   filterHighest: (value) => `Highest: ${value}`,
   clearFilter: (name) => `Clear ${name}`,
-  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
+  filterAlso: ({ phrase, values }) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Not applied from the link",
-  clauseRefused: (name, reason) => `${name}: ${composeClause(reason)}.`,
+  clauseRefused: ({ name, reason }) => `${name}: ${composeClause(reason)}.`,
   grouping: "Grouping",
   filterIsAnyOf: (label) => `${label} is any of`,
   filterIsNoneOf: (label) => `${label} is none of`,
@@ -162,7 +164,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     retained
       ? `Enter a value to change this restriction. ${STILL_APPLIES}`
       : "Enter a value to apply this restriction.",
-  filterRefused: (reasons, retained) => {
+  filterRefused: ({ reasons, retained }) => {
     const sentences = reasons
       .filter((reason) => composeClause(reason) !== "")
       .map(composeSentence)
@@ -179,7 +181,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   pagination: "Pagination",
   rowsPerPage: "Rows per page",
   submitPageSize: "Apply page size",
-  rowsShown: (first, shown, total) => {
+  rowsShown: ({ first, shown, total }) => {
     const range =
       shown === 0
         ? "0"
@@ -238,11 +240,11 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   viewSaved: (name) => `Saved "${name}".`,
   viewRenamed: (name) => `Renamed to "${name}".`,
   viewDeleted: "View deleted.",
-  viewRefused: (name, reasons) =>
+  viewRefused: ({ name, reasons }) =>
     `Not opened: "${name}" asks for what this collection cannot show — ${reasons
       .map(composeClause)
       .join("; ")}. The query is unchanged.`,
-  viewConflicted: (command, name) => {
+  viewConflicted: ({ command, name }) => {
     switch (command) {
       case "save":
         return `Not saved: "${name}" was changed elsewhere. Overwrite it, save your changes as a new view, or discard them.`;
@@ -253,9 +255,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     }
   },
   viewMissing: (command) => `${NOT_DONE[command]}: the view no longer exists.`,
-  viewUnreadable: (command, reason) =>
+  viewUnreadable: ({ command, reason }) =>
     `${NOT_DONE[command]}: the stored view cannot be read (${composeClause(reason)}).`,
-  viewFailed: (command, reason) =>
+  viewFailed: ({ command, reason }) =>
     `${NOT_DONE[command]}: ${composeClause(reason)}.`,
 
   selectionActions: "Selection actions",
@@ -268,7 +270,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   facetValuesNone: "No matching record holds a value.",
   barChartSummary: (label) =>
     `${label}: a bar chart of how many records hold each value`,
-  rangeChartSummary: (label, min, max) =>
+  rangeChartSummary: ({ label, min, max }) =>
     `${label}: a range chart from ${min} to ${max}`,
   chartTable: (label) => `${label}, as a table`,
   chartValue: "Value",
@@ -281,4 +283,4 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   chartRenderer: "Chart",
   tableRenderer: "Table",
-});
+} satisfies DataViewsMessages) satisfies MessageRecord;

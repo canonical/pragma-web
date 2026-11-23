@@ -178,7 +178,7 @@ export default function LinkRefusals({
           return (
             <li key={key}>
               <span className="reason">
-                {messages.clauseRefused(name, issue.reason)}
+                {messages.clauseRefused({ name, reason: issue.reason })}
               </span>
               {destination !== undefined && hydrated ? (
                 <Button

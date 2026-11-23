@@ -126,7 +126,7 @@ describe("describeViewStatus", () => {
     const messages = resolveMessages({
       viewPending: (command) => `en cours : ${command}`,
       viewDeleted: "Vue supprimée.",
-      viewConflicted: (command, name) => `conflit ${command} ${name}`,
+      viewConflicted: ({ command, name }) => `conflit ${command} ${name}`,
     });
     expect(
       describeViewStatus(

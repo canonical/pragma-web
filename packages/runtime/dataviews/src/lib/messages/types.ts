@@ -33,6 +33,24 @@ export type SortTermWords = {
 export type FacetCountWords = Exclude<Count, { readonly kind: "unknown" }>;
 
 /**
+ * A column's place after a change: its name, and its position among however
+ * many columns show.
+ */
+type ColumnPlaceFacts = {
+  readonly name: string;
+  readonly position: number;
+  readonly total: number;
+};
+
+/**
+ * A saved-view command that did not happen, and why.
+ */
+type ViewCommandFacts = {
+  readonly command: ViewCommand;
+  readonly reason: string;
+};
+
+/**
  * Every user-facing string DataViews renders or announces. It ships in
  * English; an application replaces it whole or in part through the root's
  * `messages`, and a part that is its own root — a standalone `DataTable` or
@@ -67,14 +85,9 @@ export type FacetCountWords = Exclude<Count, { readonly kind: "unknown" }>;
  * - a hint or a description names what it describes — `sortPrecedence`,
  *   `filterLowest`, `pageCount`.
  *
- * **How a message is handed its facts.** One fact per argument, the subject
- * first and, where a message is about a saved-view command, the command
- * first. An object is passed only where the core already has that record —
- * a `Count` — and a list of like facts is passed as an array. A name a
- * message is handed is placed where the message puts it and never altered,
- * since it may stand for a column heading drawn as more than text. Plurals
- * and ordinals are the message's own to word, as the English record words
- * them through the platform's English rules.
+ * **Facts.** One argument at most: one fact as is, two or more as one named
+ * object, a list as an array. Place names unaltered; word plurals and
+ * ordinals yourself.
  *
  * Message keys are noun phrases rather than verbs: a message is named for
  * what it says, and the name must not change when a message stops being
@@ -126,11 +139,11 @@ export type DataViewsMessages = {
    * What a sorted heading states of its column: its direction, and its
    * precedence once the ordering has more than one term.
    */
-  readonly sortPrecedence: (
-    direction: SortDirection,
-    position: number,
-    total: number,
-  ) => string;
+  readonly sortPrecedence: (facts: {
+    readonly direction: SortDirection;
+    readonly position: number;
+    readonly total: number;
+  }) => string;
   /**
    * Why an activation of a heading changed no ordering: every reason the
    * source gave, as `filterRefused` takes them.
@@ -167,24 +180,19 @@ export type DataViewsMessages = {
   // What a change to the columns announces.
   readonly columnHidden: (name: string) => string;
   /** A column shown again, with its place among however many columns show. */
-  readonly columnShown: (
-    name: string,
-    position: number,
-    total: number,
-  ) => string;
+  readonly columnShown: (facts: ColumnPlaceFacts) => string;
   /** A column moved, with its place among however many columns show. */
-  readonly columnMoved: (
-    name: string,
-    position: number,
-    total: number,
-  ) => string;
+  readonly columnMoved: (facts: ColumnPlaceFacts) => string;
   readonly tableSettingsReset: string;
 
   // The sort panel.
   /** The panel's name. */
   readonly sortPanel: string;
   /** One term of the reader's ordering, by the name its field is shown by. */
-  readonly sortTerm: (name: string, direction: SortDirection) => string;
+  readonly sortTerm: (facts: {
+    readonly name: string;
+    readonly direction: SortDirection;
+  }) => string;
   readonly moveSortTermUp: string;
   readonly moveSortTermDown: string;
   readonly removeSortTerm: string;
@@ -211,11 +219,17 @@ export type DataViewsMessages = {
    * after it: the control's phrase and the values the restriction holds.
    * What `clearFilter` names it by.
    */
-  readonly filterAlso: (phrase: string, values: readonly string[]) => string;
+  readonly filterAlso: (facts: {
+    readonly phrase: string;
+    readonly values: readonly string[];
+  }) => string;
   /** The list of a followed link's clauses that were refused, as a place. */
   readonly linkRefusals: string;
   /** One refused clause of a followed link, by its name, and why. */
-  readonly clauseRefused: (name: string, reason: string) => string;
+  readonly clauseRefused: (facts: {
+    readonly name: string;
+    readonly reason: string;
+  }) => string;
   /** A refused grouping's name, where the link names no field to group by. */
   readonly grouping: string;
   /** A closed set's any-of group, by the field's label. */
@@ -242,10 +256,10 @@ export type DataViewsMessages = {
    * schema's one reason, or every reason the source gave — and whether the
    * restriction this edit would have replaced is still in force.
    */
-  readonly filterRefused: (
-    reasons: readonly string[],
-    retained: boolean,
-  ) => string;
+  readonly filterRefused: (facts: {
+    readonly reasons: readonly string[];
+    readonly retained: boolean;
+  }) => string;
 
   // The search.
   /** The search input's label. */
@@ -263,7 +277,11 @@ export type DataViewsMessages = {
    * Which rows are on screen: the place of the first, how many show, and
    * how many the window pages over, as exactly as the source counts them.
    */
-  readonly rowsShown: (first: number, shown: number, total: Count) => string;
+  readonly rowsShown: (facts: {
+    readonly first: number;
+    readonly shown: number;
+    readonly total: Count;
+  }) => string;
   /** The page select's name. */
   readonly page: string;
   /** How many pages there are, beside the page select. */
@@ -324,16 +342,22 @@ export type DataViewsMessages = {
   readonly viewRenamed: (name: string) => string;
   readonly viewDeleted: string;
   /** A view asking for what the collection cannot show, and every reason. */
-  readonly viewRefused: (name: string, reasons: readonly string[]) => string;
+  readonly viewRefused: (facts: {
+    readonly name: string;
+    readonly reasons: readonly string[];
+  }) => string;
   /**
    * A command that met a view changed elsewhere, by the stored view's name;
    * a wording for `save-as` need not use the name, since the view under that
    * identity is not the one the reader was saving.
    */
-  readonly viewConflicted: (command: ViewCommand, name: string) => string;
+  readonly viewConflicted: (facts: {
+    readonly command: ViewCommand;
+    readonly name: string;
+  }) => string;
   readonly viewMissing: (command: ViewCommand) => string;
-  readonly viewUnreadable: (command: ViewCommand, reason: string) => string;
-  readonly viewFailed: (command: ViewCommand, reason: string) => string;
+  readonly viewUnreadable: (facts: ViewCommandFacts) => string;
+  readonly viewFailed: (facts: ViewCommandFacts) => string;
 
   // The action bar.
   /** The action bar's name. */
@@ -353,11 +377,11 @@ export type DataViewsMessages = {
   /** What a bar chart is named as, by the caption it is drawn under. */
   readonly barChartSummary: (label: string) => string;
   /** What a range chart is named as: its caption, and the ends it spans. */
-  readonly rangeChartSummary: (
-    label: string,
-    min: number,
-    max: number,
-  ) => string;
+  readonly rangeChartSummary: (facts: {
+    readonly label: string;
+    readonly min: number;
+    readonly max: number;
+  }) => string;
   /** The caption of the table carrying a drawing's own numbers. */
   readonly chartTable: (label: string) => string;
   /** The heading of a bar table's value column. */
