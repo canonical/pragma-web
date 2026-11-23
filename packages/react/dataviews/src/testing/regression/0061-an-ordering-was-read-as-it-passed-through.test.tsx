@@ -8,8 +8,9 @@
  * and what stood under that topic in the same moment is replaced.
  */
 
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
@@ -27,11 +28,7 @@ const columns: readonly DataTableColumn[] = [
 
 // What counts as one moment is this case's subject, so it decides the time.
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 describe("regression 0061 — an ordering was read as it passed through", () => {

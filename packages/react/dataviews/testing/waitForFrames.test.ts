@@ -1,4 +1,5 @@
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { installFakeClock } from "@canonical/dataviews-core/testing";
+import { describe, expect, it } from "vitest";
 import waitForFrames from "./waitForFrames.js";
 
 describe("waitForFrames", () => {
@@ -18,10 +19,7 @@ describe("waitForFrames", () => {
   });
 
   it("advances a faked clock frame by frame", async () => {
-    vi.useFakeTimers();
-    onTestFinished(() => {
-      vi.useRealTimers();
-    });
+    installFakeClock("every");
     let frames = 0;
     requestAnimationFrame(() => {
       frames += 1;
