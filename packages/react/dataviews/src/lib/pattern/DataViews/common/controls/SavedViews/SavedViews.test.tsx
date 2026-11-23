@@ -32,6 +32,7 @@ import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   createMemoryViewStore,
   type IdentifiedRecord as Row,
+  renderAtRest,
 } from "../../../../../../../testing/index.js";
 import DataViews from "../../../Provider.js";
 import SavedViews from "./SavedViews.js";
@@ -85,32 +86,36 @@ const createProviderOver = (
     ...(presentation === undefined ? {} : { presentation }),
   });
 
+/** The control over `provider`, in StrictMode as an application mounts it. */
+const composeControl = (
+  provider: DataViewsProvider<Fields, Row>,
+  props: { label?: string } = {},
+) => (
+  <StrictMode>
+    <DataViews provider={provider}>
+      <SavedViews {...props} />
+    </DataViews>
+  </StrictMode>
+);
+
 const mount = (
   store: ViewStore,
   props: { label?: string } = {},
   presentation?: PresentationStore,
 ) => {
   const provider = createProviderOver(store, presentation);
-  const rendered = render(
-    <StrictMode>
-      <DataViews provider={provider}>
-        <SavedViews {...props} />
-      </DataViews>
-    </StrictMode>,
-  );
+  const rendered = render(composeControl(provider, props));
   return { provider, ...rendered };
 };
 
-/** The control once its views are listed. */
+/** The control once it is no longer busy: its views are listed. */
 const mountListed = async (
   store: ViewStore,
   presentation?: PresentationStore,
 ) => {
-  const mounted = mount(store, {}, presentation);
-  await waitFor(() => {
-    expect(getSelect()).toBeEnabled();
-  });
-  return mounted;
+  const provider = createProviderOver(store, presentation);
+  const rendered = await renderAtRest(composeControl(provider));
+  return { provider, ...rendered };
 };
 
 const getGroup = () => screen.getByRole("group", { name: "Saved views" });
