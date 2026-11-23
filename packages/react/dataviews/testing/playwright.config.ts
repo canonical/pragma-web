@@ -1,7 +1,8 @@
 /**
  * The keyboard-only pass: Chromium alone, one worker, against the built
  * Storybook served by Vite's static preview on its own port — never 6012,
- * which a reviewer's static Storybook may already hold.
+ * which a reviewer's static Storybook may already hold. The `js-off`
+ * project runs the `*.nojs.keyboard.ts` journeys with scripting disabled.
  *
  * `bun run build:storybook && bun run test:keyboard`. A Chromium other than
  * Playwright's own is used when `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` names
@@ -17,7 +18,6 @@ const executablePath = process.env["PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"];
 
 export default defineConfig({
   testDir: resolve(import.meta.dirname, "keyboard"),
-  testMatch: "**/*.keyboard.ts",
   outputDir: join(tmpdir(), "dataviews-react-keyboard"),
   fullyParallel: false,
   workers: 1,
@@ -28,6 +28,18 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${port}`,
     launchOptions: executablePath === undefined ? {} : { executablePath },
   },
+  projects: [
+    {
+      name: "chromium",
+      testMatch: "**/*.keyboard.ts",
+      testIgnore: "**/*.nojs.keyboard.ts",
+    },
+    {
+      name: "js-off",
+      testMatch: "**/*.nojs.keyboard.ts",
+      use: { javaScriptEnabled: false },
+    },
+  ],
   webServer: {
     command: `vite preview --outDir storybook-static --host 127.0.0.1 --port ${port} --strictPort`,
     cwd: resolve(import.meta.dirname, ".."),
