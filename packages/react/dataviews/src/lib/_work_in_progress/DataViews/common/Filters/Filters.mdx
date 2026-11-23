@@ -83,9 +83,11 @@ A text field is filtered by the text its value contains, or the text it starts w
 
 A provider asked for facets — `createDataViewsProvider({ collection, source, facets: ["status", "cores"] })` — has its source count, over every record the query matches, how many hold each option or set a presence field, and find the least and greatest value a number or date field holds. Filters shows each count beside its option or presence checkbox and each end of the range beside its bound — the hints read Lowest and Highest — as a description of the control rather than part of its name. A field's own restriction is left out of its own facet, so with failed machines kept the other statuses still show how many machines they would add. Nothing is counted from the rows on screen: while no result answers the applied filter and search, no count is shown.
 
-A choices field whose options are the server's — declared with no `options` list — takes its options from the facet, with any option the set already holds kept beside them. They stay listed until a newer result lists others — while a changed query is pending, or after it fails — from the facet the latest result answered; only their counts wait for an answer to the applied query. An empty value is never offered as an option.
+A choices field whose options are the server's — declared with no `options` list — takes its options from the facet, with any option the set already holds kept beside them. Once listed, an option stays for the mount, even if a later result drops it; only its count waits for an answer to the applied filter and search. An empty value is never offered as an option.
 
 <Canvas of={Stories.CountsBesideOptions} sourceState="none" />
+
+<Canvas of={Stories.ServerOptionsKept} sourceState="none" />
 
 ## Any of, or none of
 
@@ -118,6 +120,8 @@ The filters are a GET form. Each control is named as the URL spells its clause �
 A collection with many fields marks the few a reader reaches for first: `<DataViews.Filters primary={["status"]} />`. Their controls show by default, in the order marked, and every other field the source can filter waits under "More filters", a native disclosure that needs no script — its controls still submit with the form. A field carrying a restriction always shows its control, so what filters the rows is never hidden; here cores is restricted to at least sixteen and shows beside the status. While "More filters" is open no control moves, so typing into one never loses focus; closing it brings out whatever is now restricted. With nothing marked, every field shows. Primary is the application's choice of presentation: the source never declares it and the collection's schema never carries it.
 
 <Canvas of={Stories.PrimaryFilters} sourceState="none" />
+
+<Canvas of={Stories.MoreFiltersPinned} sourceState="none" />
 
 ## Only what the source can run
 

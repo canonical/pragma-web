@@ -48,6 +48,8 @@ const REFUSED_LINK_STORIES: ReadonlySet<string> = new Set([
 const PLAYED_FILTER_STORIES: ReadonlySet<string> = new Set([
   ...FACETED_FILTER_STORIES,
   "FurtherConjunctsApplied",
+  "MoreFiltersPinned",
+  "ServerOptionsKept",
 ]);
 
 const filters = Object.entries(composeStories(filtersStories));
