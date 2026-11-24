@@ -12,11 +12,28 @@ settings:
   components:
     - Design System Tribe
 
-    # (Optional) GitHub labels. Only issues with one of those labels will be synchronized.
-    # If not specified, all issues will be synchronized
-    # labels:
-    # - bug
-    # - custom
+  # (Optional) GitHub labels. Only issues with one of those labels will be synchronized.
+  # If not specified, all issues will be synchronized
+  # Every issue type except `Type: insight`, which is read at triage and not tracked
+  # in Jira. The conventional-commit types keep issues labelled by hand syncing.
+  # The bot compares labels in lowercase.
+  labels:
+    - "type: bug"
+    - "type: ui block"
+    - "type: improvement"
+    - "type: tokens"
+    - "type: tier promotion"
+    - "type: assets"
+    - "type: docs"
+    - "type: support"
+    - "type: other"
+    - feat
+    - fix
+    - docs
+    - refactor
+    - chore
+    - test
+    - ci
 
   # (Optional) (Default: false) Add a new comment in GitHub with a link to Jira created issue
   add_gh_comment: true
@@ -32,5 +49,15 @@ settings:
 
   # (Optional) Dictionary mapping GitHub issue labels to Jira issue types.
   # If label on the issue is not in specified list, this issue will be created as a Bug
+  # Keys must be lowercase: the bot lowercases the issue's labels before looking them up.
   label_mapping:
+    "type: bug": Bug
+    "type: ui block": Story
+    "type: improvement": Story
+    "type: tokens": Story
+    "type: tier promotion": Story
+    "type: assets": Story
+    "type: docs": Task
+    "type: support": Task
+    "type: other": Task
     feat: Story
