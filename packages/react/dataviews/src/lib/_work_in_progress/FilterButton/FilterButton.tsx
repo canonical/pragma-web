@@ -1,6 +1,7 @@
 import { Badge, Button, Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { useId, useState } from "react";
+import { AssistiveText, ConditionMark } from "../../common/index.js";
 import { useIsHydrated } from "../../hooks/index.js";
 import { Panel } from "./common/Panel/index.js";
 import type { FilterButtonProps } from "./types.js";
@@ -76,16 +77,12 @@ export default function FilterButton({
             browser spaces its comma apart. */}
         {isApplied ? <span aria-hidden="true">{label}</span> : label}
         {isApplied && condition && (
-          <span
-            className="mark"
-            data-condition={condition}
-            aria-hidden="true"
-          />
+          <ConditionMark className="mark" condition={condition} />
         )}
         {isApplied && (
-          <span className="assistive">
+          <AssistiveText>
             {label}, {appliedLabel}
-          </span>
+          </AssistiveText>
         )}
         {isApplied && <Badge value={applied} aria-hidden="true" />}
         <span className="chevron">

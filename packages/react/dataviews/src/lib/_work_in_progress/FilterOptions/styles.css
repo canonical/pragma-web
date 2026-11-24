@@ -1,0 +1,84 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * FilterOptions styles
+   * @implements ds:global_dataviews.component.filter_options
+   *
+   * The name, then the words in a wrapping row. A word that leads somewhere
+   * takes the link colour; the current word takes the text colour and the
+   * bold weight, so the mark does not rest on colour alone. Each word is at
+   * least a 24 px target.
+   */
+  .ds.filter-options {
+    --filter-options-mark-size: var(--dimension-200);
+    --filter-options-gap: var(--dimension-050);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--dimension-050) var(--dimension-200);
+    font-family: var(--typography-text-secondary-font-family);
+    font-size: var(--typography-text-secondary-font-size);
+    line-height: var(--typography-text-secondary-line-height);
+
+    & > .label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--filter-options-gap);
+      color: var(--color-text-muted);
+    }
+
+    & > .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 var(--dimension-200);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    & .word {
+      display: inline-flex;
+      align-items: baseline;
+      min-block-size: var(--dimension-300);
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--color-text);
+      font: inherit;
+    }
+
+    & :is(a, button).word {
+      color: var(--color-text-link);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    & .word:is([aria-current="true"], [aria-pressed="true"]) {
+      color: var(--color-text);
+      font-weight: var(--typography-weight-bold);
+      text-decoration: none;
+    }
+
+    /* An inline block, so a link's underline stops before the count. */
+    & .count {
+      display: inline-block;
+      margin-inline-start: var(--dimension-050);
+      color: var(--color-text-muted);
+      font-weight: var(--typography-text-secondary-font-weight);
+    }
+
+    /* A Condition's mark, at the words' size, with room after it. */
+    & .mark {
+      --condition-mark-size: var(--filter-options-mark-size);
+      margin-inline-end: var(--filter-options-gap);
+    }
+
+    /* A word lines its text up on the baseline; its mark, a box with no
+       text, sits centred instead. */
+    & .word > .mark {
+      align-self: center;
+    }
+  }
+}

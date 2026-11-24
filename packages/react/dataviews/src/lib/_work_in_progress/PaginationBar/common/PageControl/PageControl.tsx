@@ -1,21 +1,11 @@
 import { Icon } from "@canonical/react-ds-global";
-import type { MouseEvent, ReactElement } from "react";
+import type { ReactElement } from "react";
 import { IconButtonStandIn } from "../../../../common/IconButtonStandIn/index.js";
+import { isPlainClick } from "../../../../utils/index.js";
 import type { PageControlProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds page-control";
-
-/**
- * Whether a click means "go here, in this tab": a plain primary click. A
- * modified click or another button keeps the link's own behaviour.
- */
-const isPlainClick = (event: MouseEvent<HTMLAnchorElement>): boolean =>
-  event.button === 0 &&
-  !event.metaKey &&
-  !event.ctrlKey &&
-  !event.shiftKey &&
-  !event.altKey;
 
 /**
  * One way to another page: a link where the page is reachable, an icon
