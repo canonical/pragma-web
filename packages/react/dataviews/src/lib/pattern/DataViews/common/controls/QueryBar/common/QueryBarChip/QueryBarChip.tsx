@@ -65,7 +65,10 @@ const QueryBarChip = ({
           };
     };
   }, [clause]);
-  const applied = useDataViewsValue(group.state, read, isSameReading);
+  const applied = useDataViewsValue(group.state, {
+    select: read,
+    isEqual: isSameReading,
+  });
   const hydrated = useIsHydrated();
   // A clause removed reads nothing until the bar drops its chip.
   if (applied === null) return null;

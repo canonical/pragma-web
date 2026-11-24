@@ -41,9 +41,9 @@ const CardItem = <TRow extends object>({
   // re-renders no card. The selector mints its value, which the channel hook
   // allows only because a name is a string: React compares the reads by
   // identity, and equal strings are identical.
-  const named = useDataViewsValue(channels.record, (record) =>
-    nameRecord(record, channels.id),
-  );
+  const named = useDataViewsValue(channels.record, {
+    select: (record) => nameRecord(record, channels.id),
+  });
   const titleField = readFieldName(title);
   const titleChannel = channels.fields[titleField];
   if (titleChannel === undefined) {
@@ -51,12 +51,11 @@ const CardItem = <TRow extends object>({
     throw new Error(`no channel observes the field "${titleField}"`);
   }
   // A title the record's type does not carry names nothing.
-  const applies = useDataViewsValue(
-    channels.record,
-    (record) =>
+  const applies = useDataViewsValue(channels.record, {
+    select: (record) =>
       readProviderHost(provider).readApplicability(titleField, record) ===
       "applies",
-  );
+  });
   const titleValue = useDataViewsValue(titleChannel);
   const spelled = spellPrimitiveValue(titleValue);
   const titleId = useId();

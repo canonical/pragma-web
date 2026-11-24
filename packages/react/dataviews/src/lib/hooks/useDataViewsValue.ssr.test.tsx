@@ -19,7 +19,9 @@ describe("useDataViewsValue on the server", () => {
         previous.join() === next.join(),
     );
     const Probe = () => (
-      <output>{useDataViewsValue(channel, listIds, isEqual).join(",")}</output>
+      <output>
+        {useDataViewsValue(channel, { select: listIds, isEqual }).join(",")}
+      </output>
     );
     expect(renderToString(<Probe />)).toBe("<output>1,2</output>");
     expect(isEqual).not.toHaveBeenCalled();

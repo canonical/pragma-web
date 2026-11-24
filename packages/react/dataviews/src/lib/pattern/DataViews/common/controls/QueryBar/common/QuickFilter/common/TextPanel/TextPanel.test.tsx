@@ -25,7 +25,10 @@ function Host({ provider }: { readonly provider: Provider }) {
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "name"),
     [],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   return (
     <TextPanel
       definition={{ field: "name", kind: "text" }}

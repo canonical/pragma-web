@@ -169,7 +169,9 @@ const nameMachine = (machine: Machine) => machine.name;`,
 /** A status field drawn by its own cell, reading the record through its scope. */
 function StatusCell({ value }: DisplayFieldCellProps): ReactElement {
   const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, (record) => record.note);
+  const note = useDataViewsValue(cell.record, {
+    select: (record) => record.note,
+  });
   return <span title={note}>{String(value).toUpperCase()}</span>;
 }
 
@@ -199,7 +201,9 @@ export const CustomCell: Story = {
     imports: spikeImports,
     declarations: `function StatusCell({ value }: DisplayFieldCellProps) {
   const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, (record) => record.note);
+  const note = useDataViewsValue(cell.record, {
+    select: (record) => record.note,
+  });
   return <span title={note}>{String(value).toUpperCase()}</span>;
 }
 

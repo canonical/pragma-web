@@ -44,5 +44,8 @@ export default function useSuggestedFacets({
           }),
     [field],
   );
-  return useDataViewsValue(provider.state, read, isSameFacets);
+  return useDataViewsValue(provider.state, {
+    select: read,
+    isEqual: isSameFacets,
+  });
 }

@@ -27,5 +27,8 @@ const isSameCount = (a: Count, b: Count): boolean =>
 export default function useAnswerCountStandIn({
   provider,
 }: UseAnswerCountStandInProps): UseAnswerCountStandInResult {
-  return useDataViewsValue(provider.state, readLiveCount, isSameCount);
+  return useDataViewsValue(provider.state, {
+    select: readLiveCount,
+    isEqual: isSameCount,
+  });
 }

@@ -153,7 +153,10 @@ export default function useTableGeometry({
       })),
     [columnIds, layout],
   );
-  const tracks = useDataViewsValue(layout.state, selectTracks, areTracksEqual);
+  const tracks = useDataViewsValue(layout.state, {
+    select: selectTracks,
+    isEqual: areTracksEqual,
+  });
 
   // Resolving against zero yields each column's own reservation, which is
   // exactly the width a resize should capture before the container is

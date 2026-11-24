@@ -16,5 +16,5 @@ const selectSearch = (state: DataViewsState): string =>
 export default function useAppliedSearch({
   provider,
 }: UseAppliedSearchProps): UseAppliedSearchResult {
-  return useDataViewsValue(provider.state, selectSearch);
+  return useDataViewsValue(provider.state, { select: selectSearch });
 }

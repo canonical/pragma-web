@@ -57,10 +57,9 @@ export default function SavedViews({
   useEffect(() => views.observe(), [views]);
   const state = useDataViewsValue(views.state);
   // The reason alone: a width commit re-renders no saved-views control.
-  const presentationReason = useDataViewsValue(
-    presentation.state,
-    (shown) => shown.presentationReason,
-  );
+  const presentationReason = useDataViewsValue(presentation.state, {
+    select: (shown) => shown.presentationReason,
+  });
   const { listing, current, modified, command } = state;
   const pending = command?.status === "pending";
   const { select, retry, recordOpener, restoreFocus, recordFocus, recordBlur } =

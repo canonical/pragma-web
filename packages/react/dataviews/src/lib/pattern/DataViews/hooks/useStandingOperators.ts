@@ -47,9 +47,8 @@ const readStandingOperators = (
 export default function useStandingOperators({
   provider,
 }: UseStandingOperatorsProps): UseStandingOperatorsResult {
-  return useDataViewsValue(
-    provider.state,
-    readStandingOperators,
-    areReadingsEqual,
-  );
+  return useDataViewsValue(provider.state, {
+    select: readStandingOperators,
+    isEqual: areReadingsEqual,
+  });
 }

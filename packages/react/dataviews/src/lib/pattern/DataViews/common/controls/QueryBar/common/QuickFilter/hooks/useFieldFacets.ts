@@ -41,5 +41,8 @@ export default function useFieldFacets({
       },
     [field],
   );
-  return useDataViewsValue(provider.state, read, isSameFieldFacets);
+  return useDataViewsValue(provider.state, {
+    select: read,
+    isEqual: isSameFieldFacets,
+  });
 }

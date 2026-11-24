@@ -45,7 +45,10 @@ function Host({
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "owner"),
     [],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   return (
     <PresencePanel
       definition={{ field: "owner", kind: "presence" }}

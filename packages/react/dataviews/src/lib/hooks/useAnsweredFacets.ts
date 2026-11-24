@@ -40,5 +40,5 @@ export default function useAnsweredFacets<
 >({
   provider,
 }: UseAnsweredFacetsProps<TFields, TRow>): UseAnsweredFacetsResult {
-  return useDataViewsValue(provider.state, readAnswered);
+  return useDataViewsValue(provider.state, { select: readAnswered });
 }

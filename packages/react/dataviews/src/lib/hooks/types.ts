@@ -23,17 +23,42 @@ import type { FocusEvent, ReactNode, Ref, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
 /**
- * What `useDataViewsValue` takes with a selector: the channel, the `select`
- * that reads it, and an optional `isEqual` over what `select` returns.
+ * What `useDataViewsValue` takes over the whole snapshot: the channel, then
+ * an optional `isEqual`.
+ */
+export type UseDataViewsValueWholeProps<T> = readonly [
+  channel: ReadonlyChannel<T>,
+  options?: {
+    readonly select?: undefined;
+    /** Whether the next snapshot says the same as the one held. */
+    readonly isEqual?: (previous: T, next: T) => boolean;
+  },
+];
+
+/**
+ * What `useDataViewsValue` takes through a selector: the channel, then
+ * `select` and an optional `isEqual`.
+ */
+export type UseDataViewsValueSelectedProps<T, TSelected> = readonly [
+  channel: ReadonlyChannel<T>,
+  options: {
+    /** Reads the part of the snapshot a render needs. */
+    readonly select: (value: T) => TSelected;
+    /** Whether the next value says the same as the one held. */
+    readonly isEqual?: (previous: TSelected, next: TSelected) => boolean;
+  },
+];
+
+/**
+ * What `useDataViewsValue` takes: the channel, then optional `select` and
+ * `isEqual`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type UseDataViewsValueProps<T, TSelected> = readonly [
-  channel: ReadonlyChannel<T>,
-  select: (value: T) => TSelected,
-  isEqual?: (previous: TSelected, next: TSelected) => boolean,
-];
+export type UseDataViewsValueProps<T, TSelected = T> =
+  | UseDataViewsValueWholeProps<T>
+  | UseDataViewsValueSelectedProps<T, TSelected>;
 
 /**
  * What `useDataViewsValue` returns: the channel's current value, or the part

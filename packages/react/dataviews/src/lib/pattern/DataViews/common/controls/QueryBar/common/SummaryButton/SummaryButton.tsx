@@ -37,7 +37,7 @@ export default function SummaryButton({
   ...rest
 }: SummaryButtonProps): ReactElement {
   const { messages } = useDataViewsRoot("QueryBar");
-  const applied = useDataViewsValue(group.state, countApplied);
+  const applied = useDataViewsValue(group.state, { select: countApplied });
   const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
     onClick?.(event);
     // WebKit focuses no button it presses: focused, the summary is what

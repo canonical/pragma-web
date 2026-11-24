@@ -328,16 +328,14 @@ export default function QueryBar({
     () => (state: QueryStateStandIn) => findContradictions(state.slice, schema),
     [schema],
   );
-  const refusedIssues = useDataViewsValue(
-    group.state,
-    readRefusedIssues,
-    isSameRefusedIssues,
-  );
-  const contradictions = useDataViewsValue(
-    group.state,
-    readContradictions,
-    isSameContradictions,
-  );
+  const refusedIssues = useDataViewsValue(group.state, {
+    select: readRefusedIssues,
+    isEqual: isSameRefusedIssues,
+  });
+  const contradictions = useDataViewsValue(group.state, {
+    select: readContradictions,
+    isEqual: isSameContradictions,
+  });
   // The contradictions already said, so each new one is said once; those
   // a link arrived with are shown, not said.
   const saidRef = useRef<ReadonlySet<string> | null>(null);
@@ -373,7 +371,9 @@ export default function QueryBar({
   });
   // Narrow, the entry holding the applied search follows it as it moves
   // elsewhere, as the sheet's removal or Back does.
-  const appliedSearch = useDataViewsValue(group.state, readAppliedSearch);
+  const appliedSearch = useDataViewsValue(group.state, {
+    select: readAppliedSearch,
+  });
   const appliedSearchRef = useRef(appliedSearch);
   // @note Impure: moves the entry's text with the applied search.
   useEffect(() => {

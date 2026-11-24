@@ -19,5 +19,8 @@ const isSameIds = (a: UseClauseIdsResult, b: UseClauseIdsResult): boolean =>
 export default function useClauseIds({
   group,
 }: UseClauseIdsProps): UseClauseIdsResult {
-  return useDataViewsValue(group.state, listChipClauses, isSameIds);
+  return useDataViewsValue(group.state, {
+    select: listChipClauses,
+    isEqual: isSameIds,
+  });
 }

@@ -50,7 +50,10 @@ function Host({
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, field),
     [field],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   const definition = provider.collection.schema.findField(field) as Extract<
     SchemaFieldDefinition,
     { readonly kind: "choices" }
