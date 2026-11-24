@@ -5,11 +5,12 @@
 
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { render } from "@testing-library/react";
-import { afterAll, describe, it } from "vitest";
+import { afterAll, beforeAll, describe, it } from "vitest";
 import preview from "../../../.storybook/preview.js";
 import {
   expectNoAxeViolations,
   FACETED_FILTER_STORIES,
+  installPopoverStandIn,
   serveMockApi,
 } from "../../../testing/index.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
@@ -23,8 +24,10 @@ import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataV
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
+import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
 import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
 import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
+import * as queryInputStories from "../../lib/_work_in_progress/QueryInput/QueryInput.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -108,4 +111,35 @@ describe("stories have no axe violations", () => {
   afterAll(() => {
     document.body.innerHTML = "";
   });
+});
+
+describe("the query controls' played stories have no axe violations", () => {
+  // The plays open native popovers, which jsdom does not have.
+  let uninstall: () => void;
+  beforeAll(() => {
+    uninstall = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstall();
+    document.body.innerHTML = "";
+  });
+
+  // Every story runs, so a new play cannot be left out.
+  for (const [name, Story] of Object.entries(
+    composeStories(queryInputStories),
+  )) {
+    it(`QueryInput ${name}`, async () => {
+      await Story.run();
+      await expectNoAxeViolations(document.body);
+    });
+  }
+
+  for (const [name, Story] of Object.entries(
+    composeStories(filterButtonStories),
+  )) {
+    it(`FilterButton ${name}`, async () => {
+      await Story.run();
+      await expectNoAxeViolations(document.body);
+    });
+  }
 });

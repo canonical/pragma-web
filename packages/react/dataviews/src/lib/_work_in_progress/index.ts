@@ -19,6 +19,12 @@ export {
   useDataViews,
   useDataViewsFilter,
 } from "./DataViews/index.js";
+export type {
+  FilterButtonCondition,
+  FilterButtonPanelHandle,
+  FilterButtonProps,
+} from "./FilterButton/index.js";
+export { FilterButton } from "./FilterButton/index.js";
 export type { PaginationBarProps } from "./PaginationBar/index.js";
 export { PaginationBar } from "./PaginationBar/index.js";
 export type {
@@ -29,3 +35,8 @@ export type {
 export { QueryChip } from "./QueryChip/index.js";
 export type { QueryChipsProps } from "./QueryChips/index.js";
 export { QueryChips } from "./QueryChips/index.js";
+export type {
+  QueryInputOption,
+  QueryInputProps,
+} from "./QueryInput/index.js";
+export { QueryInput } from "./QueryInput/index.js";
