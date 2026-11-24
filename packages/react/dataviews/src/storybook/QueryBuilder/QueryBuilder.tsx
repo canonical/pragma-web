@@ -53,7 +53,7 @@ export default function QueryBuilder({
   const [provider] = useState(() =>
     createDataViewsProvider({
       collection,
-      source: createArraySource<PoolMachine>({ rows, collection }),
+      source: createArraySource({ rows, collection }),
       ...(initial === undefined
         ? {}
         : { snapshot: { query: initial, presentation: {} } }),

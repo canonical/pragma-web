@@ -1,4 +1,5 @@
 import {
+  type ArraySource,
   createArraySource,
   createDataViewsProvider,
   createMemoryLocation,
@@ -10,7 +11,7 @@ import { ActionBar } from "../../lib/pattern/DataViews/common/controls/ActionBar
 import QueryBar from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../lib/pattern/DataViews/Provider.js";
-import type { BarMachine, PooledMachine } from "../machines/index.js";
+import type { BarMachine } from "../machines/index.js";
 import {
   barMachineCollection,
   barMachines,
@@ -42,7 +43,7 @@ export default function BarMachines({
     const data = (withPools
       ? {
           collection: pooledMachineCollection,
-          source: createArraySource<PooledMachine>({
+          source: createArraySource({
             rows: pooledMachines,
             collection: pooledMachineCollection,
             searchFields: ["hostname"],
@@ -51,7 +52,7 @@ export default function BarMachines({
         }
       : {
           collection: barMachineCollection,
-          source: createArraySource<BarMachine>({
+          source: createArraySource({
             rows: barMachines,
             collection: barMachineCollection,
             searchFields: ["hostname"],
@@ -59,7 +60,7 @@ export default function BarMachines({
           facets: ["status", "tags"],
         }) as unknown as {
       readonly collection: typeof barMachineCollection;
-      readonly source: ReturnType<typeof createArraySource<BarMachine>>;
+      readonly source: ArraySource<BarMachine>;
       readonly facets: readonly ("status" | "tags")[];
     };
     const built = createDataViewsProvider({

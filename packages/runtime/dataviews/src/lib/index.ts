@@ -122,6 +122,7 @@ export type {
   EmptyOr,
   FieldKind,
   FieldKindOperators,
+  FieldNameOf,
   FieldValidation,
   NumberField,
   NumberUnits,

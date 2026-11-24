@@ -7,7 +7,6 @@ import { type ReactElement, useState } from "react";
 import { renderToString } from "react-dom/server";
 import QueryBar from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.js";
 import DataViews from "../../lib/pattern/DataViews/Provider.js";
-import type { BarMachine } from "../machines/index.js";
 import { barMachineCollection, barMachines } from "../machines/index.js";
 import pickStoryWords from "../pickStoryWords.js";
 import followInFrame from "./followInFrame.js";
@@ -28,7 +27,7 @@ export default function ServerRenderedBar({
   const [markup] = useState(() => {
     const provider = createDataViewsProvider({
       collection: barMachineCollection,
-      source: createArraySource<BarMachine>({
+      source: createArraySource({
         rows: barMachines,
         collection: barMachineCollection,
         searchFields: ["hostname"],

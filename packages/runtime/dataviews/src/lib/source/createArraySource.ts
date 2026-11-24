@@ -1,3 +1,4 @@
+import type { Collection } from "../collection/index.js";
 import {
   applyWindow,
   collapseSortTerms,
@@ -31,10 +32,15 @@ const createExactCount = (value: number) => ({ kind: "exact" as const, value });
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function createArraySource<TRow extends object = RowRecord>(
-  config: ArraySourceConfig<TRow>,
-): ArraySource<TRow> {
-  const { collection, collation = ROOT_NUMERIC_COLLATION } = config;
+export default function createArraySource<
+  const TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+>(config: ArraySourceConfig<TFields, TRow>): ArraySource<TRow> {
+  const { collation = ROOT_NUMERIC_COLLATION } = config;
+  // Every list below derives from the schema's names at runtime, so the
+  // declaration reads the collection widely.
+  const collection: Collection<readonly SchemaFieldDefinition[], TRow> =
+    config.collection;
   const { schema } = collection;
   const searchFields = config.searchFields ?? [];
   const defaultSort = collapseSortTerms(config.defaultSort ?? []);

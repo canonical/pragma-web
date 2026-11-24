@@ -1,4 +1,5 @@
 import type {
+  FieldNameOf,
   RowRecord,
   SchemaFieldDefinition,
   SortDirection,
@@ -65,13 +66,16 @@ export default function ScopedRecordList<
   // Why the last sort changed nothing, in the source's words.
   const [refused, setRefused] = useState<readonly string[] | null>(null);
   // Offer only what the source declares it can sort by.
-  const sortable =
-    sortBy !== undefined &&
-    scope.capabilities.sort.fields.includes(sortBy.field);
+  const sortable = scope.capabilities.sort.fields.find(
+    (field) => field === sortBy?.field,
+  );
   const applied = state.slice.sort.find(
-    (term) => term.field === sortBy?.field,
+    (term) => term.field === sortable,
   )?.direction;
-  const sort = (field: string, direction: SortDirection): void => {
+  const sort = (
+    field: FieldNameOf<TFields>,
+    direction: SortDirection,
+  ): void => {
     const refusals = scope.setSort([{ field, direction }]);
     setRefused(
       refusals.length === 0 ? null : refusals.map(({ reason }) => reason),
@@ -84,20 +88,20 @@ export default function ScopedRecordList<
       aria-label={label}
       aria-busy={state.pendingRequestId !== null}
     >
-      {scripted && sortable ? (
+      {scripted && sortBy !== undefined && sortable !== undefined ? (
         <fieldset>
           <legend>{sortBy.label}</legend>
           <button
             type="button"
             aria-pressed={applied === "asc"}
-            onClick={() => sort(sortBy.field, "asc")}
+            onClick={() => sort(sortable, "asc")}
           >
             {words.sortAscending}
           </button>
           <button
             type="button"
             aria-pressed={applied === "desc"}
-            onClick={() => sort(sortBy.field, "desc")}
+            onClick={() => sort(sortable, "desc")}
           >
             {words.sortDescending}
           </button>

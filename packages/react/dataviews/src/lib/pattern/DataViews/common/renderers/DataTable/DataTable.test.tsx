@@ -63,6 +63,7 @@ import {
   installPopoverStandIn,
   MACHINE_CAPABILITIES,
   type Machine,
+  type MachineFieldName,
   type MachineFields,
   machines,
   type OddRecord,
@@ -504,7 +505,7 @@ describe("DataTable", () => {
   /** Three sortable columns over a source ordering by all three. */
   const renderOrderingTable = (
     terms: number | null,
-    defaultSort: readonly SortTerm[] = [],
+    defaultSort: readonly SortTerm<MachineFieldName>[] = [],
     columnsInView: readonly DataTableColumn[] = [
       { id: "name", header: "Name", sortable: true },
       { id: "status", header: "Status", sortable: true },
@@ -765,10 +766,13 @@ describe("DataTable", () => {
 
   /** Every ordering of distinct fields drawn from `fields`, the empty one included. */
   const listOrderings = (
-    fields: readonly string[],
-  ): readonly (readonly SortTerm[])[] => {
-    const orderings: (readonly SortTerm[])[] = [[]];
-    const extend = (prefix: readonly SortTerm[], left: readonly string[]) => {
+    fields: readonly MachineFieldName[],
+  ): readonly (readonly SortTerm<MachineFieldName>[])[] => {
+    const orderings: (readonly SortTerm<MachineFieldName>[])[] = [[]];
+    const extend = (
+      prefix: readonly SortTerm<MachineFieldName>[],
+      left: readonly MachineFieldName[],
+    ) => {
       for (const field of left) {
         for (const direction of ["asc", "desc"] as const) {
           const next = [...prefix, { field, direction }];

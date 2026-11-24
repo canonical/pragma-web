@@ -28,13 +28,16 @@ const createAlpha = () =>
  *
  * @note Impure: observes the provider and its row scopes.
  */
-const observeRow = <TRow extends object>({
+const observeRow = <
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+>({
   fields,
   provider,
   rowId = "m-1",
 }: {
   readonly fields: readonly string[];
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  readonly provider: DataViewsProvider<TFields, TRow>;
   readonly rowId?: string;
 }) => {
   const releaseProvider = provider.observe();

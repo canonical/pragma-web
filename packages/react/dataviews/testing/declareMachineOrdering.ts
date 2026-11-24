@@ -4,6 +4,7 @@ import {
   type SourceCapabilities,
 } from "@canonical/dataviews-core";
 import { MACHINE_DECLARATION, machines } from "./machines.js";
+import type { MachineFieldName } from "./types.js";
 
 /**
  * A declaration ordering by all three machine fields, with the given term
@@ -11,7 +12,7 @@ import { MACHINE_DECLARATION, machines } from "./machines.js";
  */
 export default function declareMachineOrdering(
   terms: number | null,
-  defaultSort: readonly SortTerm[] = [],
+  defaultSort: readonly SortTerm<MachineFieldName>[] = [],
 ): SourceCapabilities {
   return declareCapabilities(machines, {
     ...MACHINE_DECLARATION,

@@ -161,6 +161,17 @@ export type SchemaFieldDefinition = TypeScoped &
   (ChoicesField | NumberField | PresenceField | DateField | TextField);
 
 /**
+ * The names a schema's fields are declared under. A column, a sort term and
+ * a capability declaration name fields through it, so a misspelt name does
+ * not compile.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type FieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
+  TFields[number]["field"];
+
+/**
  * Result of validating one text input against a field's kind: the operands
  * it read, or that the input is incomplete or cannot be read.
  *

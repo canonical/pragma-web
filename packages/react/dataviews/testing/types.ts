@@ -111,6 +111,9 @@ export type MockRequestWatch = {
 /** The fields of the machine collection, for typed handles and providers. */
 export type MachineFields = typeof machines.schema.fields;
 
+/** The name of one machine field: what a machine sort term names. */
+export type MachineFieldName = MachineFields[number]["field"];
+
 /** How one test's machine provider is set up. */
 export type MachineProviderConfig = Omit<
   ManualSourceConfig<Machine>,

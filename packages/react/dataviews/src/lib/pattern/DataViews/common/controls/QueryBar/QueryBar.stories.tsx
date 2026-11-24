@@ -241,7 +241,7 @@ function StatusAliasInstances({
   const [provider] = useState(() =>
     createDataViewsProvider({
       collection: instanceCollection,
-      source: createArraySource<Instance>({
+      source: createArraySource({
         rows: instances,
         collection: instanceCollection,
       }),

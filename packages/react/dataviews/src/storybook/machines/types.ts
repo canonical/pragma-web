@@ -71,7 +71,7 @@ export type MachineSourceConfig = {
   /** The records; every machine by default. */
   readonly rows?: readonly Machine[] | undefined;
   /** The order the source documents for a query with no term; none by default. */
-  readonly defaultSort?: readonly SortTerm[] | undefined;
+  readonly defaultSort?: readonly SortTerm<SortableField>[] | undefined;
 };
 
 /** The provider every story drives, over the machine collection. */

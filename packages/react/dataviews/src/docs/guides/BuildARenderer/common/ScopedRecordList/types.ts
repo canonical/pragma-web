@@ -8,14 +8,15 @@ import type { ComponentProps } from "react";
 
 /**
  * What the list reads and commands: the members a provider and the root's
- * `useDataViews` scope both carry. A provider is one; so is the scope.
+ * `useDataViews` scope both carry. A provider is one; so is the scope. The
+ * collection carries the field names a sort term may name.
  */
 export type RecordListScope<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = Pick<
   DataViewsProvider<TFields, TRow>,
-  "state" | "rows" | "selection" | "capabilities" | "setSort"
+  "collection" | "state" | "rows" | "selection" | "capabilities" | "setSort"
 >;
 
 /** The field a list offers to sort by, and the name of its sort controls. */

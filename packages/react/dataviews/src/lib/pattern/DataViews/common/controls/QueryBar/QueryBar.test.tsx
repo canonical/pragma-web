@@ -183,7 +183,7 @@ const mount = ({
 } = {}) => {
   const provider = createDataViewsProvider({
     collection,
-    source: createArraySource<Host>({
+    source: createArraySource({
       rows: hosts,
       collection,
       searchFields: ["name"],
@@ -255,7 +255,7 @@ describe("QueryBar", () => {
     it("throws on a quick filter the schema lacks", () => {
       const provider = createDataViewsProvider({
         collection,
-        source: createArraySource<Host>({ rows: hosts, collection }),
+        source: createArraySource({ rows: hosts, collection }),
       });
       vi.spyOn(console, "error").mockImplementation(() => undefined);
       expect(() =>
@@ -371,7 +371,7 @@ describe("QueryBar", () => {
     it("reads a decimal with the messages' separator", async () => {
       const provider = createDataViewsProvider({
         collection,
-        source: createArraySource<Host>({ rows: hosts, collection }),
+        source: createArraySource({ rows: hosts, collection }),
       });
       render(
         <DataViews provider={provider} messages={{ decimalSeparator: "," }}>
@@ -1697,7 +1697,7 @@ describe("QueryBar", () => {
       const build = () =>
         createDataViewsProvider({
           collection,
-          source: createArraySource<Host>({
+          source: createArraySource({
             rows: hosts,
             collection,
             searchFields: ["name"],
@@ -1807,7 +1807,7 @@ describe("QueryBar", () => {
         <DataViews
           provider={createDataViewsProvider({
             collection,
-            source: createArraySource<Host>({ rows: hosts, collection }),
+            source: createArraySource({ rows: hosts, collection }),
             location: createMemoryLocation({ href }),
           })}
         >
@@ -1956,7 +1956,7 @@ describe("QueryBar", () => {
     it("says why a clause the source refuses did not apply, and keeps its Entry", async () => {
       const provider = createDataViewsProvider({
         collection,
-        source: createArraySource<Host>({ rows: hosts, collection }),
+        source: createArraySource({ rows: hosts, collection }),
       });
       render(
         <DataViews provider={provider}>
@@ -2728,7 +2728,7 @@ describe("QueryBar", () => {
     it("re-renders only the chip whose clause a commit changed", async () => {
       const provider = createDataViewsProvider({
         collection,
-        source: createArraySource<Host>({ rows: hosts, collection }),
+        source: createArraySource({ rows: hosts, collection }),
         snapshot: { query: "status=deployed&pool=gpu", presentation: {} },
       });
       render(
@@ -2962,7 +2962,7 @@ describe("QueryBar", () => {
         <DataViews
           provider={createDataViewsProvider({
             collection,
-            source: createArraySource<Host>({ rows: hosts, collection }),
+            source: createArraySource({ rows: hosts, collection }),
           })}
         >
           <QueryBar
@@ -2990,7 +2990,7 @@ describe("QueryBar", () => {
     const provider = (query?: string) =>
       createDataViewsProvider({
         collection,
-        source: createArraySource<Host>({ rows: hosts, collection }),
+        source: createArraySource({ rows: hosts, collection }),
         ...(query === undefined
           ? {}
           : { snapshot: { query, presentation: {} } }),
