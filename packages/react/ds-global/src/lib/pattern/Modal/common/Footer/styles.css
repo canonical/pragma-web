@@ -4,15 +4,6 @@
   /**
    * Modal.Footer styles
    * @implements ds:global.subcomponent.modal-footer
-   *
-   * DSL anatomy mapping:
-   * - layout.type: flow, layout.direction: horizontal -> display: flex; flex-direction: row
-   * - layout.justify: end -> justify-content: flex-end
-   * - spacing.gap: spacing/small -> gap: var(--modal-footer-gap)
-   * - spacing.internal: spacing/medium -> padding-block / padding-inline
-   * - appearance.border.top: border/style/divider -> an inset ::before rule, not a
-   *   border (a border would span the full dialog width; the design insets the
-   *   rule to the inline padding)
    */
 
   /* Component tokens — sourced from @canonical/design-tokens */
@@ -27,11 +18,11 @@
   }
 
   .ds.modal-footer {
-    /* layout.type: flow, direction horizontal, justify end */
+    /* layout.type: flow, direction horizontal, justify start */
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: var(--modal-footer-gap);
     padding-block: var(--modal-footer-padding-block);
     padding-inline: var(--modal-footer-padding-inline);

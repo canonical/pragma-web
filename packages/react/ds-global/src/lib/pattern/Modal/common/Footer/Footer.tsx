@@ -11,6 +11,9 @@ const componentCssClassName = "ds modal-footer";
  * capture the decision; the button's modifiers must match the consequence, so a
  * destructive confirmation uses a destructive button.
  *
+ * Actions line up at the inline-start edge. Render the primary action first —
+ * markup order is screen order.
+ *
  * @implements ds:global.subcomponent.modal-footer
  */
 const Footer = ({

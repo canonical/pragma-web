@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 type OwnProps = {
   /**
    * The actions that capture the user's decision — normally Buttons, with the
-   * affirmative one last.
+   * affirmative one first.
    */
   children?: ReactNode;
 };

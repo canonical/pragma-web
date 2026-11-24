@@ -54,13 +54,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * The full anatomy, composed from its sections: a header with the title and
- * the dismiss icon, the content, and two actions bounded by the horizontal
- * rules. The affirmative action is last and carries the constructive
- * anticipation, which is where the green fill comes from. Both actions close
- * the modal: closing is what an action does once its own work is done.
- */
 const DefaultStory = () => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const close = () => modalRef.current?.close();
@@ -78,9 +71,6 @@ const DefaultStory = () => {
         stack. Renew to keep continuous CVE management and 24/7 support.
       </Component.Content>
       <Component.Footer>
-        <Button importance="secondary" onClick={close}>
-          Cancel
-        </Button>
         <Button
           importance="primary"
           anticipation="constructive"
@@ -88,11 +78,21 @@ const DefaultStory = () => {
         >
           Confirm
         </Button>
+        <Button importance="secondary" onClick={close}>
+          Cancel
+        </Button>
       </Component.Footer>
     </Component>
   );
 };
 
+/**
+ * The full anatomy, composed from its sections: a header with the title and
+ * the dismiss icon, the content, and two actions bounded by the horizontal
+ * rules. The affirmative action is first and carries the constructive
+ * anticipation, which is where the green fill comes from. Both actions close
+ * the modal: closing is what an action does once its own work is done.
+ */
 export const Default: Story = {
   parameters: {
     docs: {
@@ -112,11 +112,11 @@ const close = () => modalRef.current?.close();
     full stack. Renew to keep continuous CVE management and 24/7 support.
   </Modal.Content>
   <Modal.Footer>
-    <Button importance="secondary" onClick={close}>
-      Cancel
-    </Button>
     <Button importance="primary" anticipation="constructive" onClick={close}>
       Confirm
+    </Button>
+    <Button importance="secondary" onClick={close}>
+      Cancel
     </Button>
   </Modal.Footer>
 </Modal>`,
@@ -126,10 +126,6 @@ const close = () => modalRef.current?.close();
   render: () => <DefaultStory />,
 };
 
-/**
- * A destructive confirmation. The consequence is spelled out in the content
- * and the affirmative action carries the matching anticipation modifier.
- */
 const DestructiveConfirmationStory = () => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const close = () => modalRef.current?.close();
@@ -147,17 +143,21 @@ const DestructiveConfirmationStory = () => {
         undone.
       </Component.Content>
       <Component.Footer>
-        <Button importance="secondary" onClick={close}>
-          Cancel
-        </Button>
         <Button importance="primary" anticipation="destructive" onClick={close}>
           Delete
+        </Button>
+        <Button importance="secondary" onClick={close}>
+          Cancel
         </Button>
       </Component.Footer>
     </Component>
   );
 };
 
+/**
+ * A destructive confirmation. The consequence is spelled out in the content
+ * and the affirmative action carries the matching anticipation modifier.
+ */
 export const DestructiveConfirmation: Story = {
   parameters: {
     docs: {
@@ -177,9 +177,6 @@ const close = () => modalRef.current?.close();
     undone.
   </Modal.Content>
   <Modal.Footer>
-    <Button importance="secondary" onClick={close}>
-      Cancel
-    </Button>
     <Button
       importance="primary"
       anticipation="destructive"
@@ -190,6 +187,9 @@ const close = () => modalRef.current?.close();
     >
       Delete
     </Button>
+    <Button importance="secondary" onClick={close}>
+      Cancel
+    </Button>
   </Modal.Footer>
 </Modal>`,
       },
@@ -198,10 +198,6 @@ const close = () => modalRef.current?.close();
   render: () => <DestructiveConfirmationStory />,
 };
 
-/**
- * Undismissible and backdrop clicks are ignored, so the visible way out is
- * an action — Escape still closes the modal, as it always does.
- */
 const UndismissibleStory = () => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const close = () => modalRef.current?.close();
@@ -218,17 +214,21 @@ const UndismissibleStory = () => {
         You have unsaved changes, which will be lost if you continue.
       </Component.Content>
       <Component.Footer>
-        <Button importance="secondary" onClick={close}>
-          Keep editing
-        </Button>
         <Button importance="primary" anticipation="destructive" onClick={close}>
           Discard
+        </Button>
+        <Button importance="secondary" onClick={close}>
+          Keep editing
         </Button>
       </Component.Footer>
     </Component>
   );
 };
 
+/**
+ * Undismissible and backdrop clicks are ignored, so the visible way out is
+ * an action — Escape still closes the modal, as it always does.
+ */
 export const Undismissible: Story = {
   parameters: {
     docs: {
@@ -247,11 +247,11 @@ const close = () => modalRef.current?.close();
     You have unsaved changes, which will be lost if you continue.
   </Modal.Content>
   <Modal.Footer>
-    <Button importance="secondary" onClick={close}>
-      Keep editing
-    </Button>
     <Button importance="primary" anticipation="destructive" onClick={close}>
       Discard
+    </Button>
+    <Button importance="secondary" onClick={close}>
+      Keep editing
     </Button>
   </Modal.Footer>
 </Modal>`,
@@ -261,14 +261,6 @@ const close = () => modalRef.current?.close();
   render: () => <UndismissibleStory />,
 };
 
-/**
- * Content is an open slot, not a text field: it takes arbitrary React, so
- * other components compose inside it. Here a paragraph, a KeyboardKey
- * shortcut hint, an InlineCode command and a row of Chips share one modal.
- * Each child brings its own margins, so the slot's outermost element owns
- * the spacing rather than leaving the browser defaults to stack on top of
- * the content padding.
- */
 const RichContentStory = () => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const close = () => modalRef.current?.close();
@@ -309,9 +301,6 @@ const RichContentStory = () => {
         </div>
       </Component.Content>
       <Component.Footer>
-        <Button importance="secondary" onClick={close}>
-          Cancel
-        </Button>
         <Button
           importance="primary"
           anticipation="constructive"
@@ -319,11 +308,22 @@ const RichContentStory = () => {
         >
           Connect
         </Button>
+        <Button importance="secondary" onClick={close}>
+          Cancel
+        </Button>
       </Component.Footer>
     </Component>
   );
 };
 
+/**
+ * Content is an open slot, not a text field: it takes arbitrary React, so
+ * other components compose inside it. Here a paragraph, a KeyboardKey
+ * shortcut hint, an InlineCode command and a row of Chips share one modal.
+ * Each child brings its own margins, so the slot's outermost element owns
+ * the spacing rather than leaving the browser defaults to stack on top of
+ * the content padding.
+ */
 export const RichContent: Story = {
   parameters: {
     docs: {
@@ -354,11 +354,11 @@ const close = () => modalRef.current?.close();
     </div>
   </Modal.Content>
   <Modal.Footer>
-    <Button importance="secondary" onClick={close}>
-      Cancel
-    </Button>
     <Button importance="primary" anticipation="constructive" onClick={close}>
       Connect
+    </Button>
+    <Button importance="secondary" onClick={close}>
+      Cancel
     </Button>
   </Modal.Footer>
 </Modal>`,
@@ -368,10 +368,6 @@ const close = () => modalRef.current?.close();
   render: () => <RichContentStory />,
 };
 
-/**
- * Only the content pane scrolls: the header and footer stay in place, and the
- * dialog never grows past --modal-max-block-size.
- */
 const storyOfUbuntu = [
   "Ubuntu is an ancient African word meaning 'humanity to others'. It is often described as reminding us that 'I am what I am because of who we all are'. We bring the spirit of Ubuntu to the world of computers and software.",
   "Linux was already established in 2004, but it was fragmented into proprietary and unsupported community editions, and free software was not a part of everyday life for most computer users. That's when Mark Shuttleworth gathered a small team of Debian developers who together founded Canonical and set out to create an easy-to-use Linux desktop called Ubuntu.",
@@ -416,6 +412,9 @@ const LongContentStory = () => {
   );
 };
 
+/**
+ * Only the content pane scrolls: the header and footer stay in place.
+ */
 export const LongContent: Story = {
   parameters: {
     docs: {
