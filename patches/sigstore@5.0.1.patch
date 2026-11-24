@@ -1,8 +1,8 @@
 diff --git a/dist/config.js b/dist/config.js
-index 373149fe22fb750faeefba5d20a0e432bb91df14..a3f048483f9a3b653405d32484f4197cfa848f75 100644
+index 373149fe22fb750faeefba5d20a0e432bb91df14..19060c3fd2756f09abea0856e52178302ffba428 100644
 --- a/dist/config.js
 +++ b/dist/config.js
-@@ -102,7 +102,17 @@ function initWitnesses(options) {
+@@ -102,7 +102,20 @@ function initWitnesses(options) {
          witnesses.push(new sign_1.RekorWitness({
              rekorBaseURL: options.rekorURL,
              entryType: options.legacyCompatibility ? 'intoto' : 'dsse',
@@ -15,8 +15,11 @@ index 373149fe22fb750faeefba5d20a0e432bb91df14..a3f048483f9a3b653405d32484f4197c
 +            // fetchOnConflict disabled, the publish dies on its own success
 +            // (v0.36.0: 53/55 packages published). @sigstore/sign 5.1.0 made
 +            // fetchOnConflict default to true, but this explicit `false`
-+            // still overrides that default. Drop this patch only when a
-+            // sigstore release stops passing `false` here.
++            // still overrides that default. Drop this patch once the
++            // libnpmpublish that lerna depends on passes fetchOnConflict: true
++            // to sigstore (sigstore/sigstore-js#1791 adds the option,
++            // npm/cli#10341 passes it), or once a sigstore release stops
++            // passing `false` here.
 +            fetchOnConflict: true,
              retry: options.retry ?? exports.DEFAULT_RETRY,
              timeout: options.timeout ?? exports.DEFAULT_TIMEOUT,
