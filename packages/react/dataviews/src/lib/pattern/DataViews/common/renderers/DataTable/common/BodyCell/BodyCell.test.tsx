@@ -106,6 +106,21 @@ describe("BodyCell", () => {
   });
 
   describe("over records of several types", () => {
+    it("draws a dash named not applicable for a field the record's type lacks", () => {
+      const { provider, scopes } = observeWorkloadRows();
+      render(
+        <BodyCell
+          provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
+          channels={scopes.readRow("w-2")}
+          column={{ id: "image", header: "Image" }}
+          field="image"
+        />,
+        inRow(),
+      );
+      expect(screen.getByRole("cell")).toHaveAccessibleName("Not applicable");
+    });
+
     it("hands its own content the record and the applicability", () => {
       const { provider, scopes } = observeWorkloadRows();
       render(

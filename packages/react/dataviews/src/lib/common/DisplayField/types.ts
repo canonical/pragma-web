@@ -55,7 +55,8 @@ export type DisplayField<TRow extends object = RowRecord> = {
   readonly field?: string;
   /**
    * Field-specific content, handed the value and the record. Without one,
-   * primitive values render as text and every other value renders nothing.
+   * primitive values render as text, every other value renders nothing,
+   * and a field that does not apply to the record draws a dash.
    */
   readonly cell?: FunctionComponent<DisplayFieldCellProps<unknown, TRow>>;
 };

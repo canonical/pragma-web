@@ -8,6 +8,7 @@ import {
   buildMachine,
   createMachineProvider,
   machines,
+  observeWorkloadRows,
   silenceRenderErrors,
 } from "../../../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../../../common/index.js";
@@ -90,5 +91,34 @@ describe("FieldValue", () => {
         />,
       ),
     ).toThrow('no channel observes the field "cores"');
+  });
+
+  describe("over records of several types", () => {
+    it("draws a dash named not applicable, and hands its own content the record", () => {
+      const { provider, scopes, readApplicability } = observeWorkloadRows();
+      const { container } = render(
+        <>
+          <FieldValue
+            provider={provider}
+            readApplicability={readApplicability}
+            channels={scopes.readRow("w-2")}
+            field={{ id: "image", header: "Image" }}
+          />
+          <FieldValue
+            provider={provider}
+            readApplicability={readApplicability}
+            channels={scopes.readRow("w-2")}
+            field={{
+              id: "kind",
+              header: "Kind",
+              field: "image",
+              cell: ({ record, applicability }) =>
+                ` ${record.name}: ${applicability}`,
+            }}
+          />
+        </>,
+      );
+      expect(container).toHaveTextContent("—Not applicable db: not-applicable");
+    });
   });
 });

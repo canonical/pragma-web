@@ -20,8 +20,8 @@ const componentCssClassName = "ds data-table-body-cell";
  * pinning, the body cell is responsible for presenting data values and
  * providing row-level interactions such as inline editing and row actions.
  *
- * Covers the text cell and a column's renderer; no inline editing or row
- * actions.
+ * Covers the text cell, the dash of a field that does not apply to the
+ * record's type, and a column's renderer; no inline editing or row actions.
  *
  * @implements ds:apps.subcomponent.data_table-body_cell
  */

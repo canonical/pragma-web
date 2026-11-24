@@ -16,7 +16,7 @@ import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTabl
 const web = elementAt(WORKLOAD_RECORDS, 0);
 
 describe("regression 0130 — a record returning as another type kept its old cells", () => {
-  it.fails("draws a dash once the field no longer applies, and the value once it does", () => {
+  it("draws a dash once the field no longer applies, and the value once it does", () => {
     const { provider, source } = createWorkloadProvider([web]);
     onTestFinished(provider.observe());
     render(

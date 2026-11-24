@@ -63,6 +63,10 @@ describe("constants", () => {
       expect(m.grouping).toBe("Grouping");
     });
 
+    it("words a scoped field's cell", () => {
+      expect(m.cellNotApplicable).toBe("Not applicable");
+    });
+
     it("words the table's selection and resize controls, with the width's plural", () => {
       expect(m.selectAllRows).toBe("Select all displayed rows");
       expect(m.selectRow("alder")).toBe("Select alder");

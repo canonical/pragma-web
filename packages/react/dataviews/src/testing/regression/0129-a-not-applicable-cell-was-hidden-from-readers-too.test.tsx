@@ -16,7 +16,7 @@ const fields = [
 ];
 
 describe("regression 0129 — a not-applicable cell was hidden from readers too", () => {
-  it.fails("names a table's cell by the words beside its dash", () => {
+  it("names a table's cell by the words beside its dash", () => {
     const { provider } = createWorkloadProvider();
     onTestFinished(provider.observe());
     render(
@@ -27,7 +27,7 @@ describe("regression 0129 — a not-applicable cell was hidden from readers too"
     expect(cell).toHaveTextContent("—");
   });
 
-  it.fails("names a card's field by the same words", () => {
+  it("names a card's field by the same words", () => {
     const { provider } = createWorkloadProvider();
     onTestFinished(provider.observe());
     render(

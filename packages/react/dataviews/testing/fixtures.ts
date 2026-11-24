@@ -672,6 +672,7 @@ export const MESSAGE_SAMPLES: {
   selectRow: [[MESSAGE_MARK]],
   columnWidth: [[1], [7]],
   columnEndPlacement: [[MESSAGE_MARK]],
+  cellNotApplicable: null,
   sortPrecedence: [
     [{ direction: "asc", position: 1, total: 1 }],
     [{ direction: "desc", position: 2, total: 3 }],

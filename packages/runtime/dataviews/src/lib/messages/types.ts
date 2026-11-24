@@ -92,6 +92,16 @@ export type DataViewsMessages = {
    */
   readonly columnEndPlacement: (name: string) => string;
 
+  // A field scoped to some record types.
+  /**
+   * Read beside the dash a cell or card field draws where its field does not
+   * apply to the record's type.
+   *
+   * @experimental Scoped fields are new, and the wording may name the
+   * record type once records have nouns.
+   */
+  readonly cellNotApplicable: string;
+
   // The table's sort.
   /**
    * What a sorted heading states of its column: its direction, and its

@@ -30,6 +30,21 @@ describe("FieldContent", () => {
       expect(container).toHaveTextContent(/^ubuntu\/24\.04$/);
     });
 
+    it("draws a dash named not applicable where the field does not apply", () => {
+      const { scopes, readApplicability } = observeWorkloadRows([web]);
+      const channels = scopes.readRow("w-1");
+      const { container } = render(
+        <FieldContent
+          channels={channels}
+          field="cores"
+          columnId="cores"
+          cell={undefined}
+          readApplicability={readApplicability}
+        />,
+      );
+      expect(container).toHaveTextContent(/^—Not applicable$/);
+    });
+
     it("redraws when the record returns as another type", () => {
       const { scopes, readApplicability, replace } = observeWorkloadRows();
       const channels = scopes.readRow("w-1");

@@ -11,7 +11,8 @@ import type { FieldValueProps } from "./types.js";
  * One field's value on a card, inside the same cell scope a table's cell
  * installs, so a field's own `cell` renders unchanged on a card and may call
  * `useDataViewsCell` for the record's channels. Without one, primitive values
- * render as text and every other value renders nothing.
+ * render as text, every other value renders nothing, and a field that does
+ * not apply to the record draws a dash.
  *
  * Its default text subscribes to its own field's channel, so a record
  * update re-renders only the values that changed. Memoised, so a card
