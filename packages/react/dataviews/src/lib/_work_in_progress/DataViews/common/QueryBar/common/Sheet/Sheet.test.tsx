@@ -13,11 +13,10 @@ import {
   within,
 } from "@testing-library/react";
 import { type ReactElement, useState } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  installDialogStandIn,
 } from "../../../../../../../../testing/index.js";
 import DataViews from "../../../../Provider.js";
 import { useQueryGroup, useSheetAnnouncer } from "../../hooks/index.js";
@@ -101,12 +100,6 @@ const mount = ({ query, href, alter, dialogProps }: MountConfig = {}) => {
 };
 
 describe("Sheet", () => {
-  let uninstall: () => void;
-  beforeEach(() => {
-    uninstall = installDialogStandIn();
-  });
-  afterEach(() => uninstall());
-
   it("is a closed modal dialog, labelled by its title, its body not yet drawn", () => {
     const { dialog } = mount({ query: "status=running" });
     expect(dialog).toHaveAttribute("id", "sheet");

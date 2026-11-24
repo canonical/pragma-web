@@ -274,13 +274,3 @@ export type ResizeObserverStandIn = {
   /** Remove the stand-in and restore the observer it replaced. */
   readonly uninstall: () => void;
 };
-
-/** How the stand-in is installed. */
-export type DialogStandInConfig = {
-  /**
-   * Whether buttons run their `commandfor` dialog's `command` on a click,
-   * as browsers with invoker commands do; off, a button has no `command`
-   * property, as in a browser without them.
-   */
-  readonly invokers?: boolean;
-};

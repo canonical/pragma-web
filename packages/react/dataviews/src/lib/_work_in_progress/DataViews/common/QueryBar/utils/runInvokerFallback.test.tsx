@@ -1,8 +1,27 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { installDialogStandIn } from "../../../../../../../testing/index.js";
 import runInvokerFallback from "./runInvokerFallback.js";
 import spellInvoker from "./spellInvoker.js";
+
+/**
+ * Make the page a browser that runs no invoker command: the shared dialog
+ * stand-in leaves a click whose default is prevented alone, so a button's
+ * `commandfor` does nothing but what its own handler does.
+ *
+ * @returns A function that brings invoker commands back.
+ */
+const withoutInvokers = (): (() => void) => {
+  const prevent = (event: Event): void => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest("button[commandfor]") !== null
+    ) {
+      event.preventDefault();
+    }
+  };
+  document.addEventListener("click", prevent, true);
+  return () => document.removeEventListener("click", prevent, true);
+};
 
 /** A dialog, and buttons that show and close it, or name nothing. */
 const renderDialog = () =>
@@ -45,7 +64,7 @@ describe("runInvokerFallback", () => {
   });
 
   it("shows and closes the dialog where the browser runs no invoker command", () => {
-    uninstall = installDialogStandIn({ invokers: false });
+    uninstall = withoutInvokers();
     const { container } = renderDialog();
     const dialog = container.querySelector("dialog") as HTMLDialogElement;
     fireEvent.click(screen.getByRole("button", { name: "Nothing" }));
@@ -65,18 +84,22 @@ describe("runInvokerFallback", () => {
   });
 
   it("leaves the command to a browser that runs it", () => {
-    uninstall = installDialogStandIn();
+    // A browser with invoker commands has the property; its own run of the
+    // command is held back, so only the fallback could show the dialog.
+    Object.defineProperty(HTMLButtonElement.prototype, "command", {
+      configurable: true,
+      get(this: HTMLButtonElement) {
+        return this.getAttribute("command") ?? "";
+      },
+    });
+    const restore = withoutInvokers();
+    uninstall = () => {
+      restore();
+      delete (HTMLButtonElement.prototype as { command?: string }).command;
+    };
     const { container } = renderDialog();
     const dialog = container.querySelector("dialog") as HTMLDialogElement;
-    let shows = 0;
-    const showModal = dialog.showModal.bind(dialog);
-    dialog.showModal = () => {
-      shows += 1;
-      showModal();
-    };
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(dialog.open).toBe(true);
-    // Only the browser's own command showed it.
-    expect(shows).toBe(0);
+    expect(dialog.open).toBe(false);
   });
 });

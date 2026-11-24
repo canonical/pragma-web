@@ -35,7 +35,6 @@ import {
   vi,
 } from "vitest";
 import {
-  installDialogStandIn,
   installPopoverStandIn,
   installResizeObserverStandIn,
   type ResizeObserverStandIn,
@@ -2686,8 +2685,6 @@ describe("QueryBar", () => {
     });
 
     it("opens the sheet, where the bar speaks while it is open", async () => {
-      const uninstallDialog = installDialogStandIn();
-      onTestFinished(uninstallDialog);
       const { provider } = mount({ query: "status=deployed&pool=gpu" });
       resizeBar(320);
       fireEvent.click(
@@ -2718,8 +2715,6 @@ describe("QueryBar", () => {
     });
 
     it("closes the sheet as the bar widens, focus on the entry", () => {
-      const uninstallDialog = installDialogStandIn();
-      onTestFinished(uninstallDialog);
       mount({ query: "status=deployed" });
       resizeBar(320);
       fireEvent.click(

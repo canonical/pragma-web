@@ -2,10 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  installDialogStandIn,
-} from "../../../../../../../../testing/index.js";
+import { createMachineProvider } from "../../../../../../../../testing/index.js";
 import DataViews from "../../../../Provider.js";
 import { useQueryGroup } from "../../hooks/index.js";
 import SummaryButton from "./SummaryButton.js";
@@ -33,6 +30,26 @@ function Connected(
 }
 
 let fixture = createMachineProvider();
+
+/**
+ * Make the page a browser that runs no invoker command: the shared dialog
+ * stand-in leaves a click whose default is prevented alone, so a button's
+ * `commandfor` does nothing but what its own handler does.
+ *
+ * @returns A function that brings invoker commands back.
+ */
+const withoutInvokers = (): (() => void) => {
+  const prevent = (event: Event): void => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest("button[commandfor]") !== null
+    ) {
+      event.preventDefault();
+    }
+  };
+  document.addEventListener("click", prevent, true);
+  return () => document.removeEventListener("click", prevent, true);
+};
 
 describe("SummaryButton", () => {
   let uninstall: () => void = () => {};
@@ -89,7 +106,7 @@ describe("SummaryButton", () => {
   });
 
   it("calls onShow, then shows the sheet, on a click", () => {
-    uninstall = installDialogStandIn({ invokers: false });
+    uninstall = withoutInvokers();
     fixture = createMachineProvider();
     const onShow = vi.fn();
     const onClick = vi.fn();
