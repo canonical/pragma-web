@@ -15,20 +15,12 @@ import {
 } from "../../../../../../hooks/index.js";
 import { spellCount } from "../../../../../../utils/index.js";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import { NO_RECORDS } from "../constants.js";
+import { NO_RECORDS, PHRASE_MESSAGES } from "../constants.js";
 import type { ChoicesFilterProps } from "./types.js";
 
 const componentCssClassName = "ds data-views-filters-choices";
 
 const NONE_SELECTED: ReadonlySet<PredicateOperand> = new Set();
-
-/** The message naming each set operator's group, by the field's label. */
-const LEGEND_MESSAGES = {
-  isAny: "filterIsAnyOf",
-  isNone: "filterIsNoneOf",
-} as const satisfies Readonly<
-  Record<ChoicesFilterProps["operator"], keyof DataViewsMessages>
->;
 
 /** The other set operator, which a standing set may move to. */
 const ALTERNATIVE_OPERATOR = { isAny: "isNone", isNone: "isAny" } as const;
@@ -165,7 +157,7 @@ export default function ChoicesFilter({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <legend className="legend">
-        {messages[LEGEND_MESSAGES[operator]](label)}
+        {messages[PHRASE_MESSAGES[operator]](label)}
       </legend>
       {listed.map((option, place) => {
         const countId = `${baseId}-count-${place}`;

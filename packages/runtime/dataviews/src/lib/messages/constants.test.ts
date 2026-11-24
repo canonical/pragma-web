@@ -184,6 +184,19 @@ describe("constants", () => {
         "Tags is any of ex-gpu, ex-nvme",
       );
       expect(m.filterStartsWith("Name")).toBe("Name starts with");
+      expect(m.filterIs("Name")).toBe("Name is");
+      expect(m.filterIsNot("Name")).toBe("Name is not");
+      expect(m.filterNotContains("Name")).toBe("Name does not contain");
+      expect(m.filterEndsWith("Name")).toBe("Name ends with");
+      expect(m.filterMatch("Name")).toBe("How Name matches");
+      expect(m.filterInUnit("Memory from", "MiB")).toBe("Memory from (MiB)");
+      expect(m.filterHasValue("Owner")).toBe("Owner has a value");
+      expect(m.filterHasNoValue("Owner")).toBe("Owner has no value");
+      expect([m.presenceAny, m.presenceSet, m.presenceUnset]).toEqual([
+        "Any",
+        "Has a value",
+        "Has no value",
+      ]);
     });
 
     it("words why a filter edit did not apply, and whether the earlier restriction stands", () => {

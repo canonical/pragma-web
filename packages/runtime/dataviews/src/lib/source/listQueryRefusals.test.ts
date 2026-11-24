@@ -96,7 +96,7 @@ describe("listQueryRefusals", () => {
       listQueryRefusals(
         permissive,
         buildQuery({
-          filter: [{ field: "status", operator: "isSet", operands: [] }],
+          filter: [{ field: "status", operator: "isSet", operands: [true] }],
         }),
       ),
     ).toEqual([

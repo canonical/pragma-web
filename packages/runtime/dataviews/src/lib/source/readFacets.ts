@@ -45,19 +45,35 @@ const FACET_READERS: {
     const tallies = new Map<string | number, Tally>();
     for (const row of rows) {
       const held = readField(row, definition.field);
-      // The order keys a string or a number, as `isAny` reads a choice value,
-      // and nothing else: a value it cannot key is no choice value.
-      const key = order.readKey(held);
-      if (key === null) {
-        continue;
-      }
-      // Keyed, so a string or a number.
-      const value = isText ? String(held) : (held as string | number);
-      const tally = tallies.get(value);
-      if (tally === undefined) {
-        tallies.set(value, { value, key, count: 1 });
-      } else {
-        tally.count += 1;
+      // A list-valued field counts the record once under each option it
+      // lists; any other holds one value.
+      const elements =
+        definition.multiple === true
+          ? Array.isArray(held)
+            ? (held as readonly unknown[])
+            : []
+          : [held];
+      // Counted once per record, however often the record lists it.
+      const counted = new Set<string | number>();
+      for (const element of elements) {
+        // The order keys a string or a number, as `isAny` reads a choice
+        // value, and nothing else: a value it cannot key is no choice value.
+        const key = order.readKey(element);
+        if (key === null) {
+          continue;
+        }
+        // Keyed, so a string or a number.
+        const value = isText ? String(element) : (element as string | number);
+        if (counted.has(value)) {
+          continue;
+        }
+        counted.add(value);
+        const tally = tallies.get(value);
+        if (tally === undefined) {
+          tallies.set(value, { value, key, count: 1 });
+        } else {
+          tally.count += 1;
+        }
       }
     }
     return {
@@ -147,7 +163,8 @@ export default function readFacets(
   rows: readonly object[],
   slice: Slice,
   definitions: readonly SchemaFieldDefinition[],
-  config: Pick<ExecuteSliceConfig, "schema" | "searchFields">,
+  config: Pick<ExecuteSliceConfig, "schema" | "searchFields"> &
+    Partial<Pick<ExecuteSliceConfig, "types">>,
   selected: readonly object[],
 ): Readonly<Record<string, Facet>> {
   const restricted = new Set(slice.filter.map(({ field }) => field));

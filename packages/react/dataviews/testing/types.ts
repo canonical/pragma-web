@@ -2,6 +2,7 @@ import type {
   Collection,
   DataViewsProvider,
   DataViewsProviderConfig,
+  FieldKindOperators,
   PresentationStore,
   QueryLocation,
   ReadonlyChannel,
@@ -53,7 +54,7 @@ export type OperatorRecord = {
  * A text operator looks at `name`, a choice operator at `status`.
  */
 export type OperatorCase = {
-  readonly operator: "contains" | "startsWith" | "isAny" | "isNone";
+  readonly operator: FieldKindOperators["text" | "choices"];
   readonly operands: readonly string[];
   readonly matches: readonly string[];
   /** What the case pins, for a failure to say. */
@@ -166,16 +167,19 @@ export type IdentifiedRecord = { readonly id: string };
 /** What a bound filter case sets; the handle, label and definition follow the field. */
 export type BoundFilterHarnessProps = Partial<
   Omit<BoundFilterProps, "handle" | "label" | "definition">
-> & { readonly field?: "cpu" | "updated" };
+> & { readonly field?: "cpu" | "updated" | "memory" };
 
 /** What a presence filter case sets; the handle, label and field are the root's. */
 export type PresenceFilterHarnessProps = Partial<
   Omit<PresenceFilterProps, "handle" | "label" | "field">
 >;
 
-/** What a text filter case sets; the handle, label and field are the root's. */
+/**
+ * What a text filter case sets; the handles, label, field and host are the
+ * harness's.
+ */
 export type TextFilterHarnessProps = Partial<
-  Omit<TextFilterProps, "handle" | "label" | "field">
+  Omit<TextFilterProps, "findHandle" | "label" | "field" | "host">
 >;
 
 /** A record with an identity and a name. */

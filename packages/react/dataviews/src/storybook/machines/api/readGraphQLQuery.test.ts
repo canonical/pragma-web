@@ -74,6 +74,24 @@ describe("readGraphQLQuery", () => {
     });
   });
 
+  it.each([
+    ["nameIs", "is"],
+    ["nameIsNot", "isNot"],
+    ["nameContains", "contains"],
+    ["nameNotContains", "notContains"],
+    ["nameStartsWith", "startsWith"],
+    ["nameEndsWith", "endsWith"],
+  ] as const)(
+    "reads where.%s as text the name must match",
+    (member, operator) => {
+      expect(
+        readGraphQLQuery({ first: 5, where: { [member]: "web" } }),
+      ).toMatchObject({
+        query: { text: [{ field: "name", operator, text: "web" }] },
+      });
+    },
+  );
+
   it("reads an empty search as none, and an ascending order in a list", () => {
     expect(
       readGraphQLQuery({
@@ -102,6 +120,9 @@ describe("readGraphQLQuery", () => {
     });
     expect(readGraphQLQuery({ first: 1, where: { id: "a" } })).toEqual({
       reason: 'this endpoint does not accept "where.id"',
+    });
+    expect(readGraphQLQuery({ first: 1, where: { regionIs: "eu" } })).toEqual({
+      reason: 'this endpoint does not accept "where.regionIs"',
     });
   });
 

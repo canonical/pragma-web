@@ -16,7 +16,7 @@ import type {
  * A closed-set field, filtered by `isAny` — the value is one of the operands
  * — and `isNone` — the value is present, a string or a number, and none of
  * the operands. An absent or null value, or one of another type, is neither
- * any nor none of them.
+ * any nor none of them. A list-valued field matches by element instead.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -33,10 +33,42 @@ export type ChoicesField = {
    * spelled on the wire reads back as the option it was.
    */
   readonly options?: readonly (string | number)[];
+  /**
+   * Whether a record holds a list of options rather than one: `isAny` then
+   * matches when any element is an operand, `isNone` when a list is held
+   * and none of its elements is, and a facet counts the records holding
+   * each option. Left out, a record holds one option.
+   */
+  readonly multiple?: true;
 };
 
 /**
- * A numeric field: lower/upper bounds with optional limits.
+ * The units a number field's values are measured in: the base unit records,
+ * sources, the wire, facets and the field's limits use, and the units a
+ * reader may type a value in. SI and IEC symbols are data, never
+ * translated.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type NumberUnits = {
+  /** The unit the record, the source and the wire use. */
+  readonly base: string;
+  /**
+   * The units a value may be typed in, ascending, each with its size in
+   * base units; the base unit is one of them, with a factor of 1.
+   */
+  readonly display: readonly {
+    readonly symbol: string;
+    readonly factor: number;
+  }[];
+};
+
+/**
+ * A numeric field: lower/upper bounds with optional limits, and optionally
+ * the units its values are measured in. A typed value may carry one of its
+ * display units, matched case-insensitively, as `16 GiB`, and is read in
+ * base units; a value without one is in base units.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -46,12 +78,13 @@ export type NumberField = {
   readonly kind: "number";
   readonly min?: number;
   readonly max?: number;
+  readonly units?: NumberUnits;
 };
 
 /**
- * A presence field: whether a record sets it, filtered by the zero-value
- * `isSet` operator. Any value but an absent or null one is set, `false`
- * included. It orders in two ranks, unset before set; `false` and `true`
+ * A presence field: whether a record sets it, filtered by `isSet` with
+ * `true` for records that set it and `false` for those that do not. Any
+ * value but an absent or null one is set, `false` included. It orders in two ranks, unset before set; `false` and `true`
  * are both set and tie.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -81,12 +114,14 @@ export type DateField = {
 
 /**
  * A free-text field: ordered through the source's collator, and filtered by
- * `contains` — the value holds the operand — and `startsWith` — the value
- * begins with it — once both are folded: normalised to NFC, lowercased
- * without a locale, final sigma read as sigma, and normalised to NFC again.
- * The operand is literal: `%`, `_` and `\` are characters to look for,
- * never wildcards, and nothing is trimmed. Only a string value can hold one;
- * an absent, null or non-string value never does.
+ * `is` — the value equals the operand — `contains` — the value holds it —
+ * `startsWith` and `endsWith` — the value begins or ends with it — once both
+ * are folded: normalised to NFC, lowercased without a locale, final sigma
+ * read as sigma, and normalised to NFC again. `isNot` and `notContains`
+ * hold exactly where `is` and `contains` do not. The operand is literal:
+ * `%`, `_` and `\` are characters to look for, never wildcards, and nothing
+ * is trimmed. Only a string value can hold one; an absent, null or
+ * non-string value never does, so it matches both negations.
  *
  * @experimental Pre-release: the operators a text field accepts may change
  * before the first release.
@@ -143,7 +178,7 @@ export type FieldValidation =
 /**
  * The applied semantic value a field's predicate carries: a `choices` set,
  * a number or date bound, whether a presence field is set, or the text a
- * text field contains or starts with.
+ * text field's operator matches.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -189,22 +224,50 @@ export type EmptyOr<T> =
 export type FieldKind = SchemaFieldDefinition["kind"];
 
 /**
- * The operators each kind accepts, at the type level: what the runtime
- * table declares, spelled so a provider's field handles can be keyed by
- * operator from a definition's kind alone.
+ * The operators each field kind accepts, by kind: a binding names a kind's
+ * operators as `FieldKindOperators["text"]` rather than listing them, and
+ * `listOfferedOperators` answers in these terms.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export type FieldKindOperators = {
   readonly choices: "isAny" | "isNone";
   readonly number: "gte" | "lte";
   readonly presence: "isSet";
   readonly date: "gte" | "lte";
-  readonly text: "contains" | "startsWith";
+  readonly text:
+    | "is"
+    | "isNot"
+    | "contains"
+    | "notContains"
+    | "startsWith"
+    | "endsWith";
 };
 
-/** One text input read as an operand, or the reason it is not one. */
+/**
+ * One text input read as an operand, or that it is still being typed, or
+ * the reason it is not one.
+ */
 export type InputParse =
   | { readonly status: "valid"; readonly operand: PredicateOperand }
+  | { readonly status: "incomplete" }
   | { readonly status: "invalid"; readonly reason: string };
+
+/**
+ * Typed text read as a number in base units: the number, text a reader is
+ * still typing towards one, a unit the field does not have, or no number.
+ */
+export type NumberReading =
+  | { readonly kind: "value"; readonly value: number }
+  | { readonly kind: "incomplete" }
+  | {
+      readonly kind: "unknown-unit";
+      readonly symbol: string;
+      /** The display symbols the field does have, in order. */
+      readonly accepted: readonly string[];
+    }
+  | { readonly kind: "not-a-number" };
 
 /**
  * The comparison key of one value the kind orders: a rank the kind places

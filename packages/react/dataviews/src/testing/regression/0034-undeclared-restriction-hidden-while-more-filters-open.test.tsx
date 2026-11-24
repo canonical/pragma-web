@@ -57,7 +57,7 @@ describe("regression 0034 — undeclared restriction hidden while More filters o
         {
           slice: {
             ...EMPTY_SLICE,
-            filter: [{ field: "spare", operator: "isSet", operands: [] }],
+            filter: [{ field: "spare", operator: "isSet", operands: [true] }],
           },
           window: DEFAULT_WINDOW,
         },
@@ -65,6 +65,6 @@ describe("regression 0034 — undeclared restriction hidden while More filters o
         null,
       );
     });
-    expect(screen.getByRole("checkbox", { name: "spare" })).toBeVisible();
+    expect(screen.getByRole("group", { name: "spare" })).toBeVisible();
   });
 });

@@ -59,7 +59,14 @@ describe("createFilterInputs", () => {
       "updated",
     ]);
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
-    expect(Object.keys(handles.name)).toEqual(["contains", "startsWith"]);
+    expect(Object.keys(handles.name)).toEqual([
+      "is",
+      "isNot",
+      "contains",
+      "notContains",
+      "startsWith",
+      "endsWith",
+    ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     // The adoption stays with the records: a root's handle cannot impose
     // a predicate the query does not hold.
@@ -396,7 +403,7 @@ describe("createFilterInputs", () => {
   it("clears a predicate on the query and answers with no refusal", () => {
     const p = createProvider();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
-    inputs.handles.owner.isSet.set([]);
+    inputs.handles.owner.isSet.set([true]);
     expect(p.state.get().slice.filter).toHaveLength(1);
     expect(inputs.handles.owner.isSet.clear()).toEqual([]);
     expect(p.state.get().slice.filter).toEqual([]);

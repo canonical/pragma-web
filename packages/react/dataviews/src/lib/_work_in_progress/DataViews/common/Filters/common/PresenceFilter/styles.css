@@ -1,0 +1,19 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * PresenceFilter styles
+   *
+   * The radios are native, themed by the page. What this sheet settles is
+   * their target: each choice's label is at least one row tall, so a radio
+   * and its words make a target of that size, and neighbouring choices
+   * never overlap.
+   */
+  .ds.data-views-filters-presence {
+    & > .option > label {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--density-line-height-effective);
+    }
+  }
+}

@@ -9,6 +9,7 @@ import {
   createMemoryLocation,
   declareCapabilities,
   type FurtherConjunct,
+  type PredicateOperator,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createManualSource } from "@canonical/dataviews-core/testing";
@@ -120,8 +121,9 @@ describe("FurtherConjuncts", () => {
     const provider = follow("/machines");
     const host = readProviderHost(provider);
     const readRowText = (
-      operator: "isNone" | "lte" | "contains" | "startsWith" | "isSet",
-      operands: readonly (string | number)[],
+      operator: PredicateOperator,
+      operands: readonly (string | number | boolean)[],
+      unit?: string,
     ) => {
       const { container, unmount } = render(
         <DataViews provider={provider}>
@@ -130,6 +132,7 @@ describe("FurtherConjuncts", () => {
             field="cpu"
             operator={operator}
             label="Cores"
+            unit={unit}
             host={host}
             onLeave={() => {}}
           />
@@ -141,11 +144,19 @@ describe("FurtherConjuncts", () => {
     };
     expect(readRowText("isNone", ["ex-gpu"])).toBe("Cores is none of ex-gpu");
     expect(readRowText("lte", [8])).toBe("Cores to 8");
+    // A bound with units names its base unit, as its control does.
+    expect(readRowText("gte", [16_384], "MiB")).toBe("Cores from (MiB) 16384");
     expect(readRowText("contains", ["ex"])).toBe("Cores contains ex");
+    expect(readRowText("notContains", ["ex"])).toBe(
+      "Cores does not contain ex",
+    );
     expect(readRowText("startsWith", ["ex"])).toBe("Cores starts with ex");
-    // Presence holds no value: its row reads as the field, its value the
-    // marker a link spells it with.
-    expect(readRowText("isSet", [])).toBe("Cores 1");
+    expect(readRowText("endsWith", ["ex"])).toBe("Cores ends with ex");
+    expect(readRowText("is", ["ex"])).toBe("Cores is ex");
+    expect(readRowText("isNot", ["ex"])).toBe("Cores is not ex");
+    // Presence reads as the field and its choice.
+    expect(readRowText("isSet", [true])).toBe("Cores has a value");
+    expect(readRowText("isSet", [false])).toBe("Cores has no value");
   });
   it("passes native props to its list, keeping its own class first", () => {
     const provider = follow("/machines");
