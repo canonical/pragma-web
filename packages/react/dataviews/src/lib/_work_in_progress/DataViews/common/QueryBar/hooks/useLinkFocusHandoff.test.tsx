@@ -48,6 +48,24 @@ describe("useLinkFocusHandoff", () => {
     expect(document.activeElement).toBe(root.querySelectorAll("button")[1]);
   });
 
+  it("tells same-named words apart by their quick filter", () => {
+    const root = document.createElement("div");
+    root.innerHTML =
+      '<div class="ds filter-options" id="s"><a href="?">All</a></div><div class="ds filter-options" id="t"><a href="?">All</a></div>';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    root.querySelectorAll("a")[1]?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    root.innerHTML =
+      '<div class="ds filter-options" id="s"><button>All</button></div><div class="ds filter-options" id="t"><button>All</button></div>';
+    rerender({ hydrated: true });
+    expect(document.activeElement).toBe(root.querySelectorAll("button")[1]);
+  });
+
   it("hands focus in the filters' disclosure to its match, or else the entry", () => {
     const root = document.createElement("div");
     root.innerHTML =
@@ -62,6 +80,71 @@ describe("useLinkFocusHandoff", () => {
       { initialProps: { hydrated: false } },
     );
     root.innerHTML = '<input data-roving-item="entry" aria-label="Filter">';
+    rerender({ hydrated: true });
+    expect(document.activeElement).toBe(root.querySelector("input"));
+  });
+
+  it("hands focus on a quick filter's Apply to its panel's first control, or the panel", () => {
+    const root = document.createElement("div");
+    root.innerHTML =
+      '<div class="ds filter-button-panel" id="p" tabindex="-1"><form class="ds data-views-quick-filter-form"><input type="checkbox" aria-label="ready"><button type="submit">Apply</button></form></div>';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    root.querySelector("button")?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    root.querySelector("button")?.remove();
+    rerender({ hydrated: true });
+    expect(document.activeElement).toBe(root.querySelector("input"));
+    // With no control left, the panel itself.
+    root.querySelector("input")?.focus();
+    const empty = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    root
+      .querySelector("form")
+      ?.insertAdjacentHTML("beforeend", '<button type="submit">Apply</button>');
+    root.querySelector<HTMLElement>('[type="submit"]')?.focus();
+    empty.rerender({ hydrated: false });
+    root.querySelector("form")?.replaceChildren();
+    empty.rerender({ hydrated: true });
+    expect(document.activeElement).toBe(root.querySelector("#p"));
+  });
+
+  it("hands focus on Apply to the panel's control that takes Tab, past the radios that do not", () => {
+    const root = document.createElement("div");
+    root.innerHTML =
+      '<div class="ds filter-button-panel" id="p" tabindex="-1"><form class="ds data-views-quick-filter-form"><input type="radio" name="o" tabindex="-1" aria-label="Any"><input type="radio" name="o" checked aria-label="Has a value"><button type="submit">Apply</button></form></div>';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    root.querySelector<HTMLElement>('[type="submit"]')?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    root.querySelector('[type="submit"]')?.remove();
+    rerender({ hydrated: true });
+    expect(document.activeElement).toHaveAttribute("aria-label", "Has a value");
+  });
+
+  it("leaves focus on a checkbox of a quick filter's form, which stays", () => {
+    const root = document.createElement("div");
+    root.innerHTML =
+      '<div class="ds filter-button-panel" id="p"><form class="ds data-views-quick-filter-form"><input type="checkbox" aria-label="ready"></form></div>';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    root.querySelector("input")?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
     rerender({ hydrated: true });
     expect(document.activeElement).toBe(root.querySelector("input"));
   });

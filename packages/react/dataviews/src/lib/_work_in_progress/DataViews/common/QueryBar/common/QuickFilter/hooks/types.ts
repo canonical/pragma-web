@@ -5,6 +5,7 @@ import type {
   Facet,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { RefObject } from "react";
 
 /** What one field's facets are read for: the provider and the field. */
 export type UseFieldFacetsProps = {
@@ -23,4 +24,9 @@ export type UseFieldFacetsResult = {
    * one is being asked for.
    */
   readonly pending: boolean;
+};
+
+/** What keeps focus in a panel: the element holding the panel's controls. */
+export type UseFocusRescueProps = {
+  readonly containerRef: RefObject<HTMLElement | null>;
 };

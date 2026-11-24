@@ -6,16 +6,18 @@ const readName = (control: Element): string | null =>
   control.getAttribute("aria-label") ?? control.textContent;
 
 /**
- * The chip a control belongs to, by its id, or null outside a chip: two
- * refused chips on one field have clear controls of one name.
+ * The chip or quick filter a control belongs to, by its id, or null
+ * outside both: two refused chips on one field have clear controls of one
+ * name, as two quick filters have "All".
  */
 const readChipId = (control: Element): string | null =>
-  control.closest(".ds.query-chip")?.id ?? null;
+  control.closest(".ds.query-chip, .ds.filter-options")?.id ?? null;
 
 /**
  * Hand focus from a link drawn before scripts to the button that takes its
  * place once they run: a reader who tabbed to a Remove or Clear link stays
- * on its control. Matched by name and chip within the bar, not by a
+ * on its control, and one on a quick filter panel's Apply, which goes,
+ * stays in the panel. Matched by name and chip within the bar, not by a
  * selector built from a field's name. Focus in the filters' disclosure,
  * which goes once scripts run, goes to its match, or else to the entry.
  *
@@ -32,6 +34,8 @@ export default function useLinkFocusHandoff({
     readonly name: string | null;
     readonly chipId: string | null;
     readonly isInDisclosure: boolean;
+    /** The quick filter panel focus was in, by its id, or null. */
+    readonly panelId: string | null;
   } | null>(null);
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -43,11 +47,23 @@ export default function useLinkFocusHandoff({
       if (active === null || !root.contains(active)) return;
       const isInDisclosure =
         active.closest(".ds.data-views-query-bar-filters-disclosure") !== null;
-      if (active instanceof HTMLAnchorElement || isInDisclosure) {
+      // Only a quick filter panel's Apply goes; its other controls stay.
+      const panel = active.matches(
+        '.ds.filter-button-panel .ds.data-views-quick-filter-form > [type="submit"]',
+      )
+        ? active.closest(".ds.filter-button-panel")
+        : null;
+      const panelId = panel === null ? null : panel.id;
+      if (
+        active instanceof HTMLAnchorElement ||
+        isInDisclosure ||
+        panelId !== null
+      ) {
         handed.current = {
           name: readName(active),
           chipId: readChipId(active),
           isInDisclosure,
+          panelId,
         };
       }
       return;
@@ -67,6 +83,17 @@ export default function useLinkFocusHandoff({
     // A control of the disclosure with no match hands focus to the entry.
     if (held.isInDisclosure) {
       root.querySelector<HTMLElement>('[data-roving-item="entry"]')?.focus();
+      return;
+    }
+    // A quick filter panel's Apply, which goes once scripts run, hands
+    // focus to the panel's first control, or the panel itself.
+    if (held.panelId !== null) {
+      const panel = root.ownerDocument.getElementById(held.panelId);
+      (
+        panel?.querySelector<HTMLElement>(
+          'input:not([type="hidden"]):not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"])',
+        ) ?? panel
+      )?.focus();
     }
   }, [hydrated, rootRef]);
 }

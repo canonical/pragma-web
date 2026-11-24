@@ -1,11 +1,14 @@
 import type {
   FieldKind,
+  Predicate,
   PredicateCondition,
   PredicateEdit,
   PredicateOperand,
   SchemaFieldDefinition,
   SourceRefusal,
 } from "@canonical/dataviews-core";
+import type { Ref } from "react";
+import type { FilterButtonPanelHandle } from "../../../../../FilterButton/index.js";
 import type { PlacedConjunct, QueryGroupStandIn } from "../../types.js";
 
 /**
@@ -59,6 +62,31 @@ export type QuickFilterPanelProps<TKind extends FieldKind> = {
    * when it applied.
    */
   readonly onCommit: (refusals: readonly SourceRefusal[]) => void;
+  /** Say why a typed value cannot apply. */
+  readonly onInvalid: (message: string) => void;
+};
+
+/**
+ * The props of one quick filter. Exempt from the native-prop extension: a
+ * private part of the query bar, which renders it whole.
+ */
+export type QuickFilterProps = {
+  /** The field it filters, which the schema declares. */
+  readonly field: string;
+  /** How it shows the field. */
+  readonly arrangement: QuickFilterArrangement;
+  readonly group: QueryGroupStandIn;
+  /** Whether the location spells addresses, which its links and form need. */
+  readonly hasHref: boolean;
+  /** Takes its filter button's panel handle, for a host that takes it over. */
+  readonly panelRef?: Ref<FilterButtonPanelHandle> | undefined;
+  /** Say why a commit was refused; the query stays as it was. */
+  readonly onRefused: (refusals: readonly SourceRefusal[]) => void;
+  /**
+   * Say what a commit did, from the field's conjuncts before it; the bar
+   * reads them after it from the query state.
+   */
+  readonly onCommitted: (field: string, before: readonly Predicate[]) => void;
   /** Say why a typed value cannot apply. */
   readonly onInvalid: (message: string) => void;
 };

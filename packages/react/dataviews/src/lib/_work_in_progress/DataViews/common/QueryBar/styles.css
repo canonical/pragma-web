@@ -14,7 +14,8 @@
     min-inline-size: 0;
 
     & > .search,
-    & > .ds.query-input {
+    & > .ds.query-input,
+    & > .line {
       grid-column: 1;
       grid-row: 1;
     }
@@ -53,6 +54,28 @@
   /* With an address, the field sits in its search form. */
   .ds.data-views-query-bar > .search {
     margin: 0;
+  }
+
+  /* With quick filters, they sit beside the field and wrap below it, in
+     the field's column, narrow or wide. */
+  .ds.data-views-query-bar > .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dimension-100) var(--dimension-200);
+
+    & > .search {
+      display: flex;
+      flex: 1 1 20rem;
+      min-inline-size: 0;
+    }
+
+    & > .quick-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--dimension-100) var(--dimension-200);
+    }
   }
 
   /* The messages sit under the field; focused, they move below as far as
