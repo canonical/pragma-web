@@ -35,10 +35,7 @@ type OwnProps<
   readonly field: string;
   /** The chart's caption and the stem of its accessible name. */
   readonly label: string;
-  /**
-   * Replaces the default text of a status shown in place of the drawing while
-   * no result answers the query. The status is the core's, as the table's is.
-   */
+  /** Replaces the default text of the chart's status. */
   readonly renderStatus?: (status: DisplayStatus) => ReactNode;
   /**
    * The words the chart renders, over English. A standalone chart is its own
