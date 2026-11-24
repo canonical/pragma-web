@@ -17,12 +17,15 @@ function createMockReqRes() {
 
 describe("serveStream", () => {
   it("calls the factory with req, awaits statusReady, pipes the stream", async () => {
-    const mockPipe = vi.fn((destination: NodeJS.WritableStream) => destination);
+    const piped: NodeJS.WritableStream[] = [];
     const mockRenderer = {
       statusCode: 200,
       statusReady: Promise.resolve(),
       renderToPipeableStream: () => ({
-        pipe: mockPipe,
+        pipe: <W extends NodeJS.WritableStream>(destination: W) => {
+          piped.push(destination);
+          return destination;
+        },
         abort: vi.fn(),
       }),
     };
@@ -32,7 +35,7 @@ describe("serveStream", () => {
 
     await middleware(req, res);
 
-    expect(mockPipe).toHaveBeenCalledWith(res);
+    expect(piped).toEqual([res]);
     expect(res.statusCode).toBe(200);
   });
 
@@ -41,7 +44,7 @@ describe("serveStream", () => {
       statusCode: 500,
       statusReady: Promise.resolve(),
       renderToPipeableStream: () => ({
-        pipe: vi.fn((destination: NodeJS.WritableStream) => destination),
+        pipe: <W extends NodeJS.WritableStream>(destination: W) => destination,
         abort: vi.fn(),
       }),
     };

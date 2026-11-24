@@ -3,6 +3,5 @@
   "compilerOptions": {
     "types": ["node", "react", "react-dom", "express"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.tests.ts"]
+  "include": ["src/**/*.ts"]
 }
