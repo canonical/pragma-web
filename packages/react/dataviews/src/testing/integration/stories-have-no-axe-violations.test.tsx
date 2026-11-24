@@ -26,6 +26,7 @@ import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
+import * as filterOptionsStories from "../../lib/_work_in_progress/FilterOptions/FilterOptions.stories.js";
 import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
 import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
 import * as queryInputStories from "../../lib/_work_in_progress/QueryInput/QueryInput.stories.js";
@@ -77,6 +78,7 @@ const played = {
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
+  FilterOptions: composeStories(filterOptionsStories),
   // The links with a refused clause, on a memory location and no mock API.
   Composition: Object.fromEntries(
     Object.entries(composeStories(compositionStories)).filter(([name]) =>
