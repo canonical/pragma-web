@@ -1,0 +1,17 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The query bar lays out its field; the field draws itself. */
+  .ds.data-views-query-bar {
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  /* Focused, the field wraps over what follows it, sticky table headers
+     included, which stand one layer up. */
+  .ds.data-views-query-bar:focus-within {
+    position: relative;
+    z-index: 2;
+  }
+}

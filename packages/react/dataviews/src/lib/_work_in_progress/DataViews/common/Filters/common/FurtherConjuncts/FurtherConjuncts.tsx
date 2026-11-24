@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { useDataViewsValue } from "../../../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
-import { PHRASE_MESSAGES } from "../constants.js";
+import { phraseOperator } from "../utils/index.js";
 import { FurtherConjunct } from "./common/index.js";
 import type { FurtherConjunctsProps } from "./types.js";
 
@@ -29,8 +29,7 @@ export default function FurtherConjuncts({
   if (others.length === 0) {
     return null;
   }
-  const key = PHRASE_MESSAGES[operator];
-  const named = key === null ? label : messages[key](label);
+  const named = phraseOperator(messages, operator, label);
   const phrase =
     unit === undefined ? named : messages.filterInUnit(named, unit);
   return (

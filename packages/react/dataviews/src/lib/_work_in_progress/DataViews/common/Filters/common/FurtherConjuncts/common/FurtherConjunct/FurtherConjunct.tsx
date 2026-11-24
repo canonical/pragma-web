@@ -41,9 +41,7 @@ export default function FurtherConjunct({
   // spells it with: the phrase is the field's label.
   const name =
     operator === "isSet"
-      ? operands.at(0) === false
-        ? messages.filterHasNoValue(phrase)
-        : messages.filterHasValue(phrase)
+      ? messages.operatorPhrase({ operator, operands, label: phrase })
       : messages.filterAlso(phrase, values);
   /**
    * Where the Clear leads without scripts: the query the core's own removal

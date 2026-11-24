@@ -3,6 +3,8 @@ import {
   DIRECTIONS,
   DEFAULT_MESSAGES as m,
   NOT_DONE,
+  OPERATORS_SHOWN,
+  OPERATORS_SPOKEN,
   PENDING,
   STILL_APPLIES,
 } from "./constants.js";
@@ -171,27 +173,32 @@ describe("constants", () => {
       expect(m.filterFrom("Cores")).toBe("Cores from");
       expect(m.filterTo("Cores")).toBe("Cores to");
       expect(m.filterLowest("2")).toBe("Lowest: 2");
+      // Each operator's control reads by the field's label and the words
+      // the operator is spoken by.
+      expect(
+        m.operatorPhrase({ operator: "isAny", operands: [], label: "Status" }),
+      ).toBe("Status is any of");
+      expect(
+        m.operatorPhrase({ operator: "isNot", operands: [], label: "Name" }),
+      ).toBe("Name is not");
+      expect(
+        m.operatorPhrase({
+          operator: "isSet",
+          operands: [false],
+          label: "Owner",
+        }),
+      ).toBe("Owner has no value");
       expect(m.filterHighest("64")).toBe("Highest: 64");
       expect(m.clearFilter("Cores from")).toBe("Clear Cores from");
-      expect(m.filterIsAnyOf("Status")).toBe("Status is any of");
-      expect(m.filterIsNoneOf("Status")).toBe("Status is none of");
       expect(m.matchAnyInstead).toBe("Match any of these instead");
       expect(m.matchNoneInstead).toBe("Match none of these instead");
       expect(m.facetCount(buildExact(12))).toBe("12");
       expect(m.facetCount(buildAtLeast(1000))).toBe("at least 1,000");
-      expect(m.filterContains("Name")).toBe("Name contains");
       expect(m.filterAlso("Tags is any of", ["ex-gpu", "ex-nvme"])).toBe(
         "Tags is any of ex-gpu, ex-nvme",
       );
-      expect(m.filterStartsWith("Name")).toBe("Name starts with");
-      expect(m.filterIs("Name")).toBe("Name is");
-      expect(m.filterIsNot("Name")).toBe("Name is not");
-      expect(m.filterNotContains("Name")).toBe("Name does not contain");
-      expect(m.filterEndsWith("Name")).toBe("Name ends with");
       expect(m.filterMatch("Name")).toBe("How Name matches");
       expect(m.filterInUnit("Memory from", "MiB")).toBe("Memory from (MiB)");
-      expect(m.filterHasValue("Owner")).toBe("Owner has a value");
-      expect(m.filterHasNoValue("Owner")).toBe("Owner has no value");
       expect([m.presenceAny, m.presenceSet, m.presenceUnset]).toEqual([
         "Any",
         "Has a value",
@@ -446,5 +453,141 @@ describe("constants", () => {
     it("says the earlier restriction stands", () => {
       expect(STILL_APPLIES).toBe("The previous restriction still applies.");
     });
+  });
+
+  it("shows each operator as its symbol, or its words where it has none", () => {
+    expect(m.operatorShown("isAny", ["ready"])).toBe(":");
+    expect(m.operatorShown("is", ["web"])).toBe(":");
+    expect(m.operatorShown("isNone", ["ready"])).toBe("≠");
+    expect(m.operatorShown("isNot", ["web"])).toBe("≠");
+    expect(m.operatorShown("contains", ["web"])).toBe("contains");
+    expect(m.operatorShown("notContains", ["web"])).toBe("does not contain");
+    expect(m.operatorShown("startsWith", ["web"])).toBe("starts with");
+    expect(m.operatorShown("endsWith", ["web"])).toBe("ends with");
+    expect(m.operatorShown("gte", [1])).toBe("≥");
+    expect(m.operatorShown("lte", [1])).toBe("≤");
+    expect(m.operatorShown("isSet", [true])).toBe("has a value");
+    expect(m.operatorShown("isSet", [false])).toBe("has no value");
+    expect(Object.keys(OPERATORS_SHOWN)).toEqual(Object.keys(OPERATORS_SPOKEN));
+    // An operator shown in words is shown in the words it is spoken by.
+    for (const [operator, show] of Object.entries(OPERATORS_SHOWN)) {
+      for (const operands of [[true], [false], ["a"]]) {
+        const shown = show(operands);
+        if (/\p{L}/u.test(shown)) {
+          expect(
+            OPERATORS_SPOKEN[operator as keyof typeof OPERATORS_SPOKEN](
+              operands,
+            ),
+          ).toContain(shown);
+        }
+      }
+    }
+  });
+
+  it("speaks each operator by its operands", () => {
+    expect(m.operatorPhrase({ operator: "isAny", operands: ["ready"] })).toBe(
+      "is",
+    );
+    expect(
+      m.operatorPhrase({ operator: "isAny", operands: ["ready", "deployed"] }),
+    ).toBe("is any of");
+    expect(m.operatorPhrase({ operator: "isAny", operands: [] })).toBe(
+      "is any of",
+    );
+    expect(m.operatorPhrase({ operator: "is", operands: ["web"] })).toBe("is");
+    expect(m.operatorPhrase({ operator: "isNone", operands: ["ready"] })).toBe(
+      "is none of",
+    );
+    expect(m.operatorPhrase({ operator: "isNot", operands: ["web"] })).toBe(
+      "is not",
+    );
+    expect(m.operatorPhrase({ operator: "contains", operands: ["web"] })).toBe(
+      "contains",
+    );
+    expect(
+      m.operatorPhrase({ operator: "notContains", operands: ["web"] }),
+    ).toBe("does not contain");
+    expect(
+      m.operatorPhrase({ operator: "startsWith", operands: ["web"] }),
+    ).toBe("starts with");
+    expect(m.operatorPhrase({ operator: "endsWith", operands: ["web"] })).toBe(
+      "ends with",
+    );
+    expect(m.operatorPhrase({ operator: "gte", operands: [1] })).toBe(
+      "at least",
+    );
+    expect(m.operatorPhrase({ operator: "lte", operands: [1] })).toBe(
+      "at most",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [true] })).toBe(
+      "has a value",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [] })).toBe(
+      "has a value",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [false] })).toBe(
+      "has no value",
+    );
+  });
+
+  it("words the query bar, its clauses and what its commits did", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(m.queryBar(noun)).toBe("Filter machines");
+    expect(m.queryBarDescription).toBe(
+      "Left and Right to move between filters, Enter to edit, Backspace or Delete to remove",
+    );
+    expect(m.queryBarPlaceholder).toBe("Search or filter");
+    expect(m.appliedFilters).toBe("Applied filters");
+    expect(m.clearFiltersAndSearch).toBe("Clear filters and search");
+    expect(m.queryCleared(buildExact(60), noun)).toBe(
+      "Cleared the filters and the search. 60 machines.",
+    );
+    // A noun with a form of its own after a count takes it.
+    expect(
+      m.recordCount(buildExact(3), { ...noun, counted: (n) => `machine×${n}` }),
+    ).toBe("3 machine×3");
+    expect(
+      m.queryClause({
+        phrase: "status is any of",
+        values: ["ready", "deployed"],
+      }),
+    ).toBe("status is any of ready, deployed");
+    expect(m.queryClause({ phrase: "owner has a value", values: [] })).toBe(
+      "owner has a value",
+    );
+    expect(m.searchClause("ex web")).toBe("Search for ex web");
+    expect(m.removeClause("status is ready")).toBe("Remove status is ready");
+    expect(m.hiddenChips(3)).toBe("+3 more");
+    expect(m.loadingSuggestions).toBe("Loading suggestions");
+    expect(m.noSuggestions).toBe("No matches");
+    expect(m.clauseField).toBe("Field");
+    expect(m.clauseOperator("status")).toBe("Operator for status");
+    expect(m.clauseValue("status")).toBe("Value for status");
+    expect(m.recordCount(buildExact(1), noun)).toBe("1 machine");
+    expect(m.recordCount(buildAtLeast(1000), noun)).toBe(
+      "at least 1,000 machines",
+    );
+    expect(m.clauseAdded("status is ready", buildExact(12), noun)).toBe(
+      "Added status is ready. 12 machines.",
+    );
+    expect(m.clauseChanged("status is ready", unknown, noun)).toBe(
+      "Changed to status is ready.",
+    );
+    expect(m.clauseRemoved("status is ready", buildAtLeast(2), noun)).toBe(
+      "Removed status is ready. At least 2 machines.",
+    );
+    expect(m.readAsAtLeast).toBe("Read as at least");
+    expect(m.readAsAtMost).toBe("Read as at most");
+    expect(m.valuePicked("status is any of ready, deployed")).toBe(
+      "status is any of ready, deployed. Enter again to apply it.",
+    );
+    expect(m.multipleValuesHint).toBe(
+      "Enter adds a value; Enter again applies them",
+    );
+    expect(m.dateFormat).toBe("Date, format YYYY-MM-DD");
+    expect(m.numberFormat([])).toBe("Number");
+    expect(m.numberFormat(["MiB", "GiB"])).toBe("Number, in MiB or GiB");
+    expect(m.clauseInvalid("not a number.")).toBe("Invalid: not a number");
+    expect(m.decimalSeparator).toBe(".");
   });
 });

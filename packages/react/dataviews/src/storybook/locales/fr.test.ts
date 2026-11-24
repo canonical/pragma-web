@@ -91,22 +91,24 @@ describe("fr", () => {
       "Cœurs à partir de 4, 8",
     );
     expect(fr.clauseRefused("Statut", "inconnu.")).toBe("Statut : inconnu.");
-    expect(fr.filterIsAnyOf("Statut")).toBe("Statut est l’une des valeurs");
-    expect(fr.filterIsNoneOf("Statut")).toBe("Statut n’est aucune des valeurs");
-    expect(fr.filterContains("Nom")).toBe("Nom contient");
-    expect(fr.filterStartsWith("Nom")).toBe("Nom commence par");
-    expect(fr.filterEndsWith("Nom")).toBe("Nom finit par");
-    expect(fr.filterNotContains("Nom")).toBe("Nom ne contient pas");
-    expect(fr.filterIsNot("Nom")).toBe("Nom n’est pas");
-    expect(fr.filterIs("Nom")).toBe("Nom est");
+    const phrase = (
+      operator: Parameters<typeof fr.operatorPhrase>[0]["operator"],
+      operands: readonly (string | boolean)[] = [],
+    ) => fr.operatorPhrase({ operator, operands, label: "Nom" });
+    expect(phrase("isAny")).toBe("Nom est l’une des valeurs");
+    expect(phrase("isNone")).toBe("Nom n’est aucune des valeurs");
+    expect(phrase("contains")).toBe("Nom contient");
+    expect(phrase("startsWith")).toBe("Nom commence par");
+    expect(phrase("endsWith")).toBe("Nom finit par");
+    expect(phrase("notContains")).toBe("Nom ne contient pas");
+    expect(phrase("isNot")).toBe("Nom n’est pas");
+    expect(phrase("is")).toBe("Nom est");
     expect(fr.filterMatch("Nom")).toBe("Comment Nom correspond");
     expect(fr.filterInUnit("Mémoire à partir de", "Mio")).toBe(
       "Mémoire à partir de (Mio)",
     );
-    expect(fr.filterHasValue("Propriétaire")).toBe("Propriétaire a une valeur");
-    expect(fr.filterHasNoValue("Propriétaire")).toBe(
-      "Propriétaire n’a pas de valeur",
-    );
+    expect(phrase("isSet", [true])).toBe("Nom a une valeur");
+    expect(phrase("isSet", [false])).toBe("Nom n’a pas de valeur");
   });
 
   it("states a count exactly or at least", () => {
@@ -183,5 +185,75 @@ describe("fr", () => {
       "Cœurs : une plage de 1 à 64",
     );
     expect(fr.chartTable("Statut")).toBe("Statut, sous forme de tableau");
+  });
+  it("words operators, shown and spoken, from their operands", () => {
+    expect(fr.operatorShown("isAny", ["prêt"])).toBe(":");
+    expect(fr.operatorShown("is", ["web"])).toBe(":");
+    expect(fr.operatorShown("isNone", ["prêt"])).toBe("≠");
+    expect(fr.operatorShown("isNot", ["web"])).toBe("≠");
+    expect(fr.operatorShown("gte", [1])).toBe("≥");
+    expect(fr.operatorShown("lte", [1])).toBe("≤");
+    expect(fr.operatorShown("contains", ["web"])).toBe("contient");
+    expect(fr.operatorPhrase({ operator: "isAny", operands: ["prêt"] })).toBe(
+      "est",
+    );
+    expect(
+      fr.operatorPhrase({ operator: "isAny", operands: ["prêt", "échoué"] }),
+    ).toBe("est l’un de");
+    expect(fr.operatorPhrase({ operator: "isNone", operands: ["prêt"] })).toBe(
+      "n’est aucun de",
+    );
+    expect(fr.operatorPhrase({ operator: "gte", operands: [1] })).toBe(
+      "au moins",
+    );
+    expect(fr.operatorPhrase({ operator: "lte", operands: [1] })).toBe(
+      "au plus",
+    );
+  });
+
+  it("words the query bar, its clauses and what its commits did", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(fr.queryBar(noun)).toBe("Filtrer les machines");
+    expect(fr.queryCleared({ kind: "exact", value: 2 }, noun)).toBe(
+      "Filtres et recherche effacés. 2 machines.",
+    );
+    expect(fr.queryCleared({ kind: "unknown" }, noun)).toBe(
+      "Filtres et recherche effacés.",
+    );
+    expect(fr.queryClause({ phrase: "Statut est", values: [] })).toBe(
+      "Statut est",
+    );
+    expect(fr.queryClause({ phrase: "Statut est", values: ["a", "b"] })).toBe(
+      "Statut est a, b",
+    );
+    expect(fr.searchClause("web")).toBe("Recherche de web");
+    expect(fr.removeClause("Statut est prêt")).toBe("Retirer Statut est prêt");
+    expect(fr.hiddenChips(3)).toBe("+3 de plus");
+    expect(fr.clauseOperator("Statut")).toBe("Opérateur de Statut");
+    expect(fr.clauseValue("Statut")).toBe("Valeur de Statut");
+    expect(fr.recordCount({ kind: "exact", value: 1 }, noun)).toBe("1 machine");
+    expect(
+      fr.recordCount(
+        { kind: "at-least", value: 3 },
+        { ...noun, counted: (n) => `machine×${n}` },
+      ),
+    ).toBe("au moins 3 machine×3");
+    expect(
+      fr.clauseAdded("Statut est prêt", { kind: "at-least", value: 5 }, noun),
+    ).toBe("Statut est prêt ajouté. Au moins 5 machines.");
+    expect(fr.clauseChanged("Statut est prêt", { kind: "unknown" }, noun)).toBe(
+      "Remplacé par Statut est prêt.",
+    );
+    expect(fr.clauseRemoved("Statut est prêt", { kind: "unknown" }, noun)).toBe(
+      "Statut est prêt retiré.",
+    );
+    expect(fr.valuePicked("Statut est prêt")).toBe(
+      "Statut est prêt. Entrée à nouveau pour l’appliquer.",
+    );
+    expect(fr.numberFormat([])).toBe("Nombre");
+    expect(fr.numberFormat(["Mio", "Gio"])).toBe("Nombre, en Mio ou Gio");
+    expect(fr.clauseInvalid("pas un nombre.")).toBe(
+      "Non valide : pas un nombre",
+    );
   });
 });
