@@ -91,11 +91,17 @@ A message that states a fact is a function of that fact. The part calls it with 
 | `columnMoved` | a column's name, its position and how many show | `Host moved to position 2 of 4` |
 | `filterRefused` | every reason, and whether the earlier restriction still applies | `Must be a number. The previous restriction still applies.` |
 | `viewPending` | the saved-view command | `Saving…` |
+| `appliedCount` | `{ count, condition }`: how many values a quick filter applies, and the condition they share | `2 applied`, `none of 2` |
+| `searchOptions` | `{ label }`: the field's label | `Search pool options` |
+| `optionsShown` | `{ count }`: how many options a quick filter's search leaves | `3 options` |
+| `optionExcluded` | `{ value }`: a quick filter's word its query excludes | `broken, excluded` |
+
+The quick filters also word, as text, `allOptions` (`All`), `optionsNone` (`No options`), `optionsPending` (`Loading options`) and `submitQuickFilter` (`Apply`).
 
 How the facts are passed:
 
-- One fact per argument, the subject first. For a saved-view message, the command comes first.
-- An object only where the core already has that record: the `Count` that `rowsShown` and `facetCount` take is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
+- A new message takes one object of named facts, such as `{ count, condition }` or `{ label }`, so a translation reads each fact by its name, and a fact added later breaks no locale.
+- Older messages take one fact per argument, the subject first, until they move to named facts. For a saved-view message, the command comes first. A `Count` they take, as `rowsShown` and `facetCount` do, is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
 - A list of like facts as an array, such as the reasons `sortRefused` takes.
 - A name is placed where the message puts it and never altered. It may stand for a column heading drawn as an element, not as text.
 

@@ -8,6 +8,7 @@
  */
 
 import type {
+  PredicateCondition,
   PredicateOperand,
   PredicateOperator,
   SortDirection,
@@ -92,10 +93,12 @@ export type RecordNoun = {
  * - a hint or a description names what it describes — `sortPrecedence`,
  *   `filterLowest`, `pageCount`.
  *
- * **How a message is handed its facts.** One fact per argument, the subject
- * first and, where a message is about a saved-view command, the command
- * first. An object is passed only where the core already has that record —
- * a `Count` — and a list of like facts is passed as an array. A name a
+ * **How a message is handed its facts.** A new message takes one object of
+ * named facts — `{ count, condition }`, `{ label }` — so a translation reads
+ * each fact by its name and a fact added later breaks no locale. Older
+ * messages take one fact per argument, the subject first and, where a
+ * message is about a saved-view command, the command first, until they
+ * move to named facts. A list of like facts is passed as an array. A name a
  * message is handed is placed where the message puts it and never altered,
  * since it may stand for a column heading drawn as more than text. Plurals
  * and ordinals are the message's own to word, as the English record words
@@ -462,6 +465,31 @@ export type DataViewsMessages = {
     readonly chosen: string;
     readonly step: string;
   }) => string;
+
+  // The quick filters.
+  /**
+   * A quick filter's applied values, after its name: how many it holds,
+   * and the condition they share, where they share one, as "none of 2"
+   * says Exclusion.
+   */
+  readonly appliedCount: (facts: {
+    readonly count: number;
+    readonly condition?: PredicateCondition | undefined;
+  }) => string;
+  /** The quick filter's word that applies no restriction. */
+  readonly allOptions: string;
+  /** The search narrowing a quick filter's options, by the field's label. */
+  readonly searchOptions: (facts: { readonly label: string }) => string;
+  /** A quick filter with no option to show. */
+  readonly optionsNone: string;
+  /** A quick filter's options while they load. */
+  readonly optionsPending: string;
+  /** A quick filter's value its query excludes, as its word is named. */
+  readonly optionExcluded: (facts: { readonly value: string }) => string;
+  /** How many of a quick filter's options its search leaves. */
+  readonly optionsShown: (facts: { readonly count: number }) => string;
+  /** The submit of a quick filter's form before scripts run. */
+  readonly submitQuickFilter: string;
 
   // The pagination bar.
   /** The bar's name. */

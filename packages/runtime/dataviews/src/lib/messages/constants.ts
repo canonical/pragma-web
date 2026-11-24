@@ -331,6 +331,19 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   },
   filterStepChosen: ({ chosen, step }) => `${chosen} chosen. ${step}.`,
 
+  appliedCount: ({ count, condition }) =>
+    condition === "exclusion"
+      ? `none of ${formatCount(count)}`
+      : `${formatCount(count)} applied`,
+  allOptions: "All",
+  searchOptions: ({ label }) => `Search ${label} options`,
+  optionsNone: "No options",
+  optionsPending: "Loading options",
+  optionExcluded: ({ value }) => `${value}, excluded`,
+  optionsShown: ({ count }) =>
+    `${formatCount(count)} ${choosePlural(count, "option", "options")}`,
+  submitQuickFilter: "Apply",
+
   pagination: "Pagination",
   rowsPerPage: "Rows per page",
   submitPageSize: "Apply page size",
