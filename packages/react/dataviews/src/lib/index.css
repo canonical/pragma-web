@@ -25,7 +25,9 @@
 @import url("./_work_in_progress/DataViews/common/Filters/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/FiltersDisclosure/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/MessageLine/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/BoundsPanel/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/ChoicesPanel/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/TypedInput/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/AddFilterWalk/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/StepListbox/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/styles.css");

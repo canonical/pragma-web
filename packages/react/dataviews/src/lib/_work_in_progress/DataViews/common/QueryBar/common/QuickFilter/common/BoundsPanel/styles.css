@@ -1,0 +1,17 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * The quick filter's bounds panel: the hint naming a number's units, then
+   * the lower bound's input above the upper's.
+   */
+  .ds.data-views-quick-filter-bounds {
+    display: grid;
+    gap: var(--dimension-200);
+
+    & > .hint {
+      margin: 0;
+      color: var(--color-text-muted);
+    }
+  }
+}

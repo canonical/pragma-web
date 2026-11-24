@@ -1,0 +1,26 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * One typed value of a quick filter's panel: its label above its input,
+   * and why a value does not read below it.
+   */
+  .ds.data-views-quick-filter-typed {
+    display: grid;
+    gap: var(--dimension-050);
+
+    & > .field {
+      display: grid;
+      gap: var(--dimension-050);
+    }
+
+    & .label {
+      color: var(--color-text-muted);
+    }
+
+    & > .error {
+      margin: 0;
+      color: var(--color-text-error);
+    }
+  }
+}
