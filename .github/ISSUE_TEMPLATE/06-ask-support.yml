@@ -1,0 +1,28 @@
+name: Ask for support or a review
+description: Get help using Pragma, or ask the team to review how your project uses it.
+labels:
+  - "Type: support"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information, such as links to private repositories.
+
+        Use this form for help using Pragma, or a review of how your project uses it. If something is broken, [report a problem](https://github.com/canonical/pragma-web/issues/new?template=01-report-problem.yml).
+  - type: input
+    id: project
+    attributes:
+      label: Project or repository
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Question, or what to review
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** A team member usually replies within a week. If this blocks a release, say so. Updates are posted on this issue.

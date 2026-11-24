@@ -1,0 +1,57 @@
+name: Propose something new
+description: Pragma is missing a UI block, design token, documentation page or tool you need.
+labels:
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when nothing in Pragma covers the need. If something exists but should be different, [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml); if one product already has it, [promote it](https://github.com/canonical/pragma-web/issues/new?template=04-promote-component.yml).
+
+        Title: the name of what should exist, for example **Date picker**. One thing per issue.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What do you want to add?
+      options:
+        - UI block
+        - Design token
+        - Documentation
+        - Tooling
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should exist, and the problem it solves
+      description: What people cannot do today, or do badly. A proposal is assessed against the problem it solves.
+    validations:
+      required: true
+  - type: textarea
+    id: usage
+    attributes:
+      label: Where it will be used
+      description: Products and pages. Used to assess how widely it is needed.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Designs and references
+      description: Figma, sketches, prototypes, or links to something similar elsewhere.
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you do this yourself?
+      options:
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue. If you will do it yourself, wait for a maintainer to confirm the approach.
