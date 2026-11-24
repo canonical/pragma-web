@@ -15,6 +15,12 @@ const unknown = { kind: "unknown" } as const;
 
 describe("constants", () => {
   describe("DEFAULT_MESSAGES", () => {
+    it.fails("words an ordering from terms already worded", () => {
+      expect(
+        Reflect.apply(m.sortApplied, undefined, [["Name, descending"]]),
+      ).toBe("Sorted by Name, descending.");
+    });
+
     it("ends each status with a full stop, and a blank reason plainly", () => {
       expect(m.statusRefreshFailed(" . ")).toBe(
         "These rows could not be refreshed.",
