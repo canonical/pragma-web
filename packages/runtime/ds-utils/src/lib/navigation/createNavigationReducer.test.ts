@@ -39,8 +39,8 @@ const testTree: Item = {
   ],
 };
 
-const annotatedRoot = annotateTree(testTree);
-const index = prepareIndex(annotatedRoot);
+const annotatedRoot = annotateTree<Item>(testTree);
+const index = prepareIndex<Item>(annotatedRoot);
 
 function makeState(overrides: Partial<NavigationState> = {}): NavigationState {
   return {
@@ -529,8 +529,8 @@ describe("HOME/END when all siblings disabled", () => {
       { url: "/d2", label: "D2", disabled: true },
     ],
   };
-  const adRoot = annotateTree(allDisabledSiblingsTree);
-  const adIdx = prepareIndex(adRoot);
+  const adRoot = annotateTree<Item>(allDisabledSiblingsTree);
+  const adIdx = prepareIndex<Item>(adRoot);
   const reduce = createNavigationReducer(adIdx, {
     rootItem: adRoot,
     orientation: "vertical",
@@ -575,8 +575,8 @@ describe("HOME/END on all-disabled siblings", () => {
       { url: "/d1", label: "D1", disabled: true },
     ],
   };
-  const root = annotateTree(allDisabledTree);
-  const idx = prepareIndex(root);
+  const root = annotateTree<Item>(allDisabledTree);
+  const idx = prepareIndex<Item>(root);
   const reduce = createNavigationReducer(idx, {
     rootItem: root,
     orientation: "vertical",
@@ -610,8 +610,8 @@ describe("PAGE_DOWN/PAGE_UP landing on a disabled item", () => {
     disabled: i === 10,
   }));
   const mixedTree: Item = { key: "root", label: "Root", items };
-  const root = annotateTree(mixedTree);
-  const idx = prepareIndex(root);
+  const root = annotateTree<Item>(mixedTree);
+  const idx = prepareIndex<Item>(root);
   const reduce = createNavigationReducer(idx, {
     rootItem: root,
     orientation: "vertical",
@@ -641,12 +641,12 @@ describe("PAGE_DOWN/PAGE_UP landing on a disabled item", () => {
     const edgedItems = items.map((item, i) =>
       i >= 10 ? { ...item, disabled: true } : item,
     );
-    const edgedRoot = annotateTree({
+    const edgedRoot = annotateTree<Item>({
       key: "root",
       label: "Root",
       items: edgedItems,
     });
-    const edgedIdx = prepareIndex(edgedRoot);
+    const edgedIdx = prepareIndex<Item>(edgedRoot);
     const edgedReduce = createNavigationReducer(edgedIdx, {
       rootItem: edgedRoot,
       orientation: "vertical",
@@ -673,12 +673,12 @@ describe("PAGE_DOWN/PAGE_UP landing on a disabled item", () => {
     const ringItems = items.map((item, i) =>
       i >= 10 ? { ...item, disabled: true } : item,
     );
-    const ringRoot = annotateTree({
+    const ringRoot = annotateTree<Item>({
       key: "root",
       label: "Root",
       items: ringItems,
     });
-    const ringIdx = prepareIndex(ringRoot);
+    const ringIdx = prepareIndex<Item>(ringRoot);
     const ringReduce = createNavigationReducer(ringIdx, {
       rootItem: ringRoot,
       orientation: "vertical",
@@ -714,8 +714,12 @@ describe("PAGE_DOWN/PAGE_UP landing on a disabled item", () => {
       label: `Item ${i}`,
       disabled: i === 1,
     }));
-    const upRoot = annotateTree({ key: "root", label: "Root", items: upItems });
-    const upIdx = prepareIndex(upRoot);
+    const upRoot = annotateTree<Item>({
+      key: "root",
+      label: "Root",
+      items: upItems,
+    });
+    const upIdx = prepareIndex<Item>(upRoot);
     const upReduce = createNavigationReducer(upIdx, {
       rootItem: upRoot,
       orientation: "vertical",
@@ -747,8 +751,8 @@ describe("PAGE_DOWN landing on disabled (2-item tree)", () => {
       { url: "/disabled", label: "Disabled", disabled: true },
     ],
   };
-  const root = annotateTree(twoItemTree);
-  const idx = prepareIndex(root);
+  const root = annotateTree<Item>(twoItemTree);
+  const idx = prepareIndex<Item>(root);
   const reduce = createNavigationReducer(idx, {
     rootItem: root,
     orientation: "vertical",
@@ -776,8 +780,8 @@ describe("tree with no enabled children", () => {
     label: "Root",
     items: [{ url: "/x", label: "X", disabled: true }],
   };
-  const emptyRoot = annotateTree(emptyTree);
-  const emptyIndex = prepareIndex(emptyRoot);
+  const emptyRoot = annotateTree<Item>(emptyTree);
+  const emptyIndex = prepareIndex<Item>(emptyRoot);
   const reduce = createNavigationReducer(emptyIndex, {
     rootItem: emptyRoot,
     orientation: "vertical",
@@ -824,8 +828,8 @@ describe("all siblings disabled with wrap", () => {
       { url: "/d2", label: "D2", disabled: true },
     ],
   };
-  const root = annotateTree(allDisabledTree);
-  const idx = prepareIndex(root);
+  const root = annotateTree<Item>(allDisabledTree);
+  const idx = prepareIndex<Item>(root);
   const reduce = createNavigationReducer(idx, {
     rootItem: root,
     orientation: "vertical",
@@ -1004,8 +1008,8 @@ describe("horizontal reducer", () => {
         },
       ],
     };
-    const disabledRoot = annotateTree(disabledChildTree);
-    const disabledIdx = prepareIndex(disabledRoot);
+    const disabledRoot = annotateTree<Item>(disabledChildTree);
+    const disabledIdx = prepareIndex<Item>(disabledRoot);
     const disabledReduce = createNavigationReducer(disabledIdx, {
       rootItem: disabledRoot,
       orientation: "horizontal",
@@ -1045,8 +1049,8 @@ describe("horizontal reducer", () => {
         },
       ],
     };
-    const bdRoot = annotateTree(bothDisabledTree);
-    const bdIdx = prepareIndex(bdRoot);
+    const bdRoot = annotateTree<Item>(bothDisabledTree);
+    const bdIdx = prepareIndex<Item>(bdRoot);
     const bdReduce = createNavigationReducer(bdIdx, {
       rootItem: bdRoot,
       orientation: "horizontal",
@@ -1125,8 +1129,8 @@ describe("presentational nodes", () => {
       { url: "/two", label: "Two" },
     ],
   };
-  const sepRoot = annotateTree(withSeparator);
-  const sepIdx = prepareIndex(sepRoot);
+  const sepRoot = annotateTree<Item>(withSeparator);
+  const sepIdx = prepareIndex<Item>(sepRoot);
   const reduce = createNavigationReducer(sepIdx, {
     rootItem: sepRoot,
     orientation: "vertical",
@@ -1157,14 +1161,14 @@ describe("presentational nodes", () => {
   });
 
   it("END lands on the last real item, not on a trailing separator", () => {
-    const trailing = annotateTree({
+    const trailing = annotateTree<Item>({
       key: "root",
       items: [
         { url: "/one", label: "One" },
         { key: "sep", presentational: true },
       ],
     } satisfies Item);
-    const idx = prepareIndex(trailing);
+    const idx = prepareIndex<Item>(trailing);
     const r = createNavigationReducer(idx, {
       rootItem: trailing,
       orientation: "vertical",
@@ -1185,7 +1189,7 @@ describe("presentational nodes", () => {
   });
 
   it("getFirstInteractiveChild skips a leading separator", () => {
-    const leading = annotateTree({
+    const leading = annotateTree<Item>({
       key: "root",
       items: [
         { key: "sep", presentational: true },
@@ -1196,7 +1200,7 @@ describe("presentational nodes", () => {
   });
 
   it("getLastInteractiveChild skips a trailing separator", () => {
-    const trailing = annotateTree({
+    const trailing = annotateTree<Item>({
       key: "root",
       items: [
         { url: "/one", label: "One" },

@@ -1,10 +1,11 @@
+import type { Item } from "@canonical/ds-types";
 import { describe, expect, it, vi } from "vitest";
 import { annotateTree } from "./annotateTree.js";
 import { prepareIndex } from "./prepareIndex.js";
 
 describe("prepareIndex", () => {
   it("creates flat index from annotated tree", () => {
-    const tree = {
+    const tree: Item = {
       key: "root",
       label: "Root",
       items: [
@@ -21,7 +22,7 @@ describe("prepareIndex", () => {
   });
 
   it("indexes nested items", () => {
-    const tree = {
+    const tree: Item = {
       key: "root",
       label: "Root",
       items: [
@@ -40,7 +41,7 @@ describe("prepareIndex", () => {
   });
 
   it("handles single root with no children", () => {
-    const tree = { key: "root", label: "Root" };
+    const tree: Item = { key: "root", label: "Root" };
     const root = annotateTree(tree);
     const index = prepareIndex(root);
 
@@ -51,7 +52,7 @@ describe("prepareIndex", () => {
   it("warns in development when two items share a url, keeping the last in the index", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
-      const tree = {
+      const tree: Item = {
         key: "root",
         label: "Root",
         items: [
@@ -75,7 +76,7 @@ describe("prepareIndex", () => {
   it("warns in development when two items share a key", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
-      const tree = {
+      const tree: Item = {
         key: "root",
         label: "Root",
         items: [
@@ -99,7 +100,7 @@ describe("prepareIndex", () => {
   it("does not warn when ids are unique", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
-      const tree = {
+      const tree: Item = {
         key: "root",
         label: "Root",
         items: [
