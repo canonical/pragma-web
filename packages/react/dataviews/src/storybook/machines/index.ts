@@ -5,7 +5,6 @@
 
 export { default as buildMachines } from "./buildMachines.js";
 export {
-  SERVER_BACKED_COLUMNS,
   SERVER_BACKED_COLUMNS_CODE,
   SERVER_BACKED_FACETS,
   SERVER_BACKED_PARTS,
@@ -25,6 +24,7 @@ export {
   machineCollection,
   pooledMachineCollection,
   pooledMachines,
+  SERVER_BACKED_COLUMNS,
   spareMachineCollection,
   spareMachines,
   storyMachines,

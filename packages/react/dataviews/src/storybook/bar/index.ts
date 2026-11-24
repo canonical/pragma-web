@@ -5,13 +5,12 @@
 
 export { default as BarMachines } from "./BarMachines.js";
 export {
-  BAR_COLUMNS,
   FRAME_KEYS,
   NARROW_QUERY,
   PHONE_SIZE,
-  WINDOW_PLATFORM,
 } from "./constants.js";
 export { default as countRows } from "./countRows.js";
+export { BAR_COLUMNS, POOLED_COLUMNS, WINDOW_PLATFORM } from "./fixtures.js";
 export { default as followInFrame } from "./followInFrame.js";
 export { default as readFrameQuery } from "./readFrameQuery.js";
 export { default as renderBarWith } from "./renderBarWith.js";

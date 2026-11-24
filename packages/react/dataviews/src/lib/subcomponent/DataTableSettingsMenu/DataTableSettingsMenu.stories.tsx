@@ -4,12 +4,13 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
 import {
   type MachineProvider,
+  machineCollection,
   showConsumerCode,
   useMachineProvider,
 } from "../../../storybook/machines/index.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../storybook/types.js";
-import type { DataTableColumn } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
+import { createColumns } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../pattern/DataViews/index.js";
 import Component from "./DataTableSettingsMenu.js";
 
@@ -29,19 +30,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<StoryArgs>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", hideable: false, sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", hideable: false, sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "cores", header: "Cores", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", hideable: false, sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", hideable: false, sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "cores", header: "Cores", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 const renderCode = `<DataViews provider={provider}>
   <DataViews.DataTable
@@ -101,7 +108,7 @@ function Collection({
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -147,7 +154,7 @@ export const WithoutALocation: Story = {
 export const HideAColumn: Story = {
   name: "Hide a column",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -179,7 +186,7 @@ export const HideAColumn: Story = {
 export const ArrangedByTheViewer: Story = {
   name: "Arranged by the viewer",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
   "table.machines.order": ["status", "name", "cores", "owner"],

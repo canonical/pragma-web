@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { SERVER_BACKED_DECLARATIONS } from "./constants.js";
 import {
   barMachineCollection,
   barMachines,
   machineCollection,
   pooledMachineCollection,
   pooledMachines,
+  SERVER_BACKED_COLUMNS,
   spareMachineCollection,
   spareMachines,
   storyMachines,
@@ -32,6 +34,24 @@ describe("fixtures", () => {
         "region",
         "owner",
       ]);
+    });
+  });
+
+  describe("SERVER_BACKED_COLUMNS", () => {
+    it("declares the five sortable columns the Show code text spells", () => {
+      expect(SERVER_BACKED_COLUMNS.map(({ id }) => id)).toEqual([
+        "name",
+        "status",
+        "cores",
+        "region",
+        "owner",
+      ]);
+      expect(SERVER_BACKED_COLUMNS.map(({ id }) => id)).toEqual(
+        SERVER_BACKED_DECLARATIONS.map(({ field }) => field),
+      );
+      expect(SERVER_BACKED_COLUMNS.every(({ sortable }) => sortable)).toBe(
+        true,
+      );
     });
   });
 

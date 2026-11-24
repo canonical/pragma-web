@@ -6,9 +6,12 @@ import {
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
 import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
-import { showConsumerCode } from "../../../../../../storybook/machines/index.js";
+import {
+  machineCollection,
+  showConsumerCode,
+} from "../../../../../../storybook/machines/index.js";
 import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
+import { createColumns } from "../../renderers/DataTable/index.js";
 import Component from "./SortPanel.js";
 
 const meta = {
@@ -21,19 +24,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "cores", header: "Cores", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "cores", header: "Cores", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 /**
  * Sort the story's provider by status, cores and host before it renders.
@@ -68,7 +77,7 @@ function SortedCollection(): ReactElement {
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     prepare: `provider.setSort([
   { field: "status", direction: "asc" },

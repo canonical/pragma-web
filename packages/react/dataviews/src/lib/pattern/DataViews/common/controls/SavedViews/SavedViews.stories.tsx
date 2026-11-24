@@ -11,6 +11,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
 import {
+  machineCollection,
   QueryInTheLocation,
   showConsumerCode,
   useMachineProvider,
@@ -19,10 +20,7 @@ import {
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import DataViews from "../../../Provider.js";
-import {
-  DataTable,
-  type DataTableColumn,
-} from "../../renderers/DataTable/index.js";
+import { createColumns, DataTable } from "../../renderers/DataTable/index.js";
 import Component from "./SavedViews.js";
 import type { DataViewsSavedViewsProps } from "./types.js";
 
@@ -39,19 +37,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<StoryArgs>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, hideable: false },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", resizable: true, hideable: false },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, hideable: false },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", resizable: true, hideable: false },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
@@ -69,7 +73,7 @@ const failedMachines: ViewDraft = {
 
 /** The store's scope as every story's consumer code declares it. */
 const parameters = showConsumerCode({
-  parts: ["DataTable", "DataViews", "type DataTableColumn"],
+  parts: ["DataTable", "DataViews", "createColumns"],
   declarations: columnsCode,
   query: "page=1&size=5",
   store: true,
@@ -395,7 +399,7 @@ export const StorageUnavailable: Story = {
 export const WithTheQueryInTheUrl: Story = {
   name: "With the query in the URL",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,

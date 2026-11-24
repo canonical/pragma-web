@@ -10,7 +10,7 @@ import {
   showConsumerCode,
 } from "../../../storybook/machines/index.js";
 import { useDataViewsValue } from "../../hooks/index.js";
-import type { DataTableColumn } from "./common/renderers/DataTable/index.js";
+import { createColumns } from "./common/renderers/DataTable/index.js";
 import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
@@ -28,17 +28,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});`;
 
 /**
  * The root on its own: one provider mounted for the parts inside it, here a
@@ -46,7 +52,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";`,
     declarations: columnsCode,
     query: "page=1&size=5",
@@ -89,12 +95,7 @@ function MachineCount(): ReactElement {
 export const OwnChild: Story = {
   name: "Own child",
   parameters: showConsumerCode({
-    parts: [
-      "DataViews",
-      "type DataTableColumn",
-      "useDataViews",
-      "useDataViewsValue",
-    ],
+    parts: ["DataViews", "createColumns", "useDataViews", "useDataViewsValue"],
     imports: `import { machineCollection, machines } from "./machines.js";`,
     declarations: `${columnsCode}
 

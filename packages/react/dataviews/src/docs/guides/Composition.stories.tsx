@@ -5,11 +5,12 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { createColumns } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import Component from "../../lib/pattern/DataViews/Provider.js";
 import { withAppScope } from "../../storybook/decorators/index.js";
 import type { MachineProvider } from "../../storybook/machines/index.js";
 import {
+  machineCollection,
   QueryInTheLocation,
   showConsumerCode,
   useMachineProvider,
@@ -31,19 +32,28 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
+
+/** The namer the connected table reads, declared at module scope. */
+const nameMachineCode = `const nameMachine = (machine: Machine) => machine.name;`;
 
 /** The pagination bar's summary: the filters hold status regions of their own. */
 const getSummary = (canvas: ReturnType<typeof within>): HTMLElement =>
@@ -81,9 +91,7 @@ function Collection({
         columns={columns}
         label="Machines"
         selectable
-        // The connected table's records are the widest shape; a typed
-        // label goes through the standalone table, or a cell's collection.
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <Component.ActionBar />
       <Component.Pagination sizes={[5, 10, 25]} />
@@ -114,14 +122,13 @@ const failedMachines: ViewDraft = {
 export const ConnectedParts: Story = {
   name: "Connected parts",
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     core: ["createPlatformLocation"],
-    coreTypes: ["RowRecord"],
-    imports: `import { machineCollection, machines } from "./machines.js";
+    imports: `import { type Machine, machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
     declarations: `${columnsCode}
 
-const nameMachine = (row: RowRecord) => String(row["name"]);`,
+${nameMachineCode}`,
     location: "createPlatformLocation(platform)",
     store: true,
     query: "page=1&size=5",
@@ -171,14 +178,13 @@ const nameMachine = (row: RowRecord) => String(row["name"]);`,
 
 /** The code the stories of a query in the URL show. */
 const queryInTheUrlCode = showConsumerCode({
-  parts: ["DataViews", "type DataTableColumn"],
+  parts: ["DataViews", "createColumns"],
   core: ["createPlatformLocation"],
-  coreTypes: ["RowRecord"],
-  imports: `import { machineCollection, machines } from "./machines.js";
+  imports: `import { type Machine, machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
   declarations: `${columnsCode}
 
-const nameMachine = (row: RowRecord) => String(row["name"]);`,
+${nameMachineCode}`,
   // The router's platform surface: anything with getLocation, navigate
   // and subscribe. The provider adopts the query it carries and writes
   // every edit back.

@@ -15,11 +15,9 @@ import {
 } from "../../../../../../storybook/bar/index.js";
 import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
+import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import DataViews from "../../../Provider.js";
-import {
-  DataTable,
-  type DataTableColumn,
-} from "../../renderers/DataTable/index.js";
+import { createColumns, DataTable } from "../../renderers/DataTable/index.js";
 import Component from "./QueryBar.js";
 
 const meta = {
@@ -227,10 +225,20 @@ const instances: readonly Instance[] = [
   { id: "i4", name: "ex-db-2", status: "Running", phase: "Starting" },
 ];
 
-const instanceColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Name" },
-  { id: "phase", header: "Phase" },
-];
+/** An instance's phase, which no field of the collection carries. */
+function PhaseCell({
+  record,
+}: DisplayFieldCellProps<unknown, Instance>): ReactElement {
+  return <>{record.phase}</>;
+}
+
+const instanceColumns = createColumns({
+  collection: instanceCollection,
+  columns: [
+    { field: "name", header: "Name" },
+    { id: "phase", header: "Phase", cell: PhaseCell },
+  ],
+});
 
 /** The bar over four instances, filtered by status. */
 function StatusAliasInstances({

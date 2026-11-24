@@ -20,7 +20,7 @@ import {
 import { useDataViewsValue } from "../../../../../hooks/index.js";
 import { useDataViews } from "../../../hooks/index.js";
 import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
+import { createColumns } from "../../renderers/DataTable/index.js";
 import Pagination from "../Pagination/Pagination.js";
 import Component from "./ActionBar.js";
 
@@ -37,11 +37,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 /**
  * A source that can archive and delete machines. Both actions take the
@@ -117,7 +120,7 @@ function ManagedMachines({
         columns={columns}
         label="Machines"
         selectable
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -134,11 +137,14 @@ function ManagedMachines({
   );
 }
 
-const selectionActionCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const selectionActionCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 // Pressed, it runs through the provider, which captures the selection as
 // its targets, runs the source's action and removes the ones that succeed.
@@ -174,20 +180,16 @@ const spellActionsCode = ({
     parts: [
       "DataTable",
       "DataViews",
-      "type DataTableColumn",
+      "createColumns",
       "useDataViews",
       ...(declarations === "" ? [] : ["useDataViewsValue"]),
     ],
     imports: `import { Button, type ButtonProps } from "@canonical/react-ds-global";
-import {
-  archiveMachines,
-  type Machine,
-  machineCollection,
-  machines,
-} from "./machines.js";`,
+import { archiveMachines, type Machine, machineCollection, machines } from "./machines.js";`,
     declarations: `${selectionActionCode}
 
-const nameMachine = (machine: Machine) => machine.name;${declarations}`,
+const nameMachine = (machine: Machine) => machine.name;
+${declarations}`,
     // Spelled relative to the `source:` line it follows, as the default is.
     source: `createArraySource({
   rows: machines,

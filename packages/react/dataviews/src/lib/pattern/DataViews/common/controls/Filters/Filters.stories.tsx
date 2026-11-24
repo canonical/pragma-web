@@ -18,6 +18,7 @@ import type { StoryWords } from "../../../../../../storybook/types.js";
 import "../../../../../../storybook/noScripts.css";
 import {
   createSourceWithoutCores,
+  machineCollection,
   showConsumerCode,
   spareMachineCollection,
   spareMachines,
@@ -25,10 +26,7 @@ import {
   useMachineProvider,
 } from "../../../../../../storybook/machines/index.js";
 import DataViews from "../../../Provider.js";
-import {
-  DataTable,
-  type DataTableColumn,
-} from "../../renderers/DataTable/index.js";
+import { createColumns, DataTable } from "../../renderers/DataTable/index.js";
 import Component from "./Filters.js";
 import type { DataViewsFiltersProps } from "./types.js";
 
@@ -54,26 +52,32 @@ const meta = {
 export default meta;
 type Story = StoryObj<StoryArgs>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 const composition = `<DataViews provider={provider}>
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
   <DataTable provider={provider} columns={columns} label="Machines" />
 </DataViews>`;
 
-const parts = ["DataTable", "DataViews", "type DataTableColumn"];
+const parts = ["DataTable", "DataViews", "createColumns"];
 
 /** A composed collection: a root, its filters and its table, in its words. */
 function FilteredMachines({
@@ -384,11 +388,14 @@ export const PrimaryFilters: Story = {
 };
 
 /** The spare machines' columns: the host, its memory and its owner. */
-const spareColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "memory", header: "Memory" },
-  { id: "owner", header: "Owner" },
-];
+const spareColumns = createColumns({
+  collection: spareMachineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "memory", header: "Memory" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 /** A root over the spare machines, starting on one query, in its words. */
 function FilteredSpareMachines({
@@ -608,6 +615,15 @@ const regionCollection = createCollection({
   ],
 });
 
+/** The regions story's columns, over its own collection. */
+const regionColumns = createColumns({
+  collection: regionCollection,
+  columns: [
+    { field: "status", header: "Status" },
+    { field: "region", header: "Region" },
+  ],
+});
+
 /** The regions story's filters and table, over a provider built once. */
 function RegionMachines({ messages, ...args }: StoryArgs): ReactElement {
   const [provider] = useState(() =>
@@ -626,7 +642,7 @@ function RegionMachines({ messages, ...args }: StoryArgs): ReactElement {
       <Component {...args} />
       <DataTable
         provider={provider}
-        columns={columns}
+        columns={regionColumns}
         label="Machines"
         {...words}
       />
@@ -645,14 +661,20 @@ export const ServerOptionsKept: Story = {
     parts,
     core: ["createCollection"],
     imports: `import { type Machine, machines } from "./machines.js";`,
-    declarations: `${columnsCode}
-
-// Regions are a choice whose options the server lists.
+    declarations: `// Regions are a choice whose options the server lists.
 const machineCollection = createCollection({
   identify: (machine: Machine) => machine.id,
   fields: [
     { field: "status", kind: "choices", options: ["running", "failed", "pending"] },
     { field: "region", kind: "choices" },
+  ],
+});
+
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "status", header: "Status" },
+    { field: "region", header: "Region" },
   ],
 });`,
     facets: ["status", "region"],

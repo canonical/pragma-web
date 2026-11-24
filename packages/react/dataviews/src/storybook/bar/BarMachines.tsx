@@ -19,7 +19,7 @@ import {
   pooledMachines,
 } from "../machines/index.js";
 import pickStoryWords from "../pickStoryWords.js";
-import { BAR_COLUMNS, WINDOW_PLATFORM } from "./constants.js";
+import { BAR_COLUMNS, POOLED_COLUMNS, WINDOW_PLATFORM } from "./fixtures.js";
 import startFrameAt from "./startFrameAt.js";
 import type { BarConfig, BarProvider, BarStoryArgs } from "./types.js";
 
@@ -106,7 +106,12 @@ export default function BarMachines({
       </div>
       <DataTable
         provider={provider}
-        columns={BAR_COLUMNS}
+        // The pooled columns name the bar's fields, over the pooled collection.
+        columns={
+          withPools
+            ? (POOLED_COLUMNS as unknown as typeof BAR_COLUMNS)
+            : BAR_COLUMNS
+        }
         label="Machines"
         {...words}
         selectable={selected !== undefined}

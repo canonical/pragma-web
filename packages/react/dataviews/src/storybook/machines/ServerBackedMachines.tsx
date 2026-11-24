@@ -2,11 +2,8 @@ import type { QueryLocation, Source } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 import type { StoryWords } from "../types.js";
-import {
-  SERVER_BACKED_COLUMNS,
-  SERVER_BACKED_FACETS,
-  SERVER_BACKED_PARTS,
-} from "./constants.js";
+import { SERVER_BACKED_FACETS, SERVER_BACKED_PARTS } from "./constants.js";
+import { SERVER_BACKED_COLUMNS } from "./fixtures.js";
 import { useMachineProvider } from "./hooks/index.js";
 import type { Machine } from "./types.js";
 

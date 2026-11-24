@@ -1,29 +1,27 @@
 /**
- * What the server-backed stories share: the columns their screen renders,
- * the names and page sizes of its parts, and the source text of those
- * columns and of the composition, for their "Show code" panels. The text is
- * written from the columns and parts it spells. Each stories file adds the
- * source its endpoint is reached through.
+ * What the server-backed stories share: the columns as declared, the names
+ * and page sizes of the parts, and the source text written from them.
  */
 
-import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+/** The machine columns as declared, each ordered by the header where the source can. */
+export const SERVER_BACKED_DECLARATIONS = [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "region", header: "Region", sortable: true },
+  { field: "owner", header: "Owner", sortable: true },
+] as const;
 
-/** The machine columns, each ordered by the header where the source can. */
-export const SERVER_BACKED_COLUMNS = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "region", header: "Region", sortable: true },
-  { id: "owner", header: "Owner", sortable: true },
-] as const satisfies readonly DataTableColumn[];
-
-/** The machine columns, as source text written from the columns themselves. */
-export const SERVER_BACKED_COLUMNS_CODE = `const columns: readonly DataTableColumn[] = [
-${SERVER_BACKED_COLUMNS.map(
-  ({ id, header, sortable }) =>
-    `  { id: ${JSON.stringify(id)}, header: ${JSON.stringify(header)}, sortable: ${String(sortable)} },`,
+/** The machine columns, as source text written from their declarations. */
+export const SERVER_BACKED_COLUMNS_CODE = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+${SERVER_BACKED_DECLARATIONS.map(
+  ({ field, header, sortable }) =>
+    `    { field: ${JSON.stringify(field)}, header: ${JSON.stringify(header)}, sortable: ${String(sortable)} },`,
 ).join("\n")}
-];`;
+  ],
+});`;
 
 /** The fields whose facets the server-backed screen asks its endpoint for. */
 export const SERVER_BACKED_FACETS = ["status", "cores"] as const;

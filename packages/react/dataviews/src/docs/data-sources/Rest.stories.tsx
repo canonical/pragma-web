@@ -37,19 +37,18 @@ type Story = StoryObj<typeof Component>;
 
 /** The consumer code every story here shows: the endpoint through TanStack Query. */
 const code = showConsumerCode({
-  parts: ["DataViews", "type DataTableColumn"],
+  parts: ["DataViews", "createColumns"],
   core: [
     "createPage",
     "createQuerySource",
     "declareCapabilities",
     "encodeQuery",
   ],
-  coreTypes: ["RowRecord"],
   imports: `import { QueryClient, QueryObserver } from "@tanstack/query-core";
-import { machineCollection } from "./machines.js";`,
+import { type Machine, machineCollection } from "./machines.js";`,
   declarations: `${SERVER_BACKED_COLUMNS_CODE}
 
-const nameMachine = (row: RowRecord) => String(row["name"]);
+const nameMachine = (machine: Machine) => machine.name;
 
 const queryClient = new QueryClient();
 // Mounted, so its queries refetch when the window regains focus or the
