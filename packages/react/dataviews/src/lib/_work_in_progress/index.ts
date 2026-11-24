@@ -10,6 +10,8 @@ export type {
   DataViewsProps,
   DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
+  DataViewsQueryBarQuickFilter,
+  DataViewsQueryBarQuickFilterArrangement,
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
@@ -27,6 +29,13 @@ export type {
   FilterButtonProps,
 } from "./FilterButton/index.js";
 export { FilterButton } from "./FilterButton/index.js";
+export type {
+  FilterOptionsCondition,
+  FilterOptionsGridProps,
+  FilterOptionsOption,
+  FilterOptionsProps,
+} from "./FilterOptions/index.js";
+export { FilterOptions } from "./FilterOptions/index.js";
 export type { PaginationBarProps } from "./PaginationBar/index.js";
 export { PaginationBar } from "./PaginationBar/index.js";
 export type {

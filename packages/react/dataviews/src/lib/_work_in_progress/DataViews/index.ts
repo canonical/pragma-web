@@ -8,6 +8,8 @@ export type { DataViewsPaginationProps } from "./common/Pagination/index.js";
 export type {
   DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
+  DataViewsQueryBarQuickFilter,
+  DataViewsQueryBarQuickFilterArrangement,
 } from "./common/QueryBar/index.js";
 export type { DataViewsSavedViewsProps } from "./common/SavedViews/index.js";
 export type { DataViewsSearchProps } from "./common/Search/index.js";
