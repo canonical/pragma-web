@@ -22,6 +22,9 @@ const NON_ASCII = /[\u0080-\u{10FFFF}]/u;
  *
  * Lowercasing is one character to one or more; nothing expands a letter into
  * a sequence it might be spelled as, so `ß` and `ss` stay different.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function foldText(text: string): string {
   if (!NON_ASCII.test(text)) {

@@ -753,6 +753,72 @@ describe("applyQueryCommand", () => {
       });
     });
 
+    it("adds a conjunct beside those at its address, from the first page", () => {
+      const result = accept(
+        applyQueryCommand(
+          bounded,
+          buildWindow({ page: 3, cursor: "ex-token" }),
+          {
+            kind: "addPredicate",
+            predicate: buildGte(2),
+          },
+        ),
+      );
+      expect(result.slice.filter).toEqual([
+        buildGte(8),
+        buildGte(4),
+        buildGte(16),
+        buildGte(2),
+      ]);
+      expect(result).toMatchObject({
+        sliceChanged: true,
+        windowChanged: true,
+        window: { page: 1, cursor: null },
+      });
+      expect(
+        accept(
+          applyQueryCommand(buildSlice(), buildWindow(), {
+            kind: "addPredicate",
+            predicate: buildGte(2),
+          }),
+        ).slice.filter,
+      ).toEqual([buildGte(2)]);
+    });
+
+    it("changes nothing for a conjunct the slice already holds", () => {
+      const tags = buildSlice({
+        filter: [{ field: "tags", operator: "isAny", operands: ["a", "b"] }],
+      });
+      for (const [held, predicate] of [
+        [bounded, buildGte(4)],
+        [tags, { field: "tags", operator: "isAny", operands: ["b", "a", "b"] }],
+      ] as const) {
+        const result = accept(
+          applyQueryCommand(held, buildWindow({ page: 2 }), {
+            kind: "addPredicate",
+            predicate,
+          }),
+        );
+        expect(result).toMatchObject({
+          sliceChanged: false,
+          windowChanged: false,
+        });
+        expect(result.slice).toBe(held);
+      }
+    });
+
+    it("rejects an added conjunct outside the grammar", () => {
+      const result = applyQueryCommand(bounded, buildWindow(), {
+        kind: "addPredicate",
+        predicate: { field: "cpu", operator: "gte", operands: [1, 2] },
+      });
+      expect(result).toMatchObject({
+        status: "rejected",
+        reason: "gte predicate needs exactly one operand",
+      });
+      expect(result.slice).toBe(bounded);
+    });
+
     it("removes the conjunct at nth alone, and nothing for one already gone", () => {
       expect(
         accept(

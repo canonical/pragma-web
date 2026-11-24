@@ -41,6 +41,27 @@ describe("isClauseReplaced", () => {
     ).toBe(false);
   });
 
+  it("replaces a filter's clause by a conjunct added on its field", () => {
+    expect(
+      isClauseReplaced(
+        {
+          kind: "addPredicate",
+          predicate: { field: "status", operator: "isAny", operands: ["a"] },
+        },
+        status,
+      ),
+    ).toBe(true);
+    expect(
+      isClauseReplaced(
+        {
+          kind: "addPredicate",
+          predicate: { field: "cpu", operator: "gte", operands: [4] },
+        },
+        status,
+      ),
+    ).toBe(false);
+  });
+
   it("replaces a filter's clause by an edit touching its field", () => {
     expect(
       isClauseReplaced(

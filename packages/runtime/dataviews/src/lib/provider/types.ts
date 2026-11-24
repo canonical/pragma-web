@@ -372,6 +372,16 @@ export type ProviderHost<
     history?: HistoryMode,
   ) => readonly SourceRefusal[];
   /**
+   * Add a conjunct beside any already at its address, as one transition;
+   * the window returns to page one. A conjunct the query already holds is
+   * no change, since A AND A is A. Given `history`, the transition enters
+   * history that way rather than as the policy says.
+   */
+  readonly addPredicate: (
+    predicate: Predicate,
+    history?: HistoryMode,
+  ) => readonly SourceRefusal[];
+  /**
    * Remove the conjunct at `nth` of an address, 0 when left out; the window
    * returns to page one. A conjunct already gone is no change.
    */

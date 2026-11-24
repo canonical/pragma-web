@@ -11,6 +11,7 @@ export { default as cycleSortTerm } from "./cycleSortTerm.js";
 export { default as listConjuncts } from "./listConjuncts.js";
 export { default as placeSortTerm } from "./placeSortTerm.js";
 export { default as rankOperand } from "./rankOperand.js";
+export { default as readCondition } from "./readCondition.js";
 export { default as rejectOperandArity } from "./rejectOperandArity.js";
 export { default as rejectWindow } from "./rejectWindow.js";
 export { default as spellQueryKey } from "./spellQueryKey.js";

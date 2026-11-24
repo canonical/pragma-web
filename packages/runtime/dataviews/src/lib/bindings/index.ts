@@ -62,6 +62,7 @@ export type { QueryCommand, QueryCommandResult } from "../query/index.js";
 export {
   applyQueryCommand,
   areListsEqual,
+  canonicalizeSlice,
   cycleSortTerm,
   placeSortTerm,
 } from "../query/index.js";
@@ -75,6 +76,7 @@ export type {
 export { createRowScopes } from "../rows/index.js";
 export type { EffectiveOrdering } from "../source/index.js";
 export {
+  foldText,
   listOfferedOperators,
   resolveEffectiveOrdering,
 } from "../source/index.js";

@@ -11,6 +11,12 @@ describe("readCommandCause", () => {
     ).toBe("filter");
     expect(
       readCommandCause({
+        kind: "addPredicate",
+        predicate: { field: "cpu", operator: "gte", operands: [4] },
+      }),
+    ).toBe("filter");
+    expect(
+      readCommandCause({
         kind: "removePredicate",
         field: "cpu",
         operator: "gte",
