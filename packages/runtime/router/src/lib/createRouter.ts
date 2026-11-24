@@ -666,6 +666,14 @@ export default function createRouter<
   let currentLoadResult: RouterLoadResult<TRoutes, TNotFound> | null = null;
   let hydratedHref: string | null = null;
   let ignoredAdapterHref: string | null = null;
+  /**
+   * The address a `setSearchParams()` call has scheduled but whose search load
+   * has not committed yet.  A later `setSearchParams()` composes on it instead
+   * of the committed location, so consecutive calls do not drop each other's
+   * updates.  Any non-search load clears it (see `performLoad`), so it never
+   * names an address a navigation has superseded.
+   */
+  let pendingSearchHref: string | null = null;
   const pendingWarmups = new Map<string, Promise<void>>();
   const warmedLoads = new Map<string, ResolvedLoadData<TRoutes, TNotFound>>();
   const preloadedModules = new Map<string, WeakRef<RouteModule>>();
@@ -1203,7 +1211,12 @@ export default function createRouter<
     options?: { readonly replace?: boolean },
   ): void {
     const currentState = store.getState();
-    const currentUrl = buildUrl(currentState.location.href);
+    // Compose on the address a previous setSearchParams() has scheduled when
+    // its search load has not committed yet, else on the committed location.
+    // Without this, a second call made before the first load commits would
+    // start from the old location and silently drop the first update.
+    const baseHref = pendingSearchHref ?? currentState.location.href;
+    const currentUrl = buildUrl(baseHref);
     const currentSearch: Record<string, string> = {};
 
     for (const [key, value] of currentUrl.searchParams.entries()) {
@@ -1239,6 +1252,7 @@ export default function createRouter<
       );
     }
 
+    pendingSearchHref = href;
     syncAdapterLocation(href, replace ? { replace: true } : undefined);
     scheduleAdapterLoad(href, "search");
   }
@@ -1309,6 +1323,13 @@ export default function createRouter<
 
     const url = buildUrl(input);
     const href = toHref(url);
+
+    // A load that is not a search update is a navigation away from any
+    // pending search href: it supersedes it, so a later setSearchParams must
+    // compose on the new address, never on the one the navigation left behind.
+    if (mode !== "search") {
+      pendingSearchHref = null;
+    }
 
     if (hydratedHref === href && currentLoadResult) {
       return currentLoadResult;
