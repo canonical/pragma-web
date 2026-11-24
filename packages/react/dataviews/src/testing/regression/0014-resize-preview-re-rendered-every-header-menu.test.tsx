@@ -10,13 +10,13 @@
  * module, as React offers no per-component render count.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
 import IconButtonStandIn from "../../lib/common/IconButtonStandIn/IconButtonStandIn.js";

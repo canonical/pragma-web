@@ -6,13 +6,13 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { createStandInViewStore } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../../../../../testing/index.js";
 

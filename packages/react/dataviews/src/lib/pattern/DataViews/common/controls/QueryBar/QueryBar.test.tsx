@@ -16,6 +16,7 @@ import {
   buildPage,
   createManualSource,
 } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import {
   act,
   fireEvent,
@@ -38,7 +39,6 @@ import {
   vi,
 } from "vitest";
 import {
-  installPopoverStandIn,
   installResizeObserverStandIn,
   type ResizeObserverStandIn,
 } from "../../../../../../../testing/index.js";

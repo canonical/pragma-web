@@ -7,6 +7,7 @@
  * reader had ever sorted from.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
   afterAll,
@@ -21,7 +22,6 @@ import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
-  installPopoverStandIn,
   openMenuFrom,
   waitForFocus,
 } from "../../../testing/index.js";

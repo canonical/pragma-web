@@ -11,6 +11,7 @@ import {
 } from "@canonical/dataviews-core";
 import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import { createRecordingLocation } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -31,7 +32,6 @@ import {
   declareMachineOrdering,
   expectNoAxeViolations,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   type MachineProvider,
   openMenuFrom,
   readAnnouncements,

@@ -1,7 +1,7 @@
 import { Button, withContextualMenu } from "@canonical/react-ds-global";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import installPopoverStandIn from "./installPopoverStandIn.js";
 import openMenuFrom from "./openMenuFrom.js";
 
 const Actions = withContextualMenu(Button);

@@ -35,7 +35,6 @@ export {
   quickHosts,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
-export { default as installPopoverStandIn } from "./installPopoverStandIn.js";
 export { default as installResizeObserverStandIn } from "./installResizeObserverStandIn.js";
 export { default as listIds } from "./listIds.js";
 export { default as MachineComposition } from "./MachineComposition.js";

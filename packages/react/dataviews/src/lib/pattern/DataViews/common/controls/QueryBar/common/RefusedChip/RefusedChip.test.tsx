@@ -3,12 +3,10 @@
  * reads its own refusal from the query state.
  */
 import { createMemoryLocation } from "@canonical/dataviews-core";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  installPopoverStandIn,
-} from "../../../../../../../../../testing/index.js";
+import { createMachineProvider } from "../../../../../../../../../testing/index.js";
 import { QueryInput } from "../../../../../../../component/QueryInput/index.js";
 import { QueryChips } from "../../../../../../../group/QueryChips/index.js";
 import DataViews from "../../../../../Provider.js";

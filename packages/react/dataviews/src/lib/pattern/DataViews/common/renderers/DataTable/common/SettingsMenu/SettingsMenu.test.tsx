@@ -4,11 +4,11 @@
  * chosen handed back and focus returned; and, before scripts run, links.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   expectNoAxeViolations,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../../../../../../../testing/index.js";
 import type { ColumnChange, ColumnSetting } from "../types.js";

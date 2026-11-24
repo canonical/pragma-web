@@ -7,13 +7,13 @@
  * went nowhere, and a screen reader could announce the document.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
-  installPopoverStandIn,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 

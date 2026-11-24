@@ -1,3 +1,4 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { render, screen } from "@testing-library/react";
 import {
   afterAll,
@@ -8,7 +9,6 @@ import {
   it,
   vi,
 } from "vitest";
-import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import useSuggestions from "../../hooks/useSuggestions.js";
 import type { QueryInputOption } from "../types.js";
 import Suggestions from "./Suggestions.js";

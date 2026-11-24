@@ -9,12 +9,12 @@
  * nearest heading with a control, and to the table's settings last.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";

@@ -12,12 +12,12 @@
  * given new offers renders again.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
 import IconButtonStandIn from "../../lib/common/IconButtonStandIn/IconButtonStandIn.js";

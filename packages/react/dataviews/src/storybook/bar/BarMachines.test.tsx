@@ -1,6 +1,6 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { installPopoverStandIn } from "../../../testing/index.js";
 import BarMachines from "./BarMachines.js";
 
 let uninstall: () => void;

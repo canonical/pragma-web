@@ -1,8 +1,8 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { installPopoverStandIn } from "../../../../testing/index.js";
 import FilterButton from "./FilterButton.js";
 import type { FilterButtonPanelHandle } from "./types.js";
 

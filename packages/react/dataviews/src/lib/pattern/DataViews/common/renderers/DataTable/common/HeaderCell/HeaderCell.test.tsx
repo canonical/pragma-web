@@ -7,6 +7,7 @@ import {
   createColumnLayout,
   createGridInteraction,
 } from "@canonical/dataviews-core/bindings";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import {
@@ -21,7 +22,6 @@ import {
 import {
   type HeaderCellCaseProps as CaseProps,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../../../../../../../testing/index.js";
 import HeaderCell from "./HeaderCell.js";

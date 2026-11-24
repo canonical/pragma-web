@@ -3,6 +3,7 @@
  * nothing out, so contrast is left to a browser.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { render } from "@testing-library/react";
 import { afterAll, beforeAll, describe, it } from "vitest";
@@ -10,7 +11,6 @@ import preview from "../../../.storybook/preview.js";
 import {
   expectNoAxeViolations,
   FACETED_FILTER_STORIES,
-  installPopoverStandIn,
   serveMockApi,
 } from "../../../testing/index.js";
 import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";

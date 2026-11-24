@@ -1,6 +1,6 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { installPopoverStandIn } from "../../../testing/index.js";
 import renderBarWith from "./renderBarWith.js";
 
 let uninstall: () => void;

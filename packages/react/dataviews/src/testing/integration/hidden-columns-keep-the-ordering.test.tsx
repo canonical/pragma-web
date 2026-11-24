@@ -7,6 +7,7 @@
  */
 
 import type { ViewPresentation } from "@canonical/dataviews-core";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { act } from "react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -14,7 +15,6 @@ import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
 import {
