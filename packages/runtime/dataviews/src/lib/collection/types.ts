@@ -98,7 +98,8 @@ export type CollectionConfig<
  * One collection, declared at module scope: its schema, its record
  * identity and its record types. The witness `useDataViews(collection)`
  * and `createDataViewsProvider({ collection })` take, and the object the
- * runtime check compares by reference.
+ * runtime check compares by reference. Invariant in its record type, so a
+ * collection proves exactly the records it identifies.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -106,7 +107,7 @@ export type CollectionConfig<
 export type Collection<
   TFields extends
     readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
-  TRow extends object = RowRecord,
+  in out TRow extends object = RowRecord,
 > = {
   readonly schema: Schema<TFields>;
   readonly identify: RowIdentifier<TRow>;
