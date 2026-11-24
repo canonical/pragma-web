@@ -10,7 +10,7 @@ import {
   it,
   vi,
 } from "vitest";
-import installPopoverStandIn from "../../../../testing/installPopoverStandIn.js";
+import { installPopoverStandIn } from "../../../../testing/index.js";
 import { useQueryEntry } from "../../common/QueryEntry/index.js";
 import { useRovingItem } from "../../common/Roving/index.js";
 import QueryInput from "./QueryInput.js";

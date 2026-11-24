@@ -6,7 +6,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import { installPopoverStandIn } from "../../../testing/index.js";
 import QueryBuilder from "./QueryBuilder.js";
 import type { Clause } from "./types.js";
 

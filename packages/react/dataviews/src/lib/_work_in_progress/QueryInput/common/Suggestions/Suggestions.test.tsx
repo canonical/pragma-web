@@ -8,7 +8,7 @@ import {
   it,
   vi,
 } from "vitest";
-import installPopoverStandIn from "../../../../../../testing/installPopoverStandIn.js";
+import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import useSuggestions from "../../hooks/useSuggestions.js";
 import type { QueryInputOption } from "../types.js";
 import Suggestions from "./Suggestions.js";

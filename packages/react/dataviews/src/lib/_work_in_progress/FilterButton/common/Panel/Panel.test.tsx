@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import installPopoverStandIn from "../../../../../../testing/installPopoverStandIn.js";
+import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import type { FilterButtonPanelHandle } from "../../types.js";
 import Panel from "./Panel.js";
 import type { PanelProps } from "./types.js";
