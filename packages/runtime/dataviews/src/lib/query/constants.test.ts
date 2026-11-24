@@ -8,9 +8,13 @@ describe("constants", () => {
       isNone: "many",
       gte: "one",
       lte: "one",
-      isSet: "none",
+      isSet: "one",
+      is: "one",
+      isNot: "one",
       contains: "one",
+      notContains: "one",
       startsWith: "one",
+      endsWith: "one",
     });
     expect(Object.isFrozen(OPERATOR_ARITY)).toBe(true);
   });
