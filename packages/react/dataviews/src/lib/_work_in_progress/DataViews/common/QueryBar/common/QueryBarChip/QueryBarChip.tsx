@@ -27,7 +27,7 @@ const isSameReading = (
  * Activating a part or removing the chip hands the bar the clause as it
  * applies.
  */
-function QueryBarChip({
+const QueryBarChip = ({
   clause,
   group,
   edit,
@@ -35,7 +35,7 @@ function QueryBarChip({
   onRemove,
   onTypedChange,
   onEntryKeyDown,
-}: QueryBarChipProps): ReactElement | null {
+}: QueryBarChipProps): ReactElement | null => {
   const read = useMemo(() => {
     if (clause.kind === "search") {
       const origin = { id: clause.id, ref: null };
@@ -77,6 +77,6 @@ function QueryBarChip({
       onEntryKeyDown={onEntryKeyDown}
     />
   );
-}
+};
 
 export default memo(QueryBarChip);
