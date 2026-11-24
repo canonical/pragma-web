@@ -3,25 +3,25 @@ import { fireEvent } from "@testing-library/react";
 import waitForFrames from "./waitForFrames.js";
 
 /**
- * Opens the popover menu a button names, as a click does, and waits for the
- * menu to take focus, a few frames after it opens.
+ * Opens the popover menu a button names, as a click does, and waits for it
+ * to take focus.
  *
- * @param trigger The button whose `popovertarget` names the menu's panel.
+ * @param trigger The button whose `popovertarget` names the menu's popover.
  * @returns The open menu.
  * @note Impure: clicks the button and waits for focus to move.
  */
 export default async function openMenuFrom(
   trigger: HTMLElement,
 ): Promise<HTMLElement> {
-  const panelId = assertInvariant(
+  const popoverId = assertInvariant(
     trigger.getAttribute("popovertarget"),
-    "a menu button names its panel",
+    "a menu button names its popover",
   );
   fireEvent.click(trigger);
   // Read afresh each frame: a menu closing as this one opens may still stand.
   return waitForFrames(() => {
     const menu = document
-      .getElementById(panelId)
+      .getElementById(popoverId)
       ?.querySelector<HTMLElement>('[role="menu"]');
     return menu?.contains(document.activeElement) ? menu : null;
   }, "an open menu holding focus");

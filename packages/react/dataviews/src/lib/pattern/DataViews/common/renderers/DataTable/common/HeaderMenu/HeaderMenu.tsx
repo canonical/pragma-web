@@ -1,5 +1,10 @@
 import type { DataViewsMessages } from "@canonical/dataviews-core";
 import {
+  type MenuEntry,
+  type MenuItem,
+  withContextualMenu,
+} from "@canonical/react-ds-global";
+import {
   memo,
   type ReactElement,
   useCallback,
@@ -7,11 +12,6 @@ import {
   useId,
   useMemo,
 } from "react";
-import {
-  type DropdownMenuEntry,
-  type DropdownMenuItem,
-  withDropdownMenu,
-} from "../../../../../../../common/DropdownButtonStandIn/index.js";
 import { IconButtonStandIn } from "../../../../../../../common/IconButtonStandIn/index.js";
 import { MessagesContext } from "../../../../../../../common/index.js";
 import { composeMessage } from "../../../../../../../utils/index.js";
@@ -20,7 +20,7 @@ import type { HeaderMenuProps } from "./types.js";
 const componentCssClassName = "ds data-table-header-menu";
 
 /** The icon button and the menu it opens. */
-const MenuTrigger = withDropdownMenu(IconButtonStandIn);
+const MenuTrigger = withContextualMenu(IconButtonStandIn);
 
 /**
  * The menu's items: the column's sort where it offers one, with remove
@@ -34,8 +34,8 @@ const listItems = (
     offers,
   }: Pick<HeaderMenuProps, "sortable" | "removable" | "hideable" | "offers">,
   messages: DataViewsMessages,
-): DropdownMenuEntry[] => {
-  const sort: DropdownMenuEntry[] = sortable
+): MenuEntry[] => {
+  const sort: MenuEntry[] = sortable
     ? [
         { key: "asc", label: messages.sortAscending },
         { key: "desc", label: messages.sortDescending },
@@ -45,7 +45,7 @@ const listItems = (
         { type: "separator", key: "separator" },
       ]
     : [];
-  const hide: DropdownMenuEntry[] = hideable
+  const hide: MenuEntry[] = hideable
     ? [{ key: "hide", label: messages.hideColumn, disabled: !offers.hide }]
     : [];
   return [
@@ -92,7 +92,7 @@ const HeaderMenu = ({
   );
   // One identity while the column holds, so the menu's own context holds.
   const choose = useCallback(
-    (item: DropdownMenuItem) => {
+    (item: MenuItem) => {
       switch (item.key) {
         case "remove":
           onRemoveFromSort(columnId);
@@ -114,8 +114,8 @@ const HeaderMenu = ({
   // names the menu itself, and any other is referenced again.
   const name =
     typeof header === "string"
-      ? { label: messages.columnOptions(header) }
-      : { labelledBy: labelId };
+      ? { menuLabel: messages.columnOptions(header) }
+      : { menuLabelledBy: labelId };
   return (
     <>
       {/* The column's heading need not be text, so it names the button by

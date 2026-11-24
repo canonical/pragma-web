@@ -8,8 +8,8 @@
  * not moved. Offers are now read from one resolution of the arrangement, and
  * a column keeps its offers object while its changes hold.
  *
- * The open menu is counted by a pass-through counter on the open menu's
- * list, as regression 0014 counts it: a menu given new offers renders again.
+ * A pass-through spy on the icon button counts Status's menu renders: a menu
+ * given new offers renders again.
  */
 
 import { act, render, screen } from "@testing-library/react";
@@ -20,22 +20,37 @@ import {
   installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
-import MenuList from "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js";
+import IconButtonStandIn from "../../lib/common/IconButtonStandIn/IconButtonStandIn.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
-// Each call of the spied list is a render of the open column menu.
+// Each call of the spy is a render of a header menu's icon button, which
+// renders whenever its HeaderMenu does.
 vi.mock(
-  "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js",
+  "../../lib/common/IconButtonStandIn/IconButtonStandIn.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js")
+        typeof import("../../lib/common/IconButtonStandIn/IconButtonStandIn.js")
       >();
     return { default: vi.fn(actual.default) };
   },
 );
 
-const renders = vi.mocked(MenuList);
+const renders = vi.mocked(IconButtonStandIn);
+
+/** The renders of header menus, as the props each was given. */
+const listHeaderMenuRenders = () =>
+  renders.mock.calls
+    .map(([props]) => props)
+    .filter((props) => props.className?.includes("data-table-header-menu"));
+
+/** How often Status's menu rendered since the spy was last cleared. */
+const countStatusRenders = (): number =>
+  listHeaderMenuRenders().filter(
+    (props) =>
+      document.getElementById(String(props["aria-labelledby"]))?.textContent ===
+      "Column options for Status",
+  ).length;
 
 describe("regression 0058 — a column change renewed every header's offers", () => {
   let uninstallPopovers: () => void;
@@ -69,18 +84,18 @@ describe("regression 0058 — a column change renewed every header's offers", ()
     act(() => {
       provider.presentation.arrange({ "table.width.name": 240 });
     });
-    expect(renders).not.toHaveBeenCalled();
+    expect(countStatusRenders()).toBe(0);
     // Owner hidden: Cores is now last shown, and Status takes the same
     // changes as before.
     act(() => {
       provider.presentation.arrange({ "table.hidden": ["owner"] });
     });
-    expect(renders).not.toHaveBeenCalled();
+    expect(countStatusRenders()).toBe(0);
     // Cores hidden too: Status is now last shown, and can move right no
     // more, so its menu renders its new offers.
     act(() => {
       provider.presentation.arrange({ "table.hidden": ["owner", "cores"] });
     });
-    expect(renders).toHaveBeenCalled();
+    expect(countStatusRenders()).toBeGreaterThan(0);
   });
 });

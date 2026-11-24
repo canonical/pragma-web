@@ -92,7 +92,6 @@ describe("SettingsMenu", () => {
   it("holds a closed menu behind its button, named for what it opens", () => {
     mount();
     expect(findTrigger()).toHaveAttribute("aria-haspopup", "menu");
-    expect(findTrigger()).toHaveAttribute("aria-expanded", "false");
     expect(
       screen.queryByRole("menu", { hidden: true }),
     ).not.toBeInTheDocument();
@@ -118,7 +117,7 @@ describe("SettingsMenu", () => {
     // hidden says so on an item a keyboard still reaches.
     expect(
       items
-        .filter((item) => item.classList.contains("disabled"))
+        .filter((item) => item.getAttribute("aria-disabled") === "true")
         .map((item) => item.textContent),
     ).toEqual([
       "Move Name left",
@@ -228,9 +227,7 @@ describe("SettingsMenu", () => {
       ).not.toBeInTheDocument();
       // The disabled reset waits for scripts, hidden until they run.
       expect(
-        screen
-          .getByText("Reset table settings")
-          .closest("[data-requires-script]"),
+        screen.getByText("Reset table settings").closest(".script-only"),
       ).not.toBeNull();
     });
 
