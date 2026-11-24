@@ -21,6 +21,7 @@ import {
 } from "../../../../../hooks/index.js";
 import {
   areDisplayFieldsEqual,
+  assertColumnsOver,
   describeStatus,
   readFieldName,
 } from "../../../../../utils/index.js";
@@ -92,6 +93,7 @@ export default function DataCards<
       "DataCards requires a provider created by createDataViewsProvider",
     );
   }
+  assertColumnsOver(fields, provider.collection, "DataCards");
   const words = useMessages({ messages });
   const declared = useStableValue(fields, areDisplayFieldsEqual);
   // Looked up in the held list, which holds the ids the caller's list holds:

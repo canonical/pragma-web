@@ -69,6 +69,7 @@ import {
   type OddRecord,
   openMenuFrom,
   type MachineProvider as Provider,
+  RACKED_MACHINE_COLLECTION,
   readAnnouncements,
   silenceRenderErrors,
   waitForFocus,
@@ -79,6 +80,7 @@ import {
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
 import { DataViews } from "../../../index.js";
+import createColumns from "./createColumns.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -192,6 +194,32 @@ describe("DataTable", () => {
     ).toThrow(
       "DataTable requires a provider created by createDataViewsProvider",
     );
+  });
+
+  it("throws at mount for columns declared over another collection, naming them", () => {
+    silenceRenderErrors();
+    const { provider } = createMachineProvider();
+    const racked = createColumns({
+      collection: RACKED_MACHINE_COLLECTION,
+      columns: [{ field: "name", header: "Name" }],
+    });
+    expect(() =>
+      render(<DataTable provider={provider} columns={racked} label="Fleet" />),
+    ).toThrow(
+      'DataTable was given columns declared over another collection, of fields "name"',
+    );
+  });
+
+  it("draws columns declared over its own collection", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const own = createColumns({
+      collection: machines,
+      columns: [{ field: "name", header: "Name" }],
+    });
+    render(<DataTable provider={provider} columns={own} label="Fleet" />);
+    expect(screen.getByRole("cell")).toHaveTextContent("alpha");
   });
 
   it("renders the table as native elements over grid geometry", () => {

@@ -18,6 +18,7 @@ import elementAt from "./elementAt.js";
 import type {
   FacetCase,
   FacetRecord,
+  Machine,
   OperatorCase,
   OperatorRecord,
   QuickHost,
@@ -34,6 +35,15 @@ export const COUNTED_EXACTLY: CountCapabilities = Object.freeze({
 export const RACK_COLLECTION = createCollection({
   identify: (rack: { readonly id: string }) => rack.id,
   fields: [{ field: "zone", kind: "choices", options: ["a", "b"] }],
+});
+
+/**
+ * Another collection of the machine records: the record types agree, the
+ * collections do not.
+ */
+export const RACKED_MACHINE_COLLECTION = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [{ field: "name", kind: "text" }],
 });
 
 /**

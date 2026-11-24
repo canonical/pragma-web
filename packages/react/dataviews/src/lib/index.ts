@@ -51,6 +51,7 @@ export type {
   UseDataViewsResult,
 } from "./pattern/index.js";
 export {
+  createColumns,
   DataTable,
   DataViews,
   useDataViews,

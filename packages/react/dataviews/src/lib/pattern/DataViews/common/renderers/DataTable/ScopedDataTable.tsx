@@ -34,7 +34,11 @@ import {
   useStableCallback,
   useStableValue,
 } from "../../../../../hooks/index.js";
-import { describeStatus, readFieldName } from "../../../../../utils/index.js";
+import {
+  assertColumnsOver,
+  describeStatus,
+  readFieldName,
+} from "../../../../../utils/index.js";
 import { VIRTUALIZED } from "../../../../../virtualization/constants.js";
 import type {
   DataTableVirtualization,
@@ -127,6 +131,7 @@ export default function ScopedDataTable<
   // Where the table keeps its arrangement: under its id in the provider's
   // presentation, or for the mount without one.
   const arrangement = useTableArrangement(provider, hasSettings, { id });
+  assertColumnsOver(columns, provider.collection, "DataTable");
   // Observed for as long as the table is mounted: a standalone table is a
   // mount that reads the provider, and the ref-count makes a table inside
   // a root that already observes cost nothing.
