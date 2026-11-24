@@ -16,6 +16,7 @@ const unitTest = reactTestConfig({
       "src/lib/hooks/useWindowFitment/constants.ts",
       "src/lib/hooks/useWindowFitment/useWindowFitment.tsx",
       "src/lib/hooks/useWindowFitment/utils/**/*.ts",
+      "src/storybook/decorators.tsx",
       "testing/**/*.ts",
     ],
     exclude: ["**/*.stories.tsx", "**/index.ts", "**/types.ts"],

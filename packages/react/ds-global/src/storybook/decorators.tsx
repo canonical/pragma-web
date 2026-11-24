@@ -4,12 +4,56 @@ import type {
   ReactElement,
   ReactNode,
 } from "react";
+import { useEffect } from "react";
+import { renderToString } from "react-dom/server";
+
+/**
+ * Renders a story's server markup and no more: React never attaches to it,
+ * so it behaves as a page does before any script runs.
+ */
+export const renderServerMarkup = () => (Story: ElementType) => (
+  <div
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: the story's own server markup, rendered from its own element
+    dangerouslySetInnerHTML={{ __html: renderToString(<Story />) }}
+  />
+);
 
 export const rtl = () => (Story: ElementType) => (
   <div dir="rtl">
     <Story />
   </div>
 );
+
+/**
+ * Sets `<html dir="rtl">` while it is mounted, and restores it after.
+ * @note Impure: sets and restores <html dir>.
+ */
+const DocumentRtl = ({ children }: { children: ReactNode }): ReactNode => {
+  useEffect(() => {
+    const root = document.documentElement;
+    const previous = root.dir;
+    root.dir = "rtl";
+    return () => {
+      root.dir = previous;
+    };
+  }, []);
+  return children;
+};
+
+/**
+ * Sets `<html dir="rtl">` in the story view, as an app does: a popover in
+ * the top layer places itself by the root's direction, not a wrapper's.
+ */
+export const rtlDocument =
+  () =>
+  (Story: ElementType, { viewMode }: { viewMode?: string }) =>
+    viewMode === "docs" ? (
+      <Story />
+    ) : (
+      <DocumentRtl>
+        <Story />
+      </DocumentRtl>
+    );
 
 /* Grid is provided by @canonical/storybook-addon-utils via `parameters.grid`
  * (a GridMode: "intrinsic" | "responsive" | "none"), which toggles the `.grid`

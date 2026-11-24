@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "../lib/component/ContextualMenu/withContextualMenu.stories";
+
+<Meta title="Documentation/ContextualMenu" />
+
+# ContextualMenu
+
+`withContextualMenu(Trigger, options?)` wraps a trigger, such as `Button`, and renders a `ContextualMenu` beside it. Call it once, at module scope. `options.wrap` (default true) makes the arrows wrap at the ends.
+
+```tsx
+import { Button, withContextualMenu } from "@canonical/react-ds-global";
+
+const ButtonMenu = withContextualMenu(Button);
+
+<ButtonMenu
+  items={[
+    { key: "rename", label: "Rename" },
+    { type: "separator", key: "s" },
+    { url: "/docs", label: "Docs" },
+  ]}
+  onSelect={(item, event) => run(item.key)}
+>
+  Actions
+</ButtonMenu>;
+```
+
+<Canvas of={Stories.Default} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+- The trigger's `onKeyDown` runs first; `event.preventDefault()` skips the menu's arrows.
+- Without the HOC: `<ContextualMenu id="m">` opens from a `popovertarget="m"` button with an id and `aria-haspopup="menu"`, anchored with `anchor-name: --m`; the id must be a CSS ident.
+
+<Canvas of={Stories.IconOnlyTrigger} />
+
+## Keyboard
+
+ArrowDown or ArrowUp on the trigger opens the menu on its first or last item. Arrows, Home, End and type-ahead move; ArrowRight and ArrowLeft open and close submenus; Enter or Space chooses; Escape closes the open submenu, or the menu with focus back on the trigger; Tab closes and moves on. Enter on a parent opens its submenu. Disabled items take focus but cannot be chosen.
+
+## Without scripts
+
+The trigger opens the native popover, and link items work. Action items are hidden; a menu of actions alone hides its trigger.
+
+<Canvas of={Stories.WithoutScripts} />
+
+## Known limits
+
+- Without CSS anchor positioning the menu opens centred in the viewport.
+- Menus mirror only when `dir` is set on `<html>`.
