@@ -317,4 +317,22 @@ describe("fr", () => {
       "Statut choisi. Opérateur.",
     );
   });
+
+  it("words the quick filters", () => {
+    expect(fr.appliedCount({ count: 2, condition: "exclusion" })).toBe(
+      "aucun des 2",
+    );
+    expect(fr.appliedCount({ count: 1, condition: "inclusion" })).toBe(
+      "1 appliqué",
+    );
+    expect(fr.appliedCount({ count: 3, condition: "inclusion" })).toBe(
+      "3 appliqués",
+    );
+    expect(fr.searchOptions({ label: "Pool" })).toBe(
+      "Rechercher parmi les options de Pool",
+    );
+    expect(fr.optionExcluded({ value: "prêt" })).toBe("prêt, exclu");
+    expect(fr.optionsShown({ count: 1 })).toBe("1 option");
+    expect(fr.optionsShown({ count: 4 })).toBe("4 options");
+  });
 });
