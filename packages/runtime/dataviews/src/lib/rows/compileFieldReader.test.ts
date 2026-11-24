@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import readField from "./readField.js";
+import compileFieldReader from "./compileFieldReader.js";
 
-describe("readField", () => {
+/** One read of one field, as a pass over a single row makes it. */
+const readField = (row: object, field: string): unknown =>
+  compileFieldReader(field)(row);
+
+describe("compileFieldReader", () => {
   describe("a flat field", () => {
     it("reads a field the row carries", () => {
       expect(readField({ name: "alpha" }, "name")).toBe("alpha");
@@ -18,7 +22,7 @@ describe("readField", () => {
   });
 
   describe("a dot path", () => {
-    it.fails("reads one own property per segment", () => {
+    it("reads one own property per segment", () => {
       expect(readField({ config: { region: "eu" } }, "config.region")).toBe(
         "eu",
       );
@@ -44,7 +48,7 @@ describe("readField", () => {
       expect(readField({ config: null }, "config.region")).toBeUndefined();
     });
 
-    it.fails("does not read an own key holding a literal dot", () => {
+    it("does not read an own key holding a literal dot", () => {
       expect(readField({ "config.region": "eu" }, "config.region")).toBe(
         undefined,
       );

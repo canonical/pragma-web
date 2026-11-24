@@ -318,7 +318,7 @@ describe("orderRows", () => {
     ]);
   });
 
-  it.fails("orders by a nested field by its dot path", () => {
+  it("orders by a nested field by its dot path", () => {
     const nested = createSchema([{ field: "config.cores", kind: "number" }]);
     const rows = [
       { id: "b", config: { cores: 12 } },

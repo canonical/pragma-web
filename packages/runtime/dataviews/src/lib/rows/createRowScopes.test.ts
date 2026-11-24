@@ -99,7 +99,7 @@ describe("createRowScopes", () => {
     expect(scopes.readRow("m-1").fields["absent"]?.get()).toBeUndefined();
   });
 
-  it.fails("publishes a nested field by its dot path, and republishes it as it moves", () => {
+  it("publishes a nested field by its dot path, and republishes it as it moves", () => {
     const place = (region: string) => ({ id: "m-1", config: { region } });
     const channel = createChannel(
       buildRowModel({ identify: readRowId, rows: [place("eu")] }),

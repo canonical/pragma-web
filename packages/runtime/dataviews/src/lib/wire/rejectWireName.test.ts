@@ -28,6 +28,10 @@ describe("rejectWireName", () => {
       expect(rejectWireName("config.region")).toBeNull();
     });
 
+    it("accepts a nested field under a record key named table", () => {
+      expect(rejectWireName("table.name")).toBeNull();
+    });
+
     it("refuses a segment holding the delimiter", () => {
       expect(rejectWireName("config.re__gion")).toBe(
         'field name "config.re__gion" must not contain "__"',
@@ -40,7 +44,7 @@ describe("rejectWireName", () => {
       );
     });
 
-    it.fails("refuses a segment with no name", () => {
+    it("refuses a segment with no name", () => {
       for (const name of [".region", "config.", "config..region"]) {
         expect(rejectWireName(name)).toBe(
           `field name "${name}" has a segment with no name`,

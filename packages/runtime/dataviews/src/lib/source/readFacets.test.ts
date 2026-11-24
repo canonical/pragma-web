@@ -176,7 +176,7 @@ describe("readFacets", () => {
     });
   });
 
-  it.fails("facets a nested field by its dot path", () => {
+  it("facets a nested field by its dot path", () => {
     const schema = createSchema([{ field: "config.region", kind: "choices" }]);
     const rows = [
       { id: "a", config: { region: "us" } },

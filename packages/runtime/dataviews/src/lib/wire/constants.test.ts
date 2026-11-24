@@ -115,6 +115,15 @@ describe("the wire grammar's names", () => {
     );
   });
 
+  it("spells and reads a dot path as it is declared", () => {
+    const nested = createSchema([{ field: "config.region", kind: "text" }]);
+    expect(spellWireKey("config.region", "isAny")).toBe("config.region");
+    expect(spellWireKey("config.cores", "gte")).toBe("config.cores__gte");
+    expect(readWireField("config.cores__gte")).toBe("config.cores");
+    expect(isOwnedKey("config.region__contains", nested)).toBe(true);
+    expect(isOwnedKey("config.zone", nested)).toBe(false);
+  });
+
   it("owns the written keys and every address of a field, and nothing else", () => {
     const hasField = createSchema([{ field: "cpu", kind: "number" }]);
     // The cursor is written now, so it is the collection's: a write that

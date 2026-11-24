@@ -104,7 +104,7 @@ describe("selectRows", () => {
     ]);
   });
 
-  it.fails("filters on a nested field by its dot path", () => {
+  it("filters on a nested field by its dot path", () => {
     const schema = createSchema([{ field: "config.region", kind: "choices" }]);
     const rows = [
       { id: "a", config: { region: "eu" } },
@@ -119,7 +119,7 @@ describe("selectRows", () => {
     ]);
   });
 
-  it.fails("searches a nested field by its dot path", () => {
+  it("searches a nested field by its dot path", () => {
     const schema = createSchema([{ field: "config.region", kind: "text" }]);
     const rows = [
       { id: "a", config: { region: "eu" } },

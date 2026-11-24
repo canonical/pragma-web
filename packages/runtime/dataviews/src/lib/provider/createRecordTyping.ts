@@ -1,8 +1,8 @@
 import {
   type Applicability,
+  compileFieldReader,
   type RowModel,
   type RowRecord,
-  readField,
 } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import type { RecordTyping, RecordTypingConfig } from "./types.js";
@@ -31,7 +31,7 @@ export default function createRecordTyping<
   if (types === null) {
     throw new Error("a monomorphic collection has no record typing to build");
   }
-  const discriminator = types.field;
+  const readDiscriminator = compileFieldReader(types.field);
   const declared = new Set(types.names);
 
   // One scope per scoped field, indexed once: applicability is asked per
@@ -45,7 +45,7 @@ export default function createRecordTyping<
 
   /** A row's declared type name, or null when it carries no such name. */
   const readTypeName = (row: TRow): string | null => {
-    const value = readField(row, discriminator);
+    const value = readDiscriminator(row);
     return typeof value === "string" && declared.has(value) ? value : null;
   };
 
@@ -56,7 +56,7 @@ export default function createRecordTyping<
   return {
     readRejection(model: RowModel<TRow>): string | null {
       for (const entry of model.entries) {
-        const value = readField(entry.record, discriminator);
+        const value = readDiscriminator(entry.record);
         if (typeof value !== "string" || !declared.has(value)) {
           return `record type ${spellValue(value)} of row "${entry.id}" is not declared`;
         }

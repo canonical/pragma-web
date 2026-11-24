@@ -11,6 +11,14 @@ const schema = createSchema([
 ]);
 
 describe("createSchema", () => {
+  it("declares a nested field under a record key named table", () => {
+    expect(
+      createSchema([{ field: "table.name", kind: "text" }]).findField(
+        "table.name",
+      ),
+    ).toMatchObject({ field: "table.name" });
+  });
+
   it("rejects empty, NUL and duplicate field names at construction", () => {
     expect(() => createSchema([{ field: "", kind: "presence" }])).toThrow(
       "non-empty",

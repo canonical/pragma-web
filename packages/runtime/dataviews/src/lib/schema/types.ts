@@ -22,6 +22,7 @@ import type {
  * name may change or move before the first release.
  */
 export type ChoicesField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "choices";
   /**
@@ -74,6 +75,7 @@ export type NumberUnits = {
  * name may change or move before the first release.
  */
 export type NumberField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "number";
   readonly min?: number;
@@ -91,6 +93,7 @@ export type NumberField = {
  * name may change or move before the first release.
  */
 export type PresenceField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "presence";
 };
@@ -108,6 +111,7 @@ export type PresenceField = {
  * name may change or move before the first release.
  */
 export type DateField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "date";
 };
@@ -127,6 +131,7 @@ export type DateField = {
  * before the first release.
  */
 export type TextField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "text";
 };
