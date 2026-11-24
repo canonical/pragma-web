@@ -1,5 +1,5 @@
 import type React from "react";
-import { Button } from "../../../../component/Button/index.js";
+import { IconButtonStandIn as IconButton } from "../../../../common/IconButtonStandIn/index.js";
 import { useModalContext } from "../../hooks/useModalContext.js";
 import type { HeaderProps } from "./types.js";
 import "./styles.css";
@@ -41,7 +41,10 @@ const Header = ({
         {children}
       </span>
       {!undismissible && (
-        <Button
+        // An icon-only control, named by dismissLabel. It carries no
+        // Tooltip: inside the modal's top layer, the Tooltip's message would
+        // render underneath it.
+        <IconButton
           type="button"
           className="close"
           importance="tertiary"
