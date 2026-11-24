@@ -28,6 +28,7 @@ describe("regression 0018 — a resize handle focusable before hydration", () =>
       />,
     );
     expect(markup).not.toContain('role="separator"');
-    expect(markup).not.toContain('tabindex="0"');
+    // Only the table itself is a stop, so a keyboard scrolls it.
+    expect(markup).not.toMatch(/<(?!table)[a-z]+[^>]* tabindex="0"/);
   });
 });

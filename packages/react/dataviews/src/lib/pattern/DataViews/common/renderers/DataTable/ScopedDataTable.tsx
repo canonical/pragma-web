@@ -41,6 +41,7 @@ import type {
   VirtualizedBodyProps,
 } from "../../../../../virtualization/types.js";
 import {
+  type DataTableColumn,
   HeaderCell,
   Row,
   SelectAllCell,
@@ -55,6 +56,7 @@ import {
   useColumnManagement,
   useHeaderSort,
   useTableGeometry,
+  useTabStop,
 } from "./hooks/index.js";
 import type { ScopedDataTableProps } from "./types.js";
 import "./styles.css";
@@ -260,6 +262,21 @@ export default function ScopedDataTable<
   // once; otherwise the held one, which re-renders nothing.
   const renderer = status === null ? showStatus : statusRenderer;
 
+  // A header's controls: a sort the source honours, and a resize handle on
+  // every column but the last, whose edge is the table's own.
+  const isSortable = (column: DataTableColumn): boolean =>
+    column.sortable === true && orderable.has(readFieldName(column));
+  const isResizable = (column: DataTableColumn, position: number): boolean =>
+    column.resizable === true && position < rendered.length - 1;
+  // The table is a tab stop only where nothing inside is.
+  const tabIndex = useTabStop(
+    provider,
+    headerRow,
+    rendered,
+    isSortable,
+    isValidElement(settings),
+  );
+
   // The tracks a row renders: selection, the columns, the settings cell.
   const tracks =
     Number(selectable) + rendered.length + Number(isValidElement(settings));
@@ -302,6 +319,7 @@ export default function ScopedDataTable<
       {/* A native table, drawn on one shared track list: its stylesheet
           lays rows out as grids, so no row sizes itself by its content. */}
       <table
+        tabIndex={tabIndex}
         {...rest}
         ref={attach}
         className={[
@@ -336,7 +354,7 @@ export default function ScopedDataTable<
             ) : null}
             {rendered.map((column, position) => {
               const field = readFieldName(column);
-              const sortable = column.sortable === true && orderable.has(field);
+              const sortable = isSortable(column);
               return (
                 <HeaderCell
                   key={column.id}
@@ -361,9 +379,7 @@ export default function ScopedDataTable<
                   offers={readOffers(column.id)}
                   onChangeColumn={changeColumn}
                   interaction={interaction}
-                  resizable={
-                    column.resizable === true && position < rendered.length - 1
-                  }
+                  resizable={isResizable(column, position)}
                   bounds={readSizingBounds(layout.readDeclared(column.id))}
                   // Solved for every rendered column, in the same order.
                   width={assertInvariant(
