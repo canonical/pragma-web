@@ -16,7 +16,7 @@ const selectInFrench = (name: string): string => `Choisir ${name}`;
 const mount = (messages?: Partial<DataViewsMessages>) =>
   renderHook(
     ({ given }: { readonly given?: Partial<DataViewsMessages> }) =>
-      useMessages(given),
+      useMessages({ messages: given }),
     { initialProps: messages === undefined ? {} : { given: messages } },
   );
 
@@ -62,7 +62,7 @@ describe("useMessages", () => {
       return null;
     });
     const Root = ({ given }: { readonly given: Partial<DataViewsMessages> }) =>
-      createElement(Reader, { words: useMessages(given) });
+      createElement(Reader, { words: useMessages({ messages: given }) });
     const { rerender } = render(
       createElement(Root, {
         given: { search: "Trouver", selectRow: selectInFrench },

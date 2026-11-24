@@ -91,7 +91,7 @@ export default function DataCards<
       "DataCards requires a provider created by createDataViewsProvider",
     );
   }
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   const declared = useStableValue(fields, areDisplayFieldsEqual);
   // Looked up in the held list, which holds the ids the caller's list holds:
   // one lookup names the card's heading and checks that the title names a

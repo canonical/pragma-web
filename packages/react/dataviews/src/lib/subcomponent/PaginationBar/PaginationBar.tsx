@@ -113,7 +113,7 @@ export default function PaginationBar<
       "PaginationBar requires a provider created by createDataViewsProvider",
     );
   }
-  const messages = useMessages(given);
+  const messages = useMessages({ messages: given });
   // Observed for as long as the bar is mounted: a standalone bar is a mount
   // that reads the provider, and the ref-count makes a bar inside a root
   // that already observes cost nothing.

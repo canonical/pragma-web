@@ -73,7 +73,7 @@ export default function ActionBar({
   // The bar's root is its own, so a caller's ref is merged onto it rather
   // than dropped: the focus goes back first, then the caller's ref is
   // released.
-  const attach = useMergedRef(ref, returnFocus);
+  const attach = useMergedRef(returnFocus, { ref });
 
   const handleFocus = (event: FocusEvent<HTMLFieldSetElement>): void => {
     const from = event.relatedTarget;

@@ -14,7 +14,7 @@ import type { UseMergedRefProps, UseMergedRefResult } from "./types.js";
  * own root merges the caller's ref, never drops it.
  */
 export default function useMergedRef<TElement>(
-  ...[ref, attach]: UseMergedRefProps<TElement>
+  ...[attach, { ref } = {}]: UseMergedRefProps<TElement>
 ): UseMergedRefResult<TElement> {
   const callerRef = useRef(ref);
   callerRef.current = ref;

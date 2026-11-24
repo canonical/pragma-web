@@ -31,7 +31,7 @@ export default function DataTable<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 >({ messages, ...props }: DataTableProps<TFields, TRow>): ReactElement {
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   const { ref, announce } = useAnnouncer();
   return (
     <>

@@ -165,7 +165,7 @@ export default function useQueryChip({
       registerMember ? registerMember(node) : undefined,
     [registerMember],
   );
-  const rootRef = useMergedRef(ref, attachRoot);
+  const rootRef = useMergedRef(attachRoot, { ref });
 
   return {
     parts: parts.map((part) => ({

@@ -47,7 +47,7 @@ export default function RendererSwitch({
   if (ids.size !== renderers.length) {
     throw new Error("RendererSwitch requires a distinct id for each renderer");
   }
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   // The application's name for this collection, or the words' own.
   const name = label ?? words.renderer;
   const hydrated = useIsHydrated();

@@ -78,7 +78,7 @@ export default function QueryInput({
     entryRef.current = node;
     return undefined;
   }, []);
-  const entryRefs = useMergedRef(ref, attachEntry);
+  const entryRefs = useMergedRef(attachEntry, { ref });
   const roving = useActiveItem({
     activeItem,
     onActiveItemChange,

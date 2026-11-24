@@ -247,7 +247,7 @@ export default function ScopedDataTable<
   // style are. The merge holds the caller's ref behind one identity, which
   // matters most here: a ref React re-ran per render would rebuild the
   // resize observer and re-measure the container on every frame of a drag.
-  const attach = useMergedRef(ref, geometry.attach);
+  const attach = useMergedRef(geometry.attach, { ref });
 
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(

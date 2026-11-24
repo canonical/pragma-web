@@ -76,7 +76,7 @@ export default function DataChart<
       `DataChart names "${field}", which the source does not facet`,
     );
   }
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   useEffect(() => provider.observe(), [provider]);
   const answered = useAnsweredFacets({ provider });
   const state = useDataViewsValue(provider.state);

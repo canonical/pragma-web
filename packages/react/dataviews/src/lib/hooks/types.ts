@@ -5,7 +5,8 @@
  * replacing it, the focus a disabled control strands, and the words a root
  * speaks. Each hook declares its result type here, and its props type where
  * it takes arguments: a config object, or a labelled tuple for a hook whose
- * arguments are positional.
+ * required inputs are positional, its optional ones in a trailing options
+ * object.
  */
 
 import type {
@@ -157,12 +158,15 @@ export type UseFocusRescueResult = {
 };
 
 /**
- * What `useMergedRef` takes: the caller's ref, if any, and the part's own
- * attach, which may answer its cleanup.
+ * What `useMergedRef` takes: the part's own attach, which may answer its
+ * cleanup, then the caller's ref, if any.
  */
 export type UseMergedRefProps<TElement> = readonly [
-  ref: Ref<TElement> | undefined,
   attach: (node: TElement) => (() => void) | undefined,
+  options?: {
+    /** The caller's ref, merged beside the part's own attach. */
+    readonly ref?: Ref<TElement> | undefined;
+  },
 ];
 
 /**
@@ -213,7 +217,12 @@ export type UseFacetsResult = {
 };
 
 /** What `useMessages` takes: the application's messages, if any. */
-export type UseMessagesProps = readonly [messages?: Partial<DataViewsMessages>];
+export type UseMessagesProps = readonly [
+  options?: {
+    /** The application's messages, over the English record. */
+    readonly messages?: Partial<DataViewsMessages> | undefined;
+  },
+];
 
 /**
  * What `useMessages` returns: every message a root speaks, the application's

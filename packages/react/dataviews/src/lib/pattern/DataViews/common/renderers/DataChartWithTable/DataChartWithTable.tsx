@@ -44,7 +44,7 @@ export default function DataChartWithTable<
 }: DataChartWithTableProps<TFields, TRow>): ReactElement {
   // Resolved once here and handed down whole, so the chart, the table and
   // the switch speak one set of words.
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   return (
     <RendererSwitch
       {...rest}
