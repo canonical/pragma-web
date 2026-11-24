@@ -119,6 +119,29 @@ describe("Link", () => {
     expect(router.getState().location.href).toBe("/");
   });
 
+  it("forwards native anchor attributes to the rendered element", () => {
+    const router = createRouter(routes, {
+      adapter: createMemoryAdapter("/"),
+    });
+
+    render(
+      <RouterProvider router={router}>
+        <Link<typeof routes>
+          aria-label="Users page"
+          data-testid="users-link"
+          to="users"
+        >
+          Users
+        </Link>
+      </RouterProvider>,
+    );
+
+    const link = screen.getByTestId("users-link");
+
+    expect(link.getAttribute("data-testid")).toBe("users-link");
+    expect(link.getAttribute("aria-label")).toBe("Users page");
+  });
+
   it("passes params, search, and hash to navigation helpers and skips prevented hovers", async () => {
     const optionPreloadSpy = vi.fn(async () => ({ default: "UserPage" }));
     const optionWarmSpy = vi.fn(async () => {});
