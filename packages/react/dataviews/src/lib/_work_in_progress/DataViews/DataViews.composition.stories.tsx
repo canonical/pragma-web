@@ -1,12 +1,12 @@
 import {
   createMemoryLocation,
-  type QueryLocation,
   type ViewDraft,
 } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type ReactElement, useState, useSyncExternalStore } from "react";
+import { type ReactElement, useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
+import QueryInTheLocation from "../../../storybook/machines/QueryInTheLocation.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
@@ -132,7 +132,7 @@ import { platform } from "./router.js";`,
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
-  render: function Render(args) {
+  render: function RenderConnectedParts(args) {
     // A memory location and a story's own store stand in for the browser's
     // here, so the story never rewrites the page's own address or its views.
     const [location] = useState(() =>
@@ -161,22 +161,6 @@ import { platform } from "./router.js";`,
     ).toBeVisible();
   },
 };
-
-/** The query the location carries, shown the way an address bar would. */
-function QueryInTheLocation({
-  location,
-}: {
-  readonly location: QueryLocation;
-}): ReactElement {
-  const query = useSyncExternalStore(location.subscribe, () =>
-    location.read().toString(),
-  );
-  return (
-    <p>
-      <output aria-label="Location">{`/machines?${query}`}</output>
-    </p>
-  );
-}
 
 /** The code the stories of a query in the URL show. */
 const queryInTheUrlCode = showConsumerCode({
@@ -213,7 +197,7 @@ import { platform } from "./router.js";`,
  */
 export const QueryInTheUrl: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render(args) {
+  render: function RenderQueryInTheUrl(args) {
     // A memory location stands in for the browser's here, so the story
     // never rewrites the page's own address.
     const [location] = useState(() =>
@@ -261,7 +245,7 @@ export const QueryInTheUrl: Story = {
  */
 export const LinkWithARefusedFilter: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render(args) {
+  render: function RenderLinkWithARefusedFilter(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?status=melted" }),
     );
@@ -298,7 +282,7 @@ export const LinkWithARefusedFilter: Story = {
  */
 export const LinkWithARefusedSort: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render(args) {
+  render: function RenderLinkWithARefusedSort(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?sort=colour__asc" }),
     );

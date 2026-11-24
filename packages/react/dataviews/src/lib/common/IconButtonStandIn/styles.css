@@ -1,0 +1,35 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Square box on a labelled Button's baseline: ::before is one 1lh-wide
+     text line; inline pad = (cell - line) / 2 - border. */
+
+  :where(.comfortable, .dense, .app, .site, .docs) .ds.icon-button {
+    --icon-button-padding-inline: calc(
+      (var(--density-line-height-effective) - var(--control-seat-line)) /
+      2 -
+      var(--button-border-width, 0px)
+    );
+  }
+
+  .ds.button.icon-button {
+    padding-inline: var(--icon-button-padding-inline, 0px);
+  }
+
+  .ds.icon-button {
+    &::before {
+      content: "\200b" / "";
+      inline-size: 1lh;
+    }
+
+    & > .icon {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+    }
+  }
+
+  .ds.icon-button:not(:where(.comfortable, .dense, .app, .site, .docs) *) {
+    padding-block: 0;
+  }
+}

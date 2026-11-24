@@ -1,0 +1,44 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * PageControl styles: a page link drawn as the bar's tertiary icon
+   * buttons, one density line square with its icon centred.
+   */
+  .ds.page-control {
+    --page-control-size: var(--density-line-height-effective);
+    --page-control-color-background: var(--color-foreground-ghost);
+    --page-control-color-background-hover: var(--color-foreground-ghost-hover);
+    --page-control-color-background-active: var(
+      --color-foreground-ghost-active
+    );
+    --page-control-focus-ring-color: var(--color-focus-ring, currentColor);
+    /* shim: design-tokens stroke */
+    --page-control-focus-ring-width: var(
+      --stroke-width-focus,
+      var(--dimension-stroke-thickness-large)
+    );
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--page-control-size);
+    block-size: var(--page-control-size);
+    color: inherit;
+    background-color: var(--page-control-color-background);
+
+    &:hover {
+      background-color: var(--page-control-color-background-hover);
+    }
+
+    &:active {
+      background-color: var(--page-control-color-background-active);
+    }
+
+    &:focus-visible {
+      outline: var(--page-control-focus-ring-width) solid
+        var(--page-control-focus-ring-color);
+      outline-offset: calc(-1 * var(--page-control-focus-ring-width));
+    }
+  }
+}

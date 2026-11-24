@@ -1,0 +1,31 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * The name form: its controls in a row, its input as wide as its content,
+   * and a name the collection refuses colouring the input's error channel.
+   */
+  .ds.data-views-saved-views-name-form {
+    --data-views-saved-views-name-form-gap: var(--space-050);
+    --data-views-saved-views-name-form-color-error: var(--form-error-color);
+
+    &:has(input:user-invalid) {
+      --form-input-border-color-bottom: var(--form-input-border-color-error);
+    }
+
+    & > form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--data-views-saved-views-name-form-gap);
+    }
+
+    & > form > .ds.input.text {
+      inline-size: auto;
+    }
+
+    & > form > .error {
+      color: var(--data-views-saved-views-name-form-color-error);
+    }
+  }
+}

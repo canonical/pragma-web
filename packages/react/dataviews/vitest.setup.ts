@@ -1,14 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import standInDialogs from "./testing/standInDialogs.js";
 
-/**
- * jsdom has no ResizeObserver, and the design system's ContextualMenu fits
- * itself to the window through one as it mounts, so a table whose header
- * menu opens would throw as the menu mounts. A browser API the environment
- * lacks is stood in for here, as the design system's own tests do: an
- * observer that observes nothing and never reports. Tests that measure stub
- * their own.
- */
+/** jsdom has no ResizeObserver; tests that measure stub their own. */
 if (typeof globalThis.ResizeObserver === "undefined") {
   globalThis.ResizeObserver = class implements ResizeObserver {
     observe(): void {}
@@ -18,3 +11,9 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 }
 
 standInDialogs();
+
+// jsdom lays nothing out, so it has no scrollIntoView for a menu's focus move
+// to call. A suite on the node environment has no Element.
+if (typeof Element !== "undefined") {
+  Element.prototype.scrollIntoView = () => {};
+}

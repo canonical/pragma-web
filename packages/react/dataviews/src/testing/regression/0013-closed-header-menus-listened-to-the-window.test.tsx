@@ -1,13 +1,13 @@
 /**
  * Regression: a header menu nobody has opened costs the page nothing.
  *
- * Before the fix, every sortable header mounted the design system's
- * ContextualMenu at once, and each registered window listeners, observers
- * and a portalled surface for positioning a menu no one had opened — on a
- * wide table, dozens of them for as long as the page stayed open.
+ * Before the fix, every sortable header mounted its menu at once, and each
+ * registered window listeners, observers and a portalled surface for a menu
+ * no one had opened — on a wide table, dozens of them for as long as the
+ * page stayed open.
  */
 
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   buildMachine,
@@ -17,7 +17,7 @@ import {
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0013 — closed header menus listened to the window", () => {
-  it("registers no window listener and portals no surface until a menu opens", () => {
+  it("registers no window listener and draws no menu until one opens", () => {
     const listened = vi.spyOn(window, "addEventListener");
     onTestFinished(() => {
       listened.mockRestore();
@@ -40,9 +40,9 @@ describe("regression 0013 — closed header menus listened to the window", () =>
     expect(
       listened.mock.calls
         .map(([type]) => type)
-        .filter((type) => type === "resize" || type === "scroll"),
+        .filter((type) => ["resize", "scroll", "pageshow"].includes(type)),
     ).toEqual([]);
-    expect(document.querySelector(".contextual-menu__surface")).toBeNull();
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 
   it("observes nothing beyond what the same table without menus observes", () => {

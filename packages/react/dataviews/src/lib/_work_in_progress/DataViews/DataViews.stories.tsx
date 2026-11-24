@@ -59,6 +59,16 @@ export const Default: Story = {
       <Component.Pagination label="Machines pagination" />
     </>
   ),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    // The header row and the five rows of the first page.
+    await waitFor(() =>
+      expect(within(table).getAllByRole("row")).toHaveLength(6),
+    );
+    await expect(
+      canvas.getByRole("navigation", { name: "Machines pagination" }),
+    ).toBeInTheDocument();
+  },
 };
 
 /** A child of the application's own, reading the rows the root holds. */

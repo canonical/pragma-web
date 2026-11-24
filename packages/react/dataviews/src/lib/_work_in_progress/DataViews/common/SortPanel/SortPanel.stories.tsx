@@ -119,4 +119,9 @@ export const NothingStated: Story = {
   }),
   decorators: [withMachineRoot()],
   render: () => <SortedCollection />,
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("Not sorted: the source documents no order."),
+    ).toBeInTheDocument();
+  },
 };

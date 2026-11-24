@@ -11,12 +11,23 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
   elementAt,
+  installPopoverStandIn,
+  openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -58,6 +69,14 @@ const listSaidIn = (element: Element): readonly string[] =>
   );
 
 describe("the announcer speaks once per root", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("gives a root one region, however many tables it places, and a standalone table its own", () => {
     const provider = createProvider();
     render(
@@ -119,7 +138,7 @@ describe("the announcer speaks once per root", () => {
     );
     const first = screen.getByRole("region", { name: "First root" });
     const second = screen.getByRole("region", { name: "Second root" });
-    fireEvent.click(
+    await openMenuFrom(
       within(first).getByRole("button", { name: "Column options for Status" }),
     );
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));
@@ -252,7 +271,7 @@ describe("the announcer speaks once per root", () => {
         label="Machines"
       />,
     );
-    fireEvent.click(
+    await openMenuFrom(
       screen.getByRole("button", { name: "Column options for St" }),
     );
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));

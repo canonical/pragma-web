@@ -8,16 +8,35 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
+  installPopoverStandIn,
+  openMenuFrom,
+  waitForFocus,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0021 — a closed menu stayed mounted", () => {
-  it("drops its surface and window listeners once closed, and hands focus to its button", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("drops its open menu and window listeners once closed, and hands focus to its button", async () => {
     const added = vi.spyOn(window, "addEventListener");
     const removed = vi.spyOn(window, "removeEventListener");
     onTestFinished(() => {
@@ -35,21 +54,19 @@ describe("regression 0021 — a closed menu stayed mounted", () => {
         label="Machines"
       />,
     );
-    const findTrigger = () =>
-      screen.getByRole("button", { name: "Column options for Name" });
-    fireEvent.click(findTrigger());
-    expect(
-      document.querySelector(".contextual-menu__surface"),
-    ).toBeInTheDocument();
+    const trigger = screen.getByRole("button", {
+      name: "Column options for Name",
+    });
+    trigger.focus();
+    await openMenuFrom(trigger);
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(
-      document.querySelector(".contextual-menu__surface"),
-    ).not.toBeInTheDocument();
+    await waitForFocus(trigger);
+    expect(screen.queryByRole("menu")).toBeNull();
     const countCalls = (spy: typeof added, type: string): number =>
       spy.mock.calls.filter(([registered]) => registered === type).length;
-    for (const type of ["resize", "scroll"]) {
+    expect(countCalls(added, "pageshow")).toBeGreaterThan(0);
+    for (const type of ["pageshow", "resize", "scroll"]) {
       expect(countCalls(removed, type)).toBe(countCalls(added, type));
     }
-    expect(findTrigger()).toHaveFocus();
   });
 });

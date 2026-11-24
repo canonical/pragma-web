@@ -9,14 +9,16 @@
 import { createPage, DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   createMemoryViewStore,
   fakeAnnouncerClock,
+  installPopoverStandIn,
   type Machine,
   type MachineProvider,
+  openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -78,6 +80,14 @@ beforeEach(() => {
 });
 
 describe("the announcer never repeats a status", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("leaves a page's arrival to the pagination summary", async () => {
     renderFirstPage();
     // One region for the root, and every assertion below reads it.
@@ -157,7 +167,7 @@ describe("the announcer never repeats a status", () => {
     // The control: had the announcer nothing to say ever, the cases above
     // could never hear anything.
     renderFirstPage();
-    fireEvent.click(
+    await openMenuFrom(
       screen.getByRole("button", { name: "Column options for Cores" }),
     );
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));

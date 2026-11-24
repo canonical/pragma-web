@@ -40,7 +40,15 @@ import {
 import { createRef, type ReactElement, StrictMode, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import {
   buildMachine,
   createMachineProvider,
@@ -49,13 +57,16 @@ import {
   elementAt,
   expectNoAxeViolations,
   fakeAnnouncerClock,
+  installPopoverStandIn,
   MACHINE_CAPABILITIES,
   type Machine,
   type MachineFields,
   machines,
   type OddRecord,
+  openMenuFrom,
   type MachineProvider as Provider,
   readAnnouncements,
+  waitForFocus,
 } from "../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
@@ -149,6 +160,14 @@ const renderDeliveredTable = (
 };
 
 describe("DataTable", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("refuses a value that is not a provider", () => {
     const notAProvider = {} as Provider;
     expect(() =>
@@ -655,7 +674,7 @@ describe("DataTable", () => {
     expect(findSortReason("Name")).toBeEmptyDOMElement();
 
     // An accepted choice clears it, even one that changes nothing.
-    openMenuOf("Name");
+    await openMenuOf("Name");
     choose("Sort ascending");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "name", direction: "asc" },
@@ -919,7 +938,7 @@ describe("DataTable", () => {
     }
   });
 
-  it("clears a refusal's reason once focus leaves its header and its own menu", () => {
+  it("clears a refusal's reason once focus leaves its header and its own menu", async () => {
     renderOrderingTable(1);
     // Each sort button is found once and held: the table never replaces the
     // sort button it draws, so the held node is the one a reader is on.
@@ -940,8 +959,8 @@ describe("DataTable", () => {
       }),
     });
     expect(findStatusReason()).not.toBeEmptyDOMElement();
-    // Into this column's own menu, portalled outside the header: it stands.
-    openMenuOf("Status");
+    // Into this column's own menu, in the header: it stands.
+    await openMenuOf("Status");
     fireEvent.blur(status, {
       relatedTarget: screen.getByRole("menuitem", { name: "Sort ascending" }),
     });
@@ -953,7 +972,7 @@ describe("DataTable", () => {
     fireEvent.click(status, { shiftKey: true });
     expect(findStatusReason()).not.toBeEmptyDOMElement();
     // Into another column's menu: it goes.
-    openMenuOf("Name");
+    await openMenuOf("Name");
     fireEvent.blur(status, {
       relatedTarget: screen.getByRole("menuitem", { name: "Sort descending" }),
     });
@@ -1079,13 +1098,12 @@ describe("DataTable", () => {
   });
 
   /** Open one column's header menu from its trigger. */
-  const openMenuOf = (name: string): HTMLElement => {
-    const trigger = `Column options for ${name}`;
-    fireEvent.click(
-      within(findHeader(name)).getByRole("button", { name: trigger }),
-    );
-    // The menu mounts as it opens, replacing the button that opened it.
-    return within(findHeader(name)).getByRole("button", { name: trigger });
+  const openMenuOf = async (name: string): Promise<HTMLElement> => {
+    const trigger = within(findHeader(name)).getByRole("button", {
+      name: `Column options for ${name}`,
+    });
+    await openMenuFrom(trigger);
+    return trigger;
   };
 
   /** Choose an item of the open header menu, the one menu open. */
@@ -1098,37 +1116,37 @@ describe("DataTable", () => {
     fireEvent.click(within(menu).getByRole("menuitem", { name: item }));
   };
 
-  it("sorts from a column's header menu and returns focus to its trigger", () => {
+  it("sorts from a column's header menu and returns focus to its trigger", async () => {
     const { provider } = renderOrderingTable(2);
-    openMenuOf("Status");
+    await openMenuOf("Status");
     choose("Sort descending");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "status", direction: "desc" },
     ]);
-    // Closed, the menu unmounts: its button, in the trigger's place, has focus.
-    expect(
+    // Closed, the menu returns focus to its button.
+    await waitForFocus(
       screen.getByRole("button", { name: "Column options for Status" }),
-    ).toHaveFocus();
+    );
     expect(findHeader("Status")).toHaveAttribute("aria-sort", "descending");
   });
 
-  it("adds a column from its menu while the source has room, and sorts by it alone once it has none", () => {
+  it("adds a column from its menu while the source has room, and sorts by it alone once it has none", async () => {
     const { provider } = renderOrderingTable(2);
     fireEvent.click(findSortButton("Name"));
-    openMenuOf("Status");
+    await openMenuOf("Status");
     choose("Sort ascending");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "name", direction: "asc" },
       { field: "status", direction: "asc" },
     ]);
-    openMenuOf("Cores");
+    await openMenuOf("Cores");
     choose("Sort descending");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "cores", direction: "desc" },
     ]);
   });
 
-  it("sets an ordered column's direction where it stands from its menu", () => {
+  it("sets an ordered column's direction where it stands from its menu", async () => {
     const { provider } = renderOrderingTable(3);
     act(() => {
       provider.setSort([
@@ -1137,7 +1155,7 @@ describe("DataTable", () => {
         { field: "cores", direction: "asc" },
       ]);
     });
-    openMenuOf("Status");
+    await openMenuOf("Status");
     choose("Sort descending");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "name", direction: "asc" },
@@ -1146,13 +1164,13 @@ describe("DataTable", () => {
     ]);
   });
 
-  it("offers remove from sort only while the reader's ordering names the column", () => {
+  it("offers remove from sort only while the reader's ordering names the column", async () => {
     const { provider } = renderOrderingTable(3, [
       { field: "status", direction: "asc" },
     ]);
     // The source's default orders by Status, but the reader stated nothing:
     // there is no term of the reader's to remove.
-    openMenuOf("Status");
+    await openMenuOf("Status");
     expect(
       screen.queryByRole("menuitem", { name: "Remove from sort" }),
     ).toBeNull();
@@ -1163,18 +1181,18 @@ describe("DataTable", () => {
         { field: "name", direction: "desc" },
       ]);
     });
-    openMenuOf("Status");
+    await openMenuOf("Status");
     choose("Remove from sort");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "name", direction: "desc" },
     ]);
-    // Closed, the menu unmounts: its button, in the trigger's place, has focus.
-    expect(
+    // Closed, the menu returns focus to its button.
+    await waitForFocus(
       screen.getByRole("button", { name: "Column options for Status" }),
-    ).toHaveFocus();
+    );
   });
 
-  it("offers a header menu on every column that can be sorted, hidden or moved, once scripts run", () => {
+  it("offers a header menu on every column that can be sorted, hidden or moved, once scripts run", async () => {
     renderOrderingTable(
       3,
       [],
@@ -1187,13 +1205,13 @@ describe("DataTable", () => {
     expect(
       screen.getByRole("button", { name: "Column options for Name" }),
     ).toHaveAttribute("aria-haspopup", "menu");
-    openMenuOf("Status");
+    await openMenuOf("Status");
     // No sort where the column offers none; standing in the middle, both moves.
     expect(
       screen.getAllByRole("menuitem").map((item) => item.textContent),
     ).toEqual(["Hide column", "Move column left", "Move column right"]);
     fireEvent.keyDown(document, { key: "Escape" });
-    openMenuOf("Cores");
+    await openMenuOf("Cores");
     // A column that may not be hidden is offered no Hide.
     expect(
       screen.getAllByRole("menuitem").map((item) => item.textContent),
@@ -1203,7 +1221,7 @@ describe("DataTable", () => {
     ).toHaveClass("disabled");
   });
 
-  it("offers no header menu on a column that can be neither sorted, hidden nor moved", () => {
+  it("offers no header menu on a column that can be neither sorted, hidden nor moved", async () => {
     renderOrderingTable(
       3,
       [],
@@ -1228,7 +1246,7 @@ describe("DataTable", () => {
         { id: "status", header: "Status", hideable: false },
       ],
     );
-    openMenuOf("Name");
+    await openMenuOf("Name");
     expect(
       screen.getByRole("menuitem", { name: "Move column left" }),
     ).toHaveClass("disabled");
@@ -1247,7 +1265,7 @@ describe("DataTable", () => {
     );
     const slice = provider.state.get().slice;
     const requests = source.calls.length;
-    openMenuOf("Status");
+    await openMenuOf("Status");
     choose("Hide column");
     expect(
       screen.queryByRole("columnheader", { name: "Status" }),
@@ -1258,12 +1276,12 @@ describe("DataTable", () => {
     expect(provider.state.get().slice).toBe(slice);
     expect(source.calls).toHaveLength(requests);
     // The last column's menu, once hidden, hands focus to the new last one.
-    openMenuOf("Cores");
+    await openMenuOf("Cores");
     choose("Hide column");
     expect(findSortButton("Name")).toHaveFocus();
   });
 
-  it("disables Hide on the last column shown, from its own header menu", () => {
+  it("disables Hide on the last column shown, from its own header menu", async () => {
     const { provider } = renderOrderingTable(
       3,
       [],
@@ -1275,7 +1293,7 @@ describe("DataTable", () => {
     act(() => {
       provider.presentation.arrange({ "table.hidden": ["status"] });
     });
-    openMenuOf("Name");
+    await openMenuOf("Name");
     const hide = screen.getByRole("menuitem", { name: "Hide column" });
     expect(hide).toHaveClass("disabled");
     fireEvent.click(hide);
@@ -1284,7 +1302,7 @@ describe("DataTable", () => {
     });
   });
 
-  it("draws a settings cell and nothing else in a table declaring no columns", () => {
+  it("draws a settings cell and nothing else in a table declaring no columns", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -1297,7 +1315,7 @@ describe("DataTable", () => {
       />,
     );
     expect(screen.getAllByRole("columnheader")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     expect(
       screen.getByRole("menuitem", { name: "Reset table settings" }),
     ).toHaveClass("disabled");
@@ -1316,7 +1334,7 @@ describe("DataTable", () => {
     );
     const slice = provider.state.get().slice;
     const requests = source.calls.length;
-    openMenuOf("Name");
+    await openMenuOf("Name");
     choose("Move column right");
     expect(
       screen
@@ -1336,7 +1354,7 @@ describe("DataTable", () => {
 
   it("has no axe violation with a header menu open", async () => {
     renderOrderingTable(3);
-    openMenuOf("Name");
+    await openMenuOf("Name");
     await expectNoAxeViolations(document.body);
   });
 
@@ -1376,7 +1394,7 @@ describe("DataTable", () => {
     }
   });
 
-  it("sorts by a column's field, not its id, from every gesture, and says why on that header", () => {
+  it("sorts by a column's field, not its id, from every gesture, and says why on that header", async () => {
     const { provider } = renderOrderingTable(
       2,
       [],
@@ -1396,9 +1414,9 @@ describe("DataTable", () => {
     expect(findSortReason("Size")?.textContent?.trim()).toBe(
       "Sort unchanged: this source orders by at most 2 terms.",
     );
-    openMenuOf("Host");
+    await openMenuOf("Host");
     choose("Sort descending");
-    openMenuOf("State");
+    await openMenuOf("State");
     choose("Remove from sort");
     expect(provider.state.get().slice.sort).toEqual([
       { field: "name", direction: "desc" },
@@ -2800,7 +2818,7 @@ describe("DataTable", () => {
     );
   });
 
-  it("marks the table busy while a request is in flight", () => {
+  it("marks the table busy while a request is in flight", async () => {
     const { provider, source } = renderDeliveredTable();
     expect(screen.getByRole("table", { name: "Machines" })).toHaveAttribute(
       "aria-busy",

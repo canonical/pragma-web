@@ -257,6 +257,16 @@ describe("PaginationBar", () => {
     expect(readWindow(provider)).toEqual(buildWindow(1, 2));
   });
 
+  it("draws the page ends with the skip icons", () => {
+    const { provider, source } = makeProvider();
+    mount(provider);
+    load(source, buildMachines(2), 6);
+    const readIcon = (control: HTMLElement) =>
+      control.querySelector("use")?.getAttribute("href");
+    expect(readIcon(getFirst())).toMatch(/skip-to-start\.svg#skip-to-start$/);
+    expect(readIcon(getLast())).toMatch(/skip-to-end\.svg#skip-to-end$/);
+  });
+
   it("steps one page from wherever it is", () => {
     const { provider, source } = makeProvider();
     mount(provider);
@@ -651,7 +661,7 @@ describe("PaginationBar", () => {
     const next = screen.getByRole("link", { name: "Next page" });
     expect(next).toHaveAttribute("data-router-link");
     expect(next).toHaveAttribute("href", "?page=2&size=2");
-    expect(next).toHaveClass("ds", "button", "tertiary", "next");
+    expect(next).toHaveClass("ds", "page-control", "next");
     fireEvent.click(next);
     // The router's link saw the click; the bar moved nothing itself.
     expect(seen).toEqual(["?page=2&size=2"]);
@@ -745,6 +755,17 @@ describe("PaginationBar", () => {
     const nav = screen.getByRole("navigation", { name: "Pagination" });
     expect(nav).toHaveClass("ds", "data-table-pagination-bar", "footer");
     expect(nav).toHaveAttribute("id", "machines-pages");
+  });
+
+  it("sets the Dense modifier after its base class", () => {
+    mount(makeProvider().provider, { className: "footer" });
+    const nav = screen.getByRole("navigation", { name: "Pagination" });
+    expect([...nav.classList]).toEqual([
+      "ds",
+      "data-table-pagination-bar",
+      "dense",
+      "footer",
+    ]);
   });
 
   it("speaks the words it is given, keeping English only where none are given", () => {

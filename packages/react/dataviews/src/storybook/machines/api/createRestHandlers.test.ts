@@ -91,6 +91,236 @@ describe("createRestHandlers", () => {
     expect(alder.body).toMatchObject({ matched: 1 });
   });
 
+  it("pins what it answers to representative queries", async () => {
+    for (const [params, expected] of [
+      [
+        "status=running&cores__gte=8&cores__lte=32",
+        { ids: ["m-03", "m-05", "m-07"], matched: 3, facets: {} },
+      ],
+      [
+        "name__contains=AR",
+        { ids: ["m-03", "m-11", "m-12"], matched: 3, facets: {} },
+      ],
+      [
+        "name__startsWith=c&region__contains=-2",
+        { ids: ["m-03"], matched: 1, facets: {} },
+      ],
+      [
+        "region__startsWith=AP",
+        { ids: ["m-05", "m-06", "m-09", "m-12"], matched: 4, facets: {} },
+      ],
+      [
+        "status__isAny=failed&status__isAny=pending&status__isNone=pending",
+        { ids: ["m-02", "m-06", "m-10"], matched: 3, facets: {} },
+      ],
+      [
+        "status__isNone=running",
+        {
+          ids: ["m-02", "m-04", "m-06", "m-08", "m-10", "m-12"],
+          matched: 6,
+          facets: {},
+        },
+      ],
+      ["q=EX:I", { ids: ["m-09"], matched: 1, facets: {} }],
+      [
+        "q=example&sort=status__asc",
+        {
+          ids: [
+            "m-01",
+            "m-03",
+            "m-05",
+            "m-07",
+            "m-09",
+            "m-11",
+            "m-02",
+            "m-06",
+            "m-10",
+            "m-04",
+            "m-08",
+            "m-12",
+          ],
+          matched: 12,
+          facets: {},
+        },
+      ],
+      [
+        "sort=status__desc",
+        {
+          ids: [
+            "m-04",
+            "m-08",
+            "m-12",
+            "m-02",
+            "m-06",
+            "m-10",
+            "m-01",
+            "m-03",
+            "m-05",
+            "m-07",
+            "m-09",
+            "m-11",
+          ],
+          matched: 12,
+          facets: {},
+        },
+      ],
+      [
+        "sort=name__desc",
+        {
+          ids: [
+            "m-12",
+            "m-11",
+            "m-10",
+            "m-09",
+            "m-08",
+            "m-07",
+            "m-06",
+            "m-05",
+            "m-04",
+            "m-03",
+            "m-02",
+            "m-01",
+          ],
+          matched: 12,
+          facets: {},
+        },
+      ],
+      [
+        "sort=cores__asc",
+        {
+          ids: [
+            "m-04",
+            "m-10",
+            "m-01",
+            "m-06",
+            "m-11",
+            "m-02",
+            "m-07",
+            "m-12",
+            "m-03",
+            "m-08",
+            "m-05",
+            "m-09",
+          ],
+          matched: 12,
+          facets: {},
+        },
+      ],
+      [
+        "sort=region__asc&size=4&page=2",
+        { ids: ["m-01", "m-02", "m-07", "m-10"], matched: 12, facets: {} },
+      ],
+      [
+        "sort=owner__desc&size=5&page=3",
+        { ids: ["m-02", "m-01"], matched: 12, facets: {} },
+      ],
+      ["size=5&page=4", { ids: [], matched: 12, facets: {} }],
+      [
+        "facet=status&facet=cores",
+        {
+          ids: [
+            "m-01",
+            "m-02",
+            "m-03",
+            "m-04",
+            "m-05",
+            "m-06",
+            "m-07",
+            "m-08",
+            "m-09",
+            "m-10",
+            "m-11",
+            "m-12",
+          ],
+          matched: 12,
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 6 } },
+                { value: "failed", count: { kind: "exact", value: 3 } },
+                { value: "pending", count: { kind: "exact", value: 3 } },
+              ],
+            },
+            cores: { kind: "range", min: 2, max: 64 },
+          },
+        },
+      ],
+      [
+        "status=failed&cores__gte=8&facet=status&facet=cores",
+        {
+          ids: ["m-02"],
+          matched: 1,
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 4 } },
+                { value: "failed", count: { kind: "exact", value: 1 } },
+                { value: "pending", count: { kind: "exact", value: 2 } },
+              ],
+            },
+            cores: { kind: "range", min: 2, max: 8 },
+          },
+        },
+      ],
+      [
+        "q=ex:a&cores__lte=8&facet=cores&facet=status",
+        {
+          ids: ["m-01"],
+          matched: 1,
+          facets: {
+            cores: { kind: "range", min: 4, max: 4 },
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 1 } },
+              ],
+            },
+          },
+        },
+      ],
+      [
+        "name__contains=zzz&facet=status&facet=cores",
+        {
+          ids: [],
+          matched: 0,
+          facets: {
+            status: { kind: "values", values: [] },
+            cores: { kind: "range", min: null, max: null },
+          },
+        },
+      ],
+      [
+        "region__contains=us&status__isNone=pending&sort=cores__desc&facet=status",
+        {
+          ids: ["m-03", "m-11"],
+          matched: 2,
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 2 } },
+                { value: "pending", count: { kind: "exact", value: 2 } },
+              ],
+            },
+          },
+        },
+      ],
+    ] as const) {
+      const { status, body } = await requestRest("live", params);
+      expect(status).toBe(200);
+      const { items, matched, facets } = body as {
+        readonly items: readonly { readonly id: string }[];
+        readonly matched: number;
+        readonly facets: unknown;
+      };
+      expect({ ids: items.map((item) => item.id), matched, facets }).toEqual(
+        expected,
+      );
+    }
+  });
+
   it("refuses what it cannot run rather than answering more", async () => {
     for (const [params, reason] of [
       ["owner__contains=ex", 'this endpoint does not accept "owner__contains"'],

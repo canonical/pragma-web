@@ -183,7 +183,9 @@ export default function PaginationBar<
     <nav
       {...rest}
       aria-label={label ?? messages.pagination}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      className={[componentCssClassName, "dense", className]
+        .filter(Boolean)
+        .join(" ")}
       data-hydrated={hydrated ? "" : undefined}
     >
       <div className="sizing">
@@ -250,7 +252,7 @@ export default function PaginationBar<
         <div className="navigation" {...trackFocus}>
           <PageControl
             LinkComponent={LinkComponent}
-            icon="back-to-top"
+            icon="skip-to-start"
             className="first"
             label={messages.goToFirstPage}
             destination={destinations.first}
@@ -277,7 +279,7 @@ export default function PaginationBar<
           />
           <PageControl
             LinkComponent={LinkComponent}
-            icon="back-to-top"
+            icon="skip-to-end"
             className="last"
             label={messages.goToLastPage}
             destination={destinations.last}

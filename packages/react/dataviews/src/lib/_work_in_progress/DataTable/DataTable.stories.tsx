@@ -1,3 +1,4 @@
+import { Icon } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
@@ -148,6 +149,15 @@ const sizedColumns: readonly DataTableColumn[] = [
   },
 ];
 
+/** The sized columns under their plain headings. */
+const plainSizedColumns: readonly DataTableColumn[] = sizedColumns.map(
+  (column) => ({
+    ...column,
+    header:
+      plainColumns.find(({ id }) => id === column.id)?.header ?? column.header,
+  }),
+);
+
 /** Mark the named columns resizable, leaving the rest as they are. */
 const markResizable = (
   columns: readonly DataTableColumn[],
@@ -277,6 +287,20 @@ export const Sortable: Story = {
     render: tableCode,
   }),
   render: renderMachines(sortableColumns),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("columnheader", { name: "Host" });
+    await expect(host).not.toHaveAttribute("aria-sort");
+    const hostSort = within(host).getByRole("button", { name: "Host" });
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).toHaveAttribute("aria-sort", "ascending"));
+    await userEvent.click(hostSort);
+    await waitFor(() =>
+      expect(host).toHaveAttribute("aria-sort", "descending"),
+    );
+    // A third press returns to the source's own order, leaving the story at rest.
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).not.toHaveAttribute("aria-sort"));
+  },
 };
 
 /**
@@ -379,6 +403,25 @@ export const SortLimitedToOneTerm: Story = {
   render: renderMachines(markResizable(sortableColumns, ["status"]), {
     source: createOneTermSource,
   }),
+  play: async ({ canvas }) => {
+    const hostSort = await canvas.findByRole("button", { name: "Host" });
+    const host = canvas.getByRole("columnheader", { name: "Host" });
+    await userEvent.click(hostSort);
+    const status = canvas.getByRole("columnheader", { name: "Status" });
+    within(status).getByRole("button", { name: "Status" }).focus();
+    // One call, so Shift is still held when Enter activates the button.
+    await userEvent.keyboard("{Shift>}{Enter}{/Shift}");
+    const refusal = "Sort unchanged: this source orders by at most 1 term.";
+    await expect(await within(status).findByText(refusal)).toBeInTheDocument();
+    await expect(host).toHaveAttribute("aria-sort", "ascending");
+    // Two more presses return to the source's order, leaving the story at rest.
+    await userEvent.click(hostSort);
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).not.toHaveAttribute("aria-sort"));
+    await waitFor(() =>
+      expect(within(status).queryByText(refusal)).not.toBeInTheDocument(),
+    );
+  },
 };
 
 /**
@@ -569,6 +612,13 @@ export const HorizontalScroll: Story = {
   render: renderMachines(sizedColumns),
 };
 
+/** The sized columns, with Host, Region and Owner marked resizable. */
+const resizableColumns = markResizable(plainSizedColumns, [
+  "name",
+  "region",
+  "owner",
+]);
+
 /** The code a resizable table's stories show. */
 const resizableCode = showConsumerCode({
   parts: tableParts,
@@ -600,9 +650,7 @@ const resizableCode = showConsumerCode({
 export const Resizable: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const controls = await canvas.findAllByRole("separator");
     await expect(controls).toHaveLength(2);
@@ -631,6 +679,15 @@ export const MixedResizableColumns: Story = {
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(markResizable(plainColumns, ["name", "region"])),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("separator", { name: "Host" });
+    await expect(
+      canvas.getByRole("separator", { name: "Region" }),
+    ).toBeInTheDocument();
+    for (const name of ["Status", "Cores", "Owner"]) {
+      await expect(canvas.queryByRole("separator", { name })).toBeNull();
+    }
+  },
 };
 
 /**
@@ -644,9 +701,7 @@ export const MixedResizableColumns: Story = {
 export const ResizeWithoutDragging: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const before = Number(host.getAttribute("aria-valuenow"));
@@ -683,9 +738,7 @@ export const PlacingAColumnsEdge: Story = {
   name: "Placing a column's edge",
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const edge = host.getBoundingClientRect();
@@ -862,9 +915,21 @@ export const SpaceAfterFixedColumns: Story = {
 };
 
 const statusDisplay = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+  running: {
+    label: "Running",
+    icon: "success",
+    tone: "var(--color-icon-success)",
+  },
+  failed: {
+    label: "Failed",
+    icon: "error",
+    tone: "var(--color-icon-destructive)",
+  },
+  pending: {
+    label: "Pending",
+    icon: "queued",
+    tone: "var(--color-icon-muted)",
+  },
 } as const;
 
 const isStatus = (value: unknown): value is keyof typeof statusDisplay =>
@@ -875,11 +940,11 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
   if (!isStatus(value)) {
     return null;
   }
-  const { label, tone } = statusDisplay[value];
+  const { label, icon, tone } = statusDisplay[value];
   return (
     <span>
-      <span aria-hidden="true" style={{ color: tone }}>
-        ●{" "}
+      <span style={{ color: tone }}>
+        <Icon icon={icon} />{" "}
       </span>
       {label}
     </span>
@@ -896,18 +961,21 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
 export const CustomCellRenderer: Story = {
   parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
-    declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+    imports: `import type { IconName } from "@canonical/ds-assets";
+import { Icon } from "@canonical/react-ds-global";
+import { machineCollection, machines } from "./machines.js";`,
+    declarations: `const statusDisplay: Record<string, { label: string; icon: IconName; tone: string }> = {
+  running: { label: "Running", icon: "success", tone: "var(--color-icon-success)" },
+  failed: { label: "Failed", icon: "error", tone: "var(--color-icon-destructive)" },
+  pending: { label: "Pending", icon: "queued", tone: "var(--color-icon-muted)" },
 };
 
 const StatusCell = ({ value }: DisplayFieldCellProps) => {
   const shown = statusDisplay[String(value)];
   return shown ? (
     <span>
-      <span aria-hidden="true" style={{ color: shown.tone }}>
-        ●{" "}
+      <span style={{ color: shown.tone }}>
+        <Icon icon={shown.icon} />{" "}
       </span>
       {shown.label}
     </span>

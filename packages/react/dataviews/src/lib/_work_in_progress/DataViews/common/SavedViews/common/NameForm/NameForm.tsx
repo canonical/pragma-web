@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import type { NameFormProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds data-views-saved-views-name-form";
 

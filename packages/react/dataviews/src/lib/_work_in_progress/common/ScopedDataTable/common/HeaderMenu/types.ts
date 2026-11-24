@@ -6,7 +6,8 @@ import type { HeaderColumnChange, HeaderColumnOffers } from "../types.js";
  * Props of one column header's menu.
  *
  * Exempt from the native-prop extension convention: an internal renderer
- * the header cell composes, forwarding no caller's native props.
+ * with no single native root (a label, a trigger and its menu as
+ * siblings), forwarding no caller's native props.
  */
 export type HeaderMenuProps = {
   /** The column the menu acts on, handed back with each choice. */

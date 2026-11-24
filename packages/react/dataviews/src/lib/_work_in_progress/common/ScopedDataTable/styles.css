@@ -10,29 +10,29 @@
   .ds.data-table {
     /* Component tier. Semantic tokens not yet in design-tokens are read
        through marked shims over today's values. */
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-border-width: var(
       --stroke-width-border,
       var(--dimension-stroke-thickness-medium)
     );
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-focus-width: var(
       --stroke-width-focus,
       var(--dimension-stroke-thickness-large)
     );
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-resize-mark-inline-size: var(
       --stroke-width-mark,
       var(--dimension-stroke-thickness-large)
     );
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-resize-mark-block-size: var(
       --size-mark-block,
       var(--dimension-250)
     );
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-control-track: var(--size-control-track, var(--dimension-400));
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-resize-target: var(
       --size-target-minimum,
       var(--dimension-300)
@@ -40,9 +40,9 @@
     --data-table-gap: var(--space-050);
     --data-table-overlay-padding-block: var(--space-050);
     --data-table-status-padding-block: var(--space-300);
-    /* shim: design-tokens stacking, rung 2.5 */
+    /* shim: design-tokens stacking */
     --data-table-stacking-sticky: var(--stacking-sticky, 1);
-    /* shim: design-tokens stacking, rung 2.5 */
+    /* shim: design-tokens stacking */
     --data-table-stacking-overlay: var(--stacking-overlay, 1);
     /* Local stacking: the parts' steps order only among themselves. */
     isolation: isolate;
@@ -127,14 +127,14 @@
 
     /* Selected: a selection token, shimmed over the information tint. */
     &[aria-selected="true"] {
-      /* shim: design-tokens selection, rung 2.5 */
+      /* shim: design-tokens selection */
       background-color: var(
         --color-background-selected,
         var(--color-foreground-secondary-information)
       );
 
       &:hover {
-        /* shim: design-tokens selection, rung 2.5 */
+        /* shim: design-tokens selection */
         background-color: var(
           --color-background-selected-hover,
           var(--color-foreground-secondary-information-hover)
@@ -349,17 +349,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* The menu button's name: read, taking no room and drawing nothing.
-       Unthemable geometry. */
-    & > .menu > .trigger > .menu-label {
-      position: absolute;
-      inline-size: 0;
-      block-size: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-
     /* The reason: a manual popover on the cell, clicks pass through. */
     & > .sort-reason {
       position-area: block-end center;
@@ -379,28 +368,12 @@
       border: var(--data-table-border-width) solid var(--color-border-muted);
     }
 
-    /* The column's menu: an icon beside the sort control that neither
-       shrinks with the label nor looks like a separate button. Its name is
-       the hidden label above. */
-    & > .menu {
+    /* The column's menu button beside the sort control: it does not shrink
+       with the label, and its ring is inset, as the table's scroll box
+       clips the header's edges. */
+    & > .ds.data-table-header-menu {
+      --focus-outline-offset: calc(-1 * var(--focus-outline-width, 2px));
       flex: none;
-
-      & > .trigger {
-        display: flex;
-        align-items: center;
-        margin: 0;
-        padding: 0;
-        color: inherit;
-        font: inherit;
-        background: none;
-        border: none;
-
-        &:focus-visible {
-          outline: var(--data-table-focus-width) solid
-            var(--color-focus-ring, currentColor);
-          outline-offset: calc(-1 * var(--data-table-focus-width));
-        }
-      }
     }
   }
 
@@ -425,7 +398,7 @@
   .ds.data-table-header-cell:where(
       :has(
         > .ds.data-table-resize-handle[data-mode="placing"],
-        > .menu > .trigger[aria-expanded="true"]
+        > .ds.data-table-header-menu[aria-expanded="true"]
       )
     )
     > .sort-reason {
@@ -435,8 +408,8 @@
   /* The selection column, in the header and in every row, and the
      settings cell: one control, centred in its track. A grid item's
      automatic minimum is its content, so zero here, as for every cell.
-     Overflow is visible so a focus ring on the control is not clipped by
-     the cell that holds it. */
+     Overflow is visible so a selection control's ring is not clipped by
+     its cell. */
   .ds.data-table-select-all-cell,
   .ds.data-table-selection-cell,
   .ds.data-table-settings-cell {
@@ -450,16 +423,16 @@
   }
 
   /* The header's own cells take the header row's full height and type, as
-     a header cell does. The settings cell is also the containing block of
-     its menu's disclosure, shown below it. */
+     a header cell does. */
   .ds.data-table-select-all-cell,
   .ds.data-table-settings-cell {
     align-self: stretch;
     font-weight: var(--typography-text-primary-bold-font-weight);
   }
 
-  .ds.data-table-settings-cell {
-    position: relative;
+  /* The settings button's ring is inset, as the header menu's is. */
+  .ds.data-table-settings-cell .ds.data-table-settings-menu {
+    --focus-outline-offset: calc(-1 * var(--focus-outline-width, 2px));
   }
 
   /* One cell for the whole table, muted; the two failures in the error

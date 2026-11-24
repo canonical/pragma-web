@@ -2,28 +2,9 @@ import { delay, HttpResponse, type RequestHandler } from "msw";
 import { type GraphQLResponseBody, graphql } from "msw/graphql";
 import { storyMachines } from "../fixtures.js";
 import { API_SCENARIOS } from "./constants.js";
-import foldStoredText from "./foldStoredText.js";
-import readApiFacets from "./readApiFacets.js";
+import createApiExecutor from "./createApiExecutor.js";
 import readGraphQLQuery from "./readGraphQLQuery.js";
-import selectRecords from "./selectRecords.js";
-import type {
-  ApiScenario,
-  ApiTextMatch,
-  MachinesData,
-  MockApiConfig,
-} from "./types.js";
-
-/**
- * Whether a value holds text, as a resolver in JavaScript answers it: the
- * operand folded once per query, each value folded, then a plain substring
- * or prefix test, with no pattern to escape.
- */
-const matchText = (operator: ApiTextMatch["operator"], text: string) => {
-  const needle = foldStoredText(text);
-  return operator === "contains"
-    ? (value: string): boolean => foldStoredText(value).includes(needle)
-    : (value: string): boolean => foldStoredText(value).startsWith(needle);
-};
+import type { ApiScenario, MachinesData, MockApiConfig } from "./types.js";
 
 /** A cursor the endpoint hands back for the page starting after `offset`. */
 const spellCursor = (offset: number): string => btoa(String(offset));
@@ -40,18 +21,17 @@ const fail = (message: string) => respond({ errors: [{ message }] });
 
 /**
  * The GraphQL machine endpoint, `POST /graphql/<scenario>`, once for every
- * scenario: `MachinesQuery` answers a forward connection over the records
- * the query matches, with no total, ordered by at most one term.
+ * scenario: `MachinesQuery` answers a forward connection with no total.
+ * Each answer depends on its path and variables alone.
  *
- * Stateless, as the REST endpoint is: a request's answer depends on its path
- * and its variables alone.
- *
- * @note Impure: its handlers wait on timers before they answer.
+ * @note Impure: its handlers wait on timers before they answer, and share an
+ * executor that caches the last query it ran.
  */
 export default function createGraphQLHandlers({
   records = storyMachines,
   latency = 0,
 }: MockApiConfig = {}): readonly RequestHandler[] {
+  const execute = createApiExecutor(records);
   const answer = async (
     scenario: ApiScenario,
     variables: Readonly<Record<string, unknown>>,
@@ -70,17 +50,20 @@ export default function createGraphQLHandlers({
     if (scenario === "first-page-only" && read.offset > 0) {
       return fail("the machines past the first page are unavailable");
     }
-    const matched = selectRecords(records, read.query, matchText);
-    const page = matched.slice(read.offset, read.offset + read.first);
+    const {
+      rows: page,
+      matched,
+      facets,
+    } = execute(read.query, read.offset, read.first);
     const end = read.offset + page.length;
     return respond({
       data: {
         machines: {
           totalCount: null,
-          facets: readApiFacets(records, read.query, matched, matchText),
+          facets,
           pageInfo: {
             endCursor: page.length === 0 ? null : spellCursor(end),
-            hasNextPage: end < matched.length,
+            hasNextPage: end < matched,
           },
           edges: page.map((node, position) => ({
             cursor: spellCursor(read.offset + position + 1),

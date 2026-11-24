@@ -9,10 +9,20 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import {
   type HeaderCellCaseProps as CaseProps,
   createMachineProvider,
+  installPopoverStandIn,
+  openMenuFrom,
 } from "../../../../../../../testing/index.js";
 import HeaderCell from "./HeaderCell.js";
 import type { HeaderCellProps } from "./types.js";
@@ -309,17 +319,21 @@ describe("HeaderCell", () => {
       );
     });
 
-    it("sits beside the menu whose open state hides it", () => {
+    it("sits beside the menu whose open state hides it", async () => {
+      Reflect.deleteProperty(HTMLElement.prototype, "showPopover");
+      Reflect.deleteProperty(HTMLElement.prototype, "hidePopover");
+      onTestFinished(installPopoverStandIn());
       mount({ sortable: true, reason: "Refused." });
-      fireEvent.click(
-        screen.getByRole("button", { name: "Column options for Name" }),
-      );
-      // The stylesheet hides the reason while the column's menu is open.
+      const trigger = screen.getByRole("button", {
+        name: "Column options for Name",
+      });
+      await openMenuFrom(trigger);
+      // The stylesheet hides the reason while this button's menu is open.
       expect(
         getHeader().querySelector(
-          ':scope > .menu > .trigger[aria-expanded="true"]',
+          ':scope > .ds.data-table-header-menu[aria-expanded="true"]',
         ),
-      ).not.toBeNull();
+      ).toBe(trigger);
       expect(getHeader().querySelector(":scope > .sort-reason")).not.toBeNull();
     });
   });

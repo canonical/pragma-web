@@ -6,17 +6,25 @@
    *
    * A work-in-progress prototype: no chart exists in the design system, so it
    * binds the text, border, surface and foreground tokens the other parts
-   * bind. The bars and the band borrow the primary foreground, since there is
-   * no chart palette token; that missing token is a finding, recorded in the
-   * recipe, not a value invented here. Each range marker carries a ring in
-   * the surface colour, so it stays legible where it meets the band.
+   * bind. The bars and the band read the first chart series colour. Each
+   * range marker carries a ring in the surface colour, so it stays legible
+   * where it meets the band.
    */
   .ds.data-chart {
-    --data-chart-gap: var(--dimension-100);
-    --data-chart-status-padding-block: var(--dimension-050);
-    --data-chart-cell-padding-block: var(--dimension-050);
-    --data-chart-cell-padding-inline-end: var(--dimension-200);
-    --data-chart-stroke-width: var(--dimension-stroke-thickness-medium);
+    --data-chart-gap: var(--space-100);
+    --data-chart-status-padding-block: var(--space-050);
+    --data-chart-cell-padding-block: var(--space-050);
+    --data-chart-cell-padding-inline-end: var(--space-200);
+    /* shim: design-tokens stroke */
+    --data-chart-stroke-width: var(
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
+    );
+    /* shim: design-tokens chart */
+    --data-chart-series-color: var(
+      --color-chart-series-1,
+      var(--color-foreground-primary)
+    );
 
     display: flex;
     flex-direction: column;
@@ -49,7 +57,7 @@
     }
 
     & :is(.bar, .band, .marker) {
-      fill: var(--color-foreground-primary);
+      fill: var(--data-chart-series-color);
     }
 
     & .marker {
