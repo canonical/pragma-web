@@ -7,14 +7,16 @@ import {
 } from "../../../../../../hooks/index.js";
 import { QueryChip } from "../../../../../QueryChip/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
-import entryFormat from "../../entryFormat.js";
-import readRangeBound from "../../readRangeBound.js";
-import speakRange from "../../speakRange.js";
-import spellCommandHref from "../../spellCommandHref.js";
-import spellOperand from "../../spellOperand.js";
-import spellOperator from "../../spellOperator.js";
 import type { QueryStateStandIn } from "../../types.js";
-import { readLabelsStandIn } from "../../utils/index.js";
+import {
+  entryFormat,
+  readLabelsStandIn,
+  readRangeBound,
+  speakRange,
+  spellCommandHref,
+  spellOperand,
+  spellOperator,
+} from "../../utils/index.js";
 import type { RangeChipProps } from "./types.js";
 
 /** Which of the two bounds: the `gte`, or the `lte`. */

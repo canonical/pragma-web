@@ -7,9 +7,9 @@ import type {
   Slice,
 } from "@canonical/dataviews-core";
 import { foldText } from "@canonical/dataviews-core/bindings";
+import type { PlacedConjunct, QueryContradiction } from "../types.js";
 import compareBounds from "./compareBounds.js";
 import placeConjuncts from "./placeConjuncts.js";
-import type { PlacedConjunct, QueryContradiction } from "./types.js";
 
 /** One field's conjuncts, by operator, each with its place. */
 type FieldConjuncts = ReadonlyMap<PredicateOperator, readonly PlacedConjunct[]>;

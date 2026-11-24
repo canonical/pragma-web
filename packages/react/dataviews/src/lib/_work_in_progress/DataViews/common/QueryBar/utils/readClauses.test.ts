@@ -10,8 +10,8 @@ import {
   canonicalizeSlice,
 } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
+import type { QueryClause, QueryStateStandIn } from "../types.js";
 import readClauses from "./readClauses.js";
-import type { QueryClause, QueryStateStandIn } from "./types.js";
 
 const stateOf = (
   slice: Partial<Slice>,

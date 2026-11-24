@@ -8,17 +8,17 @@ import type {
   SourceCapabilities,
 } from "@canonical/dataviews-core";
 import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
-import type { UseFacetsResult } from "../../../../hooks/index.js";
-import { listFacetOptions } from "../Filters/common/utils/index.js";
-import { OPERATOR_SYMBOLS } from "./constants.js";
-import spellOperator from "./spellOperator.js";
+import type { UseFacetsResult } from "../../../../../hooks/index.js";
+import { listFacetOptions } from "../../Filters/common/utils/index.js";
+import { OPERATOR_SYMBOLS } from "../constants.js";
 import type {
   DataViewsQueryBarPreset,
   QueryBarDraft,
   QueryBarLabelsStandIn,
   QueryBarOption,
   QueryBarPart,
-} from "./types.js";
+} from "../types.js";
+import spellOperator from "./spellOperator.js";
 
 /** What the suggestions are read from. */
 type SuggestOptionsConfig = {

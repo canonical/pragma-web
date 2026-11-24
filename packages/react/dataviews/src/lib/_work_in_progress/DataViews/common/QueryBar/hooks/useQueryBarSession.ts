@@ -5,9 +5,8 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { useEffect, useReducer, useRef } from "react";
 import { ENTRY_ITEM_ID } from "../../../../QueryInput/common/constants.js";
-import readDraftId from "../readDraftId.js";
-import reduceSession from "../reduceSession.js";
 import type { QueryBarSession } from "../types.js";
+import { readDraftId, reduceSession } from "../utils/index.js";
 import type {
   UseQueryBarSessionProps,
   UseQueryBarSessionResult,

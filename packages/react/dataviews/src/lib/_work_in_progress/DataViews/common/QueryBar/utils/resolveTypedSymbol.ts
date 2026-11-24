@@ -1,6 +1,6 @@
 import type { PredicateOperator } from "@canonical/dataviews-core";
-import { OPERATOR_SYMBOLS } from "./constants.js";
-import type { TypedSymbolReading } from "./types.js";
+import { OPERATOR_SYMBOLS } from "../constants.js";
+import type { TypedSymbolReading } from "../types.js";
 
 /**
  * The operator a typed symbol reads as on one field: the first of the

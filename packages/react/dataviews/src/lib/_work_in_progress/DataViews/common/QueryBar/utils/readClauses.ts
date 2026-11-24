@@ -1,13 +1,13 @@
 import { readCondition, type Slice } from "@canonical/dataviews-core";
-import compareBounds from "./compareBounds.js";
-import placeConjuncts from "./placeConjuncts.js";
 import type {
   QueryClause,
   QueryPredicateClause,
   QueryRangeClause,
   QueryRefusedClause,
   QueryStateStandIn,
-} from "./types.js";
+} from "../types.js";
+import compareBounds from "./compareBounds.js";
+import placeConjuncts from "./placeConjuncts.js";
 
 /** One field's bound clauses, by operator. */
 type Bounds = {

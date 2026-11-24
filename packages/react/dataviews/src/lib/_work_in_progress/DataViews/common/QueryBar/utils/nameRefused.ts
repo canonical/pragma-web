@@ -1,6 +1,6 @@
 import type { DataViewsMessages, QueryIssue } from "@canonical/dataviews-core";
 import { QUERY_KEYS } from "@canonical/dataviews-core/bindings";
-import type { QueryBarLabelsStandIn } from "./types.js";
+import type { QueryBarLabelsStandIn } from "../types.js";
 
 /**
  * What a refused parameter is called: its field's label, the search's

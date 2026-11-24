@@ -1,9 +1,9 @@
-import readDraftId from "./readDraftId.js";
 import type {
   QueryBarDraft,
   QueryBarSession,
   QueryBarSessionAction,
-} from "./types.js";
+} from "../types.js";
+import readDraftId from "./readDraftId.js";
 
 /** The roving items a draft's chip holds: its first Segment and its Entry. */
 const listDraftItems = (draft: QueryBarDraft): readonly string[] => {

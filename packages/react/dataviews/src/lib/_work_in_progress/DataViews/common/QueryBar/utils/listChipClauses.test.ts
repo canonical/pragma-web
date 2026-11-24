@@ -1,7 +1,7 @@
 import { DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
+import type { QueryStateStandIn } from "../types.js";
 import listChipClauses from "./listChipClauses.js";
-import type { QueryStateStandIn } from "./types.js";
 
 /** A query state over a filter and a search, with two refused parameters. */
 const state: QueryStateStandIn = {

@@ -4,8 +4,8 @@ import type {
   Schema,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { QueryBarLabelsStandIn } from "../types.js";
 import spellOperand from "./spellOperand.js";
-import type { QueryBarLabelsStandIn } from "./types.js";
 
 /**
  * A field's two bounds as one clause is spoken: the lower bound with the

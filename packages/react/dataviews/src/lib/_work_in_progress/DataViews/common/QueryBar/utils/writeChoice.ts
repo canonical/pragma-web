@@ -8,7 +8,7 @@ import {
   canonicalizeSlice,
   listOfferedOperators,
 } from "@canonical/dataviews-core/bindings";
-import type { QueryBarChoice, QueryBarDraft } from "./types.js";
+import type { QueryBarChoice, QueryBarDraft } from "../types.js";
 
 /** A clause on one field: the draft kind a choice writes into. */
 type PredicateDraft = Extract<QueryBarDraft, { readonly kind: "predicate" }>;

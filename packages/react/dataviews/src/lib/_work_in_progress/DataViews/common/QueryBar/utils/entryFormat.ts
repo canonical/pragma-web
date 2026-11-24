@@ -2,7 +2,7 @@ import type {
   DataViewsMessages,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { QueryBarPart } from "./types.js";
+import type { QueryBarPart } from "../types.js";
 
 /** The format props an Entry takes: a template always with its words. */
 type EntryFormat =

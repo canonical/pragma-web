@@ -1,6 +1,6 @@
 import type { Slice } from "@canonical/dataviews-core";
 import { canonicalizeSlice } from "@canonical/dataviews-core/bindings";
-import type { PlacedConjunct } from "./types.js";
+import type { PlacedConjunct } from "../types.js";
 
 /**
  * Each conjunct of a slice with its place: in canonical order, each

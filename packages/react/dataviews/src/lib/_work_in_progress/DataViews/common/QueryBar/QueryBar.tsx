@@ -26,7 +26,6 @@ import { QueryChips } from "../../../QueryChips/index.js";
 import { ENTRY_ITEM_ID as ENTRY } from "../../../QueryInput/common/constants.js";
 import { QueryInput } from "../../../QueryInput/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
-import canTakeEntry from "./canTakeEntry.js";
 import { DraftChip } from "./common/DraftChip/index.js";
 import { FiltersDisclosure } from "./common/FiltersDisclosure/index.js";
 import {
@@ -38,9 +37,6 @@ import { RangeChip } from "./common/RangeChip/index.js";
 import { RefusedChip } from "./common/RefusedChip/index.js";
 import { SearchForm } from "./common/SearchForm/index.js";
 import { DRAFT_ID } from "./constants.js";
-import findContradictions from "./findContradictions.js";
-import findMissingPart from "./findMissingPart.js";
-import findNextPart from "./findNextPart.js";
 import {
   useAnnounceOutcome,
   useClauseIds,
@@ -50,18 +46,6 @@ import {
   useQueryGroup,
   useSuggestedFacets,
 } from "./hooks/index.js";
-import isRangeBound from "./isRangeBound.js";
-import listChipClauses from "./listChipClauses.js";
-import nameRefused from "./nameRefused.js";
-import readDraftId from "./readDraftId.js";
-import readRangeBound from "./readRangeBound.js";
-import readTypedOperator from "./readTypedOperator.js";
-import resolveTypedSymbol from "./resolveTypedSymbol.js";
-import speakClause from "./speakClause.js";
-import speakRange from "./speakRange.js";
-import spellCommandHref from "./spellCommandHref.js";
-import spellOperand from "./spellOperand.js";
-import suggestOptions from "./suggestOptions.js";
 import type {
   DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
@@ -78,8 +62,27 @@ import type {
   QueryStateStandIn,
   TypedSymbolReading,
 } from "./types.js";
-import { findTabbableBeyond, readLabelsStandIn } from "./utils/index.js";
-import writeChoice from "./writeChoice.js";
+import {
+  canTakeEntry,
+  findContradictions,
+  findMissingPart,
+  findNextPart,
+  findTabbableBeyond,
+  isRangeBound,
+  listChipClauses,
+  nameRefused,
+  readDraftId,
+  readLabelsStandIn,
+  readRangeBound,
+  readTypedOperator,
+  resolveTypedSymbol,
+  speakClause,
+  speakRange,
+  spellCommandHref,
+  spellOperand,
+  suggestOptions,
+  writeChoice,
+} from "./utils/index.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-query-bar";

@@ -1,4 +1,4 @@
-import type { QueryBarDraft, QueryBarPart } from "./types.js";
+import type { QueryBarDraft, QueryBarPart } from "../types.js";
 
 /**
  * A clause's parts, in the order the chip shows them and Tab walks them:

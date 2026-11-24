@@ -1,5 +1,5 @@
 import { useDataViewsValue } from "../../../../../hooks/index.js";
-import listChipClauses from "../listChipClauses.js";
+import { listChipClauses } from "../utils/index.js";
 import type { UseClauseIdsProps, UseClauseIdsResult } from "./types.js";
 
 /** Two lists of clauses with the same ids, in the same order. */

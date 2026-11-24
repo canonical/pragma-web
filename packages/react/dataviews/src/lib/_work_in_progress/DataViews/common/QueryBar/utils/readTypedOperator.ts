@@ -1,5 +1,5 @@
 import type { PredicateOperator } from "@canonical/dataviews-core";
-import { OPERATOR_SYMBOLS } from "./constants.js";
+import { OPERATOR_SYMBOLS } from "../constants.js";
 import resolveTypedSymbol from "./resolveTypedSymbol.js";
 
 /**

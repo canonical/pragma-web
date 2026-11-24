@@ -1,7 +1,7 @@
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
 import nameRefused from "./nameRefused.js";
-import { readLabelsStandIn } from "./utils/index.js";
+import readLabelsStandIn from "./readLabelsStandIn.js";
 
 const issue = (parameter: string, field: string | null) =>
   ({ parameter, field, code: "invalid", reason: "no" }) as const;

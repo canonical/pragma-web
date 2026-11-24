@@ -3,8 +3,8 @@ import type {
   Schema,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { QueryBarDraft, QueryBarLabelsStandIn } from "../types.js";
 import spellOperand from "./spellOperand.js";
-import type { QueryBarDraft, QueryBarLabelsStandIn } from "./types.js";
 
 /**
  * A clause as it is spoken, from the messages record: its field's label,

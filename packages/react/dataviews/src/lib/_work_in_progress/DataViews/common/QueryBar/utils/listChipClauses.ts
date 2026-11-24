@@ -1,6 +1,6 @@
 import { isNarrowingIssue } from "@canonical/dataviews-core/bindings";
+import type { QueryClause, QueryStateStandIn } from "../types.js";
 import readClauses from "./readClauses.js";
-import type { QueryClause, QueryStateStandIn } from "./types.js";
 
 /**
  * The clauses the bar shows as chips, in order: one per conjunct, a

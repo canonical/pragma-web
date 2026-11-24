@@ -1,4 +1,4 @@
-import type { QueryBarDraft } from "./types.js";
+import type { QueryBarDraft } from "../types.js";
 
 /**
  * Whether a draft edits one bound of a range chip, whose Entry takes only

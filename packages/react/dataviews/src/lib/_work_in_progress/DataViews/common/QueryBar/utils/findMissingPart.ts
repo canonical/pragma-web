@@ -1,4 +1,4 @@
-import type { QueryBarDraft, QueryBarPart } from "./types.js";
+import type { QueryBarDraft, QueryBarPart } from "../types.js";
 
 /**
  * The first part a clause still lacks: its operator, then a value, which

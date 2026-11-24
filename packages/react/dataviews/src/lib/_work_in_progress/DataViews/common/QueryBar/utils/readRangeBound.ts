@@ -1,5 +1,5 @@
 import type { Predicate } from "@canonical/dataviews-core";
-import type { QueryBarDraft, QueryRangeClause } from "./types.js";
+import type { QueryBarDraft, QueryRangeClause } from "../types.js";
 
 /**
  * One bound of a range as the draft an edit of its value starts from: the

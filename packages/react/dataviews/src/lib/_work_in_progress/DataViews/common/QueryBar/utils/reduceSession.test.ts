@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { QueryBarDraft, QueryBarSession } from "../types.js";
 import reduceSession from "./reduceSession.js";
-import type { QueryBarDraft, QueryBarSession } from "./types.js";
 
 const idle: QueryBarSession = {
   text: "sta",

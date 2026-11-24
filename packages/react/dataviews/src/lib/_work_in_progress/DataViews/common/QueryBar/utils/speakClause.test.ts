@@ -1,8 +1,8 @@
 import { createSchema } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
+import readLabelsStandIn from "./readLabelsStandIn.js";
 import speakClause from "./speakClause.js";
-import { readLabelsStandIn } from "./utils/index.js";
 
 const schema = createSchema([
   { field: "status", kind: "choices", options: ["ready", "deployed"] },

@@ -7,10 +7,12 @@ import {
 } from "../../../../../../hooks/index.js";
 import { QueryChip } from "../../../../../QueryChip/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
-import listChipClauses from "../../listChipClauses.js";
-import nameRefused from "../../nameRefused.js";
 import type { QueryStateStandIn } from "../../types.js";
-import { readLabelsStandIn } from "../../utils/index.js";
+import {
+  listChipClauses,
+  nameRefused,
+  readLabelsStandIn,
+} from "../../utils/index.js";
 import type { RefusedChipProps } from "./types.js";
 
 /** Two readings of a refusal that say the same. */

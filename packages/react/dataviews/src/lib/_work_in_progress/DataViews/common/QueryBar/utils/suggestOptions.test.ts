@@ -4,9 +4,9 @@ import {
 } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
+import type { QueryBarDraft } from "../types.js";
+import readLabelsStandIn from "./readLabelsStandIn.js";
 import suggestOptions from "./suggestOptions.js";
-import type { QueryBarDraft } from "./types.js";
-import { readLabelsStandIn } from "./utils/index.js";
 
 const collection = createCollection({
   identify: (record: { readonly id: string }) => record.id,

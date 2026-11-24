@@ -1,5 +1,5 @@
-import { DRAFT_ID } from "./constants.js";
-import type { QueryBarDraft } from "./types.js";
+import { DRAFT_ID } from "../constants.js";
+import type { QueryBarDraft } from "../types.js";
 
 /**
  * The id of the chip a draft stands in: the edited clause's, or the chip

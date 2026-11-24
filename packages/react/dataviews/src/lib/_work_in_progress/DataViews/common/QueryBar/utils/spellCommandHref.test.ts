@@ -5,12 +5,12 @@ import {
 import { createManualSource } from "@canonical/dataviews-core/testing";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { Machine } from "../../../../../../testing/index.js";
+import type { Machine } from "../../../../../../../testing/index.js";
 import {
   MACHINE_CAPABILITIES,
   machines,
-} from "../../../../../../testing/machines.js";
-import useQueryGroup from "./hooks/useQueryGroup.js";
+} from "../../../../../../../testing/machines.js";
+import useQueryGroup from "../hooks/useQueryGroup.js";
 import spellCommandHref from "./spellCommandHref.js";
 
 /** The query group over a provider with or without a location. */

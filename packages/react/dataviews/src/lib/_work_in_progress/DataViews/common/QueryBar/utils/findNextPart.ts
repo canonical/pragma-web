@@ -1,5 +1,5 @@
+import type { QueryBarDraft, QueryBarPart } from "../types.js";
 import listParts from "./listParts.js";
-import type { QueryBarDraft, QueryBarPart } from "./types.js";
 
 /**
  * The part Tab or Shift+Tab moves the Entry to: the next or the previous

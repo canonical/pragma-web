@@ -1,4 +1,4 @@
-import type { QueryBarDraft, QueryBarPart } from "./types.js";
+import type { QueryBarDraft, QueryBarPart } from "../types.js";
 
 /**
  * Whether a part of a clause can take the Entry: a chip keeps at least one

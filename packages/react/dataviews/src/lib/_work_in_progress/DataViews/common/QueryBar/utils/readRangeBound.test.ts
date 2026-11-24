@@ -1,8 +1,8 @@
 import { DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
+import type { QueryRangeClause } from "../types.js";
 import readClauses from "./readClauses.js";
 import readRangeBound from "./readRangeBound.js";
-import type { QueryRangeClause } from "./types.js";
 
 const [range] = readClauses({
   slice: {

@@ -2,7 +2,7 @@ import {
   applyQueryCommand,
   type QueryCommand,
 } from "@canonical/dataviews-core/bindings";
-import type { QueryGroupStandIn } from "./types.js";
+import type { QueryGroupStandIn } from "../types.js";
 
 /**
  * Where a command leads without scripts: the address of the query it would

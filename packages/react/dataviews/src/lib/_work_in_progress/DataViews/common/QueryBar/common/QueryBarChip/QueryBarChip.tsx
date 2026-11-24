@@ -4,8 +4,8 @@ import {
   useDataViewsValue,
   useIsHydrated,
 } from "../../../../../../hooks/index.js";
-import spellCommandHref from "../../spellCommandHref.js";
 import type { QueryBarDraft, QueryStateStandIn } from "../../types.js";
+import { spellCommandHref } from "../../utils/index.js";
 import { DraftChip } from "../DraftChip/index.js";
 import type { QueryBarChipProps } from "./types.js";
 
