@@ -186,4 +186,74 @@ describe("fr", () => {
     );
     expect(fr.chartTable("Statut")).toBe("Statut, sous forme de tableau");
   });
+  it("words operators, shown and spoken, from their operands", () => {
+    expect(fr.operatorShown("isAny", ["prêt"])).toBe(":");
+    expect(fr.operatorShown("is", ["web"])).toBe(":");
+    expect(fr.operatorShown("isNone", ["prêt"])).toBe("≠");
+    expect(fr.operatorShown("isNot", ["web"])).toBe("≠");
+    expect(fr.operatorShown("gte", [1])).toBe("≥");
+    expect(fr.operatorShown("lte", [1])).toBe("≤");
+    expect(fr.operatorShown("contains", ["web"])).toBe("contient");
+    expect(fr.operatorPhrase({ operator: "isAny", operands: ["prêt"] })).toBe(
+      "est",
+    );
+    expect(
+      fr.operatorPhrase({ operator: "isAny", operands: ["prêt", "échoué"] }),
+    ).toBe("est l’un de");
+    expect(fr.operatorPhrase({ operator: "isNone", operands: ["prêt"] })).toBe(
+      "n’est aucun de",
+    );
+    expect(fr.operatorPhrase({ operator: "gte", operands: [1] })).toBe(
+      "au moins",
+    );
+    expect(fr.operatorPhrase({ operator: "lte", operands: [1] })).toBe(
+      "au plus",
+    );
+  });
+
+  it("words the query bar, its clauses and what its commits did", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(fr.queryBar(noun)).toBe("Filtrer les machines");
+    expect(fr.queryCleared({ kind: "exact", value: 2 }, noun)).toBe(
+      "Filtres et recherche effacés. 2 machines.",
+    );
+    expect(fr.queryCleared({ kind: "unknown" }, noun)).toBe(
+      "Filtres et recherche effacés.",
+    );
+    expect(fr.queryClause({ phrase: "Statut est", values: [] })).toBe(
+      "Statut est",
+    );
+    expect(fr.queryClause({ phrase: "Statut est", values: ["a", "b"] })).toBe(
+      "Statut est a, b",
+    );
+    expect(fr.searchClause("web")).toBe("Recherche de web");
+    expect(fr.removeClause("Statut est prêt")).toBe("Retirer Statut est prêt");
+    expect(fr.hiddenChips(3)).toBe("+3 de plus");
+    expect(fr.clauseOperator("Statut")).toBe("Opérateur de Statut");
+    expect(fr.clauseValue("Statut")).toBe("Valeur de Statut");
+    expect(fr.recordCount({ kind: "exact", value: 1 }, noun)).toBe("1 machine");
+    expect(
+      fr.recordCount(
+        { kind: "at-least", value: 3 },
+        { ...noun, counted: (n) => `machine×${n}` },
+      ),
+    ).toBe("au moins 3 machine×3");
+    expect(
+      fr.clauseAdded("Statut est prêt", { kind: "at-least", value: 5 }, noun),
+    ).toBe("Statut est prêt ajouté. Au moins 5 machines.");
+    expect(fr.clauseChanged("Statut est prêt", { kind: "unknown" }, noun)).toBe(
+      "Remplacé par Statut est prêt.",
+    );
+    expect(fr.clauseRemoved("Statut est prêt", { kind: "unknown" }, noun)).toBe(
+      "Statut est prêt retiré.",
+    );
+    expect(fr.valuePicked("Statut est prêt")).toBe(
+      "Statut est prêt. Entrée à nouveau pour l’appliquer.",
+    );
+    expect(fr.numberFormat([])).toBe("Nombre");
+    expect(fr.numberFormat(["Mio", "Gio"])).toBe("Nombre, en Mio ou Gio");
+    expect(fr.clauseInvalid("pas un nombre.")).toBe(
+      "Non valide : pas un nombre",
+    );
+  });
 });
