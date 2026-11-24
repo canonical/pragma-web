@@ -172,6 +172,7 @@ The manifest now carries an `exports` map, which is the list of paths this packa
 | `@canonical/react-ds-global/index.css` | the aggregate stylesheet above |
 | `@canonical/react-ds-global/dist/…` | any published file, by its exact path |
 | `@canonical/react-ds-global/package.json` | the manifest |
+| `@canonical/react-ds-global/testing` | test helpers, such as `installPopoverStandIn` |
 
 **This is a breaking change for anyone importing by a path the map does not answer.** Before, a package with no `exports` map let a resolver reach any file in the directory and, in most bundlers, guess at the rest — the extension you left off, or the `index.js` inside a folder you named. Two things stop working:
 

@@ -12,6 +12,10 @@
       "default": "./dist/esm/index.js"
     },
     "./index.css": "./dist/esm/lib/index.css",
+    "./testing": {
+      "types": "./dist/types/testing/index.d.ts",
+      "default": "./dist/esm/testing/index.js"
+    },
     "./package.json": "./package.json",
     "./dist/*": "./dist/*"
   },
@@ -40,7 +44,7 @@
     "build:storybook": "storybook build",
     "build:package": "bun run build:package:tsc && bun run build:package:copycss",
     "build:package:copycss": "copyfiles -u 1 'src/lib/{,**/}*.css' dist/esm",
-    "build:package:tsc": "tsc -p tsconfig.build.json",
+    "build:package:tsc": "tsc -p tsconfig.build.json && tsc -p tsconfig.testing.json",
     "check": "bun run check:biome && bun run check:ts && bun run check:webarchitect",
     "check:webarchitect": "webarchitect library",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
@@ -49,6 +53,7 @@
     "check:ts": "tsc --noEmit",
     "storybook": "storybook dev -p 6006 --no-open --host 0.0.0.0",
     "test": "bun run test:vitest",
+    "test:coverage": "vitest run --coverage",
     "test:vitest": "vitest run",
     "test:vitest:watch": "vitest"
   },
