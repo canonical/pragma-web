@@ -1,11 +1,16 @@
 import type { DisplayStatus } from "@canonical/dataviews-core";
 import type { ComponentProps, ReactNode } from "react";
 
-type OwnProps = {
-  /** The status, as the core decided it. */
-  readonly status: DisplayStatus;
+/** A status a renderer shows: named by one of the core's statuses. */
+export type StatusItemStatus = {
+  readonly status: DisplayStatus["status"];
+};
+
+type OwnProps<TStatus extends StatusItemStatus> = {
+  /** The status, as the core or the renderer decided it. */
+  readonly status: TStatus;
   /** The text or content shown for it. */
-  readonly renderStatus: (status: DisplayStatus) => ReactNode;
+  readonly renderStatus: (status: TStatus) => ReactNode;
 };
 
 /**
@@ -13,5 +18,9 @@ type OwnProps = {
  * div props, less those it owns: `children`, the status shown, and
  * `data-status`, the status it carries.
  */
-export type StatusItemProps = OwnProps &
-  Omit<ComponentProps<"div">, keyof OwnProps | "children" | "data-status">;
+export type StatusItemProps<TStatus extends StatusItemStatus = DisplayStatus> =
+  OwnProps<TStatus> &
+    Omit<
+      ComponentProps<"div">,
+      keyof OwnProps<TStatus> | "children" | "data-status"
+    >;

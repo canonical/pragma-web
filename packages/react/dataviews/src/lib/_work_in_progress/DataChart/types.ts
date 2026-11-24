@@ -1,7 +1,6 @@
 import type {
   DataViewsMessages,
   DataViewsProvider,
-  DisplayStatus,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
@@ -16,6 +15,19 @@ import type { ComponentProps, ReactNode } from "react";
  * the package root; its shape may change or it may be withdrawn.
  */
 export type DataChartType = "bar" | "range";
+
+/**
+ * What a chart says of its own facet, never of rows: pending while none
+ * answers the query, failed when none will, refresh-failed above a drawing
+ * kept through a failed refresh or kept as stale.
+ *
+ * @experimental Pre-release: a work-in-progress prototype, not admitted to
+ * the package root; its shape may change or it may be withdrawn.
+ */
+export type ChartStatus =
+  | { readonly status: "pending" }
+  | { readonly status: "failed"; readonly reason: string }
+  | { readonly status: "refresh-failed"; readonly reason: string };
 
 type OwnProps<
   TFields extends readonly SchemaFieldDefinition[],
@@ -35,11 +47,8 @@ type OwnProps<
   readonly field: string;
   /** The chart's caption and the stem of its accessible name. */
   readonly label: string;
-  /**
-   * Replaces the default text of a status shown in place of the drawing while
-   * no result answers the query. The status is the core's, as the table's is.
-   */
-  readonly renderStatus?: (status: DisplayStatus) => ReactNode;
+  /** Replaces the default text of the chart's status. */
+  readonly renderStatus?: (status: ChartStatus) => ReactNode;
   /**
    * The words the chart renders, over English. A standalone chart is its own
    * root and takes them here; the connected chart takes its root's.

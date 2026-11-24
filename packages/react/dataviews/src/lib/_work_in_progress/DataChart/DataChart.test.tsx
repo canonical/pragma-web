@@ -305,7 +305,7 @@ describe("DataChart", () => {
       expect(screen.queryByRole("table")).toBeNull();
     });
 
-    it.fails("never draws bars counted for an earlier query: a failure stands in their place", () => {
+    it("never draws bars counted for an earlier query: a failure stands in their place", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -338,7 +338,7 @@ describe("DataChart", () => {
       expect(screen.queryByRole("img")).toBeNull();
     });
 
-    it.fails("keeps the previous bars mounted and hidden while a new restriction loads", () => {
+    it("keeps the previous bars mounted and hidden while a new restriction loads", () => {
       const { provider, source } = createFacetedManual();
       const { container } = render(
         <DataChart
@@ -373,7 +373,7 @@ describe("DataChart", () => {
       );
     });
 
-    it.fails("hides a kept facet's sentence of no value while a new restriction loads", () => {
+    it("hides a kept facet's sentence of no value while a new restriction loads", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -397,7 +397,7 @@ describe("DataChart", () => {
       ).not.toBeNull();
     });
 
-    it.fails("says the chart, not the rows, could not be loaded", () => {
+    it("says the chart, not the rows, could not be loaded", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -419,7 +419,7 @@ describe("DataChart", () => {
       expect(screen.queryByRole("img")).toBeNull();
     });
 
-    it.fails("says a refresh failed above the bars it keeps", () => {
+    it("says a refresh failed above the bars it keeps", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -451,7 +451,7 @@ describe("DataChart", () => {
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
 
-    it.fails("says a failed re-sort above the bars it keeps, as a failed refresh", () => {
+    it("says a failed re-sort above the bars it keeps, as a failed refresh", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -486,7 +486,7 @@ describe("DataChart", () => {
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
 
-    it.fails("says a failed re-sort above the bars it keeps, with no row on screen", () => {
+    it("says a failed re-sort above the bars it keeps, with no row on screen", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -535,7 +535,7 @@ describe("DataChart", () => {
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
 
-    it.fails("says no row status over an empty collection, only the facet's words", () => {
+    it("says no row status over an empty collection, only the facet's words", () => {
       render(
         <DataChart
           type="bar"
@@ -566,7 +566,7 @@ describe("DataChart", () => {
       ).toHaveTextContent("said pending");
     });
 
-    it.fails("says a query matched nothing as a facet holding nothing", () => {
+    it("says a query matched nothing as a facet holding nothing", () => {
       // A restriction the source runs, matching none of the fleet: its
       // machines hold one core apiece up to their number.
       const provider = createFacetedFleet({ href: "/machines?cores__gte=999" });

@@ -1,5 +1,6 @@
 import type {
-  DisplayStatus,
+  DataViewsMessages,
+  Facet,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
@@ -11,9 +12,9 @@ import {
 import {
   type ReactElement,
   type ReactNode,
-  useCallback,
   useEffect,
   useId,
+  useState,
 } from "react";
 import { MessagesContext, StatusItem } from "../../common/index.js";
 import {
@@ -22,12 +23,28 @@ import {
   useMessages,
   useStableValue,
 } from "../../hooks/index.js";
-import { describeStatus, isSameFacet } from "../../utils/index.js";
+import { isSameFacet } from "../../utils/index.js";
 import { BarDrawing, RangeDrawing } from "./common/index.js";
-import type { DataChartProps } from "./types.js";
+import type { ChartStatus, DataChartProps } from "./types.js";
+import { resolveChartStatus } from "./utils/index.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-chart";
+
+/** A chart's status in the words it is given. */
+const describeChartStatus = (
+  status: ChartStatus,
+  messages: DataViewsMessages,
+): string => {
+  switch (status.status) {
+    case "pending":
+      return messages.chartPending;
+    case "failed":
+      return messages.chartFailed(status.reason);
+    case "refresh-failed":
+      return messages.chartRefreshFailed(status.reason);
+  }
+};
 
 /**
  * A prototype chart of one field, counted or measured by the source over
@@ -43,9 +60,10 @@ const componentCssClassName = "ds data-chart";
  *
  * Either drawing is an image named for what it shows, and the numbers are in
  * the native table that follows it, so nothing is carried by the drawing
- * alone. While no result answers the query, the core's status is shown in
- * place of the drawing, never one made for another query. The server draws
- * it from the facets of the page it renders, so it needs no script.
+ * alone. The server draws it from the facets of the page it renders, so it
+ * needs no script.
+ *
+ * Its status is its own facet's, never the rows'.
  *
  * Not exported from the package root: a work-in-progress prototype, imported
  * from its own module to find out what a chart needs.
@@ -95,10 +113,12 @@ export default function DataChart<
   useEffect(() => provider.observe(), [provider]);
   const answered = useAnsweredFacets({ provider });
   const state = useDataViewsValue(provider.state);
-  const status = useStableValue(
+  const pending = state.pendingRequestId !== null;
+  const shown = useStableValue(
     resolveDisplayStatus(state),
     areDisplayStatusesEqual,
   );
+  const status = resolveChartStatus(shown, answered !== null, pending);
   const captionId = useId();
   // Held at one reference while it claims the same, so a result that moved
   // another field's facet redraws nothing here: the source mints a fresh
@@ -108,6 +128,19 @@ export default function DataChart<
     answered === null ? null : answered[field],
     isSameFacet,
   );
+  // The last facet drawn, kept under a pending status so the figure keeps
+  // its height.
+  const [kept, keep] = useState<Facet | null | undefined>(facet);
+  if (facet !== null && facet !== kept) {
+    keep(facet);
+  }
+  // Under a failure nothing is drawn, and while pending the last drawing.
+  const drawn =
+    status?.status === "failed"
+      ? null
+      : status?.status === "pending"
+        ? kept
+        : facet;
   if (type === "bar" && facet?.kind === "range") {
     throw new Error(
       `DataChart of type "bar" draws values, and "${field}" is a range`,
@@ -118,34 +151,34 @@ export default function DataChart<
       `DataChart of type "range" draws a range, and "${field}" holds values`,
     );
   }
-  // The words' own text for a status, unless the caller renders its own.
-  const describe = useCallback(
-    (shown: DisplayStatus) => describeStatus(shown, words),
-    [words],
-  );
-  const showStatus = renderStatus ?? describe;
-  // Three states, read apart: null while no result answers the query, when
-  // the figure says only that it is busy; undefined where a result answered
-  // without this field's facet, which is said rather than thrown, since the
-  // answer carries it and no mounting check could have caught it; and a
-  // facet of its own, which may list no value, or have no ends, at all.
+  // Three states, read apart: null, nothing to draw; undefined where a
+  // result answered without this field's facet, which is said rather than
+  // thrown, since the answer carries it and no mounting check could have
+  // caught it; and a facet of its own, which may list no value, or have no
+  // ends, at all.
+  const hidden = status?.status === "pending" ? true : undefined;
+  // The words' own text for the status, unless the caller renders its own.
+  const showStatus =
+    renderStatus ?? ((shown: ChartStatus) => describeChartStatus(shown, words));
   let drawing: ReactNode = null;
-  if (facet === undefined) {
+  if (drawn === undefined) {
     drawing = (
-      <p>{type === "bar" ? words.facetCountsAbsent : words.facetRangeAbsent}</p>
+      <p aria-hidden={hidden}>
+        {type === "bar" ? words.facetCountsAbsent : words.facetRangeAbsent}
+      </p>
     );
-  } else if (facet?.kind === "values") {
+  } else if (drawn?.kind === "values") {
     drawing =
-      facet.values.length === 0 ? (
-        <p>{words.facetValuesNone}</p>
+      drawn.values.length === 0 ? (
+        <p aria-hidden={hidden}>{words.facetValuesNone}</p>
       ) : (
-        <BarDrawing label={label} values={facet.values} />
+        <BarDrawing label={label} values={drawn.values} aria-hidden={hidden} />
       );
-  } else if (facet?.kind === "range") {
+  } else if (drawn?.kind === "range") {
     // Ends that are numbers and finite: a range of NaN or of infinities has
     // no length to scale against, so it says what a range of nothing says
     // rather than drawing an axis no coordinate lands on.
-    const { min, max } = facet;
+    const { min, max } = drawn;
     drawing =
       typeof min === "number" &&
       typeof max === "number" &&
@@ -157,9 +190,10 @@ export default function DataChart<
           max={max}
           lowerBound={bounds?.min}
           upperBound={bounds?.max}
+          aria-hidden={hidden}
         />
       ) : (
-        <p>{words.facetValuesNone}</p>
+        <p aria-hidden={hidden}>{words.facetValuesNone}</p>
       );
   }
   return (
@@ -168,7 +202,7 @@ export default function DataChart<
         {...rest}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
         aria-labelledby={captionId}
-        aria-busy={state.pendingRequestId !== null}
+        aria-busy={pending}
       >
         <figcaption id={captionId}>{label}</figcaption>
         {status === null ? null : (

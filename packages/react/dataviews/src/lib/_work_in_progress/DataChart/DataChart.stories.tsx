@@ -1,3 +1,4 @@
+import type { Source } from "@canonical/dataviews-core";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
@@ -7,11 +8,15 @@ import {
 } from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
+import createMachineSource from "../../../storybook/machines/createMachineSource.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
-import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
+import type {
+  Machine,
+  MachineProviderConfig,
+} from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../storybook/types.js";
@@ -277,6 +282,57 @@ export const Loading: Story = {
   ),
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Loading…")).toBeVisible();
+  },
+};
+
+/** The machines, answering the opening query and holding any other. */
+const createRefreshingSource = (): Source<Machine> => {
+  const source = createMachineSource();
+  let opening: string | undefined;
+  return {
+    ...source,
+    execute: (request, deliver) => {
+      const slice = JSON.stringify(request.slice);
+      opening ??= slice;
+      return slice === opening
+        ? source.execute(request, deliver)
+        : () => undefined;
+    },
+  };
+};
+
+/**
+ * Refreshing: a filter asks the source again, which holds the answer, so the
+ * chart says "Loading…" above its last drawing, kept mounted and hidden.
+ */
+export const Refreshing: Story = {
+  decorators: [
+    withMachineRoot({
+      query: "page=1&size=5",
+      facets: ["status", "cores"],
+      source: createRefreshingSource,
+    }),
+  ],
+  render: ({ label }) => (
+    <>
+      <DataViews.Filters />
+      <ConnectedChart type="bar" field="status" label={label} />
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const chart = within(
+      await canvas.findByRole("figure", { name: "Machines by status" }),
+    );
+    const name = "Machines by status, as a table";
+    await chart.findByRole("table", { name });
+    await userEvent.click(
+      await canvas.findByRole("checkbox", { name: /^failed/ }),
+    );
+    await expect(await chart.findByText("Loading…")).toBeVisible();
+    await expect(chart.queryByRole("table", { name })).toBeNull();
+    await expect(
+      chart.getByRole("table", { name, hidden: true }),
+    ).toBeInTheDocument();
   },
 };
 
