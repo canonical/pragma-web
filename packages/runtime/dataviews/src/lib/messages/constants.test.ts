@@ -15,6 +15,15 @@ const unknown = { kind: "unknown" } as const;
 
 describe("constants", () => {
   describe("DEFAULT_MESSAGES", () => {
+    it.fails("ends each status with a full stop, and a blank reason plainly", () => {
+      expect(m.statusRefreshFailed(" . ")).toBe(
+        "These rows could not be refreshed.",
+      );
+      expect(m.statusStale("")).toBe(
+        "These rows do not match the current query.",
+      );
+    });
+
     it("words the table's status row", () => {
       expect(m.statusPending).toBe("Loading…");
       expect(m.statusFailed("timeout")).toBe(

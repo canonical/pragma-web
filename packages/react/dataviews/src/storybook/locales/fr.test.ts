@@ -21,6 +21,27 @@ describe("fr", () => {
     );
   });
 
+  it.fails("ends each status with a full stop, and a blank reason plainly", () => {
+    expect(fr.statusFailed("timeout.")).toBe(
+      "Ces lignes n’ont pas pu être chargées : timeout.",
+    );
+    expect(fr.statusFailed(" . ")).toBe(
+      "Ces lignes n’ont pas pu être chargées.",
+    );
+    expect(fr.statusRefreshFailed("timeout")).toBe(
+      "Ces lignes n’ont pas pu être actualisées : timeout.",
+    );
+    expect(fr.statusRefreshFailed("")).toBe(
+      "Ces lignes n’ont pas pu être actualisées.",
+    );
+    expect(fr.statusStale("moved")).toBe(
+      "Ces lignes ne correspondent pas à la requête actuelle : moved.",
+    );
+    expect(fr.statusStale(" ")).toBe(
+      "Ces lignes ne correspondent pas à la requête actuelle.",
+    );
+  });
+
   it("refuses a link with or without a reason", () => {
     expect(fr.statusRefused(" . ")).toBe("Ce lien n’a pas pu être suivi.");
     expect(fr.statusRefused("bad page.")).toBe(
