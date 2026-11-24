@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "../../component/Button/index.js";
 import { Chip } from "../../component/Chip/index.js";
 import { InlineCode } from "../../component/InlineCode/index.js";
@@ -448,4 +448,66 @@ export const LongContent: Story = {
     },
   },
   render: () => <LongContentStory />,
+};
+
+/**
+ * Driven through the controlled `open` and `onOpenChange` props, requiring no
+ * ref handle. Setting `open` opens or closes the modal, and native dismissals
+ * (Escape, close button, backdrop click) synchronize back via `onOpenChange`.
+ */
+const ControlledOpenStory = () => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Modal</Button>
+      <Component open={open} onOpenChange={setOpen}>
+        <Component.Header>Controlled Modal</Component.Header>
+        <Component.Content>
+          This modal's visibility is driven by React state via the controlled{" "}
+          <InlineCode>open</InlineCode> and{" "}
+          <InlineCode>onOpenChange</InlineCode> props without holding a ref.
+        </Component.Content>
+        <Component.Footer>
+          <Button
+            importance="primary"
+            anticipation="constructive"
+            onClick={() => setOpen(false)}
+          >
+            Close
+          </Button>
+        </Component.Footer>
+      </Component>
+    </>
+  );
+};
+
+export const ControlledOpen: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `const [open, setOpen] = useState(false);
+
+<>
+  <Button onClick={() => setOpen(true)}>Open Modal</Button>
+  <Modal open={open} onOpenChange={setOpen}>
+    <Modal.Header>Controlled Modal</Modal.Header>
+    <Modal.Content>
+      This modal's visibility is driven by React state without holding a ref.
+    </Modal.Content>
+    <Modal.Footer>
+      <Button
+        importance="primary"
+        anticipation="constructive"
+        onClick={() => setOpen(false)}
+      >
+        Close
+      </Button>
+    </Modal.Footer>
+  </Modal>
+</>`,
+      },
+    },
+  },
+  render: () => <ControlledOpenStory />,
 };

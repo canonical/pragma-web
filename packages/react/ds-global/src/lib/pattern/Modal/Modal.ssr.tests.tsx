@@ -30,15 +30,33 @@ describe("Modal SSR", () => {
     expect(html).toContain('class="ds modal-footer"');
   });
 
-  it("renders closed", () => {
-    // showModal() is what makes a dialog modal, and it only runs on the
-    // client: a server-rendered `open` attribute would paint a non-modal
-    // dialog with no backdrop and no focus trap.
-    const html = renderToString(
+  it("renders closed when open is omitted or false", () => {
+    const htmlClosedDefault = renderToString(
       <Component ref={createRef<HTMLDialogElement>()}>
         <Component.Content>Placeholder content</Component.Content>
       </Component>,
     );
-    expect(html).not.toMatch(/<dialog[^>]*\sopen/);
+    expect(htmlClosedDefault).not.toMatch(/<dialog[^>]*\sopen/);
+    expect(htmlClosedDefault).not.toContain("modal-non-modal-backdrop");
+
+    const htmlClosedExplicit = renderToString(
+      <Component open={false}>
+        <Component.Content>Placeholder content</Component.Content>
+      </Component>,
+    );
+    expect(htmlClosedExplicit).not.toMatch(/<dialog[^>]*\sopen/);
+    expect(htmlClosedExplicit).not.toContain("modal-non-modal-backdrop");
+  });
+
+  it("renders open and includes the non-modal backdrop when open is true", () => {
+    const html = renderToString(
+      <Component open>
+        <Component.Content>Placeholder content</Component.Content>
+      </Component>,
+    );
+    expect(html).toMatch(/<dialog[^>]*\sopen/);
+    expect(html).toMatch(
+      /<div class="ds modal-non-modal-backdrop"><\/div><dialog[^>]*\sopen/,
+    );
   });
 });
