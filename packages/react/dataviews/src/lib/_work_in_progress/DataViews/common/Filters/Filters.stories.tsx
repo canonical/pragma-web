@@ -373,11 +373,13 @@ const spareColumns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];
 
-/** A root over the spare machines, starting on one query. */
+/** A root over the spare machines, starting on one query, in its words. */
 function FilteredSpareMachines({
   query,
+  messages,
   ...args
-}: DataViewsFiltersProps & { readonly query: string }): ReactElement {
+}: StoryArgs & { readonly query: string }): ReactElement {
+  const words = pickStoryWords({ messages });
   const [provider] = useState(() =>
     createDataViewsProvider({
       collection: spareMachineCollection,
@@ -389,12 +391,13 @@ function FilteredSpareMachines({
     }),
   );
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
       <DataTable
         provider={provider}
         columns={spareColumns}
         label="Spare machines"
+        {...words}
       />
     </DataViews>
   );
@@ -486,11 +489,16 @@ export const PresenceOutsideThePrimaryFilters: Story = {
   },
 };
 
-/** The spare machines' filters as a server renders them, never hydrated. */
+/**
+ * The spare machines' filters as a server renders them, never hydrated, in
+ * the story's words.
+ */
 function ServerRenderedSpareFilters({
   query,
+  messages,
   ...args
-}: DataViewsFiltersProps & { readonly query: string }): ReactElement {
+}: StoryArgs & { readonly query: string }): ReactElement {
+  const words = pickStoryWords({ messages });
   const [markup] = useState(() => {
     const provider = createDataViewsProvider({
       collection: spareMachineCollection,
@@ -501,7 +509,7 @@ function ServerRenderedSpareFilters({
       snapshot: { query, presentation: {} },
     });
     return renderToString(
-      <DataViews provider={provider}>
+      <DataViews provider={provider} {...words}>
         <Component {...args} />
       </DataViews>,
     );
