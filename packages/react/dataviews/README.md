@@ -19,6 +19,7 @@ Under active development; the public surface grows change by change. Prototype r
 - **`useDataViews(collection)`** — the typed collection scope for custom children: the collection's state channel, its rows, the refused URL clauses, selection, saved views, presentation, this root's filter handles and the bounded commands, `runAction` and `listRefusals` among them. The module-scope collection is the type and identity witness: it must be the one the enclosing root's provider was built over, so a custom child lives at module scope with no provider prop, and a nested root over another collection rejects it rather than answering with the wrong records typed as the right ones.
 - **`useDataViewsValue(channel)`, `useDataViewsValue(channel, { select, isEqual })`** — observe one channel, or the part `select` reads; the held value is returned while `isEqual` says the next reads the same.
 - **`useDataViewsFilter(collection, field, operator)`** — one filter of the enclosing root: its text input, applied semantic value — typed by the field's kind — and feedback, with `edit`/`set`/`clear` routed through the root's record. The records are the root's: two roots over one provider share the applied query and never each other's half-typed input.
+- **`createColumns({ collection, columns })`** — columns over the collection's fields, each `cell` handed its typed value, record and applicability; a column with an `id` and a `cell` and no field draws its record. The connected table infers its records from it, and every table throws at mount on another collection's columns.
 - **`useDataViewsCell(collection)`** — the current cell's scope (row id, column id, the read-only record channel typed as the collection's records, fields and selected channels), installed by the table renderer; throws outside a rendered cell or on a witness mismatch.
 - **`DataViews.Search`** — the connected search: one labelled native search input over the applied search. Every edit applies as it is typed through `setSearch`, and a search replaces the history entry rather than pushing one, so typing never floods history and Back restores the applied search into the input. It reads the applied search alone, so a result arriving re-renders no search box; it throws where the source declares no search, as SavedViews does without a store. At baseline it is a GET form carrying the rest of the query hidden.
 - **`DataViews.Filters`** — the connected query-editing part. Which fields it offers and which operators each accepts come from the provider — its collection's schema, and the capabilities its source declares — so it never offers a restriction the source would refuse, takes no query props, and has no draft query to keep in step with the applied one. An edit the source refuses keeps the restriction in force and says why beside the control. At baseline it is a GET form whose controls are named as the URL spells their clauses, a number bound a native number input carrying the schema's bounds, with the rest of the query hidden beside them; once scripting is enabled every edit applies as it is made and a submission is intercepted.
@@ -43,6 +44,21 @@ The remaining connected part, Summary, lands in a later change. The pagination b
 **One screen, in outline.** The collection is declared once at module scope; the provider is built once per page over it, its source and its ports; every part observes it:
 
 ```tsx
+import {
+  createArraySource,
+  createCollection,
+  createDataViewsProvider,
+  createPlatformLocation,
+} from "@canonical/dataviews-core";
+import {
+  createColumns,
+  DataViews,
+  useDataViews,
+  useDataViewsValue,
+} from "@canonical/dataviews-react";
+import { useState } from "react";
+import { exportNames, type Machine, platform, store } from "./app.js";
+
 export const machines = createCollection({
   identify: (machine: Machine) => machine.id,
   fields: [
@@ -51,6 +67,17 @@ export const machines = createCollection({
     { field: "cores", kind: "number", min: 1 },
   ],
 });
+
+const columns = createColumns({
+  collection: machines,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores", sortable: true },
+  ],
+});
+
+const nameMachine = (machine: Machine) => machine.name;
 
 function ExportNames() {
   const { rows } = useDataViews(machines);
@@ -73,7 +100,12 @@ export function MachinesPage({ rows }: { rows: readonly Machine[] }) {
       <DataViews.SavedViews label="Machine views" />
       <DataViews.Search />
       <DataViews.Filters />
-      <DataViews.DataTable columns={columns} label="Machines" selectable />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        selectable
+        getRowLabel={nameMachine}
+      />
       <ExportNames />
       <DataViews.Pagination label="Machines pagination" />
     </DataViews>
@@ -134,7 +166,8 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **Sorting** — `sortable` takes effect where the source's declaration, read by the provider, names the field sortable; on any other field the heading is plain, and nothing throws.
 - **Selection** — the design system's checkboxes in a 32px column, named by `getRowLabel`; select-all acts on the displayed rows.
 - **Resizing and its limits** — held to the declared bounds; no control on the last column; two tables with one id on one provider agree on every width, and nothing is passed between them.
-- **A cell that reads its own scope** — a module-scope renderer reading its row's record through `useDataViewsCell(collection)`, typed by the collection.
+- **A cell handed its record** — a module-scope renderer handed its typed value and record, reading the row's selection through `useDataViewsCell(collection)`.
+- **Records of several types** — containers and virtual machines in one table: a field that does not apply draws a dash read as "Not applicable", and a cell narrows on the record's type.
 - **The outcomes** — pending, failed, refused — a followed link's filter or search refused, so nothing ran — no access, empty and no match in place of the rows; a failed refresh and retained rows that no longer answer the current query (`refresh-failed`, `stale`) above them, with `renderStatus` over the core's `DisplayStatus`.
 - **Mounting only the rows in view** — `virtualization={virtualizeRows({ estimatedRowHeight })}`, from `@canonical/dataviews-react/virtualization`, for a result window of thousands of rows: the table becomes its own scroll viewport and every row still counts.
 
