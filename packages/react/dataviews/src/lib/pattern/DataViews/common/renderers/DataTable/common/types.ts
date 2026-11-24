@@ -21,7 +21,10 @@ export type DataTableColumn<TRow extends object = RowRecord> =
     readonly sizing?: ColumnSizing;
     /** Whether the viewer may hide the column; defaults to true. */
     readonly hideable?: boolean;
-    /** Offers sorting from the header, where the source can sort the field. */
+    /**
+     * Offers sorting from the header where the source can sort the field;
+     * elsewhere the heading is plain.
+     */
     readonly sortable?: boolean;
     /**
      * Offers resizing from the trailing edge, within its sizing bounds; never on

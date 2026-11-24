@@ -111,7 +111,7 @@ export const machineCollection = createCollection({
 });
 ```
 
-The filters and the table's sortable columns offer nothing the source did not declare it can execute — the provider reads the source's capabilities once, and a command outside them is refused at the boundary and moves nothing. Leave `location` out and the query lives in the provider alone; leave `views` out and the collection has no saved views; leave `presentation` out and the arrangement — column widths, order and visibility — lives in memory for the session.
+The filters and the table's sortable columns offer nothing the source did not declare it can execute — the provider reads the source's capabilities once, a `sortable` column on a field the source cannot order is a plain heading, and a command outside them is refused at the boundary and moves nothing. Leave `location` out and the query lives in the provider alone; leave `views` out and the collection has no saved views; leave `presentation` out and the arrangement — column widths, order and visibility — lives in memory for the session.
 
 <Canvas of={Stories.ConnectedParts} sourceState="none" />
 

@@ -110,10 +110,9 @@ const plainColumns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];
 
-// A sortable column may only name a field the fixture source declares it can
-// order by, and every sortable column below is built through this helper,
-// whose type holds it to that: a column offering a sort its source cannot
-// execute is a dead control, and no story demonstrates one.
+// Every sortable column below is built through this helper, whose type holds
+// it to a field the fixture source orders by. A `sortable` column on any other
+// field would draw a plain heading; no story shows one.
 const declareSortableColumn = (
   id: SortableField,
   header: string,

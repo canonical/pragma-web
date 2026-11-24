@@ -131,7 +131,7 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 
 - **A table over a provider** — build the provider once, over the collection and its source, and mount: the table observes it.
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.
-- **Sorting** — offer a sort only on a field the source declares: `sortable` takes effect only where the source's declaration, read by the provider, names the field sortable.
+- **Sorting** — `sortable` takes effect where the source's declaration, read by the provider, names the field sortable; on any other field the heading is plain, and nothing throws.
 - **Selection** — the design system's checkboxes in a 32px column, named by `getRowLabel`; select-all acts on the displayed rows.
 - **Resizing and its limits** — held to the declared bounds; no control on the last column; two tables with one id on one provider agree on every width, and nothing is passed between them.
 - **A cell that reads its own scope** — a module-scope renderer reading its row's record through `useDataViewsCell(collection)`, typed by the collection.
