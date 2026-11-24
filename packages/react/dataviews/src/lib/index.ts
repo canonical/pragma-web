@@ -45,7 +45,9 @@ export type {
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
+  UseDataViewsFilterProps,
   UseDataViewsFilterResult,
+  UseDataViewsProps,
   UseDataViewsResult,
 } from "./pattern/index.js";
 export {

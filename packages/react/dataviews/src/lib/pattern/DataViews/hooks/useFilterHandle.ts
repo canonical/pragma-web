@@ -1,6 +1,5 @@
-import type { FilterHandle } from "@canonical/dataviews-core";
 import { useMemo, useSyncExternalStore } from "react";
-import type { UseFilterHandleResult } from "./types.js";
+import type { UseFilterHandleProps, UseFilterHandleResult } from "./types.js";
 
 /**
  * Bind to one filter handle: its text input, applied semantic value and
@@ -11,7 +10,7 @@ import type { UseFilterHandleResult } from "./types.js";
  * @note Impure: subscribes to the handle's two channels while mounted.
  */
 export default function useFilterHandle<TApplied>(
-  handle: FilterHandle<TApplied>,
+  ...[handle]: UseFilterHandleProps<TApplied>
 ): UseFilterHandleResult<TApplied> {
   const state = useSyncExternalStore(
     handle.state.subscribe,
