@@ -35,6 +35,11 @@ type OwnProps = {
    */
   readonly sortable: boolean;
   /**
+   * The record types the column's field applies to, read with the heading,
+   * or null where it applies to every record.
+   */
+  readonly scope: readonly string[] | null;
+  /**
    * Where this column's field stands in the ordering in force — the query's
    * own terms, or the source's default when it states none — or null when
    * the ordering does not name it. Shown whether or not the column offers

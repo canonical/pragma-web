@@ -673,6 +673,10 @@ export const MESSAGE_SAMPLES: {
   columnWidth: [[1], [7]],
   columnEndPlacement: [[MESSAGE_MARK]],
   cellNotApplicable: null,
+  columnAppliesTo: [
+    [{ types: [MESSAGE_MARK] }],
+    [{ types: [MESSAGE_MARK, MESSAGE_MARK] }],
+  ],
   sortPrecedence: [
     [{ direction: "asc", position: 1, total: 1 }],
     [{ direction: "desc", position: 2, total: 3 }],

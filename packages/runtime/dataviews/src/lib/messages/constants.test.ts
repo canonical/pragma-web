@@ -63,8 +63,12 @@ describe("constants", () => {
       expect(m.grouping).toBe("Grouping");
     });
 
-    it("words a scoped field's cell", () => {
+    it("words a scoped field's cell and heading", () => {
       expect(m.cellNotApplicable).toBe("Not applicable");
+      expect(m.columnAppliesTo({ types: ["vm"] })).toBe("Applies to vm");
+      expect(m.columnAppliesTo({ types: ["container", "vm"] })).toBe(
+        "Applies to container, vm",
+      );
     });
 
     it("words the table's selection and resize controls, with the width's plural", () => {

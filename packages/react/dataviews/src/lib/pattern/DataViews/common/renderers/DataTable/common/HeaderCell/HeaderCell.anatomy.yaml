@@ -17,6 +17,9 @@
 #   description     design none           DOM `span[hidden]`, the direction
 #                                         and precedence the sort control is
 #                                         described by
+#   scope           design none           DOM `span[hidden]`, the record types
+#                                         a scoped field applies to, which the
+#                                         heading is described by
 #   reason          design none yet       DOM `span.sort-reason`, why the last
 #                                         activation changed nothing, shown
 #                                         and not live: the table's announcer
@@ -150,6 +153,12 @@ node:
     # the sort control, or the heading itself, is described by. Hidden.
     - node:
         role: description
+      relation:
+        cardinality: "0..1"
+    # On a field scoped to some record types: "Applies to vm", which the
+    # sort control, or the heading itself, is described by. Hidden.
+    - node:
+        role: scope
       relation:
         cardinality: "0..1"
     # Once scripts run, on a sortable column: why its last activation

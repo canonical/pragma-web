@@ -101,6 +101,15 @@ export type DataViewsMessages = {
    * record type once records have nouns.
    */
   readonly cellNotApplicable: string;
+  /**
+   * The record types a scoped column applies to, read with its heading.
+   *
+   * @experimental Scoped fields are new, and the wording may name the
+   * record type once records have nouns.
+   */
+  readonly columnAppliesTo: (facts: {
+    readonly types: readonly string[];
+  }) => string;
 
   // The table's sort.
   /**

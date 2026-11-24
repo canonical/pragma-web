@@ -51,8 +51,11 @@ describe("fr", () => {
     expect(fr.viewsUnreadable(2)).toBe("2 vues enregistrées sont illisibles.");
   });
 
-  it("words a scoped field's cell", () => {
+  it("words a scoped field's cell and heading", () => {
     expect(fr.cellNotApplicable).toBe("Sans objet");
+    expect(fr.columnAppliesTo({ types: ["conteneur", "vm"] })).toBe(
+      "S’applique à conteneur, vm",
+    );
   });
 
   it("states sort precedence with French ordinals", () => {

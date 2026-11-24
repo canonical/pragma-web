@@ -132,6 +132,13 @@ export default function ScopedDataTable<
   // a root that already observes cost nothing.
   useEffect(() => provider.observe(), [provider]);
   const { readApplicability } = readProviderHost(provider);
+  const { collection } = provider;
+  // The types a field applies to, read with its heading; null on a
+  // collection of one type, where every field applies.
+  const readScope = (field: string): readonly string[] | null =>
+    collection.types === null
+      ? null
+      : (collection.schema.findField(field)?.appliesTo ?? null);
   // Sorting is offered from the same declaration Filters reads.
   const declared = provider.capabilities;
   const sortableFields =
@@ -391,6 +398,7 @@ export default function ScopedDataTable<
                   key={column.id}
                   column={column}
                   sortable={sortable}
+                  scope={readScope(field)}
                   precedence={headerSort.precedences.get(field) ?? null}
                   primary={column.id === headerSort.primaryColumnId}
                   // Spelled only while it is rendered: once scripts take over

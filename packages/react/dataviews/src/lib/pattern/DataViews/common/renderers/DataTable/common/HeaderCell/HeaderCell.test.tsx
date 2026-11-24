@@ -62,6 +62,7 @@ const mount = (props: CaseProps = {}) => {
       <HeaderCell
         column={{ id: "name", header: "Name" }}
         sortable={false}
+        scope={null}
         precedence={null}
         primary={false}
         destination={null}
@@ -178,6 +179,27 @@ describe("HeaderCell", () => {
     });
   });
 
+  describe("a scoped field", () => {
+    it("reads the record types it applies to with its control", () => {
+      mount({
+        sortable: true,
+        scope: ["vm"],
+        precedence: { direction: "asc", position: 1, count: 1 },
+      });
+      expect(
+        screen.getByRole("button", { name: "Name" }),
+      ).toHaveAccessibleDescription("ascending Applies to vm");
+    });
+
+    it("reads them with a header that has no control of its own", () => {
+      mount({ scope: ["container", "vm"] });
+      expect(getHeader()).toHaveAccessibleDescription(
+        "Applies to container, vm",
+      );
+      expect(screen.getByText("Applies to container, vm")).not.toBeVisible();
+    });
+  });
+
   describe("a refusal's reason", () => {
     // jsdom's document never has focus; the cell tells the window losing
     // focus from the column losing it by asking.
@@ -244,6 +266,7 @@ describe("HeaderCell", () => {
           <HeaderCell
             column={{ id: "name", header: "Name" }}
             sortable
+            scope={null}
             precedence={null}
             primary={false}
             destination={null}
