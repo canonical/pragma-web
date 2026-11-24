@@ -95,6 +95,18 @@ describe("fr", () => {
     expect(fr.filterIsNoneOf("Statut")).toBe("Statut n’est aucune des valeurs");
     expect(fr.filterContains("Nom")).toBe("Nom contient");
     expect(fr.filterStartsWith("Nom")).toBe("Nom commence par");
+    expect(fr.filterEndsWith("Nom")).toBe("Nom finit par");
+    expect(fr.filterNotContains("Nom")).toBe("Nom ne contient pas");
+    expect(fr.filterIsNot("Nom")).toBe("Nom n’est pas");
+    expect(fr.filterIs("Nom")).toBe("Nom est");
+    expect(fr.filterMatch("Nom")).toBe("Comment Nom correspond");
+    expect(fr.filterInUnit("Mémoire à partir de", "Mio")).toBe(
+      "Mémoire à partir de (Mio)",
+    );
+    expect(fr.filterHasValue("Propriétaire")).toBe("Propriétaire a une valeur");
+    expect(fr.filterHasNoValue("Propriétaire")).toBe(
+      "Propriétaire n’a pas de valeur",
+    );
   });
 
   it("states a count exactly or at least", () => {
