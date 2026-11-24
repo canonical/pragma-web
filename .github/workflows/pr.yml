@@ -133,6 +133,16 @@ jobs:
       - name: Check workspace sibling version ranges
         run: bun run check:ranges
 
+        # Sibling of the ranges guard: a test file excluded from check:ts is
+        # type-checked by nothing (vitest strips types), so a green CI run can
+        # hide a failing test. The test runs first because a guard whose
+        # failing case no longer fails is worse than no guard.
+      - name: Test the test-exclusion guard
+        run: bun run check:test-exclusions:test
+
+      - name: Check no tsconfig excludes test files
+        run: bun run check:test-exclusions
+
   build-gate:
     runs-on: ubuntu-latest
     needs: build-matrix
