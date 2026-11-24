@@ -14,7 +14,11 @@ import type { DataTableColumn } from "../types.js";
  * caller's native props.
  */
 export type RowProps<TRow extends object> = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /** The provider's collection and selection, all its cells read. */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection" | "selection"
+  >;
   readonly channels: RowChannels<TRow>;
   readonly columns: readonly DataTableColumn[];
   readonly selectable: boolean;

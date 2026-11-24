@@ -13,8 +13,11 @@ import type { DisplayField } from "../../../../../../../common/index.js";
  * element of its own.
  */
 export type FieldValueProps<TRow extends object> = {
-  /** The provider whose collection the cell scope names. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /** The provider's collection, which witnesses the field's scope. */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection"
+  >;
   /** The card's row channels, from the cards' row scopes. */
   readonly channels: RowChannels<TRow>;
   /** The field shown. */

@@ -35,6 +35,7 @@ export {
   OPERATOR_RECORDS,
   quickHostCollection,
   quickHosts,
+  RACK_COLLECTION,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
 export { default as installPopoverStandIn } from "./installPopoverStandIn.js";

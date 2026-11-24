@@ -28,6 +28,12 @@ export const COUNTED_EXACTLY: CountCapabilities = Object.freeze({
   matched: "exact",
 });
 
+/** Racks: a collection no machine provider is built over. */
+export const RACK_COLLECTION = createCollection({
+  identify: (rack: { readonly id: string }) => rack.id,
+  fields: [{ field: "zone", kind: "choices", options: ["a", "b"] }],
+});
+
 /**
  * The URL a server render and the hydration over it answer: running
  * machines ordered by cores, the second page of fifty.

@@ -4,6 +4,7 @@ import type {
 } from "@canonical/dataviews-core";
 import type {
   DisplayEntry,
+  ProviderHost,
   RowChannels,
 } from "@canonical/dataviews-core/bindings";
 import type { ComponentProps } from "react";
@@ -13,8 +14,16 @@ import type { DisplayField } from "../../../../../../../common/index.js";
 type RecordEntry = Extract<DisplayEntry, { readonly kind: "record" }>;
 
 type OwnProps<TRow extends object> = {
-  /** The provider whose selection the cards' checkboxes toggle. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /** The provider's collection and selection, all its cards read. */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection" | "selection"
+  >;
+  /** Whether a field applies to a record, from the provider's host. */
+  readonly readApplicability: ProviderHost<
+    readonly SchemaFieldDefinition[],
+    TRow
+  >["readApplicability"];
   /** The record entries the core displays, in its order. */
   readonly records: readonly RecordEntry[];
   /** One record's channels, by its identity. */

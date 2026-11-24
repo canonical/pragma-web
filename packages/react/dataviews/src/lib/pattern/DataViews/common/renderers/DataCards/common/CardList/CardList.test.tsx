@@ -1,4 +1,7 @@
-import { createRowScopes } from "@canonical/dataviews-core/bindings";
+import {
+  createRowScopes,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
@@ -40,6 +43,7 @@ describe("CardList", () => {
     render(
       <CardList
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         // The positions the core gives a page of records: it counts a
         // header row as the first, which the cards have none of.
         records={[
@@ -80,6 +84,7 @@ describe("CardList", () => {
     render(
       <CardList
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         records={[]}
         readRow={scopes.readRow}
         title={title}
@@ -98,6 +103,7 @@ describe("CardList", () => {
     render(
       <CardList
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         // The positions the core gives a page of records: it counts a
         // header row as the first, which the cards have none of.
         records={[
@@ -126,6 +132,7 @@ describe("CardList", () => {
     const { container } = render(
       <CardList
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         records={[]}
         readRow={scopes.readRow}
         title={title}

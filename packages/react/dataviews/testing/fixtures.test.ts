@@ -13,6 +13,7 @@ import {
   MESSAGE_SAMPLES,
   OPERATOR_CASES,
   OPERATOR_RECORDS,
+  RACK_COLLECTION,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
 
@@ -20,6 +21,13 @@ describe("fixtures", () => {
   describe("COUNTED_EXACTLY", () => {
     it("counts exactly", () => {
       expect(COUNTED_EXACTLY.matched).toBe("exact");
+    });
+  });
+
+  describe("RACK_COLLECTION", () => {
+    it("declares racks by zone", () => {
+      expect(RACK_COLLECTION.schema.fieldNames).toEqual(["zone"]);
+      expect(RACK_COLLECTION.identify({ id: "r-1" })).toBe("r-1");
     });
   });
 

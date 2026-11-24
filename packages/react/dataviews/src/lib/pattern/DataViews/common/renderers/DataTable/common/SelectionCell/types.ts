@@ -6,8 +6,11 @@ import type { RowChannels } from "@canonical/dataviews-core/bindings";
 import type { ComponentProps } from "react";
 
 type OwnProps<TRow extends object> = {
-  /** The provider whose selection the checkbox toggles the row in. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /** The provider's selection, which the checkbox toggles. */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "selection"
+  >;
   /** The row's channels: its record, for the name, and its identity. */
   readonly channels: RowChannels<TRow>;
   /** Whether the row is selected, as the row itself reads it. */

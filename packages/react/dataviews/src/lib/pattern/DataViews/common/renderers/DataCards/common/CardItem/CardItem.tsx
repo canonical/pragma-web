@@ -1,4 +1,3 @@
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { Card } from "@canonical/react-ds-global";
 import { CheckboxInput } from "@canonical/react-ds-global-form";
 import { memo, type ReactElement, useContext, useId } from "react";
@@ -26,6 +25,7 @@ const componentCssClassName = "data-card";
  */
 const CardItem = <TRow extends object>({
   provider,
+  readApplicability,
   channels,
   title,
   details,
@@ -52,9 +52,7 @@ const CardItem = <TRow extends object>({
   }
   // A title the record's type does not carry names nothing.
   const applies = useDataViewsValue(channels.record, {
-    select: (record) =>
-      readProviderHost(provider).readApplicability(titleField, record) ===
-      "applies",
+    select: (record) => readApplicability(titleField, record) === "applies",
   });
   const titleValue = useDataViewsValue(titleChannel);
   const spelled = spellPrimitiveValue(titleValue);

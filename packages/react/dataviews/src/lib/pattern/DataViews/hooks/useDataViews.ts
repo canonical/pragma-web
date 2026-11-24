@@ -1,11 +1,10 @@
 import type {
-  DataViewsProvider,
-  FilterHandles,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import { useContext, useMemo } from "react";
 import Context from "../Context.js";
+import { narrowRootScope } from "../common/utils/index.js";
 import type { UseDataViewsProps, UseDataViewsResult } from "./types.js";
 
 /**
@@ -30,16 +29,7 @@ export default function useDataViews<
   if (root === undefined) {
     throw new Error("useDataViews must be used inside a DataViews root");
   }
-  if (root.provider.collection !== collection) {
-    throw new Error(
-      "useDataViews was passed a collection that is not the one the enclosing DataViews root's provider was built over",
-    );
-  }
-  // Checked above: the root's provider was built over this very collection,
-  // so its records are the collection's and the widest shape the context
-  // holds narrows back to the types the caller named.
-  const provider = root.provider as DataViewsProvider<TFields, TRow>;
-  const filters = root.filters as FilterHandles<TFields>;
+  const { provider, filters } = narrowRootScope(root, collection);
   return useMemo(
     () => ({
       collection: provider.collection,

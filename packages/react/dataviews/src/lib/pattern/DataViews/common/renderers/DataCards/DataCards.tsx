@@ -8,6 +8,7 @@ import {
   areListsEqual,
   isDataViewsProvider,
   listDisplayEntries,
+  readProviderHost,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
@@ -108,6 +109,7 @@ export default function DataCards<
   );
   const names = useStableValue(declared.map(readFieldName), areNamesEqual);
   const scopes = useRowScopes(provider, names);
+  const { readApplicability } = readProviderHost(provider);
   const state = useDataViewsValue(provider.state);
   const status = useStableValue(
     resolveDisplayStatus(state),
@@ -152,6 +154,7 @@ export default function DataCards<
         )}
         <CardList
           provider={provider}
+          readApplicability={readApplicability}
           records={records}
           readRow={scopes.readRow}
           title={heading}

@@ -2,7 +2,10 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import { createRowScopes } from "@canonical/dataviews-core/bindings";
+import {
+  createRowScopes,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
@@ -58,6 +61,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[{ id: "status", header: "Status" }]}
@@ -82,6 +86,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -111,6 +116,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -134,6 +140,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "host", header: "Host" }}
           details={[]}
@@ -155,6 +162,7 @@ describe("CardItem", () => {
       render(
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -174,6 +182,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
