@@ -6,7 +6,7 @@ export { default as answerOverHttp2 } from "./answerOverHttp2.js";
 export { default as awaitDelivery } from "./awaitDelivery.js";
 export { default as buildFleet } from "./buildFleet.js";
 export { default as buildMachine } from "./buildMachine.js";
-export { CHART_FACETS, DELIVERY_WAIT, MOCK_API_ORIGIN } from "./constants.js";
+export { CHART_FACETS, MOCK_API_ORIGIN } from "./constants.js";
 export { default as createCuedSource } from "./createCuedSource.js";
 export { default as createFacetedFleet } from "./createFacetedFleet.js";
 export { default as createFacetedManual } from "./createFacetedManual.js";
