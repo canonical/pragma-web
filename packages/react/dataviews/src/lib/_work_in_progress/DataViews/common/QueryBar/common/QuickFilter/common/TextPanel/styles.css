@@ -1,0 +1,9 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /** The quick filter's text panel: one input per operator, in a column. */
+  .ds.data-views-quick-filter-text {
+    display: grid;
+    gap: var(--dimension-200);
+  }
+}

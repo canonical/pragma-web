@@ -1,0 +1,28 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * The quick filter's presence panel: three radios in a column, each label
+   * at least a 24 px target.
+   */
+  .ds.data-views-quick-filter-presence {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-inline-size: 0;
+
+    & > .legend {
+      padding: 0;
+      margin-block-end: var(--dimension-050);
+      color: var(--color-text-muted);
+    }
+
+    & > .option {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+      min-block-size: var(--dimension-300);
+    }
+  }
+}
