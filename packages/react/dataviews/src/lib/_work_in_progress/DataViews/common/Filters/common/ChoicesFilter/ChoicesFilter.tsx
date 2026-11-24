@@ -15,7 +15,7 @@ import {
 } from "../../../../../../hooks/index.js";
 import { spellCount } from "../../../../../../utils/index.js";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import { NO_RECORDS } from "../constants.js";
+import { NO_RECORDS } from "../../../constants.js";
 import { phraseOperator } from "../utils/index.js";
 import type { ChoicesFilterProps } from "./types.js";
 

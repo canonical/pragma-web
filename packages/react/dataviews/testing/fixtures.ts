@@ -8,15 +8,18 @@
  * delivery, a display status, a stored view — is a file of its own beside
  * this one.
  */
+
 import type {
   CountCapabilities,
   DataViewsMessages,
 } from "@canonical/dataviews-core";
+import { createCollection } from "@canonical/dataviews-core";
 import type {
   FacetCase,
   FacetRecord,
   OperatorCase,
   OperatorRecord,
+  QuickHost,
 } from "./types.js";
 
 /** Both counts answered exactly, as complete local input answers them. */
@@ -993,3 +996,69 @@ export const MESSAGE_SAMPLES: {
   chartLowest: null,
   chartHighest: null,
 };
+
+/** Twelve pools: more than a filter's panel lists without a search. */
+const POOLS = Array.from(
+  { length: 12 },
+  (_, index) => `pool-${String(index + 1).padStart(2, "0")}`,
+);
+
+/**
+ * The quick filters' collection: a choice of one among four, one among
+ * twelve, a list of three tags, a choice whose options are the server's,
+ * memory in MiB typed in MiB or GiB, a date, a text and a presence.
+ */
+export const quickHostCollection = createCollection({
+  identify: (host: QuickHost) => host.id,
+  fields: [
+    {
+      field: "status",
+      kind: "choices",
+      options: ["deployed", "ready", "commissioning", "broken"],
+    },
+    { field: "pool", kind: "choices", options: POOLS },
+    {
+      field: "tags",
+      kind: "choices",
+      options: ["ex-gpu", "ex-nvme", "ex-ssd"],
+      multiple: true,
+    },
+    { field: "zone", kind: "choices" },
+    {
+      field: "memory",
+      kind: "number",
+      min: 0,
+      units: {
+        base: "MiB",
+        display: [
+          { symbol: "MiB", factor: 1 },
+          { symbol: "GiB", factor: 1024 },
+        ],
+      },
+    },
+    { field: "seen", kind: "date" },
+    { field: "name", kind: "text" },
+    { field: "owner", kind: "presence" },
+  ],
+});
+
+const STATUSES = ["deployed", "ready", "commissioning", "broken"] as const;
+const TAGS = [["ex-gpu"], ["ex-nvme", "ex-ssd"], []] as const;
+
+/** Twelve hosts, each taking the next status, pool, tag set and zone. */
+export const quickHosts: readonly QuickHost[] = Array.from(
+  { length: 12 },
+  (_, index): QuickHost => {
+    const host = {
+      id: `h${index + 1}`,
+      name: `ex-host-${index + 1}`,
+      status: STATUSES.at(index % STATUSES.length) as string,
+      pool: POOLS.at(index) as string,
+      tags: TAGS.at(index % TAGS.length) as readonly string[],
+      zone: index % 2 === 0 ? "east" : "west",
+      memory: 4096 * (index + 1),
+      seen: `2026-${String(index + 1).padStart(2, "0")}-01`,
+    };
+    return index % 3 === 0 ? { ...host, owner: "ex:ana" } : host;
+  },
+);

@@ -12,6 +12,7 @@ export { default as createFakeChannel } from "./createFakeChannel.js";
 export { default as createListing } from "./createListing.js";
 export { default as createMachineProvider } from "./createMachineProvider.js";
 export { default as createMemoryViewStore } from "./createMemoryViewStore.js";
+export { default as createQuickFilterProvider } from "./createQuickFilterProvider.js";
 export { default as createTokenMessages } from "./createTokenMessages.js";
 export { default as declareMachineOrdering } from "./declareMachineOrdering.js";
 export { default as deliverFacets } from "./deliverFacets.js";
@@ -29,6 +30,8 @@ export {
   MESSAGE_SAMPLES,
   OPERATOR_CASES,
   OPERATOR_RECORDS,
+  quickHostCollection,
+  quickHosts,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
 export { default as installPopoverStandIn } from "./installPopoverStandIn.js";
