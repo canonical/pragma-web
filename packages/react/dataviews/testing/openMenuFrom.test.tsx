@@ -1,11 +1,10 @@
-import { Button } from "@canonical/react-ds-global";
+import { Button, withContextualMenu } from "@canonical/react-ds-global";
 import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { withDropdownMenu } from "../src/lib/common/DropdownButtonStandIn/index.js";
 import installPopoverStandIn from "./installPopoverStandIn.js";
 import openMenuFrom from "./openMenuFrom.js";
 
-const Actions = withDropdownMenu(Button);
+const Actions = withContextualMenu(Button);
 
 describe("openMenuFrom", () => {
   let uninstall: () => void;
@@ -25,10 +24,10 @@ describe("openMenuFrom", () => {
     expect(screen.getByRole("menuitem", { name: "Copy" })).toHaveFocus();
   });
 
-  it("refuses a button that names no panel", async () => {
+  it("refuses a button that names no popover", async () => {
     render(<Button>Plain</Button>);
     await expect(
       openMenuFrom(screen.getByRole("button", { name: "Plain" })),
-    ).rejects.toThrow("a menu button names its panel");
+    ).rejects.toThrow("a menu button names its popover");
   });
 });

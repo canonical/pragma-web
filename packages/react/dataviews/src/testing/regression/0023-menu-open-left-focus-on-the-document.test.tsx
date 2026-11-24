@@ -14,7 +14,6 @@ import {
   createMachineProvider,
   declareMachineOrdering,
   installPopoverStandIn,
-  waitForFocus,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
@@ -44,16 +43,21 @@ describe("regression 0023 — opening a menu left focus on the document", () => 
       screen.getByRole("button", { name: "Column options for Name" });
     const trigger = findTrigger();
     trigger.focus();
+    const focused: Element[] = [];
+    const record = (event: FocusEvent) => focused.push(event.target as Element);
+    document.addEventListener("focusin", record);
     await act(async () => {
       fireEvent.click(trigger);
     });
-    // Open, before any frame passes: the same button, still holding focus.
+    document.removeEventListener("focusin", record);
+    // The same button stays, and focus goes from it straight to the first
+    // item, where it stays.
     const menu = screen.getByRole("menu");
+    const first = within(menu).getByRole("menuitem", {
+      name: "Sort ascending",
+    });
     expect(findTrigger()).toBe(trigger);
-    expect(trigger).toHaveFocus();
-    // Then the menu takes focus on its first item.
-    await waitForFocus(
-      within(menu).getByRole("menuitem", { name: "Sort ascending" }),
-    );
+    expect(focused).toEqual([first]);
+    expect(first).toHaveFocus();
   });
 });

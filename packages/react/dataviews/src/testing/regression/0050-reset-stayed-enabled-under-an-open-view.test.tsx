@@ -76,7 +76,7 @@ describe("regression 0050 — reset stayed enabled under an open view", () => {
     const reset = screen.getByRole("menuitem", {
       name: "Reset table settings",
     });
-    expect(reset).toHaveClass("disabled");
+    expect(reset).toHaveAttribute("aria-disabled", "true");
     fireEvent.click(reset);
     expect(await readAnnouncements()).toEqual([]);
   });

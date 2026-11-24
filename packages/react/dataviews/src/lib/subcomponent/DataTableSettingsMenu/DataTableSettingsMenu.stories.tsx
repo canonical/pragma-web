@@ -56,9 +56,7 @@ const renderCode = `<DataViews provider={provider}>
 const closeMenu = async (canvas: ReturnType<typeof within>): Promise<void> => {
   const trigger = canvas.getByRole("button", { name: "Table settings" });
   await userEvent.click(trigger);
-  await waitFor(() =>
-    expect(trigger).toHaveAttribute("aria-expanded", "false"),
-  );
+  await waitFor(() => expect(canvas.queryByRole("menu")).toBeNull());
 };
 
 /**

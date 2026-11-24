@@ -1,5 +1,10 @@
 import type { DataViewsMessages } from "@canonical/dataviews-core";
 import {
+  type MenuEntry,
+  type MenuItem,
+  withContextualMenu,
+} from "@canonical/react-ds-global";
+import {
   memo,
   type ReactElement,
   type ReactNode,
@@ -7,11 +12,6 @@ import {
   useContext,
   useMemo,
 } from "react";
-import {
-  type DropdownMenuEntry,
-  type DropdownMenuItem,
-  withDropdownMenu,
-} from "../../../../../../../common/DropdownButtonStandIn/index.js";
 import { IconButtonStandIn } from "../../../../../../../common/IconButtonStandIn/index.js";
 import { MessagesContext } from "../../../../../../../common/index.js";
 import { composeMessage } from "../../../../../../../utils/index.js";
@@ -24,7 +24,7 @@ import type { SettingsDestinations, SettingsMenuProps } from "./types.js";
 const componentCssClassName = "ds data-table-settings-menu";
 
 /** The icon button and the menu it opens. */
-const MenuTrigger = withDropdownMenu(IconButtonStandIn);
+const MenuTrigger = withContextualMenu(IconButtonStandIn);
 
 /** The message naming each change to a column. */
 const CHANGE_MESSAGES = {
@@ -36,7 +36,7 @@ const CHANGE_MESSAGES = {
 
 /** The menu's items, what choosing each does and what each says, by key. */
 type ListedItems = {
-  readonly items: DropdownMenuEntry[];
+  readonly items: MenuEntry[];
   readonly actions: ReadonlyMap<string, () => void>;
   readonly labels: ReadonlyMap<string, ReactNode>;
 };
@@ -93,23 +93,23 @@ const listItems = (
     content: ReactNode,
     disabled: boolean,
     url: string | undefined,
-  ): DropdownMenuItem => {
+  ): MenuItem => {
     labels.set(key, content);
     const item = { key, disabled, displayItemsType: "custom" as const };
-    // A disabled item leads nowhere, so before scripts it is hidden too.
-    return disabled || url === undefined
+    // The menu hides a disabled link before scripts, as it does an action.
+    return url === undefined
       ? { ...item, Component: ItemLabel }
       : { ...item, url, Component: ItemLabel };
   };
   // Waiting, every item is disabled, and the reason stands first.
   const waiting = reason !== null;
-  const items: DropdownMenuEntry[] = waiting
+  const items: MenuEntry[] = waiting
     ? [
         buildItem("reason", reason, true, undefined),
         { type: "separator", key: "separator:reason" },
       ]
     : [];
-  const changes = settings.flatMap((setting): DropdownMenuEntry[] => {
+  const changes = settings.flatMap((setting): MenuEntry[] => {
     const { id, hideable } = setting.column;
     const entries = listChanges(setting).map((change) => {
       const key = spellDestinationKey(id, change);
@@ -166,7 +166,7 @@ const SettingsMenu = ({
     [settings, resettable, reason, onChange, onReset, messages, destinations],
   );
   const choose = useCallback(
-    (item: DropdownMenuItem) => {
+    (item: MenuItem) => {
       // Every item listed here has a key; separators are not chosen.
       actions.get(String(item.key))?.();
     },

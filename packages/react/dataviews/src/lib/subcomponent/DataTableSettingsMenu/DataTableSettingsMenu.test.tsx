@@ -256,7 +256,7 @@ describe("DataTable.SettingsMenu", () => {
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide Status" }));
     await openMenuFrom(table.getByRole("button", { name: "Table settings" }));
     const hideLast = screen.getByRole("menuitem", { name: "Hide Cores" });
-    expect(hideLast).toHaveClass("disabled");
+    expect(hideLast).toHaveAttribute("aria-disabled", "true");
     fireEvent.click(hideLast);
     expect(other.provider.presentation.state.get().presentation).toEqual({
       "table.t.hidden": ["status"],
@@ -270,7 +270,7 @@ describe("DataTable.SettingsMenu", () => {
     const reset = screen.getByRole("menuitem", {
       name: "Reset table settings",
     });
-    expect(reset).toHaveClass("disabled");
+    expect(reset).toHaveAttribute("aria-disabled", "true");
     fireEvent.click(reset);
     // A disabled item leaves the menu open.
     expect(reset).toBeInTheDocument();
@@ -377,7 +377,7 @@ describe("DataTable.SettingsMenu", () => {
     await openMenuFrom(findTrigger());
     expect(
       screen.getByRole("menuitem", { name: "Reset table settings" }),
-    ).toHaveClass("disabled");
+    ).toHaveAttribute("aria-disabled", "true");
   });
 
   it("has no axe violations with the menu closed and open", async () => {

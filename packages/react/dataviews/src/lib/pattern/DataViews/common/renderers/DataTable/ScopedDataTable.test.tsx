@@ -214,7 +214,7 @@ describe("ScopedDataTable", () => {
       "Columns can change once the linked view has loaded.",
     );
     for (const item of items) {
-      expect(item).toHaveClass("disabled");
+      expect(item).toHaveAttribute("aria-disabled", "true");
     }
   });
 
