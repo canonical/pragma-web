@@ -256,4 +256,31 @@ describe("fr", () => {
       "Non valide : pas un nombre",
     );
   });
+  it("words the query bar's ranges, clashes and disclosure", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(fr.clauseBound({ label: "Cœurs", bound: "lower" })).toBe(
+      "Borne inférieure de Cœurs",
+    );
+    expect(fr.clauseBound({ label: "Cœurs", bound: "upper" })).toBe(
+      "Borne supérieure de Cœurs",
+    );
+    expect(fr.rangeClause({ lower: "au moins 2", upper: "au plus 8" })).toBe(
+      "au moins 2 et au plus 8",
+    );
+    expect(fr.filtersDisclosure({ applied: 0 })).toBe("Filtres");
+    expect(fr.filtersDisclosure({ applied: 2 })).toBe("Filtres (2)");
+    expect(fr.queryContradiction({ label: "Cœurs" })).toBe(
+      "Les filtres Cœurs ne peuvent pas tous être vrais : rien ne correspond.",
+    );
+    expect(fr.mergeClauses({ label: "Cœurs" })).toBe(
+      "Fusionner les filtres Cœurs",
+    );
+    expect(
+      fr.clausesMerged({
+        label: "Cœurs",
+        count: { kind: "exact", value: 3 },
+        noun,
+      }),
+    ).toBe("Filtres Cœurs fusionnés. 3 machines.");
+  });
 });
