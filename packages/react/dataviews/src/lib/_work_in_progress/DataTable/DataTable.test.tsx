@@ -1229,14 +1229,14 @@ describe("DataTable", () => {
   const plainName: DataTableColumn = { id: "name", header: "Name" };
   const plainStatus: DataTableColumn = { id: "status", header: "Status" };
 
-  it.fails("is a tab stop where no control inside takes focus", () => {
+  it("is a tab stop where no control inside takes focus", () => {
     renderOrderingTable(3, [], [plainName, plainStatus]);
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table.querySelector("button, input, a[href]")).toBeNull();
     expect(table.tabIndex).toBe(0);
   });
 
-  it.fails.each<
+  it.each<
     [
       string,
       {
@@ -1269,7 +1269,7 @@ describe("DataTable", () => {
     );
   });
 
-  it.fails("is no tab stop where a column's own content holds a link", async () => {
+  it("is no tab stop where a column's own content holds a link", async () => {
     const Link = ({ value, rowId }: DisplayFieldCellProps) => (
       <a href={`/machines/${rowId}`}>{String(value)}</a>
     );
@@ -1279,7 +1279,7 @@ describe("DataTable", () => {
     await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
   });
 
-  it.fails("is a tab stop where a column's own link is hidden", async () => {
+  it("is a tab stop where a column's own link is hidden", async () => {
     const HiddenLink = ({ value, rowId }: DisplayFieldCellProps) => (
       <span hidden>
         <a href={`/machines/${rowId}`}>{String(value)}</a>
@@ -1295,7 +1295,7 @@ describe("DataTable", () => {
     await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
   });
 
-  it.fails("flips the tab stop as selection comes and goes", async () => {
+  it("flips the tab stop as selection comes and goes", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -1316,7 +1316,7 @@ describe("DataTable", () => {
     await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
   });
 
-  it.fails("flips the tab stop as a refreshed row draws a link or none", async () => {
+  it("flips the tab stop as a refreshed row draws a link or none", async () => {
     // A status cell that links only a running machine.
     const LinkRunning = ({ value, rowId }: DisplayFieldCellProps) =>
       value === "running" ? (
@@ -1342,7 +1342,7 @@ describe("DataTable", () => {
     await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
   });
 
-  it.fails("flips the tab stop as a control inside is disabled or not", async () => {
+  it("flips the tab stop as a control inside is disabled or not", async () => {
     // A status cell whose one button is enabled only on a running machine.
     const ActRunning = ({ value }: DisplayFieldCellProps) => (
       <button type="button" disabled={value !== "running"}>
@@ -1370,7 +1370,7 @@ describe("DataTable", () => {
     expect(within(table).getByRole("button")).toBe(button);
   });
 
-  it.fails("keeps focus on a focused table as it comes to hold a control", async () => {
+  it("keeps focus on a focused table as it comes to hold a control", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });

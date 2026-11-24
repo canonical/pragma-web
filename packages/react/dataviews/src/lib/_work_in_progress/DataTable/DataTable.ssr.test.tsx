@@ -71,7 +71,7 @@ describe("DataTable SSR", () => {
     expect(readPresentation).not.toHaveBeenCalled();
     expect(heard).not.toHaveBeenCalled();
     expect(html).toContain('class="ds data-table dense"');
-    expect(html).toContain('<table class="ds data-table dense"');
+    expect(html).toMatch(/<table[^>]* class="ds data-table dense"/);
     expect(html).toContain('aria-label="Machines"');
     // A resize handle's keys work only once scripts run, so none is sent.
     expect(html).not.toContain('role="separator"');
@@ -98,7 +98,7 @@ describe("DataTable SSR", () => {
     ).toHaveLength(2);
   });
 
-  it.fails("is a tab stop before scripts run where no control takes focus", () => {
+  it("is a tab stop before scripts run where no control takes focus", () => {
     // No location: the checkboxes are disabled and no handle is sent.
     const { provider } = createMachineProvider();
     const html = renderToString(
@@ -131,7 +131,7 @@ describe("DataTable SSR", () => {
     );
   };
 
-  it.fails.each([
+  it.each([
     [
       "a sortable column",
       { columns: [{ id: "name", header: "Name", sortable: true }] },
@@ -141,11 +141,11 @@ describe("DataTable SSR", () => {
     expect(renderLocated(props)).toMatch(/<table[^>]* tabindex="-1"/);
   });
 
-  it.fails("is a tab stop before scripts run with a location and no link", () => {
+  it("is a tab stop before scripts run with a location and no link", () => {
     expect(renderLocated({})).toMatch(/<table[^>]* tabindex="0"/);
   });
 
-  it.fails("is a tab stop before scripts run even where a row's cell holds a link", () => {
+  it("is a tab stop before scripts run even where a row's cell holds a link", () => {
     const Link = ({ value, rowId }: DisplayFieldCellProps) => (
       <a href={`/machines/${rowId}`}>{String(value)}</a>
     );

@@ -162,3 +162,22 @@ export type UseHeaderSortResult = {
   /** Let a refusal's reason go. */
   readonly clearRefusal: () => void;
 };
+
+/** What the tab stop hook reads: the header row and what render can draw. */
+export type UseTabStopProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  readonly provider: DataViewsProvider<TFields, TRow>;
+  /** The header row, whose table is read once committed. */
+  readonly headerRow: RefObject<HTMLTableRowElement | null>;
+  /** The columns shown, in their order. */
+  readonly columns: readonly DataTableColumn[];
+  /** Whether a column's header draws a sort. */
+  readonly isSortable: (column: DataTableColumn) => boolean;
+  /** Whether the table has settings. */
+  readonly arranged: boolean;
+};
+
+/** The table's tab index: 0 where Tab reaches nothing inside, else -1. */
+export type UseTabStopResult = 0 | -1;
