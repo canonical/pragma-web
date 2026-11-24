@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  machines,
   silenceRenderErrors,
 } from "../../../../../../../testing/index.js";
 import type { DisplayField } from "../../../../../common/index.js";
 import DataViews from "../../../Provider.js";
+import { createColumns } from "../DataTable/index.js";
 import DataCards from "./ConnectedDataCards.js";
 
 const fields: readonly DisplayField[] = [
@@ -48,5 +50,27 @@ describe("DataViews DataCards", () => {
     expect(() =>
       render(<DataCards fields={fields} title="name" label="Machines" />),
     ).toThrow("DataViews.DataCards must be used inside a DataViews root");
+  });
+
+  it("names each card from a record typed by its fields", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    render(
+      <DataViews provider={provider}>
+        <DataCards
+          fields={createColumns({
+            collection: machines,
+            columns: [{ field: "name", header: "Name" }],
+          })}
+          title="name"
+          label="Machines"
+          getRowLabel={(row) => `${row.name} (${row.status})`}
+        />
+      </DataViews>,
+    );
+    expect(
+      screen.getByRole("listitem", { name: "alpha (running)" }),
+    ).toBeInTheDocument();
   });
 });

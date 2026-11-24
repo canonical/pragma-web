@@ -1,5 +1,7 @@
+import type { RowRecord } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useDataViewsRoot } from "../../../hooks/index.js";
+import { narrowRootRecords } from "../../utils/index.js";
 import Standalone from "./DataCards.js";
 import type { DataViewsDataCardsProps } from "./types.js";
 
@@ -20,11 +22,17 @@ import type { DataViewsDataCardsProps } from "./types.js";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export default function ConnectedDataCards(
-  props: DataViewsDataCardsProps,
+export default function ConnectedDataCards<TRow extends object = RowRecord>(
+  props: DataViewsDataCardsProps<TRow>,
 ): ReactElement {
   const { provider, messages } = useDataViewsRoot("DataCards");
-  return <Standalone {...props} provider={provider} messages={messages} />;
+  return (
+    <Standalone
+      {...props}
+      provider={narrowRootRecords(provider, props.fields, "DataCards")}
+      messages={messages}
+    />
+  );
 }
 
 ConnectedDataCards.displayName = "DataViews.DataCards";

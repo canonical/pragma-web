@@ -3,6 +3,7 @@
 export type {
   DataTableColumn,
   DataTableProps,
+  DeclaredColumns,
 } from "./DataViews/common/renderers/DataTable/index.js";
 export {
   createColumns,

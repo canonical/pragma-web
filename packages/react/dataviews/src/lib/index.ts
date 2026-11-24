@@ -45,6 +45,7 @@ export type {
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
+  DeclaredColumns,
   UseDataViewsFilterProps,
   UseDataViewsFilterResult,
   UseDataViewsProps,

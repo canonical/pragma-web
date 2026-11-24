@@ -13,6 +13,7 @@ import type {
 } from "react";
 import type { AnnouncerTopic } from "../../../../../common/index.js";
 import type { DataTableVirtualization } from "../../../../../virtualization/types.js";
+import type { ConnectedColumns } from "../../../types.js";
 import type { DataTableColumn } from "./common/index.js";
 
 type OwnProps<
@@ -25,7 +26,7 @@ type OwnProps<
    * The columns, in declared order; the presentation decides which show and
    * where.
    */
-  readonly columns: readonly DataTableColumn<TRow>[];
+  readonly columns: readonly DataTableColumn<NoInfer<TRow>>[];
   /** The table's accessible name. */
   readonly label: string;
   /** Render a leading selection column backed by the provider's selection. */
@@ -96,17 +97,31 @@ export type DataTableProps<
   readonly messages?: Partial<DataViewsMessages>;
 };
 
+/** The brand of a column list `createColumns` returned; never exported. */
+declare const declaredOver: unique symbol;
+
 /**
- * Props of the connected table: the table's own, less what the enclosing
- * root supplies — the provider, and the words its parts speak. The records
- * are the widest shape, since the root's provider may have been built over
- * any collection; a custom cell narrows them through
- * `useDataViewsCell(collection)`.
+ * A column list `createColumns` returned over records `TRow`. The brand's
+ * key is type-only and not exported, so no other list carries it.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type DataViewsDataTableProps = Omit<
-  DataTableProps<readonly SchemaFieldDefinition[]>,
-  "provider" | "messages"
->;
+export type DeclaredColumns<TRow extends object> =
+  readonly DataTableColumn<TRow>[] & { readonly [declaredOver]: TRow };
+
+/**
+ * Props of the connected table: the table's own, less what the enclosing
+ * root supplies — the provider, and the words its parts speak. Columns from
+ * `createColumns` type `TRow`; plain columns read `RowRecord`.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsDataTableProps<TRow extends object = RowRecord> = Omit<
+  DataTableProps<readonly SchemaFieldDefinition[], NoInfer<TRow>>,
+  "provider" | "messages" | "columns"
+> & {
+  /** The columns, in declared order. */
+  readonly columns: ConnectedColumns<TRow, DataTableColumn<NoInfer<TRow>>>;
+};

@@ -8,6 +8,7 @@ import type { FunctionComponent, ReactNode } from "react";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import { readColumnRegistry } from "../../../../../utils/index.js";
 import type { DataTableColumn } from "./common/index.js";
+import type { DeclaredColumns } from "./types.js";
 
 /** The members of a record union that declare a name. */
 type Declaring<TUnion, TName> = TUnion extends unknown
@@ -150,7 +151,7 @@ export default function createColumns<
   readonly collection: Collection<TFields, TRow>;
   /** The columns, in declared order. */
   readonly columns: readonly TypedColumn<TFields, TRow>[];
-}): readonly DataTableColumn<TRow>[] {
+}): DeclaredColumns<TRow> {
   const ids = new Set<string>();
   const declared = Object.freeze(
     columns.map((column): DataTableColumn<TRow> => {
@@ -194,5 +195,6 @@ export default function createColumns<
     }),
   );
   readColumnRegistry().set(declared, collection);
-  return declared;
+  // The brand is type-only, and this list is the one it proves.
+  return declared as DeclaredColumns<TRow>;
 }

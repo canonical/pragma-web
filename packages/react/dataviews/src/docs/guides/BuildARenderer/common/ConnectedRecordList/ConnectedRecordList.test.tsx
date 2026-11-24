@@ -6,6 +6,7 @@ import {
   machines,
   silenceRenderErrors,
 } from "../../../../../../testing/index.js";
+import { createColumns } from "../../../../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../../../../lib/pattern/DataViews/index.js";
 import ConnectedRecordList from "./ConnectedRecordList.js";
 
@@ -24,10 +25,13 @@ describe("ConnectedRecordList", () => {
         />
         <DataViews.DataTable
           id="t"
-          columns={[{ id: "name", header: "Name" }]}
+          columns={createColumns({
+            collection: machines,
+            columns: [{ field: "name", header: "Name" }],
+          })}
           label="Machine table"
           selectable
-          getRowLabel={(row) => String(row["name"])}
+          getRowLabel={(row) => row.name}
         />
       </DataViews>,
     );
