@@ -11,18 +11,16 @@ const componentCssClassName = "ds indentation-block";
  * @returns {React.ReactElement} - Rendered IndentationBlock
  */
 const IndentationBlock = ({
-  id,
-  className,
-  style,
   depth,
+  className,
+  ...props
 }: IndentationBlockProps): React.ReactElement | null => {
   const uid = useId();
 
   return (
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
     >
       {Array.from({ length: depth }).map((_, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: index is prefixed with a uid

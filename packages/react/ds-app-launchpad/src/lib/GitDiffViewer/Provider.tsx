@@ -1,13 +1,22 @@
 import { forwardRef, useCallback, useState } from "react";
 import Context from "./Context.js";
 import "./styles.css";
-import type { ProviderOptions } from "./types.js";
+import type { ContextOptions, ProviderOptions } from "./types.js";
 
 const componentCssClassName = "ds git-diff-viewer";
 
 const Provider = forwardRef<HTMLDivElement, ProviderOptions>(
   (
-    { id, className, style, children, ...contextOptions },
+    {
+      className,
+      children,
+      diff,
+      lineDecorations,
+      wrapLines,
+      isCollapsed,
+      onCollapseToggle,
+      ...props
+    },
     ref,
   ): React.ReactElement => {
     const [addCommentOpenLocations, setAddCommentOpenLocations] = useState<
@@ -29,18 +38,25 @@ const Provider = forwardRef<HTMLDivElement, ProviderOptions>(
 
     return (
       <Context.Provider
-        value={{
-          ...contextOptions,
-          addCommentOpenLocations,
-          toggleAddCommentLocation,
-        }}
+        // Each all-or-none option group arrives whole from the props type;
+        // destructuring it out of the native props only hides that pairing.
+        value={
+          {
+            diff,
+            lineDecorations,
+            wrapLines,
+            isCollapsed,
+            onCollapseToggle,
+            addCommentOpenLocations,
+            toggleAddCommentLocation,
+          } as ContextOptions
+        }
       >
         <div
-          id={id}
-          style={style}
           className={[componentCssClassName, className]
             .filter(Boolean)
             .join(" ")}
+          {...props}
           ref={ref}
         >
           {children}

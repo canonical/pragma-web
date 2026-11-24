@@ -16,4 +16,16 @@ describe("FileTree component", () => {
     );
     expect(container.querySelector(".test-class")).toBeInTheDocument();
   });
+
+  it("forwards native props to the wrapper root", () => {
+    const { container } = render(
+      <FileTree data-testid="file-tree" aria-label="Files" className="extra">
+        FileTree
+      </FileTree>,
+    );
+    const root = container.firstElementChild;
+    expect(root).toHaveAttribute("data-testid", "file-tree");
+    expect(root).toHaveAttribute("aria-label", "Files");
+    expect(root).toHaveClass("ds", "file-tree", "extra");
+  });
 });

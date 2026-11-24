@@ -12,9 +12,8 @@ const componentCssClassName = "ds search-box";
  * @returns {React.ReactElement} - Rendered SearchBox
  */
 const SearchBox = ({
-  id,
   className,
-  style,
+  ...props
 }: SearchBoxProps): React.ReactElement | null => {
   const { searchQuery, onSearch } = useFileTree();
 
@@ -49,9 +48,8 @@ const SearchBox = ({
 
   return (
     <form
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
       onSubmit={handleSearch}
       onReset={handleReset}
     >

@@ -6,18 +6,16 @@ import "./styles.css";
 const componentCssClassName = "ds detailed-change-marker";
 
 const DetailedChangeMarker = ({
-  id,
-  className,
-  style,
   added,
   deleted,
   modified,
+  className,
+  ...props
 }: DetailedChangeMarkerProps): React.ReactElement => {
   return (
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
     >
       {added && <span className="added">{added}</span>}
       {deleted && <span className="deleted">{deleted}</span>}

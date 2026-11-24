@@ -17,6 +17,15 @@ describe("MarkdownEditor", () => {
     expect(screen.getByLabelText("Markdown Editor")).toBeInTheDocument();
   });
 
+  it("forwards native textarea props to the inner textarea", () => {
+    render(
+      <MarkdownEditor data-testid="editor" aria-label="Markdown content" />,
+    );
+    const textarea = screen.getByRole("textbox");
+    expect(textarea).toHaveAttribute("data-testid", "editor");
+    expect(textarea).toHaveAttribute("aria-label", "Markdown content");
+  });
+
   it("switches between write and preview modes", async () => {
     const { container } = render(
       <MarkdownEditor defaultValue={fixtures.markdownLongExample} />,

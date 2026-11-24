@@ -1,6 +1,6 @@
 /* @canonical/generator-ds 0.8.0-experimental.0 */
 import type React from "react";
-import type { JSX } from "react";
+import type { ComponentProps, JSX } from "react";
 
 export interface EditingContextType {
   isEditing: boolean;
@@ -13,15 +13,9 @@ export type EditElement<T extends EditElementProps> = (
   props: T,
 ) => React.ReactNode;
 
-export interface EditableBlockProps<T extends EditElementProps> {
-  /** Unique identifier for the editable block */
-  id?: string;
+type OwnProps<T extends EditElementProps> = {
   /** Component to render when in edit mode, must implement EditElement interface */
   EditComponent: EditElement<T>;
-  /** CSS class name for additional styling */
-  className?: string;
-  /** Inline CSS styles to apply to the component */
-  style?: React.CSSProperties;
   /** Title text for the editable block */
   title?: string;
   /** HTML element type to render as the title component (e.g., 'div', 'section') */
@@ -29,6 +23,9 @@ export interface EditableBlockProps<T extends EditElementProps> {
 
   /** Whether the block is read-only */
   isReadOnly?: boolean;
-}
+};
+
+export type EditableBlockProps<T extends EditElementProps> = OwnProps<T> &
+  Omit<ComponentProps<"div">, keyof OwnProps<T>>;
 
 export type { EditableBlockProps as default };

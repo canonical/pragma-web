@@ -1,6 +1,7 @@
 /* @canonical/generator-ds 0.9.0-experimental.1 */
 import type { AllOrNone } from "@canonical/ds-utils";
 import type React from "react";
+import type { ComponentProps } from "react";
 import type {
   FileProps,
   FolderProps,
@@ -65,13 +66,7 @@ export type ManagedContextOptions = {
 };
 export type ContextOptions = UserContextOptions & ManagedContextOptions;
 
-export type ProviderOptions = {
-  /** A unique identifier for the SearchBox */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Inline styles */
-  style?: React.CSSProperties;
+type OwnProps = {
   /**
    * Consider using `FileTree.Folder` and `FileTree.File` components to build the file tree.
    */
@@ -82,6 +77,9 @@ export type ProviderOptions = {
    */
   header?: React.ReactNode;
 } & UserContextOptions;
+
+export type ProviderOptions = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps>;
 
 export type FileTreeComponent = ((
   props: ProviderOptions,

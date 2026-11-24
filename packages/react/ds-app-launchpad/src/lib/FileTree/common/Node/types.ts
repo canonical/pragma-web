@@ -1,3 +1,4 @@
+import type { ComponentProps, ReactNode } from "react";
 import type { FileTreeData } from "../../types.js";
 
 export type ContextOptions = {
@@ -17,17 +18,12 @@ export type FolderOptions = {
   defaultOpen?: boolean;
 };
 
-export type ProviderProps = {
-  /** A unique identifier for the Folder */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Child elements */
-  children?: React.ReactNode;
-  /** Inline styles */
-  style?: React.CSSProperties;
+type OwnProps = {
   name: string;
 
   /** Shows a marker to the right of the node */
-  marker?: React.ReactNode;
+  marker?: ReactNode;
 } & (FileOptions | FolderOptions);
+
+export type ProviderProps = OwnProps &
+  Omit<ComponentProps<"li">, keyof OwnProps>;

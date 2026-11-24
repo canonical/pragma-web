@@ -9,15 +9,13 @@ const componentCssClassName = "ds toolbar-separator";
  * A visual separator between groups of controls in a toolbar.
  */
 const ToolbarSeparator = ({
-  id,
   className,
-  style,
+  ...props
 }: ToolbarSeparatorProps): React.ReactElement => {
   return (
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
     />
   );
 };

@@ -75,4 +75,20 @@ describe("FileHeader component", () => {
     );
     expect(screen.getByTestId("mock-diff-change-marker")).toBeDefined();
   });
+
+  it("forwards native props to the div root", () => {
+    render(
+      <Provider diff={fixtures.diffExample}>
+        <Component
+          className="custom-class"
+          data-testid="file-header"
+          aria-label="Diff file header"
+        />
+      </Provider>,
+    );
+    const header = screen.getByTestId("file-header");
+    expect(header.tagName).toBe("DIV");
+    expect(header).toHaveClass("custom-class");
+    expect(header).toHaveAttribute("aria-label", "Diff file header");
+  });
 });

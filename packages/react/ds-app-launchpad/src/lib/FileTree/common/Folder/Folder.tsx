@@ -9,24 +9,12 @@ import type { FolderProps } from "./types.js";
  * @returns {React.ReactElement} - Rendered Folder
  */
 const Folder = ({
-  id,
-  children,
-  className,
-  style,
   name,
   defaultOpen,
+  ...props
 }: FolderProps): React.ReactElement => {
   return (
-    <Node
-      id={id}
-      className={className}
-      style={style}
-      name={name}
-      nodeType="folder"
-      defaultOpen={defaultOpen}
-    >
-      {children}
-    </Node>
+    <Node {...props} name={name} nodeType="folder" defaultOpen={defaultOpen} />
   );
 };
 

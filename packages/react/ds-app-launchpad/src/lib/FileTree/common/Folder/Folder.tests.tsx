@@ -34,4 +34,21 @@ describe("File component", () => {
       });
     });
   });
+
+  it("forwards native props to the li root", () => {
+    render(
+      <FileTree>
+        <FileTree.Folder
+          name="assets"
+          data-testid="folder-node"
+          aria-label="Folder assets"
+        />
+      </FileTree>,
+    );
+    const node = screen.getByTestId("folder-node");
+    expect(node.tagName).toBe("LI");
+    expect(node).toHaveClass("ds node");
+    expect(node).toHaveClass("folder");
+    expect(node).toHaveAttribute("aria-label", "Folder assets");
+  });
 });

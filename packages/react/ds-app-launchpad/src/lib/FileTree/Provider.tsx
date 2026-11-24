@@ -2,18 +2,25 @@ import type React from "react";
 import { useCallback, useEffect, useRef } from "react";
 import Context from "./Context.js";
 import "./styles.css";
-import type { ManagedContextOptions, ProviderOptions } from "./types.js";
+import type {
+  ContextOptions,
+  ManagedContextOptions,
+  ProviderOptions,
+} from "./types.js";
 
 const componentCssClassName = "ds file-tree";
 export const dataPathHash = "data-path-hash";
 
 const Provider = ({
-  id,
   className,
-  style,
   children,
   header,
-  ...contextOptions
+  selectedFile,
+  onSelectFile,
+  searchQuery,
+  onSearch,
+  expandable,
+  ...props
 }: ProviderOptions): React.ReactElement => {
   const fileTreeRef = useRef<HTMLUListElement>(null);
 
@@ -99,22 +106,28 @@ const Provider = ({
       `[${dataPathHash}]:not([hidden])`,
     );
     firstNode?.setAttribute("tabindex", "0");
-  }, [contextOptions.searchQuery, contextOptions.selectedFile]);
+  }, [searchQuery, selectedFile]);
 
   return (
     <Context.Provider
-      value={{
-        ...contextOptions,
-        expandable: contextOptions.expandable ?? false,
-        focusNextNode: handleFocusNextNode,
-        focusEndNode: handleFocusEndNode,
-        focusNextSiblingCharacter: handleFocusNextSiblingCharacter,
-      }}
+      // Each all-or-none option group arrives whole from the props type;
+      // destructuring it out of the native props only hides that pairing.
+      value={
+        {
+          selectedFile,
+          onSelectFile,
+          searchQuery,
+          onSearch,
+          expandable: expandable ?? false,
+          focusNextNode: handleFocusNextNode,
+          focusEndNode: handleFocusEndNode,
+          focusNextSiblingCharacter: handleFocusNextSiblingCharacter,
+        } as ContextOptions
+      }
     >
       <div
-        id={id}
-        style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
+        {...props}
       >
         {header}
         {/* biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: legacy code */}

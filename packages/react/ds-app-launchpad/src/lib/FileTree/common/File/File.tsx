@@ -8,23 +8,8 @@ import type { FileProps } from "./types.js";
  * description of the File component
  * @returns {React.ReactElement} - Rendered File
  */
-const File = ({
-  id,
-  className,
-  style,
-  name,
-  marker,
-}: FileProps): React.ReactElement => {
-  return (
-    <Node
-      id={id}
-      className={className}
-      style={style}
-      name={name}
-      nodeType="file"
-      marker={marker}
-    />
-  );
+const File = ({ name, marker, ...props }: FileProps): React.ReactElement => {
+  return <Node {...props} name={name} nodeType="file" marker={marker} />;
 };
 
 export default File;

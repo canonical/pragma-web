@@ -18,15 +18,14 @@ const componentCssClassName = "ds relative-time";
  * and renders as proper semantic HTML using the <time> element. The component leverages the Temporal API for calculations and Intl.RelativeTimeFormat for localization.
  */
 const RelativeTime = ({
-  id,
-  className,
-  style,
   time,
   relativeTimeFormat,
   nowThreshold = 10,
   disableLiveUpdate = false,
   nowKeyword = "now",
   invalidDateKeyword = "invalid date",
+  className,
+  ...props
 }: RelativeTimeProps): React.ReactElement => {
   const [relativeTime, setRelativeTime] = useState("");
   const [localeTimeString, setLocaleTimeString] = useState("");
@@ -92,9 +91,8 @@ const RelativeTime = ({
 
   return (
     <time
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
       title={localeTimeString}
       dateTime={stringTime}
     >

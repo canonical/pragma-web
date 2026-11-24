@@ -104,4 +104,20 @@ describe("Toolbar", () => {
 
     expect(divElement).toHaveFocus();
   });
+
+  it("forwards native props to the toolbar root", () => {
+    render(
+      <Toolbar
+        label="Test Toolbar"
+        data-testid="toolbar"
+        aria-describedby="hint"
+      >
+        <button type="button">Button 1</button>
+      </Toolbar>,
+    );
+    const toolbar = screen.getByRole("toolbar", { name: "Test Toolbar" });
+    expect(toolbar).toHaveClass("ds toolbar");
+    expect(toolbar).toHaveAttribute("data-testid", "toolbar");
+    expect(toolbar).toHaveAttribute("aria-describedby", "hint");
+  });
 });

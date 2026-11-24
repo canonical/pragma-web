@@ -1,18 +1,14 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
-import type React from "react";
+import type { ComponentProps, ReactNode } from "react";
 
-export interface FileProps {
-  /** A unique identifier for the File */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Inline styles */
-  style?: React.CSSProperties;
+type OwnProps = {
   /** File name */
   name: string;
 
   /**
    * Shows a marker to the right of the file name.
    */
-  marker?: React.ReactNode;
-}
+  marker?: ReactNode;
+};
+
+export type FileProps = OwnProps & Omit<ComponentProps<"li">, keyof OwnProps>;

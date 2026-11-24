@@ -34,4 +34,20 @@ describe("File component", () => {
       });
     });
   });
+
+  it("forwards native props to the li root", () => {
+    render(
+      <FileTree>
+        <FileTree.File
+          name="example.js"
+          data-testid="file-node"
+          aria-label="File example"
+        />
+      </FileTree>,
+    );
+    const node = screen.getByTestId("file-node");
+    expect(node.tagName).toBe("LI");
+    expect(node).toHaveClass("ds node");
+    expect(node).toHaveAttribute("aria-label", "File example");
+  });
 });

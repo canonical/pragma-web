@@ -133,4 +133,19 @@ describe("ViewModeTabs", () => {
     expect(updatedTabs[0]).toHaveAttribute("tabIndex", "-1");
     expect(updatedTabs[1]).toHaveAttribute("tabIndex", "0");
   });
+
+  it("forwards native props to the tablist root", () => {
+    render(
+      <Component
+        editMode="write"
+        onEditModeChange={mockOnEditModeChange}
+        data-testid="view-mode-tabs"
+        aria-labelledby="tabs-label"
+      />,
+    );
+    const tablist = screen.getByRole("tablist");
+    expect(tablist).toHaveClass("ds view-mode-tabs");
+    expect(tablist).toHaveAttribute("data-testid", "view-mode-tabs");
+    expect(tablist).toHaveAttribute("aria-labelledby", "tabs-label");
+  });
 });

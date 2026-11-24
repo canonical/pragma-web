@@ -1,5 +1,5 @@
 /* @canonical/generator-canonical-ds 0.0.1 */
-import type React from "react";
+import type { ComponentProps } from "react";
 
 export type DiffContentLine = {
   content: string;
@@ -27,16 +27,14 @@ export type DiffHunkLine = {
 };
 
 type DiffLineCommonProps = {
-  /** A unique identifier for the DiffLine */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Inline styles */
-  style?: React.CSSProperties;
   /** Callback function for when a line is clicked. */
   onLineClick?: (() => void) | undefined;
 };
 
-export type DiffContentLineProps = DiffLineCommonProps & DiffContentLine;
-export type DiffHunkLineProps = DiffLineCommonProps & DiffHunkLine;
+export type DiffContentLineProps = DiffLineCommonProps &
+  DiffContentLine &
+  Omit<ComponentProps<"tr">, keyof DiffLineCommonProps | keyof DiffContentLine>;
+export type DiffHunkLineProps = DiffLineCommonProps &
+  DiffHunkLine &
+  Omit<ComponentProps<"tr">, keyof DiffLineCommonProps | keyof DiffHunkLine>;
 export type DiffLineProps = DiffContentLineProps | DiffHunkLineProps;

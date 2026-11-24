@@ -1,5 +1,5 @@
 /* @canonical/generator-ds 0.9.0-experimental.12 */
-import type React from "react";
+import type { ComponentProps } from "react";
 
 export type DiffChangeAutoOptions = {
   deletions: number;
@@ -16,12 +16,8 @@ export type MarkerOptions = {
   markerStyle: "detailed" | "simple";
 };
 
-export type DiffChangeMarkerProps = {
-  /* A unique identifier for the DiffChangeMarker */
-  id?: string;
-  /* Additional CSS classes */
-  className?: string;
-  /* Inline styles */
-  style?: React.CSSProperties;
-} & MarkerOptions &
+type OwnProps = MarkerOptions &
   (DiffChangeAutoOptions | DiffChangeManualOptions);
+
+export type DiffChangeMarkerProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps>;

@@ -12,25 +12,30 @@ const componentCssClassName = "ds diff-change-marker";
  * @returns {React.ReactElement} - Rendered DiffChangeMarker
  */
 const DiffChangeMarker = ({
-  id,
-  className,
-  style,
   markerStyle,
-  ...markerOptions
-}: DiffChangeMarkerProps): React.ReactElement => {
-  const isManual = "type" in markerOptions;
+  additions,
+  deletions,
+  type,
+  className,
+  ...props
+}: DiffChangeMarkerProps & {
+  additions?: number;
+  deletions?: number;
+  type?: DiffChangeType;
+}): React.ReactElement => {
+  const isManual = type !== undefined;
 
-  const getChangeType = () => {
+  const getChangeType = (): DiffChangeType => {
     if (isManual) {
-      return markerOptions.type;
+      return type as DiffChangeType;
     }
-    if (markerOptions.additions && markerOptions.deletions) {
+    if (additions && deletions) {
       return "modified";
     }
-    if (markerOptions.additions) {
+    if (additions) {
       return "added";
     }
-    if (markerOptions.deletions) {
+    if (deletions) {
       return "deleted";
     }
     return "modified";
@@ -51,11 +56,10 @@ const DiffChangeMarker = ({
 
   return (
     <div
-      id={id}
-      style={style}
-      className={[componentCssClassName, className, `style-${markerStyle}`]
+      className={[componentCssClassName, `style-${markerStyle}`, className]
         .filter(Boolean)
         .join(" ")}
+      {...props}
     >
       {markerStyle === "detailed" ? (
         isManual ? (
@@ -64,16 +68,8 @@ const DiffChangeMarker = ({
           />
         ) : (
           <DetailedChangeMarker
-            deleted={
-              markerOptions.deletions > 0
-                ? `-${markerOptions.deletions}`
-                : undefined
-            }
-            added={
-              markerOptions.additions > 0
-                ? `+${markerOptions.additions}`
-                : undefined
-            }
+            deleted={(deletions ?? 0) > 0 ? `-${deletions}` : undefined}
+            added={(additions ?? 0) > 0 ? `+${additions}` : undefined}
           />
         )
       ) : (
