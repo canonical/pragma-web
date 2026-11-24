@@ -1,0 +1,24 @@
+name: Apply issue form labels
+description: Adds the labels a newly opened issue's form answers imply.
+inputs:
+  github-token:
+    description: >-
+      Token used to write the issue's labels. Defaults to the job's own token,
+      which is all the labelling needs.
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    # The logic sits in a sibling `.cjs` file rather than inline in this YAML,
+    # for the same reasons as `apply-type-label`: syntax checking, editor
+    # support, and a module that can be loaded on its own. The path comes from
+    # the environment rather than from a `${{ }}` expression, so a Windows
+    # runner's backslashes never land inside a JavaScript string literal.
+    - name: Add the labels the form answers imply
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const applyIssueFormLabels = require(`${process.env.GITHUB_ACTION_PATH}/apply-issue-form-labels.cjs`);
+          await applyIssueFormLabels({ github, context, core });

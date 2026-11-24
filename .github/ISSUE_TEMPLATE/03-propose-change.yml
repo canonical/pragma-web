@@ -1,7 +1,6 @@
-name: Propose a change to a UI block or code
-description: A UI block or package works as designed, but should gain a property, variant or behaviour, or work differently.
+name: Propose a change
+description: A UI block, design token, documentation page or tool works as designed, but should work differently.
 labels:
-  - "Type: improvement"
   - "Status: needs triage"
 body:
   - type: markdown
@@ -9,46 +8,43 @@ body:
       value: |
         Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
 
-        Use this form when a block works as designed, but the design should change.
+        Use this form when something works as designed, but the design should change. If it does not match its design, documentation or tokens, [report a problem](https://github.com/canonical/pragma-web/issues/new?template=01-report-problem.yml).
 
-        - It does not match its design, documentation or tokens: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
-        - A token's value should change: [propose a token change](https://github.com/canonical/pragma-web/issues/new?template=05-propose-token-change.yml).
-
-        Title: **Block: what changes**, for example **Chip: add a removable variant**. One change per issue.
-  - type: input
-    id: target
+        Title: **Thing: what changes**, for example **Chip: add a removable variant**. One change per issue.
+  - type: dropdown
+    id: kind
     attributes:
-      label: UI block or package
-      placeholder: Accordion, @canonical/router-core …
+      label: What do you want to change?
+      options:
+        - UI block
+        - Design token
+        - Documentation
+        - Tooling
     validations:
       required: true
   - type: textarea
     id: change
     attributes:
-      label: What should change
-      description: A new property, variant or behaviour, or a change to an existing one.
+      label: What should change, and what it affects
+      description: "The change and why it is needed, then the products, pages or components it affects. A change must work for every product that uses it. For a token: current and proposed values."
     validations:
       required: true
   - type: textarea
-    id: use-case
+    id: references
     attributes:
-      label: Use case
-      description: The problem this solves, and where. A change must work for every product that uses the block.
-    validations:
-      required: true
-  - type: textarea
-    id: visual
+      label: Designs and references
+      description: Figma, prototypes or screenshots.
+  - type: dropdown
+    id: contribution
     attributes:
-      label: Designs or screenshots (optional)
-      description: A design file, prototype or screenshots.
-  - type: checkboxes
-    id: flags
-    attributes:
-      label: About this change
+      label: Will you do this yourself?
       options:
-        - label: This is an accessibility issue.
-        - label: I'd like to contribute this myself.
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
   - type: markdown
     attributes:
       value: |
-        **What happens next:** Triage usually replies within a week. Updates are posted on this issue. If you offered to contribute, wait for a maintainer to confirm the approach.
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue. If you will do it yourself, wait for a maintainer to confirm the approach.

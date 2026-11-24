@@ -1,0 +1,50 @@
+name: Promote a component
+description: A component built for one product is needed by other products too.
+labels:
+  - "Type: tier promotion"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when a component one product built should be shared with others. If nothing similar exists yet, [propose something new](https://github.com/canonical/pragma-web/issues/new?template=02-propose-new.yml).
+  - type: input
+    id: link
+    attributes:
+      label: Link to the component
+      description: Its code, Storybook story or Figma component, in the product that has it.
+      placeholder: https://…
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale for upstreaming
+      description: Why it is reusable beyond the product it was built for, and any caveats, such as variants, behaviour or styling that differ between products.
+    validations:
+      required: true
+  - type: textarea
+    id: consumers
+    attributes:
+      label: Other products that need it
+      description: Each product, with a link to where it would be used. A component is shared only when more than one product needs it.
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you do this yourself?
+      options:
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

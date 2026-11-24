@@ -1,0 +1,35 @@
+# Turns issue form answers into labels.
+# A form can only apply fixed labels, so the labels that depend on an answer
+# (the kind of problem or proposal, and "Will you do this yourself?") are added
+# here, once, when the issue is opened. Triage owns the labels after that.
+name: "Issue form labels"
+on:
+  issues:
+    types:
+      - opened
+permissions:
+  issues: read
+
+jobs:
+  apply-issue-form-labels:
+    name: Apply issue form labels
+    runs-on: ubuntu-latest
+    permissions:
+      # A job that declares any permission gets none of the others, so the read
+      # the checkout step needs has to be named here explicitly.
+      contents: read
+      # Adding labels, and creating a mapped label that does not exist yet.
+      issues: write
+    steps:
+      # A local `uses: ./…` action has to be on disk before it can run. On an
+      # `issues` event the checkout is the default branch, so the action that
+      # runs is always the reviewed one on `main`. The issue body is only read
+      # and compared against fixed strings, never evaluated.
+      - name: Check out the label action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions
+
+      - name: Add the labels the form answers imply
+        uses: ./.github/actions/apply-issue-form-labels

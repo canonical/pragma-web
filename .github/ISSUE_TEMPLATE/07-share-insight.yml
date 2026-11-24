@@ -7,11 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information, such as customer names or data.
 
-        Use this form to share an observation without requesting a specific change.
-
-        - You know what should change: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        Use this form to share an observation without requesting a specific change. If you know what should change, [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
   - type: textarea
     id: observation
     attributes:
@@ -29,16 +27,8 @@ body:
   - type: textarea
     id: evidence
     attributes:
-      label: Evidence
-      description: Links, screenshots or quotes.
-  - type: textarea
-    id: reach
-    attributes:
-      label: Who is affected, and how often
-  - type: textarea
-    id: direction
-    attributes:
-      label: Suggested direction (optional)
+      label: Evidence, and who is affected
+      description: Links, screenshots or quotes, and who runs into this and how often.
   - type: markdown
     attributes:
       value: |

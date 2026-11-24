@@ -1,0 +1,66 @@
+name: Report a problem
+description: Something in Figma, the code, the design tokens or the documentation is broken or wrong.
+labels:
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when something does not match its design, its documentation or the design tokens, including Figma and code that disagree. If it works as designed but should work differently, [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+  - type: dropdown
+    id: location
+    attributes:
+      label: Where is the problem?
+      options:
+        - Figma library
+        - Code
+        - Design tokens
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to it
+      description: "Figma: right-click the frame or component and copy the link to the selection. Code: the page, Storybook story or product, plus the package and version if you know them. Documentation: the page."
+      placeholder: https://…
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong
+      description: What it should match (the design, the code, the documentation or the tokens), and what it does instead. Say if it affects accessibility.
+      value: |
+        Expected:
+
+        Actual:
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: Steps, or the file and line for a problem in the code itself. Leave empty for a problem in Figma.
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Screenshots, browser and viewport, or a reproduction. Add a screenshot if people outside Canonical cannot open your Figma link.
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you do this yourself?
+      options:
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

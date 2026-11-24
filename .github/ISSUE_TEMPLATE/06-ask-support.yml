@@ -7,11 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information, such as links to private repositories.
 
-        Use this form for help using Pragma, or a review of how your project uses it.
-
-        - Something is broken: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
+        Use this form for help using Pragma, or a review of how your project uses it. If something is broken, [report a problem](https://github.com/canonical/pragma-web/issues/new?template=01-report-problem.yml).
   - type: input
     id: project
     attributes:

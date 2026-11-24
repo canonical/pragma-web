@@ -1,0 +1,63 @@
+name: Contribute assets
+description: Add icons, illustrations or other assets you have made, or update existing ones.
+labels:
+  - "Type: assets"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when you have assets ready to add or update. They must follow the asset guidelines; a designer checks them before they are added. If an existing asset is broken, [report a problem](https://github.com/canonical/pragma-web/issues/new?template=01-report-problem.yml).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of asset
+      options:
+        - Icon
+        - Illustration
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: names
+    attributes:
+      label: Asset names
+      description: One per line. Mark the ones that update an existing asset.
+      placeholder: |
+        arrow-up-right
+        cloud-sync (update)
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Files or Figma link
+      description: SVG files, or a link to the Figma frame that holds them.
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: Intended use
+      description: Where they will be used. Used to check them against the existing set.
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you do this yourself?
+      description: Adding the assets to the code, as well as providing them.
+      options:
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

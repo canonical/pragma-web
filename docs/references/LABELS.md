@@ -32,22 +32,35 @@ This list is the same one pinned as the `types:` input of
 lint accepts but the label set does not know is exactly the gap this replaces.
 
 Issues have no conventional-commit title, so on an **issue** the same vocabulary is
-applied by hand as a triage act. `.github/.jira_sync_config.yaml` maps `feat` to a Jira
-Story.
+applied by hand as a triage act. `.github/.jira_sync_config.yaml` still syncs issues
+labelled this way, and maps `feat` to a Jira Story.
 
 ## Applied by the issue forms
 
-Each form in `.github/ISSUE_TEMPLATE/` applies its labels when the issue is opened.
-A form cannot choose labels from the answers, so labels that depend on an answer (the
-kind of bug, the accessibility and contribution checkboxes) are added at triage.
+Labels come from two places. Each form in `.github/ISSUE_TEMPLATE/` applies its fixed
+labels, and the `Issue form labels` workflow adds the labels its answers imply. The
+rules the forms follow are in [ISSUE_FORMS.md](./ISSUE_FORMS.md).
 
 | Label | Colour | Meaning |
 | --- | --- | --- |
 | `Status: needs triage` | `#cdcdcd` | Nobody has triaged this issue yet. Every form applies it; triage removes it. |
-| `Type: bug` … | `#c5def5` | The kind of request, one per form: `bug`, `UI block`, `improvement`, `docs`, `tokens`, `tier promotion`, `assets`, `support`, `insight`. "Raise something else" applies none. |
-| `Discipline: design` / `eng` | `#f9d0c4` | The discipline that triages the issue. Both when it needs both. |
-| `Area: a11y` | `#d4c5f9` | The issue concerns accessibility. |
-| `Contribution: offered` | `#c2e0c6` | The filer will do the work. Without it, the issue waits for an owner. |
+| `Type: bug` … | `#c5def5` | The kind of request. Exactly one per issue, listed below. |
+| `Discipline: design` / `eng` | `#f9d0c4` | The discipline that triages the issue. Both when it needs both. Triage adds it when the answers do not imply one. |
+| `Area: a11y` | `#d4c5f9` | The issue concerns accessibility. Added at triage. |
+| `Contribution: offered` | `#c2e0c6` | The filer answered "Yes" to "Will you do this yourself?". Without it, the issue waits for an owner. |
+
+| `Type:` label | Applied by | Jira issue type |
+| --- | --- | --- |
+| `Type: bug` | Report a problem: Figma library, Code, Design tokens, Not sure | Bug |
+| `Type: docs` | Report a problem, Propose something new, Propose a change: Documentation | Task |
+| `Type: UI block` | Propose something new: UI block | Story |
+| `Type: improvement` | Propose a change: UI block; Propose something new or a change: Tooling | Story |
+| `Type: tokens` | Propose something new or a change: Design token | Story |
+| `Type: tier promotion` | Promote a component | Story |
+| `Type: assets` | Contribute assets | Story |
+| `Type: support` | Ask for support or a review | Task |
+| `Type: insight` | Share an insight | not synced |
+| `Type: other` | Raise something else | Task |
 
 ## Human judgements
 
