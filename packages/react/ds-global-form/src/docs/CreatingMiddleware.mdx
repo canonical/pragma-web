@@ -95,7 +95,7 @@ import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
 />
 ```
 
-The middleware manages loading and error states internally. While the fetch is in progress, it renders a loading indicator instead of the input. If the fetch fails, it renders an error message. Once the data arrives, the input renders with the fetched options.
+The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The request is aborted when the field unmounts. A different URL is a new middleware, so create it with `useMemo` (or outside the component) keyed on the URL: the field then remounts and fetches again.
 
 ### addRESTValidation
 
@@ -132,7 +132,7 @@ import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
 />
 ```
 
-The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, it calls `clearErrors`.
+The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, it calls `clearErrors`. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
 
 ## Writing custom middleware
 
