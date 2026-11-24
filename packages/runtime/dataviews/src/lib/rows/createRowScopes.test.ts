@@ -4,7 +4,7 @@
  * channels so an unchanged value never notifies its cell. Each case is
  * mutation-tested against that contract.
  */
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import { buildRowModel } from "../../../testing/index.js";
 import { createChannel } from "../observable/index.js";
 import { createSelection } from "../selection/index.js";
@@ -97,6 +97,29 @@ describe("createRowScopes", () => {
   it("publishes undefined for a field the record does not carry", () => {
     const { scopes } = createHarness([buildMachine("m-1")], ["absent"]);
     expect(scopes.readRow("m-1").fields["absent"]?.get()).toBeUndefined();
+  });
+
+  it.fails("publishes a nested field by its dot path, and republishes it as it moves", () => {
+    const place = (region: string) => ({ id: "m-1", config: { region } });
+    const channel = createChannel(
+      buildRowModel({ identify: readRowId, rows: [place("eu")] }),
+    );
+    const scopes = createRowScopes({
+      rows: channel,
+      selection: createSelection(),
+      fields: ["config.region"],
+    });
+    onTestFinished(scopes.observe());
+    const region = scopes.readRow("m-1").fields["config.region"];
+    expect(region?.get()).toBe("eu");
+    channel.set(
+      buildRowModel({
+        identify: readRowId,
+        rows: [place("us")],
+        previous: channel.get(),
+      }),
+    );
+    expect(region?.get()).toBe("us");
   });
 
   it("collapses a repeated field name to one channel", () => {
