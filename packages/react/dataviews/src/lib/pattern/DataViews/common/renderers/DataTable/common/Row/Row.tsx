@@ -22,6 +22,7 @@ const Row = <TRow extends object>({
   columns,
   selectable,
   getRowLabel,
+  readApplicability,
   position,
   gap,
   ref,
@@ -58,6 +59,7 @@ const Row = <TRow extends object>({
           channels={channels}
           column={column}
           field={readFieldName(column)}
+          readApplicability={readApplicability}
         />
       ))}
     </tr>

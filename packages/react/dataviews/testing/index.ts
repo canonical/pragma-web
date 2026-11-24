@@ -49,6 +49,7 @@ export {
   MACHINE_DECLARATION,
   machines,
 } from "./machines.js";
+export { default as observeWorkloadRows } from "./observeWorkloadRows.js";
 export { default as openMenuFrom } from "./openMenuFrom.js";
 export { default as readAnnouncements } from "./readAnnouncements.js";
 export { default as readFailureReason } from "./readFailureReason.js";

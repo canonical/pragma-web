@@ -2,7 +2,10 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { RowChannels } from "@canonical/dataviews-core/bindings";
+import type {
+  ProviderHost,
+  RowChannels,
+} from "@canonical/dataviews-core/bindings";
 import type { ComponentProps } from "react";
 import type { DataTableColumn } from "../types.js";
 
@@ -12,9 +15,17 @@ type OwnProps<TRow extends object> = {
     DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
     "collection"
   >;
+  /** The row's channels, from the table's row scopes. */
   readonly channels: RowChannels<TRow>;
-  readonly column: DataTableColumn;
+  /** The column the cell draws. */
+  readonly column: DataTableColumn<TRow>;
+  /** The column's field name on the record. */
   readonly field: string;
+  /** Whether a field applies to a record, from the provider's host. */
+  readonly readApplicability: ProviderHost<
+    readonly SchemaFieldDefinition[],
+    TRow
+  >["readApplicability"];
 };
 
 /** Props of one body cell: its own, and the native props of its `td`. */

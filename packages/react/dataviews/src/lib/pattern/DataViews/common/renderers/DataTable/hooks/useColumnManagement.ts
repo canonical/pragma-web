@@ -25,9 +25,9 @@ import {
 } from "../../../../../../hooks/index.js";
 import { composeMessage } from "../../../../../../utils/index.js";
 import type {
+  AnyDataTableColumn,
   ColumnChange,
   ColumnSetting,
-  DataTableColumn,
   SettingsDestinations,
 } from "../common/index.js";
 import {
@@ -50,7 +50,9 @@ const CHANGES = {
 } satisfies Readonly<
   Record<
     ColumnChange,
-    (config: ColumnCommandConfig<DataTableColumn>) => PresentationPatch | null
+    (
+      config: ColumnCommandConfig<AnyDataTableColumn>,
+    ) => PresentationPatch | null
   >
 >;
 
@@ -89,7 +91,7 @@ const readShownView = (views: ViewsState | null): string | null =>
 
 /** The ids an arrangement shows, in its order. */
 const listShownIds = (
-  columns: readonly DataTableColumn[],
+  columns: readonly AnyDataTableColumn[],
   presentation: ViewPresentation,
   table: string,
 ): readonly string[] =>

@@ -86,7 +86,12 @@ const CardItem = <TRow extends object>({
           />
         ) : null}
         <span id={titleId} className="title">
-          <FieldValue provider={provider} channels={channels} field={title} />
+          <FieldValue
+            provider={provider}
+            channels={channels}
+            field={title}
+            readApplicability={readApplicability}
+          />
         </span>
       </Card.Header>
       {details.length === 0 ? null : (
@@ -100,6 +105,7 @@ const CardItem = <TRow extends object>({
                     provider={provider}
                     channels={channels}
                     field={field}
+                    readApplicability={readApplicability}
                   />
                 </dd>
               </div>

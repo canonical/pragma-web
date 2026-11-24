@@ -110,6 +110,7 @@ export type {
   SourceRefusalPart,
 } from "./result/index.js";
 export type {
+  Applicability,
   RowEntry,
   RowIdentifier,
   RowModel,

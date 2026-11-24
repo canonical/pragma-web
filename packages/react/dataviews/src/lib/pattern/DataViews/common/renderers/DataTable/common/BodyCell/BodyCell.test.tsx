@@ -9,6 +9,7 @@ import {
   buildMachine,
   createMachineProvider,
   deliverRows,
+  observeWorkloadRows,
 } from "../../../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../../../common/index.js";
 import { BodyCell } from "./index.js";
@@ -47,6 +48,7 @@ describe("BodyCell", () => {
       render(
         <BodyCell
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           column={{ id: "zone", header: "Zone" }}
           field="zone"
@@ -64,6 +66,7 @@ describe("BodyCell", () => {
     const { rerender } = render(
       <BodyCell
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         channels={channels}
         column={column}
         field="name"
@@ -73,6 +76,7 @@ describe("BodyCell", () => {
     rerender(
       <BodyCell
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         channels={channels}
         column={column}
         field="name"
@@ -87,6 +91,7 @@ describe("BodyCell", () => {
     render(
       <BodyCell
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         channels={channels}
         column={{ id: "name", header: "Name" }}
         field="name"
@@ -98,5 +103,27 @@ describe("BodyCell", () => {
     const cell = screen.getByRole("cell");
     expect(cell.className).toBe("ds data-table-body-cell extra");
     expect(cell).toHaveAttribute("title", "Name");
+  });
+
+  describe("over records of several types", () => {
+    it("hands its own content the record and the applicability", () => {
+      const { provider, scopes } = observeWorkloadRows();
+      render(
+        <BodyCell
+          provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
+          channels={scopes.readRow("w-2")}
+          column={{
+            id: "cores",
+            header: "Cores",
+            cell: ({ value, record, applicability }) =>
+              `${record.type} ${String(value)} ${applicability}`,
+          }}
+          field="cores"
+        />,
+        inRow(),
+      );
+      expect(screen.getByRole("cell")).toHaveTextContent("vm 4 applies");
+    });
   });
 });

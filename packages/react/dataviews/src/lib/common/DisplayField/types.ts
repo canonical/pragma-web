@@ -4,17 +4,33 @@
  * the props every renderer hands it, whichever renderer draws it.
  */
 
-import type { ComponentType, ReactNode } from "react";
+import type { Applicability, RowRecord } from "@canonical/dataviews-core";
+import type { FunctionComponent, ReactNode } from "react";
 
 /**
- * The props one field's content receives, in whichever renderer draws it.
+ * The props one field's content receives, in whichever renderer draws it:
+ * the field's value, typed `TValue`, and the record it was read from, typed
+ * `TRow`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type DisplayFieldCellProps = {
-  /** The field's current value. */
-  readonly value: unknown;
+export type DisplayFieldCellProps<
+  TValue = unknown,
+  TRow extends object = RowRecord,
+> = {
+  /**
+   * The field's current value; undefined where the field does not apply to
+   * the record's type.
+   */
+  readonly value: TValue;
+  /**
+   * The whole record. The content renders again whenever a field of the
+   * record moves.
+   */
+  readonly record: TRow;
+  /** Whether the field applies to the record's type. */
+  readonly applicability: Applicability;
   /** The row's stable identity. */
   readonly rowId: string;
   /** The declaring field's identity: a table's column, a card's field. */
@@ -30,7 +46,7 @@ export type DisplayFieldCellProps = {
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type DisplayField = {
+export type DisplayField<TRow extends object = RowRecord> = {
   /** The field's identity, unique within its renderer. */
   readonly id: string;
   /** The field's heading. */
@@ -38,9 +54,8 @@ export type DisplayField = {
   /** The record field shown. Defaults to the id. */
   readonly field?: string;
   /**
-   * Field-specific content. Rendered inside the cell's scope, so it may call
-   * `useDataViewsCell` for the row's channels. Without one, primitive values
-   * render as text and every other value renders nothing.
+   * Field-specific content, handed the value and the record. Without one,
+   * primitive values render as text and every other value renders nothing.
    */
-  readonly cell?: ComponentType<DisplayFieldCellProps>;
+  readonly cell?: FunctionComponent<DisplayFieldCellProps<unknown, TRow>>;
 };

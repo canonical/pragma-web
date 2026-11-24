@@ -11,6 +11,7 @@ import {
   createGridInteraction,
   isDataViewsProvider,
   listDisplayEntries,
+  readProviderHost,
   readSizingBounds,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
@@ -41,7 +42,7 @@ import type {
   VirtualizedBodyProps,
 } from "../../../../../virtualization/types.js";
 import {
-  type DataTableColumn,
+  type AnyDataTableColumn,
   HeaderCell,
   Row,
   SelectAllCell,
@@ -91,6 +92,8 @@ const renderVirtualizedBody = (
 /**
  * The table, given its words and announcer rather than resolving them.
  *
+ * @implements ds:apps.pattern.datatable
+ *
  * @note Impure: observes the provider and the grid interaction while
  * mounted.
  */
@@ -128,6 +131,7 @@ export default function ScopedDataTable<
   // mount that reads the provider, and the ref-count makes a table inside
   // a root that already observes cost nothing.
   useEffect(() => provider.observe(), [provider]);
+  const { readApplicability } = readProviderHost(provider);
   // Sorting is offered from the same declaration Filters reads.
   const declared = provider.capabilities;
   const sortableFields =
@@ -280,9 +284,9 @@ export default function ScopedDataTable<
   // A header's controls: a sort the source honours, and a resize handle on
   // every column but the last, whose edge is the table's own; the header
   // keeps the handle's place while column changes wait.
-  const isSortable = (column: DataTableColumn): boolean =>
+  const isSortable = (column: AnyDataTableColumn): boolean =>
     column.sortable === true && orderable.has(readFieldName(column));
-  const isResizable = (column: DataTableColumn, position: number): boolean =>
+  const isResizable = (column: AnyDataTableColumn, position: number): boolean =>
     column.resizable === true && position < rendered.length - 1;
   // The table is a tab stop only where nothing inside is; only the
   // settings menu draws links of its own.
@@ -319,9 +323,19 @@ export default function ScopedDataTable<
           columns={rendered}
           selectable={selectable}
           getRowLabel={getRowLabel}
+          readApplicability={readApplicability}
         />
       ),
-    [renderer, provider, scopes, rendered, selectable, getRowLabel, tracks],
+    [
+      renderer,
+      provider,
+      scopes,
+      rendered,
+      selectable,
+      getRowLabel,
+      readApplicability,
+      tracks,
+    ],
   );
 
   // A custom property, which `CSSProperties` does not spell.

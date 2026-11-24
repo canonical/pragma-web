@@ -2,12 +2,9 @@ import { memo, type ReactElement, useMemo } from "react";
 import {
   CellContext,
   type CellContextValue,
+  FieldContent,
 } from "../../../../../../../common/index.js";
-import { useDataViewsValue } from "../../../../../../../hooks/index.js";
-import {
-  readFieldName,
-  spellPrimitiveValue,
-} from "../../../../../../../utils/index.js";
+import { readFieldName } from "../../../../../../../utils/index.js";
 import type { FieldValueProps } from "./types.js";
 
 /**
@@ -16,9 +13,9 @@ import type { FieldValueProps } from "./types.js";
  * `useDataViewsCell` for the record's channels. Without one, primitive values
  * render as text and every other value renders nothing.
  *
- * It subscribes to its own field's channel, so a record update re-renders
- * only the values that changed. Memoised, so a card re-rendering for its
- * selection re-renders none of them.
+ * Its default text subscribes to its own field's channel, so a record
+ * update re-renders only the values that changed. Memoised, so a card
+ * re-rendering for its selection re-renders none of them.
  *
  * @implements ds:apps.subcomponent.data_cards-field_value
  */
@@ -26,15 +23,8 @@ const FieldValue = <TRow extends object>({
   provider,
   channels,
   field,
+  readApplicability,
 }: FieldValueProps<TRow>): ReactElement => {
-  const name = readFieldName(field);
-  const channel = channels.fields[name];
-  if (channel === undefined) {
-    // The scopes observe every field the cards show, so a value without its
-    // channel is a card built against another field list.
-    throw new Error(`no channel observes the field "${name}"`);
-  }
-  const value = useDataViewsValue(channel);
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,
@@ -46,14 +36,15 @@ const FieldValue = <TRow extends object>({
     }),
     [provider, channels, field.id],
   );
-  const Content = field.cell;
   return (
     <CellContext value={cell}>
-      {Content === undefined ? (
-        spellPrimitiveValue(value)
-      ) : (
-        <Content value={value} rowId={channels.id} columnId={field.id} />
-      )}
+      <FieldContent
+        channels={channels}
+        field={readFieldName(field)}
+        columnId={field.id}
+        cell={field.cell}
+        readApplicability={readApplicability}
+      />
     </CellContext>
   );
 };

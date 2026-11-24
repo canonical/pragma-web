@@ -1952,7 +1952,7 @@ describe("DataTable", () => {
     expect(renders).toEqual(["m-2"]);
   });
 
-  it("notifies only the cells whose field values changed", () => {
+  it("draws again only the content of a record whose fields moved", () => {
     const renders: string[] = [];
     const Probe = ({ rowId, columnId }: DisplayFieldCellProps) => {
       renders.push(`${rowId}/${columnId}`);
@@ -1973,7 +1973,8 @@ describe("DataTable", () => {
       buildMachine("m-1", "alpha", "failed"),
       buildMachine("m-2", "beta"),
     ]);
-    expect(renders).toEqual(["m-1/status"]);
+    // A column's own content reads its whole record, so both of m-1's draw.
+    expect(renders).toEqual(["m-1/name", "m-1/status"]);
   });
 
   it("mints one scope per row, shared by its cells and stable across renders", () => {

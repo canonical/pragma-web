@@ -23,9 +23,9 @@ type OwnProps<TRow extends object> = {
   /** The record's row channels, from the cards' row scopes. */
   readonly channels: RowChannels<TRow>;
   /** The field heading the card and naming it. */
-  readonly title: DisplayField;
+  readonly title: DisplayField<TRow>;
   /** The fields listed beneath the title, in order. */
-  readonly details: readonly DisplayField[];
+  readonly details: readonly DisplayField<TRow>[];
   /** Offer the card's selection checkbox. */
   readonly selectable: boolean;
   /**

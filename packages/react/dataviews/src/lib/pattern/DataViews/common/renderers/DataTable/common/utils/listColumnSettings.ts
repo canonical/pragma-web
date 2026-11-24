@@ -1,6 +1,6 @@
 import type { ViewPresentation } from "@canonical/dataviews-core";
 import { resolveColumnArrangement } from "@canonical/dataviews-core/bindings";
-import type { ColumnSetting, DataTableColumn } from "../types.js";
+import type { AnyDataTableColumn, ColumnSetting } from "../types.js";
 import areColumnOffersEqual from "./areColumnOffersEqual.js";
 
 /**
@@ -16,7 +16,7 @@ import areColumnOffersEqual from "./areColumnOffersEqual.js";
  * change elsewhere.
  */
 export default function listColumnSettings(
-  columns: readonly DataTableColumn[],
+  columns: readonly AnyDataTableColumn[],
   presentation: ViewPresentation,
   table: string,
   previous: readonly ColumnSetting[],

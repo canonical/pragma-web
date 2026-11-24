@@ -20,6 +20,7 @@ import type {
 import type { ReactNode, RefObject } from "react";
 import type { AnnouncerTopic } from "../../../../../../common/index.js";
 import type {
+  AnyDataTableColumn,
   ColumnChange,
   ColumnSetting,
   DataTableColumn,
@@ -38,7 +39,7 @@ export type UseColumnManagementProps<
 > = readonly [
   provider: DataViewsProvider<TFields, TRow>,
   arrangement: UseTableArrangementResult,
-  columns: readonly DataTableColumn[],
+  columns: readonly AnyDataTableColumn[],
   headerRow: RefObject<HTMLTableRowElement | null>,
   messages: DataViewsMessages,
   announce: (message: ReactNode, topic?: AnnouncerTopic) => void,
@@ -110,14 +111,16 @@ export type UseTableGeometryResult = {
  * What the arrangement hook takes: the table's name, the presentation, then
  * the declared columns.
  */
-export type UseColumnArrangementProps = readonly [
-  table: string,
-  presentation: Presentation,
-  columns: readonly DataTableColumn[],
-];
+export type UseColumnArrangementProps<TRow extends object = RowRecord> =
+  readonly [
+    table: string,
+    presentation: Presentation,
+    columns: readonly DataTableColumn<TRow>[],
+  ];
 
 /** The columns a table renders, in the arrangement's order, the hidden ones left out. */
-export type UseColumnArrangementResult = readonly DataTableColumn[];
+export type UseColumnArrangementResult<TRow extends object = RowRecord> =
+  readonly DataTableColumn<TRow>[];
 
 /**
  * What the header row's sort hook reads: the provider, the columns shown,
@@ -129,7 +132,7 @@ export type UseHeaderSortProps<
   TRow extends object = RowRecord,
 > = readonly [
   provider: DataViewsProvider<TFields, TRow>,
-  columns: readonly DataTableColumn[],
+  columns: readonly AnyDataTableColumn[],
   slice: Slice,
   window: ResultWindow,
   messages: DataViewsMessages,
@@ -175,8 +178,8 @@ export type UseTabStopProps<
 > = readonly [
   provider: DataViewsProvider<TFields, TRow>,
   headerRow: RefObject<HTMLTableRowElement | null>,
-  columns: readonly DataTableColumn[],
-  isSortable: (column: DataTableColumn) => boolean,
+  columns: readonly AnyDataTableColumn[],
+  isSortable: (column: AnyDataTableColumn) => boolean,
   arranged: boolean,
 ];
 

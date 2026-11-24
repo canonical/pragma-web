@@ -46,6 +46,7 @@ const mountRow = ({
     <Row
       {...native}
       provider={provider}
+      readApplicability={readProviderHost(provider).readApplicability}
       channels={scopes.readRow("m-1")}
       columns={COLUMNS}
       selectable={selectable}

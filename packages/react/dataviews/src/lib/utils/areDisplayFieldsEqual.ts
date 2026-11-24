@@ -8,8 +8,8 @@ import type { DisplayField } from "../common/index.js";
  * the other a component, and neither has content this could compare.
  */
 export default function areDisplayFieldsEqual(
-  a: readonly DisplayField[],
-  b: readonly DisplayField[],
+  a: readonly DisplayField<never>[],
+  b: readonly DisplayField<never>[],
 ): boolean {
   return areListsEqual(
     a,

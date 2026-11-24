@@ -11,7 +11,7 @@ import { describe, expect, it, onTestFinished } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  createWorkloadProvider,
+  observeWorkloadRows,
   silenceRenderErrors,
 } from "../../../../../../../../../testing/index.js";
 import CardItem from "./CardItem.js";
@@ -132,17 +132,13 @@ describe("CardItem", () => {
   });
 
   it("names a card by its identity where its title does not apply", () => {
-    const { provider, channels } = observeRow({
-      fields: ["image"],
-      provider: createWorkloadProvider().provider,
-      rowId: "w-2",
-    });
+    const { provider, scopes, readApplicability } = observeWorkloadRows();
     render(
       <ul>
         <CardItem
           provider={provider}
-          readApplicability={readProviderHost(provider).readApplicability}
-          channels={channels}
+          readApplicability={readApplicability}
+          channels={scopes.readRow("w-2")}
           title={{ id: "image", header: "Image" }}
           details={[]}
           selectable={false}

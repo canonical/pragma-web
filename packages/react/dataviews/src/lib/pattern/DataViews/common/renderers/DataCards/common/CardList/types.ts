@@ -29,9 +29,9 @@ type OwnProps<TRow extends object> = {
   /** One record's channels, by its identity. */
   readonly readRow: (rowId: string) => RowChannels<TRow>;
   /** The field heading each card and naming it. */
-  readonly title: DisplayField;
+  readonly title: DisplayField<TRow>;
   /** The fields listed beneath the title, in order. */
-  readonly details: readonly DisplayField[];
+  readonly details: readonly DisplayField<TRow>[];
   /** Offer each card's selection checkbox. */
   readonly selectable: boolean;
   /**

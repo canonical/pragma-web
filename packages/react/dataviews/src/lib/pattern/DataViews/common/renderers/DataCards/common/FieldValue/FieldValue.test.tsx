@@ -1,4 +1,7 @@
-import { createRowScopes } from "@canonical/dataviews-core/bindings";
+import {
+  createRowScopes,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
@@ -44,6 +47,7 @@ describe("FieldValue", () => {
     const { container } = render(
       <FieldValue
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         channels={channels}
         field={{ id: "cores", header: "Cores" }}
       />,
@@ -65,6 +69,7 @@ describe("FieldValue", () => {
     render(
       <FieldValue
         provider={provider}
+        readApplicability={readProviderHost(provider).readApplicability}
         channels={channels}
         field={{ id: "state", header: "State", field: "status", cell: Owner }}
       />,
@@ -79,6 +84,7 @@ describe("FieldValue", () => {
       render(
         <FieldValue
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           field={{ id: "cores", header: "Cores" }}
         />,

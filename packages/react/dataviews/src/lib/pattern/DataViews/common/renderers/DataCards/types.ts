@@ -18,7 +18,7 @@ type OwnProps<
    * The fields each card shows, in order. The one `title` names heads the
    * card; the rest are listed beneath it, each under its heading.
    */
-  readonly fields: readonly DisplayField[];
+  readonly fields: readonly DisplayField<TRow>[];
   /**
    * The id of the field that heads each card and names it: the card, and its
    * selection checkbox, are named for this field's value. It must be one of

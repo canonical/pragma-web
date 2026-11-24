@@ -25,7 +25,7 @@ type OwnProps<
    * The columns, in declared order; the presentation decides which show and
    * where.
    */
-  readonly columns: readonly DataTableColumn[];
+  readonly columns: readonly DataTableColumn<TRow>[];
   /** The table's accessible name. */
   readonly label: string;
   /** Render a leading selection column backed by the provider's selection. */
