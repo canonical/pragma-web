@@ -1,5 +1,6 @@
 import type React from "react";
 import { Spinner } from "../../subcomponent/Spinner/index.js";
+import { hasVisibleChildren } from "../../utils/index.js";
 import { Icon } from "../Icon/index.js";
 import type Props from "./types.js";
 import "./styles.css";
@@ -28,16 +29,15 @@ const Button = ({
   disabled,
   ...props
 }: Props): React.ReactElement => {
-  // Booleans and nullish children render nothing; everything else (including
-  // the number 0) produces visible text that names the button.
-  const hasVisibleChildren =
-    children != null && typeof children !== "boolean" && children !== "";
+  const showsLabel = hasVisibleChildren(children);
 
+  // An icon-only button needs a name from its aria props.
+  // @note Impure: warns in development.
   if (
     typeof process !== "undefined" &&
     process.env.NODE_ENV !== "production" &&
     (icon || loading) &&
-    !hasVisibleChildren &&
+    !showsLabel &&
     !props["aria-label"] &&
     !props["aria-labelledby"]
   ) {
@@ -78,7 +78,7 @@ const Button = ({
           overlaid centered on top. The label is wrapped so it can be hidden
           (a bare text child is not an element and cannot be). */}
       {iconElement}
-      {hasVisibleChildren && <span className="label">{children}</span>}
+      {showsLabel && <span className="label">{children}</span>}
       {loading && (
         <span className="loading-spinner" aria-hidden="true">
           <Spinner />
