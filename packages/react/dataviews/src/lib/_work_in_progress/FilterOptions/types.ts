@@ -2,6 +2,8 @@ import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
 import type { QueryChipCondition } from "../QueryChip/index.js";
 
+export type { FilterOptionsGridProps } from "./common/FilterOptionsGrid/types.js";
+
 /**
  * The Condition of what applies to a filter's words, which picks the mark
  * shown after its name.

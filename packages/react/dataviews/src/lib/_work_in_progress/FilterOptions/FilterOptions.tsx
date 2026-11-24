@@ -3,6 +3,7 @@ import { useId } from "react";
 import { AssistiveText, ConditionMark } from "../../common/index.js";
 import { useIsHydrated } from "../../hooks/index.js";
 import { isPlainClick } from "../../utils/index.js";
+import { FilterOptionsGrid } from "./common/FilterOptionsGrid/index.js";
 import type { FilterOptionsOption, FilterOptionsProps } from "./types.js";
 import "./styles.css";
 
@@ -19,7 +20,8 @@ const componentCssClassName = "ds filter-options";
  * somewhere renders through `LinkComponent`, a router's link or an anchor.
  * Unlike **FilterButton**, the values show without opening anything.
  * Unlike **Chip**, a word offers a value rather than standing for one
- * applied.
+ * applied. Several filters line up in a **FilterOptions.Grid**, one per
+ * line.
  *
  * `import { FilterOptions } from "@canonical/dataviews-react";`
  *
@@ -159,3 +161,5 @@ export default function FilterOptions({
     </div>
   );
 }
+
+FilterOptions.Grid = FilterOptionsGrid;
