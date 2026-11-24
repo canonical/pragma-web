@@ -114,3 +114,8 @@ export type StoryViewStoreConfig = {
   /** The browser's IndexedDB by default; a stand-in shows refused storage. */
   readonly indexedDB?: IndexedDBFactory | undefined;
 };
+
+/** One of the quick filters' machines: a bar machine in one of twelve pools. */
+export type PooledMachine = BarMachine & {
+  readonly pool: string;
+};
