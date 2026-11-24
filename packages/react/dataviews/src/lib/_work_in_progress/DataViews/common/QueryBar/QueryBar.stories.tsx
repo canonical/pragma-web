@@ -16,10 +16,15 @@ import {
   barMachines,
 } from "../../../../../storybook/machines/fixtures.js";
 import type { BarMachine } from "../../../../../storybook/machines/types.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./QueryBar.js";
 import type { DataViewsQueryBarProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsQueryBarProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/QueryBar",
@@ -30,10 +35,10 @@ const meta = {
   parameters: {
     docs: { story: { inline: false, iframeHeight: "560px" } },
   },
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 /** The machines' provider, as an application builds one. */
 type BarProvider = DataViewsProvider<
@@ -85,8 +90,10 @@ function BarMachines({
   inlineSize,
   withOutsideChange = false,
   withHistory = false,
+  messages,
   ...args
-}: DataViewsQueryBarProps & BarConfig): ReactElement {
+}: StoryArgs & BarConfig): ReactElement {
+  const words = pickStoryWords({ messages });
   const [provider] = useState<BarProvider>(() =>
     createDataViewsProvider({
       collection: barMachineCollection,
@@ -103,7 +110,7 @@ function BarMachines({
     }),
   );
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       {withOutsideChange && (
         <button
           type="button"
@@ -125,7 +132,12 @@ function BarMachines({
       <div style={inlineSize === undefined ? undefined : { inlineSize }}>
         <Component {...args} />
       </div>
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
     </DataViews>
   );
 }
@@ -328,7 +340,8 @@ const instanceColumns: readonly DataTableColumn[] = [
 ];
 
 /** The bar over four instances, filtered by status. */
-function StatusAliasInstances(args: DataViewsQueryBarProps): ReactElement {
+function StatusAliasInstances({ messages, ...args }: StoryArgs): ReactElement {
+  const words = pickStoryWords({ messages });
   const [provider] = useState(() =>
     createDataViewsProvider({
       collection: instanceCollection,
@@ -340,12 +353,13 @@ function StatusAliasInstances(args: DataViewsQueryBarProps): ReactElement {
     }),
   );
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
       <DataTable
         provider={provider}
         columns={instanceColumns}
         label="Instances"
+        {...words}
       />
     </DataViews>
   );
