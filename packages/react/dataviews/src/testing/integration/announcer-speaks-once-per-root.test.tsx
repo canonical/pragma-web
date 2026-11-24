@@ -8,6 +8,7 @@
  * reader states nothing.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
@@ -26,7 +27,6 @@ import {
   createMachineProvider,
   declareMachineOrdering,
   elementAt,
-  installPopoverStandIn,
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";

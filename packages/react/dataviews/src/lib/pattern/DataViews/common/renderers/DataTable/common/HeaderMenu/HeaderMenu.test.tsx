@@ -1,10 +1,8 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import {
-  installPopoverStandIn,
-  openMenuFrom,
-} from "../../../../../../../../../testing/index.js";
+import { openMenuFrom } from "../../../../../../../../../testing/index.js";
 import HeaderMenu from "./HeaderMenu.js";
 import type { HeaderMenuProps } from "./types.js";
 

@@ -1,3 +1,4 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { createRef, useState } from "react";
@@ -10,7 +11,6 @@ import {
   it,
   vi,
 } from "vitest";
-import { installPopoverStandIn } from "../../../../testing/index.js";
 import { useQueryEntry } from "../../common/QueryEntry/index.js";
 import { useRovingItem } from "../../common/Roving/index.js";
 import QueryInput from "./QueryInput.js";

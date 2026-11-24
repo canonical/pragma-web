@@ -28,6 +28,7 @@ import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import {
   act,
   cleanup,
@@ -57,7 +58,6 @@ import {
   elementAt,
   expectNoAxeViolations,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   MACHINE_CAPABILITIES,
   type Machine,
   type MachineFields,

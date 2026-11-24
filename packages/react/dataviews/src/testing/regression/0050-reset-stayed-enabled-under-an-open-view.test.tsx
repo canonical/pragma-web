@@ -10,6 +10,7 @@
  * layer alone.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
@@ -18,7 +19,6 @@ import {
   createMemoryViewStore,
   declareMachineOrdering,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
