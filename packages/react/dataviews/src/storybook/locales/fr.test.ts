@@ -283,4 +283,38 @@ describe("fr", () => {
       }),
     ).toBe("Filtres Cœurs fusionnés. 3 machines.");
   });
+  it("words the query bar's narrow form and its sheet", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(fr.filtersApplied({ applied: 1 })).toBe("1 appliqué");
+    expect(fr.filtersApplied({ applied: 2 })).toBe("2 appliqués");
+    expect(fr.searchEntry({ noun })).toBe("Rechercher des machines");
+    expect(fr.filterSheet({ noun })).toBe("Filtrer les machines");
+    expect(fr.chooseOperator({ label: "Statut" })).toBe(
+      "Choisir un opérateur pour Statut",
+    );
+    expect(fr.chooseValue({ label: "Statut" })).toBe(
+      "Choisir une valeur pour Statut",
+    );
+    expect(
+      fr.filtersCleared({ count: { kind: "exact", value: 4 }, noun }),
+    ).toBe("Filtres effacés. 4 machines.");
+    expect(fr.resultsUpdated({ count: { kind: "unknown" }, noun })).toBe(
+      "Résultats mis à jour.",
+    );
+    expect(fr.showResults({ count: { kind: "unknown" } })).toBe(
+      "Afficher les résultats",
+    );
+    expect(fr.showResults({ count: { kind: "at-least", value: 5 } })).toBe(
+      "Afficher 5+ résultats",
+    );
+    expect(fr.showResults({ count: { kind: "exact", value: 1 } })).toBe(
+      "Afficher 1 résultat",
+    );
+    expect(fr.showResults({ count: { kind: "exact", value: 3 } })).toBe(
+      "Afficher 3 résultats",
+    );
+    expect(fr.filterStepChosen({ chosen: "Statut", step: "Opérateur" })).toBe(
+      "Statut choisi. Opérateur.",
+    );
+  });
 });
