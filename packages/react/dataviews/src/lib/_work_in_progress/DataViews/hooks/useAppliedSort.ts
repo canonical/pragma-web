@@ -18,5 +18,9 @@ const selectSort = (state: DataViewsState): readonly SortTerm[] =>
 export default function useAppliedSort({
   provider,
 }: UseAppliedSortProps): UseAppliedSortResult {
-  return useDataViewsValue(provider.state, selectSort, areSortListsEqual);
+  return useDataViewsValue({
+    channel: provider.state,
+    select: selectSort,
+    isEqual: areSortListsEqual,
+  });
 }

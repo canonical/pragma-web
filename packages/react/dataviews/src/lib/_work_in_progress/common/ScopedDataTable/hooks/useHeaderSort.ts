@@ -160,29 +160,33 @@ export default function useHeaderSort<
     setRefusal({ columnId, reasons, sort: applied });
     announce(messages.sortRefused(reasons), SORT_REFUSAL_TOPIC);
   };
-  const sortColumn = useStableCallback(
-    (columnId: string, additive: boolean) => {
+  const sortColumn = useStableCallback({
+    callback: (columnId: string, additive: boolean) => {
       applyToColumn(columnId, (field, current) =>
         cycleSortTerm(current, field, additive),
       );
     },
-  );
-  const placeColumn = useStableCallback(
-    (columnId: string, direction: SortDirection) => {
+  });
+  const placeColumn = useStableCallback({
+    callback: (columnId: string, direction: SortDirection) => {
       applyToColumn(columnId, (field, current) =>
         placeSortTerm(current, field, direction, declared.terms),
       );
     },
-  );
-  const removeFromSort = useStableCallback((columnId: string) => {
-    applyToColumn(columnId, (field, current) =>
-      current.filter((term) => term.field !== field),
-    );
+  });
+  const removeFromSort = useStableCallback({
+    callback: (columnId: string) => {
+      applyToColumn(columnId, (field, current) =>
+        current.filter((term) => term.field !== field),
+      );
+    },
   });
   // Asked on every focus move out of a column, and nearly always with nothing
   // refused: an update nothing needs can still run the table once.
-  const clearRefusal = useStableCallback(() => {
-    setRefusal((previous) => (previous === null ? previous : null));
+  const clearRefusal = useStableCallback({
+    callback: () => {
+      setRefusal((previous) => (previous === null ? previous : null));
+    },
   });
 
   // A reason stands only over the ordering it was refused for, and only

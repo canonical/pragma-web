@@ -26,7 +26,7 @@ const Row = <TRow extends object>({
   gap,
   ref,
 }: RowProps<TRow>): ReactElement => {
-  const selected = useDataViewsValue(channels.selected);
+  const selected = useDataViewsValue({ channel: channels.selected });
   const hydrated = useIsHydrated();
   return (
     // aria-selected only where selection works: offered, and scripts run.

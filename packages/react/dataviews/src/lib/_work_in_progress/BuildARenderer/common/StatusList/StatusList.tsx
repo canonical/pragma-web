@@ -34,8 +34,8 @@ export default function StatusList<
   useEffect(() => provider.observe(), [provider]);
   // English, with the application's messages over it.
   const words = useMemo(() => resolveMessages(messages), [messages]);
-  const state = useDataViewsValue(provider.state);
-  const rows = useDataViewsValue(provider.rows);
+  const state = useDataViewsValue({ channel: provider.state });
+  const rows = useDataViewsValue({ channel: provider.rows });
   // Null while the rows speak for themselves.
   const status = resolveDisplayStatus(state);
   // The status entry, if any, then one entry per row the status keeps.

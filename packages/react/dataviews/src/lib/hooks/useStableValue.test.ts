@@ -13,7 +13,7 @@ const areListsEqual = (
 describe("useStableValue", () => {
   it("returns the held reference while the new value equals it", () => {
     const { result, rerender } = renderHook(
-      ({ value }) => useStableValue(value, areListsEqual),
+      ({ value }) => useStableValue({ value, isEqual: areListsEqual }),
       { initialProps: { value: [1, 2] } },
     );
     const first = result.current;
@@ -23,7 +23,7 @@ describe("useStableValue", () => {
 
   it("takes a value that differs", () => {
     const { result, rerender } = renderHook(
-      ({ value }) => useStableValue(value, areListsEqual),
+      ({ value }) => useStableValue({ value, isEqual: areListsEqual }),
       { initialProps: { value: [1, 2] } },
     );
     const next = [1, 3];
@@ -35,9 +35,12 @@ describe("useStableValue", () => {
     const value = [1];
     let asked = 0;
     const { result, rerender } = renderHook(() =>
-      useStableValue(value, () => {
-        asked += 1;
-        return false;
+      useStableValue({
+        value,
+        isEqual: () => {
+          asked += 1;
+          return false;
+        },
       }),
     );
     rerender();

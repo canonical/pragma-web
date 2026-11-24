@@ -30,9 +30,9 @@ const areMessagesEqual = (
  * Held through the package's own answer to referential stability, so there
  * is one such comparison rather than two.
  */
-export default function useMessages(
-  ...[messages = NO_MESSAGES]: UseMessagesProps
-): UseMessagesResult {
-  const given = useStableValue(messages, areMessagesEqual);
+export default function useMessages({
+  messages = NO_MESSAGES,
+}: UseMessagesProps): UseMessagesResult {
+  const given = useStableValue({ value: messages, isEqual: areMessagesEqual });
   return useMemo(() => resolveMessages(given), [given]);
 }

@@ -407,7 +407,7 @@ describe("DataTable", () => {
     // record channel is typed as its records.
     const Badge = ({ value, rowId, columnId }: DisplayFieldCellProps) => {
       const cell = useDataViewsCell({ collection: machines });
-      const record = useDataViewsValue(cell.record);
+      const record = useDataViewsValue({ channel: cell.record });
       return (
         <span data-testid={`${rowId}-${columnId}`}>
           {String(value)} of {record.name}
@@ -1732,7 +1732,9 @@ describe("DataTable", () => {
     const Probe = ({ rowId }: DisplayFieldCellProps) => {
       // Reads the row's membership, so this probe is notified exactly when
       // that row's selection channel publishes.
-      useDataViewsValue(useDataViewsCell({ collection: machines }).selected);
+      useDataViewsValue({
+        channel: useDataViewsCell({ collection: machines }).selected,
+      });
       renders.push(rowId);
       return null;
     };

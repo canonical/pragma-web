@@ -18,9 +18,10 @@ import type { UseRowScopesProps, UseRowScopesResult } from "./types.js";
 export default function useRowScopes<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object,
->(
-  ...[provider, fields]: UseRowScopesProps<TFields, TRow>
-): UseRowScopesResult<TRow> {
+>({
+  provider,
+  fields,
+}: UseRowScopesProps<TFields, TRow>): UseRowScopesResult<TRow> {
   const scopes = useMemo(
     () =>
       createRowScopes<TRow>({

@@ -91,8 +91,11 @@ export default function DataCards<
       "DataCards requires a provider created by createDataViewsProvider",
     );
   }
-  const words = useMessages(messages);
-  const declared = useStableValue(fields, areDisplayFieldsEqual);
+  const words = useMessages({ messages });
+  const declared = useStableValue({
+    value: fields,
+    isEqual: areDisplayFieldsEqual,
+  });
   // Looked up in the held list, which holds the ids the caller's list holds:
   // one lookup names the card's heading and checks that the title names a
   // field at all.
@@ -106,14 +109,17 @@ export default function DataCards<
     () => declared.filter((field) => field.id !== title),
     [declared, title],
   );
-  const names = useStableValue(declared.map(readFieldName), areNamesEqual);
-  const scopes = useRowScopes(provider, names);
-  const state = useDataViewsValue(provider.state);
-  const status = useStableValue(
-    resolveDisplayStatus(state),
-    areDisplayStatusesEqual,
-  );
-  const ids = useDataViewsValue(scopes.ids);
+  const names = useStableValue({
+    value: declared.map(readFieldName),
+    isEqual: areNamesEqual,
+  });
+  const scopes = useRowScopes({ provider, fields: names });
+  const state = useDataViewsValue({ channel: provider.state });
+  const status = useStableValue({
+    value: resolveDisplayStatus(state),
+    isEqual: areDisplayStatusesEqual,
+  });
+  const ids = useDataViewsValue({ channel: scopes.ids });
   const entries = useMemo(
     () => listDisplayEntries({ rowIds: ids, status }),
     [ids, status],

@@ -281,7 +281,7 @@ export const SelectedAcrossPages: Story = {
 /** A count that names what is selected, following the selection. */
 function MachinesSelected(): ReactElement {
   const { selection } = useDataViews({ collection: machineCollection });
-  const count = useDataViewsValue(selection.state).ids.size;
+  const count = useDataViewsValue({ channel: selection.state }).ids.size;
   return (
     <span role="status" className="indicator">
       {`${count} ${count === 1 ? "machine" : "machines"} selected`}
@@ -294,7 +294,7 @@ const machinesSelectedCode = `
 // Follows the selection, and announces it as the default count does.
 function MachinesSelected() {
   const { selection } = useDataViews({ collection: machineCollection });
-  const count = useDataViewsValue(selection.state).ids.size;
+  const count = useDataViewsValue({ channel: selection.state }).ids.size;
   return (
     <span role="status" className="indicator">
       {\`\${count} \${count === 1 ? "machine" : "machines"} selected\`}

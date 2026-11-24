@@ -19,7 +19,7 @@ const VirtualBody = ({
   estimatedRowHeight,
   tracks,
 }: VirtualBodyProps): ReactElement => {
-  const model = useDataViewsValue(rowModel);
+  const model = useDataViewsValue({ channel: rowModel });
   const { mounted, body, readRowRef, onFocus, onBlur } = useVirtualRows({
     entries,
     estimatedRowHeight,

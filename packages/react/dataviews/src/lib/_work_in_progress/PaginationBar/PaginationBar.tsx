@@ -115,12 +115,12 @@ export default function PaginationBar<
       "PaginationBar requires a provider created by createDataViewsProvider",
     );
   }
-  const messages = useMessages(given);
+  const messages = useMessages({ messages: given });
   // Observed for as long as the bar is mounted: a standalone bar is a mount
   // that reads the provider, and the ref-count makes a bar inside a root
   // that already observes cost nothing.
   useEffect(() => provider.observe(), [provider]);
-  const snapshot = useDataViewsValue(provider.state);
+  const snapshot = useDataViewsValue({ channel: provider.state });
   // The core's facts: what is on screen, what is counted, what is reachable.
   const facts = resolvePagination(
     snapshot,

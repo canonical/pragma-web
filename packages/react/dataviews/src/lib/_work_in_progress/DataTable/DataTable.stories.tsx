@@ -1017,8 +1017,8 @@ const columns: readonly DataTableColumn[] = [
  */
 function HostCell({ value }: DisplayFieldCellProps): ReactElement {
   const cell = useDataViewsCell({ collection: machineCollection });
-  const { owner } = useDataViewsValue(cell.record);
-  const selected = useDataViewsValue(cell.selected);
+  const { owner } = useDataViewsValue({ channel: cell.record });
+  const selected = useDataViewsValue({ channel: cell.selected });
   return (
     <span
       style={{
@@ -1063,8 +1063,8 @@ export const CellReadingItsScope: Story = {
   const { record, selected } = useDataViewsCell({
     collection: machineCollection,
   });
-  const { owner } = useDataViewsValue(record);
-  const isSelected = useDataViewsValue(selected);
+  const { owner } = useDataViewsValue({ channel: record });
+  const isSelected = useDataViewsValue({ channel: selected });
   return (
     <span
       style={{

@@ -141,7 +141,7 @@ export default function SortPanel({
       root.current = null;
     };
   }, []);
-  const attach = useMergedRef(ref, attachRoot);
+  const attach = useMergedRef({ ref, attach: attachRoot });
   useLayoutEffect(() => {
     const control = focused.current;
     // The section renders on every path, and React attaches its ref before

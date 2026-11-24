@@ -114,12 +114,12 @@ export default function useColumnManagement<
   announce,
 }: UseColumnManagementProps<TFields, TRow>): UseColumnManagementResult {
   const { presentation } = provider;
-  const declared = useStableValue(columns, areColumnsEqual);
+  const declared = useStableValue({ value: columns, isEqual: areColumnsEqual });
   // The arrangement alone: a change to the reason re-renders no table.
-  const arrangement = useDataViewsValue(
-    presentation.state,
-    (shown) => shown.presentation,
-  );
+  const arrangement = useDataViewsValue({
+    channel: presentation.state,
+    select: (shown) => shown.presentation,
+  });
   // The list last handed out, whose offers objects a new list keeps where a
   // column's changes hold. Written during render: the latest list is what
   // every later render compares with, so a discarded render writing it
@@ -131,7 +131,10 @@ export default function useColumnManagement<
   );
   // Held at one reference while they say the same: a resize writes a width,
   // which changes no column's visibility or place.
-  const settings = useStableValue(derived, areColumnSettingsEqual);
+  const settings = useStableValue({
+    value: derived,
+    isEqual: areColumnSettingsEqual,
+  });
   previous.current = settings;
   // Each column's offers by its id, so a header reads its own at once on
   // every render of the header row.
@@ -151,7 +154,10 @@ export default function useColumnManagement<
   );
   // The viewer's own changes where a change is written now: what a reset can
   // clear, so an open view's saved arrangement beneath never keeps it on.
-  const own = useDataViewsValue(presentation.state, (shown) => shown.own);
+  const own = useDataViewsValue({
+    channel: presentation.state,
+    select: (shown) => shown.own,
+  });
   const resettable = useMemo(
     () => Object.keys(resetColumnArrangement({ presentation: own })).length > 0,
     [own],
@@ -203,8 +209,8 @@ export default function useColumnManagement<
     }
   });
 
-  const changeColumn = useStableCallback(
-    (columnId: string, change: ColumnChange) => {
+  const changeColumn = useStableCallback({
+    callback: (columnId: string, change: ColumnChange) => {
       const column = columns.find((candidate) => candidate.id === columnId);
       if (column === undefined) {
         return;
@@ -252,22 +258,24 @@ export default function useColumnManagement<
         ),
       );
     },
-  );
+  });
 
-  const resetColumns = useStableCallback(() => {
-    const patch = resetColumnArrangement({
-      presentation: presentation.state.get().own,
-    });
-    if (Object.keys(patch).length === 0) {
-      return;
-    }
-    presentation.arrange(patch);
-    announce(messages.tableSettingsReset);
+  const resetColumns = useStableCallback({
+    callback: () => {
+      const patch = resetColumnArrangement({
+        presentation: presentation.state.get().own,
+      });
+      if (Object.keys(patch).length === 0) {
+        return;
+      }
+      presentation.arrange(patch);
+      announce(messages.tableSettingsReset);
+    },
   });
 
   const { spellQuery } = readProviderHost(provider);
-  const listDestinations = useStableCallback(
-    (): SettingsDestinations | null => {
+  const listDestinations = useStableCallback({
+    callback: (): SettingsDestinations | null => {
       // The same query from the page it stands on, read once for every
       // link: a change to the columns asks the source for nothing, so the
       // window stays where it is.
@@ -299,7 +307,7 @@ export default function useColumnManagement<
       }
       return { changes, reset: spell(null) };
     },
-  );
+  });
 
   return {
     settings,

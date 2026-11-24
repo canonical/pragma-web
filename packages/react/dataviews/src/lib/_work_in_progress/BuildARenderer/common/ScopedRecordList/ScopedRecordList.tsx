@@ -52,8 +52,8 @@ export default function ScopedRecordList<
     [scope.rows, scope.selection],
   );
   useEffect(() => scopes.observe(), [scopes]);
-  const state = useDataViewsValue(scope.state);
-  const ids = useDataViewsValue(scopes.ids);
+  const state = useDataViewsValue({ channel: scope.state });
+  const ids = useDataViewsValue({ channel: scopes.ids });
   const status = resolveDisplayStatus(state);
   const entries = listDisplayEntries({ rowIds: ids, status });
   // Why the last sort changed nothing, in the source's words.

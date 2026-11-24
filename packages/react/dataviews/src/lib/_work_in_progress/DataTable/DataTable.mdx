@@ -179,8 +179,8 @@ function HostCell({ value }: DisplayFieldCellProps) {
   const { record, selected } = useDataViewsCell({
     collection: machineCollection,
   });
-  const { owner } = useDataViewsValue(record);
-  const isSelected = useDataViewsValue(selected);
+  const { owner } = useDataViewsValue({ channel: record });
+  const isSelected = useDataViewsValue({ channel: selected });
   return (
     <span
       style={{

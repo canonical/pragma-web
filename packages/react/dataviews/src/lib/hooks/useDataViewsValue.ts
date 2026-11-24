@@ -1,4 +1,3 @@
-import type { ReadonlyChannel } from "@canonical/dataviews-core";
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type {
   UseDataViewsValueProps,
@@ -15,23 +14,22 @@ const selectWhole = (value: unknown): unknown => value;
  * `import { useDataViewsValue } from "@canonical/dataviews-react";`
  *
  * ```ts
- * const state = useDataViewsValue(provider.state);
- * const search = useDataViewsValue(provider.state, (s) => s.slice.search ?? "");
- * const ids = useDataViewsValue(
- *   selection.state,
- *   (s) => [...s.ids],
- *   (a, b) => a.length === b.length && a.every((id, i) => id === b.at(i)),
- * );
+ * const state = useDataViewsValue({ channel: provider.state });
+ * const search = useDataViewsValue({
+ *   channel: provider.state,
+ *   select: (s) => s.slice.search ?? "",
+ * });
+ * const ids = useDataViewsValue({
+ *   channel: selection.state,
+ *   select: (s) => [...s.ids],
+ *   isEqual: (a, b) =>
+ *     a.length === b.length && a.every((id, i) => id === b.at(i)),
+ * });
  * ```
  *
- * Returns the held value while `isEqual(previous, next)` holds; without it,
- * `Object.is`. Keep `select` and `isEqual` stable and pure.
+ * Keep `select` and `isEqual` stable and pure.
  *
- * @param channel - The channel observed: a provider's state, its presentation,
- *   a selection, a row's record.
- * @param select - Reads the part of the snapshot this render needs.
- * @param isEqual - Whether the next value says the same as the one held, so
- *   the held one is returned in its place.
+ * @param props - The channel, and optionally `select` and `isEqual`.
  *
  * @note Impure: subscribes to the channel, caches the last snapshot's
  * selection, and writes the committed value to a ref in an effect after
@@ -41,16 +39,18 @@ const selectWhole = (value: unknown): unknown => value;
  * name may change or move before the first release.
  */
 export default function useDataViewsValue<T>(
-  ...args: readonly [channel: UseDataViewsValueProps<T, T>[0]]
+  props: UseDataViewsValueProps<T> & { readonly select?: undefined },
 ): UseDataViewsValueResult<T>;
 export default function useDataViewsValue<T, TSelected>(
-  ...args: UseDataViewsValueProps<T, TSelected>
+  props: UseDataViewsValueProps<T, TSelected> & {
+    readonly select: (value: T) => TSelected;
+  },
 ): UseDataViewsValueResult<TSelected>;
-export default function useDataViewsValue(
-  channel: ReadonlyChannel<unknown>,
-  select: (value: unknown) => unknown = selectWhole,
-  isEqual: (previous: unknown, next: unknown) => boolean = Object.is,
-): unknown {
+export default function useDataViewsValue({
+  channel,
+  select = selectWhole,
+  isEqual = Object.is,
+}: UseDataViewsValueProps<unknown, unknown>): unknown {
   // What the last committed render returned: written after commit, never
   // during render, so a render React discards leaves it as it was.
   const held = useRef<{ readonly value: unknown } | null>(null);

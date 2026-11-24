@@ -34,9 +34,9 @@ const countRestrictedFields = (
 export default function useRestrictedFields({
   provider,
 }: UseRestrictedFieldsProps): UseRestrictedFieldsResult {
-  return useDataViewsValue(
-    provider.state,
-    countRestrictedFields,
-    areTalliesEqual,
-  );
+  return useDataViewsValue({
+    channel: provider.state,
+    select: countRestrictedFields,
+    isEqual: areTalliesEqual,
+  });
 }

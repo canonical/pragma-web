@@ -17,9 +17,12 @@ import type {
 export default function useStableCallback<
   TArgs extends readonly unknown[],
   TResult,
->(
-  ...[callback]: UseStableCallbackProps<TArgs, TResult>
-): UseStableCallbackResult<TArgs, TResult> {
+>({
+  callback,
+}: UseStableCallbackProps<TArgs, TResult>): UseStableCallbackResult<
+  TArgs,
+  TResult
+> {
   // Written during render: the latest callback is what every reader
   // wants, so a render React discards writing it first is harmless.
   const held = useRef(callback);

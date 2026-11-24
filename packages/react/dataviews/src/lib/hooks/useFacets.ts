@@ -34,6 +34,9 @@ export default function useFacets<
   TRow extends object = RowRecord,
 >({ provider }: UseFacetsProps<TFields, TRow>): UseFacetsResult {
   const answered = useAnsweredFacets({ provider });
-  const latest = useDataViewsValue(provider.state, readLatest);
+  const latest = useDataViewsValue({
+    channel: provider.state,
+    select: readLatest,
+  });
   return useMemo(() => ({ answered, latest }), [answered, latest]);
 }

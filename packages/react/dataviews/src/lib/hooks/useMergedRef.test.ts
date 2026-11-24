@@ -8,7 +8,7 @@ describe("useMergedRef", () => {
     const ref = createRef<HTMLDivElement>();
     const release = vi.fn();
     const attach = vi.fn(() => release);
-    const { result } = renderHook(() => useMergedRef(ref, attach));
+    const { result } = renderHook(() => useMergedRef({ ref, attach }));
     const node = document.createElement("div");
     const detach = result.current(node);
     expect(attach).toHaveBeenCalledWith(node);
@@ -21,7 +21,9 @@ describe("useMergedRef", () => {
   it("runs a callback ref's own cleanup instead of a null call", () => {
     const cleanup = vi.fn();
     const ref = vi.fn(() => cleanup);
-    const { result } = renderHook(() => useMergedRef(ref, () => undefined));
+    const { result } = renderHook(() =>
+      useMergedRef({ ref, attach: () => undefined }),
+    );
     const node = document.createElement("div");
     const detach = result.current(node);
     detach();
@@ -31,7 +33,9 @@ describe("useMergedRef", () => {
 
   it("calls a callback ref with null when it returned no cleanup", () => {
     const ref = vi.fn();
-    const { result } = renderHook(() => useMergedRef(ref, () => undefined));
+    const { result } = renderHook(() =>
+      useMergedRef({ ref, attach: () => undefined }),
+    );
     const node = document.createElement("div");
     result.current(node)();
     expect(ref.mock.calls).toEqual([[node], [null]]);
@@ -42,7 +46,7 @@ describe("useMergedRef", () => {
     const first = vi.fn();
     const latest = vi.fn();
     const { result, rerender } = renderHook(
-      ({ ref }) => useMergedRef(ref, attach),
+      ({ ref }) => useMergedRef({ ref, attach }),
       { initialProps: { ref: first } },
     );
     const merged = result.current;
@@ -55,7 +59,7 @@ describe("useMergedRef", () => {
 
   it("works without a caller's ref", () => {
     const { result } = renderHook(() =>
-      useMergedRef<HTMLDivElement>(undefined, () => undefined),
+      useMergedRef<HTMLDivElement>({ ref: undefined, attach: () => undefined }),
     );
     expect(() => result.current(document.createElement("div"))()).not.toThrow();
   });

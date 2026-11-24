@@ -88,7 +88,7 @@ export default function useTableGeometry({
 }: UseTableGeometryProps): UseTableGeometryResult {
   const [container, setContainer] = useState<number | null>(null);
   const [reserved, setReserved] = useState(0);
-  const interactionState = useDataViewsValue(interaction.state);
+  const interactionState = useDataViewsValue({ channel: interaction.state });
 
   const attach = useCallback(
     (node: HTMLTableElement): (() => void) | undefined => {
@@ -153,7 +153,11 @@ export default function useTableGeometry({
       })),
     [columnIds, layout],
   );
-  const tracks = useDataViewsValue(layout.state, selectTracks, areTracksEqual);
+  const tracks = useDataViewsValue({
+    channel: layout.state,
+    select: selectTracks,
+    isEqual: areTracksEqual,
+  });
 
   // Resolving against zero yields each column's own reservation, which is
   // exactly the width a resize should capture before the container is

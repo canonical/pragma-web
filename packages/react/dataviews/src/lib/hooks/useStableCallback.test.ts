@@ -5,7 +5,7 @@ import useStableCallback from "./useStableCallback.js";
 describe("useStableCallback", () => {
   it("holds one identity across renders", () => {
     const { result, rerender } = renderHook(
-      ({ callback }) => useStableCallback(callback),
+      ({ callback }) => useStableCallback({ callback }),
       { initialProps: { callback: (value: number) => value + 1 } },
     );
     const first = result.current;
@@ -15,7 +15,7 @@ describe("useStableCallback", () => {
 
   it("calls the latest function with its arguments", () => {
     const { result, rerender } = renderHook(
-      ({ callback }) => useStableCallback(callback),
+      ({ callback }) => useStableCallback({ callback }),
       { initialProps: { callback: (value: number) => value + 1 } },
     );
     expect(result.current(1)).toBe(2);

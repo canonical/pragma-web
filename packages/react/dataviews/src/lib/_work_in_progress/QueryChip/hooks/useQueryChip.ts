@@ -5,7 +5,6 @@ import {
   isValidElement,
   type ReactElement,
   type ReactNode,
-  type Ref,
   useCallback,
   useId,
 } from "react";
@@ -165,7 +164,7 @@ export default function useQueryChip({
       registerMember ? registerMember(node) : undefined,
     [registerMember],
   );
-  const rootRef = useMergedRef(ref, attachRoot);
+  const rootRef = useMergedRef({ ref, attach: attachRoot });
 
   return {
     parts: parts.map((part) => ({

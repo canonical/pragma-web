@@ -38,7 +38,7 @@ const BodyCell = <TRow extends object>({
     // its channel is a table built against another column list.
     throw new Error(`no channel observes the field "${field}"`);
   }
-  const value = useDataViewsValue(channel);
+  const value = useDataViewsValue({ channel });
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,

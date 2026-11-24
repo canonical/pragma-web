@@ -109,25 +109,25 @@ export default function DataChart<
       `DataChart names "${field}", which the source does not facet`,
     );
   }
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   useEffect(() => provider.observe(), [provider]);
   const answered = useAnsweredFacets({ provider });
-  const state = useDataViewsValue(provider.state);
+  const state = useDataViewsValue({ channel: provider.state });
   const pending = state.pendingRequestId !== null;
-  const shown = useStableValue(
-    resolveDisplayStatus(state),
-    areDisplayStatusesEqual,
-  );
+  const shown = useStableValue({
+    value: resolveDisplayStatus(state),
+    isEqual: areDisplayStatusesEqual,
+  });
   const status = resolveChartStatus(shown, answered !== null, pending);
   const captionId = useId();
   // Held at one reference while it claims the same, so a result that moved
   // another field's facet redraws nothing here: the source mints a fresh
   // facet for every request, and the provider keeps the whole record only
   // while every field's facet is unchanged.
-  const facet = useStableValue(
-    answered === null ? null : answered[field],
-    isSameFacet,
-  );
+  const facet = useStableValue({
+    value: answered === null ? null : answered[field],
+    isEqual: isSameFacet,
+  });
   // The last facet drawn, kept under a pending status so the figure keeps
   // its height.
   const [kept, keep] = useState<Facet | null | undefined>(facet);

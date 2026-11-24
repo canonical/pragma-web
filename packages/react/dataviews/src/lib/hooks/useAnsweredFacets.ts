@@ -21,5 +21,8 @@ export default function useAnsweredFacets<
 >({
   provider,
 }: UseAnsweredFacetsProps<TFields, TRow>): UseAnsweredFacetsResult {
-  return useDataViewsValue(provider.state, readAnsweredFacets);
+  return useDataViewsValue({
+    channel: provider.state,
+    select: readAnsweredFacets,
+  });
 }

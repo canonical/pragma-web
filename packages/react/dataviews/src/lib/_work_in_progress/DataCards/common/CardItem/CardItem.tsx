@@ -31,22 +31,23 @@ const CardItem = <TRow extends object>({
   ...rest
 }: CardItemProps<TRow>): ReactElement => {
   const messages = useContext(MessagesContext);
-  const selected = useDataViewsValue(channels.selected);
+  const selected = useDataViewsValue({ channel: channels.selected });
   // The name the caller gives the record, read from the record channel as
   // the name itself: a record replaced without changing what it is called
   // re-renders no card, and a card named by its title reads nothing of the
   // record at all. The selector mints its value, which the channel hook
   // allows only because a name is a string: React compares the reads by
   // identity, and equal strings are identical.
-  const named = useDataViewsValue(channels.record, (record) =>
-    nameRecord(record, channels.id),
-  );
+  const named = useDataViewsValue({
+    channel: channels.record,
+    select: (record) => nameRecord(record, channels.id),
+  });
   const titleChannel = channels.fields[readFieldName(title)];
   if (titleChannel === undefined) {
     // The scopes observe every field the cards show, the title's included.
     throw new Error(`no channel observes the field "${readFieldName(title)}"`);
   }
-  const titleValue = useDataViewsValue(titleChannel);
+  const titleValue = useDataViewsValue({ channel: titleChannel });
   const spelled = spellPrimitiveValue(titleValue);
   const titleId = useId();
   // Blank is no name at all: a title holding empty text, or none, leaves the

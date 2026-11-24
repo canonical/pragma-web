@@ -21,8 +21,8 @@ const RecordItem = <TRow extends object>({
 }: RecordItemProps<TRow>): ReactElement => {
   // Each item reads its own row: a change to one record, or to whether it is
   // selected, re-renders that item alone.
-  const record = useDataViewsValue(channels.record);
-  const selected = useDataViewsValue(channels.selected);
+  const record = useDataViewsValue({ channel: channels.record });
+  const selected = useDataViewsValue({ channel: channels.selected });
   const name = nameRecord(record);
   return (
     <li {...rest}>

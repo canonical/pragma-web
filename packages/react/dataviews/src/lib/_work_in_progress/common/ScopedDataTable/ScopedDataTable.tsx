@@ -140,7 +140,10 @@ export default function ScopedDataTable<
     presentation: provider.presentation,
     columns,
   });
-  const model = useStableValue(rendered, areColumnModelsEqual);
+  const model = useStableValue({
+    value: rendered,
+    isEqual: areColumnModelsEqual,
+  });
 
   const fields = useMemo<readonly string[]>(
     () => model.map(readFieldName),
@@ -175,16 +178,16 @@ export default function ScopedDataTable<
   useEffect(() => interaction.observe(), [interaction]);
 
   const geometry = useTableGeometry({ layout, interaction, columnIds });
-  const scopes = useRowScopes(provider, fields);
-  const state = useDataViewsValue(provider.state);
+  const scopes = useRowScopes({ provider, fields });
+  const state = useDataViewsValue({ channel: provider.state });
   // The core's answer, held at one reference while it says the same thing,
   // so the entries are listed again only when a row identity or the status
   // changes.
-  const status = useStableValue(
-    resolveDisplayStatus(state),
-    areDisplayStatusesEqual,
-  );
-  const ids = useDataViewsValue(scopes.ids);
+  const status = useStableValue({
+    value: resolveDisplayStatus(state),
+    isEqual: areDisplayStatusesEqual,
+  });
+  const ids = useDataViewsValue({ channel: scopes.ids });
   // The core decides what the body shows: the status row first, then the
   // rows where the status keeps them.
   const entries = useMemo(
@@ -245,7 +248,7 @@ export default function ScopedDataTable<
   // style are. The merge holds the caller's ref behind one identity, which
   // matters most here: a ref React re-ran per render would rebuild the
   // resize observer and re-measure the container on every frame of a drag.
-  const attach = useMergedRef(ref, geometry.attach);
+  const attach = useMergedRef({ ref, attach: geometry.attach });
 
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(
@@ -255,7 +258,7 @@ export default function ScopedDataTable<
   const statusRenderer = renderStatus ?? describe;
   // Held behind one identity: a status renderer written inline must not
   // re-render every row.
-  const showStatus = useStableCallback(statusRenderer);
+  const showStatus = useStableCallback({ callback: statusRenderer });
   // While a status shows, the latest renderer, so a new one is shown at
   // once; otherwise the held one, which re-renders nothing.
   const renderer = status === null ? showStatus : statusRenderer;

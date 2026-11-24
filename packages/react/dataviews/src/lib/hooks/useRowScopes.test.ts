@@ -13,7 +13,9 @@ const FIELDS = ["name"] as const;
 describe("useRowScopes", () => {
   it("observes the rows delivered after it mounts", () => {
     const { provider } = createMachineProvider();
-    const { result } = renderHook(() => useRowScopes(provider, FIELDS));
+    const { result } = renderHook(() =>
+      useRowScopes({ provider, fields: FIELDS }),
+    );
     expect(result.current.ids.get()).toEqual([]);
     const host = readProviderHost(provider);
     act(() => {
@@ -30,7 +32,7 @@ describe("useRowScopes", () => {
   it("keeps one registry for one field list, and mints another for a new one", () => {
     const { provider } = createMachineProvider();
     const { result, rerender } = renderHook(
-      ({ fields }) => useRowScopes(provider, fields),
+      ({ fields }) => useRowScopes({ provider, fields }),
       { initialProps: { fields: FIELDS as readonly string[] } },
     );
     const first = result.current;
@@ -43,7 +45,7 @@ describe("useRowScopes", () => {
   it("stops observing once unmounted", () => {
     const { provider } = createMachineProvider();
     const { result, unmount } = renderHook(() =>
-      useRowScopes(provider, FIELDS),
+      useRowScopes({ provider, fields: FIELDS }),
     );
     const scopes = result.current;
     unmount();

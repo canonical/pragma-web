@@ -10,13 +10,14 @@ import type { UseStableValueProps, UseStableValueResult } from "./types.js";
  * a subscription or a memoised child keyed on the value is not rebuilt
  * because a caller wrote an array literal in its own render.
  */
-export default function useStableValue<TValue>(
-  ...[value, equals]: UseStableValueProps<TValue>
-): UseStableValueResult<TValue> {
+export default function useStableValue<TValue>({
+  value,
+  isEqual,
+}: UseStableValueProps<TValue>): UseStableValueResult<TValue> {
   // Written during render: the write is idempotent for one value, so a
   // render React discards leaves the ref as the committed one would.
   const held = useRef(value);
-  if (held.current !== value && !equals(held.current, value)) {
+  if (held.current !== value && !isEqual(held.current, value)) {
     held.current = value;
   }
   return held.current;

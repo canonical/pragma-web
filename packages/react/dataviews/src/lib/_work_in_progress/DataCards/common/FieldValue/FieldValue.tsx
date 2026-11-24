@@ -31,7 +31,7 @@ const FieldValue = <TRow extends object>({
     // channel is a card built against another field list.
     throw new Error(`no channel observes the field "${name}"`);
   }
-  const value = useDataViewsValue(channel);
+  const value = useDataViewsValue({ channel });
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,

@@ -44,7 +44,7 @@ export default function useProviderState<
     () => createFilterInputs({ host: readProviderHost(widest) }),
     [widest],
   );
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   const { ref, announce } = useAnnouncer();
   useEffect(() => provider.observe(), [provider]);
   useEffect(() => inputs.observe(), [inputs]);

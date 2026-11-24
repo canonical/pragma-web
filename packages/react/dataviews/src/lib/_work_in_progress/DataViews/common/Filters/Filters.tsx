@@ -371,7 +371,7 @@ export default function Filters({
   });
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
-  const issues = useDataViewsValue(provider.issues);
+  const issues = useDataViewsValue({ channel: provider.issues });
   // The controls submit every filter themselves, and the refused clauses
   // the query is withheld for are left out: submitting the form removes
   // them, as their Clear does.

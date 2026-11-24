@@ -1,12 +1,4 @@
-/**
- * Hook domain types for the hooks every part shares: the value hook that
- * observes one channel, the cell hook a column's own renderer reads, whether
- * scripts have taken over, the focus a server's link hands to the button
- * replacing it, the focus a disabled control strands, and the words a root
- * speaks. Each hook declares its result type here, and its props type where
- * it takes arguments: a config object, or a labelled tuple for a hook whose
- * arguments are positional.
- */
+/** Hook domain types for the shared hooks: every hook's props and result. */
 
 import type {
   Collection,
@@ -23,17 +15,19 @@ import type { FocusEvent, ReactNode, Ref, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
 /**
- * What `useDataViewsValue` takes with a selector: the channel, the `select`
- * that reads it, and an optional `isEqual` over what `select` returns.
+ * What `useDataViewsValue` takes.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type UseDataViewsValueProps<T, TSelected> = readonly [
-  channel: ReadonlyChannel<T>,
-  select: (value: T) => TSelected,
-  isEqual?: (previous: TSelected, next: TSelected) => boolean,
-];
+export type UseDataViewsValueProps<T, TSelected = T> = {
+  /** The channel observed: a provider's state, a selection, a row's record. */
+  readonly channel: ReadonlyChannel<T>;
+  /** Reads the part of the snapshot this render needs; the whole by default. */
+  readonly select?: (value: T) => TSelected;
+  /** Whether the next value says the same as the held one; `Object.is` by default. */
+  readonly isEqual?: (previous: TSelected, next: TSelected) => boolean;
+};
 
 /**
  * What `useDataViewsValue` returns: the channel's current value, or the part
@@ -134,14 +128,13 @@ export type UseFocusRescueResult = {
   readonly onBlur: () => void;
 };
 
-/**
- * What `useMergedRef` takes: the caller's ref, if any, and the part's own
- * attach, which may answer its cleanup.
- */
-export type UseMergedRefProps<TElement> = readonly [
-  ref: Ref<TElement> | undefined,
-  attach: (node: TElement) => (() => void) | undefined,
-];
+/** What `useMergedRef` takes. */
+export type UseMergedRefProps<TElement> = {
+  /** The caller's ref, if any. */
+  readonly ref: Ref<TElement> | undefined;
+  /** The part's own attach, which may answer its cleanup. */
+  readonly attach: (node: TElement) => (() => void) | undefined;
+};
 
 /**
  * What `useMergedRef` returns: one callback ref, answering the cleanup that
@@ -190,8 +183,11 @@ export type UseFacetsResult = {
   readonly latest: Readonly<Record<string, Facet>> | null;
 };
 
-/** What `useMessages` takes: the application's messages, if any. */
-export type UseMessagesProps = readonly [messages?: Partial<DataViewsMessages>];
+/** What `useMessages` takes. */
+export type UseMessagesProps = {
+  /** The application's messages, over the English record. */
+  readonly messages?: Partial<DataViewsMessages> | undefined;
+};
 
 /**
  * What `useMessages` returns: every message a root speaks, the application's
@@ -199,27 +195,29 @@ export type UseMessagesProps = readonly [messages?: Partial<DataViewsMessages>];
  */
 export type UseMessagesResult = DataViewsMessages;
 
-/**
- * What `useRowScopes` takes: the provider whose rows are scoped, and the
- * names of the fields each scope observes, held at one reference.
- */
+/** What `useRowScopes` takes. */
 export type UseRowScopesProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object,
-> = readonly [
-  provider: DataViewsProvider<TFields, TRow>,
-  fields: readonly string[],
-];
+> = {
+  /** The provider whose rows are scoped. */
+  readonly provider: DataViewsProvider<TFields, TRow>;
+  /** The names of the fields each scope observes, at one reference. */
+  readonly fields: readonly string[];
+};
 
 /** The row-scope registry `useRowScopes` mints for one renderer. */
 export type UseRowScopesResult<TRow extends object = RowRecord> =
   RowScopes<TRow>;
 
-/** What `useStableCallback` takes: the caller's function, rebuilt or not. */
+/** What `useStableCallback` takes. */
 export type UseStableCallbackProps<
   TArgs extends readonly unknown[],
   TResult,
-> = readonly [callback: (...args: TArgs) => TResult];
+> = {
+  /** The caller's function, rebuilt or not. */
+  readonly callback: (...args: TArgs) => TResult;
+};
 
 /** What `useStableCallback` answers: the caller's function behind one identity. */
 export type UseStableCallbackResult<
@@ -239,14 +237,13 @@ export type UseAnnouncerResult = {
   readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
 };
 
-/**
- * What `useStableValue` takes: the value rebuilt every render, and whether
- * it says the same as the one held.
- */
-export type UseStableValueProps<TValue> = readonly [
-  value: TValue,
-  equals: (held: TValue, next: TValue) => boolean,
-];
+/** What `useStableValue` takes. */
+export type UseStableValueProps<TValue> = {
+  /** The value rebuilt every render. */
+  readonly value: TValue;
+  /** Whether the next value says the same as the one held. */
+  readonly isEqual: (held: TValue, next: TValue) => boolean;
+};
 
 /** What `useStableValue` answers: the value held at one reference while it says the same. */
 export type UseStableValueResult<TValue> = TValue;

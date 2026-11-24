@@ -13,9 +13,10 @@ import type { UseMergedRefProps, UseMergedRefResult } from "./types.js";
  * every render never costs a re-attach. Convention: a part that holds its
  * own root merges the caller's ref, never drops it.
  */
-export default function useMergedRef<TElement>(
-  ...[ref, attach]: UseMergedRefProps<TElement>
-): UseMergedRefResult<TElement> {
+export default function useMergedRef<TElement>({
+  ref,
+  attach,
+}: UseMergedRefProps<TElement>): UseMergedRefResult<TElement> {
   const callerRef = useRef(ref);
   callerRef.current = ref;
   return useCallback(

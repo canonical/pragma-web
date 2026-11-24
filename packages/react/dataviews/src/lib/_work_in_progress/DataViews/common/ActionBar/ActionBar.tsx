@@ -53,7 +53,7 @@ export default function ActionBar({
 }: DataViewsActionBarProps): ReactElement | null {
   const { provider, messages } = useDataViewsRoot({ part: "ActionBar" });
   const { selection } = provider;
-  const count = useDataViewsValue(selection.state).ids.size;
+  const count = useDataViewsValue({ channel: selection.state }).ids.size;
 
   // Where focus entered the bar from. React releases the bar's ref before
   // it removes the bar, so a bar leaving with the focus inside it can still
@@ -73,7 +73,7 @@ export default function ActionBar({
   // The bar's root is its own, so a caller's ref is merged onto it rather
   // than dropped: the focus goes back first, then the caller's ref is
   // released.
-  const attach = useMergedRef(ref, returnFocus);
+  const attach = useMergedRef({ ref, attach: returnFocus });
 
   const handleFocus = (event: FocusEvent<HTMLFieldSetElement>): void => {
     const from = event.relatedTarget;

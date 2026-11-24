@@ -40,7 +40,7 @@ A provider, made by `createDataViewsProvider`, carries channels and commands. A 
 
 Three hooks from `@canonical/dataviews-react` read them in React:
 
-- `useDataViewsValue(channel)` returns the channel's value and re-renders the component when it changes. Pass a selector as the second argument to re-render only when one part of the value changes.
+- `useDataViewsValue({ channel })` returns the channel's value and re-renders the component when it changes. Pass a `select` to re-render only when one part of the value changes.
 - `useDataViews({ collection })` returns the enclosing root's scope: the provider's channels and commands, less `observe` and `reset`. It throws outside a root, and throws when the collection is not the one the root's provider was built over.
 - `useDataViewsCell({ collection })` reads the scope of one cell. `DataTable` and `DataCards` install that scope around a field's `cell`. A renderer of your own cannot install it, so it hands each row's channels to its own components instead, as step 3 does.
 
@@ -71,7 +71,7 @@ The smallest renderer observes the provider and lists its rows.
 
 `provider.observe()` starts the provider: the first observer runs the source and the ports, such as the location. It returns the function that stops observing, so the effect returns it as its cleanup. Observing is counted: two renderers on one provider share one source, and the source stops when the last one unmounts. Call it from an effect, never during render. React can discard a render, and a subscription made there would never be released. A server render runs no effects, so it starts nothing.
 
-`useDataViewsValue(provider.rows)` re-renders the list each time the rows change. Each item is keyed by the row's identity, never by its position: sorting and paging move records between positions.
+`useDataViewsValue({ channel: provider.rows })` re-renders the list each time the rows change. Each item is keyed by the row's identity, never by its position: sorting and paging move records between positions.
 
 <Canvas of={Stories.APlainList} sourceState="none" />
 

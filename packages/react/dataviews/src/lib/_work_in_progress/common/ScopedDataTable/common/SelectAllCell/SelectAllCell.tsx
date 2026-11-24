@@ -25,7 +25,7 @@ export default function SelectAllCell({
   ...rest
 }: SelectAllCellProps): ReactElement {
   const messages = useContext(MessagesContext);
-  const ids = useDataViewsValue(displayed);
+  const ids = useDataViewsValue({ channel: displayed });
   const { checked, mixed, toggle } = useSelectAllOnPage({ selection, ids });
   // Selection works once scripts run: until then the box draws disabled.
   const hydrated = useIsHydrated();

@@ -27,7 +27,7 @@ export default function PlainList<
 }: PlainListProps<TFields, TRow>): ReactElement {
   // The first observer starts the source; the cleanup stops observing.
   useEffect(() => provider.observe(), [provider]);
-  const rows = useDataViewsValue(provider.rows);
+  const rows = useDataViewsValue({ channel: provider.rows });
   return (
     <ul aria-label={label}>
       {rows.entries.map((row) => (

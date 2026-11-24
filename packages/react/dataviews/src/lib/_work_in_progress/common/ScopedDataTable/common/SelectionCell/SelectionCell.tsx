@@ -24,7 +24,7 @@ export default function SelectionCell<TRow extends object>({
   ...rest
 }: SelectionCellProps<TRow>): ReactElement {
   const messages = useContext(MessagesContext);
-  const record = useDataViewsValue(channels.record);
+  const record = useDataViewsValue({ channel: channels.record });
   // Selection works once scripts run: until then the box draws disabled.
   const hydrated = useIsHydrated();
   return (

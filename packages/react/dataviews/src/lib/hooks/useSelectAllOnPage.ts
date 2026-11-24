@@ -16,7 +16,7 @@ export default function useSelectAllOnPage({
   selection,
   ids,
 }: UseSelectAllOnPageProps): UseSelectAllOnPageResult {
-  const state = useDataViewsValue(selection.state);
+  const state = useDataViewsValue({ channel: selection.state });
   // Counted, not filtered: this runs on every render of its control, and an
   // intermediate array per render is one allocation and one scan the count
   // does not need.

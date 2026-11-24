@@ -54,7 +54,7 @@ describe("FieldValue", () => {
   it("renders the field's own content inside the value's cell scope", () => {
     const Owner = ({ value, rowId, columnId }: DisplayFieldCellProps) => {
       const cell = useDataViewsCell({ collection: machines });
-      const record = useDataViewsValue(cell.record);
+      const record = useDataViewsValue({ channel: cell.record });
       return (
         <span>
           {rowId}/{columnId}: {String(value)} on {record.name}

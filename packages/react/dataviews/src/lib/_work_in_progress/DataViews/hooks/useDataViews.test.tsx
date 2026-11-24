@@ -226,7 +226,10 @@ describe("useDataViews", () => {
   it("reads through StrictMode's double mount: one live execution, values that follow", () => {
     const { provider, source } = createMachineProvider();
     const { result } = renderHook(
-      () => useDataViewsValue(useDataViews({ collection: machines }).state),
+      () =>
+        useDataViewsValue({
+          channel: useDataViews({ collection: machines }).state,
+        }),
       {
         wrapper: ({ children }) => (
           <StrictMode>

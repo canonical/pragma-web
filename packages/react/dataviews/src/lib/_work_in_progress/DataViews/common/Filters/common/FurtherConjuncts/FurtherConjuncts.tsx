@@ -43,7 +43,7 @@ export default function FurtherConjuncts({
   ...rest
 }: FurtherConjunctsProps): ReactElement | null {
   const { messages } = useDataViewsRoot({ part: "Filters" });
-  const others = useDataViewsValue(handle.others);
+  const others = useDataViewsValue({ channel: handle.others });
   if (others.length === 0) {
     return null;
   }

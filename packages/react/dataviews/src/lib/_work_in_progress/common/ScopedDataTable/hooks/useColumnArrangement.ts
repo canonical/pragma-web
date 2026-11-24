@@ -31,5 +31,9 @@ export default function useColumnArrangement({
         .map(({ column }) => column),
     [columns],
   );
-  return useDataViewsValue(presentation.state, selectVisible, areColumnsEqual);
+  return useDataViewsValue({
+    channel: presentation.state,
+    select: selectVisible,
+    isEqual: areColumnsEqual,
+  });
 }

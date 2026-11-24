@@ -70,7 +70,7 @@ export default function ChoicesFilter({
   const alternativeField = useFilterHandle({ handle: alternativeHandle });
   // The set the control shows may be any conjunct at its address, so the
   // move names the one it is.
-  const nth = useDataViewsValue(handle.nth);
+  const nth = useDataViewsValue({ channel: handle.nth });
   const hydrated = useIsHydrated();
   // The move link a server rendered and the button replacing it: the button
   // takes the link's focus, or the reader who tabbed to the move before
