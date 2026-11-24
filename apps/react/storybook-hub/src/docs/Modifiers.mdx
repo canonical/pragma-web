@@ -18,12 +18,14 @@ The modifier architecture is defined by a formal contract (WD433) that specifies
 ```css
 /* Generated from the token file for .constructive (anticipation family) */
 .constructive {
-  --modifier-color-foreground-primary: var(--color-foreground-primary-constructive);
-  --modifier-color-foreground-ghost:   var(--color-foreground-ghost-constructive);
-  --modifier-color-text:               var(--color-text-constructive);
-  --modifier-color-icon:               var(--color-icon-constructive);
-  --modifier-color-border:             var(--color-border-constructive);
-  --modifier-color-focus-ring:          var(--color-focus-ring-constructive);
+  --modifier-color-foreground-primary: var(
+    --color-foreground-primary-constructive
+  );
+  --modifier-color-foreground-ghost: var(--color-foreground-ghost-constructive);
+  --modifier-color-text: var(--color-text-constructive);
+  --modifier-color-icon: var(--color-icon-constructive);
+  --modifier-color-border: var(--color-border-constructive);
+  --modifier-color-focus-ring: var(--color-focus-ring-constructive);
 }
 ```
 
@@ -32,22 +34,31 @@ The modifier architecture is defined by a formal contract (WD433) that specifies
 ```css
 /* Button subscribes to the primary foreground tier */
 .ds.button {
-  background-color: var(--modifier-color-foreground-primary, var(--button-color-background));
-  color:            var(--modifier-color-text, var(--button-color-text));
-  border-color:     var(--modifier-color-border, var(--button-color-border));
+  background-color: var(
+    --modifier-color-foreground-primary,
+    var(--button-color-background)
+  );
+  color: var(--modifier-color-text, var(--button-color-text));
+  border-color: var(--modifier-color-border, var(--button-color-border));
 }
 
 /* Badge subscribes to the secondary foreground tier */
 .ds.badge {
-  background-color: var(--modifier-color-foreground-secondary, var(--badge-color-background));
-  color:            var(--modifier-color-text, var(--badge-color-text));
+  background-color: var(
+    --modifier-color-foreground-secondary,
+    var(--badge-color-background)
+  );
+  color: var(--modifier-color-text, var(--badge-color-text));
 }
 
 /* Chip subscribes to the secondary foreground tier */
 .ds.chip {
-  background-color: var(--modifier-color-foreground-secondary, var(--chip-color-background));
-  color:            var(--modifier-color-text, var(--chip-color-text));
-  border-color:     var(--modifier-color-border, var(--chip-color-border));
+  background-color: var(
+    --modifier-color-foreground-secondary,
+    var(--chip-color-background)
+  );
+  color: var(--modifier-color-text, var(--chip-color-text));
+  border-color: var(--modifier-color-border, var(--chip-color-border));
 }
 ```
 
@@ -74,9 +85,33 @@ Expected consequence of an action, applied before the action occurs.
     </tr>
   </thead>
   <tbody>
-    <tr><td><code>constructive</code></td><td><code>.constructive</code></td><td>Positive outcome — create, save, confirm</td></tr>
-    <tr><td><code>destructive</code></td><td><code>.destructive</code></td><td>Negative or irreversible outcome — delete, remove</td></tr>
-    <tr><td><code>caution</code></td><td><code>.caution</code></td><td>Potentially risky, requires attention</td></tr>
+    <tr>
+      <td>
+        <code>constructive</code>
+      </td>
+      <td>
+        <code>.constructive</code>
+      </td>
+      <td>Positive outcome — create, save, confirm</td>
+    </tr>
+    <tr>
+      <td>
+        <code>destructive</code>
+      </td>
+      <td>
+        <code>.destructive</code>
+      </td>
+      <td>Negative or irreversible outcome — delete, remove</td>
+    </tr>
+    <tr>
+      <td>
+        <code>caution</code>
+      </td>
+      <td>
+        <code>.caution</code>
+      </td>
+      <td>Potentially risky, requires attention</td>
+    </tr>
   </tbody>
 </table>
 
@@ -97,10 +132,42 @@ Feedback about an outcome or current state.
     </tr>
   </thead>
   <tbody>
-    <tr><td><code>success</code></td><td><code>.success</code></td><td>Positive outcome achieved</td></tr>
-    <tr><td><code>error</code></td><td><code>.error</code></td><td>Failure or invalid state</td></tr>
-    <tr><td><code>warning</code></td><td><code>.warning</code></td><td>Requires attention, not yet failed</td></tr>
-    <tr><td><code>information</code></td><td><code>.information</code></td><td>Neutral informational state</td></tr>
+    <tr>
+      <td>
+        <code>success</code>
+      </td>
+      <td>
+        <code>.success</code>
+      </td>
+      <td>Positive outcome achieved</td>
+    </tr>
+    <tr>
+      <td>
+        <code>error</code>
+      </td>
+      <td>
+        <code>.error</code>
+      </td>
+      <td>Failure or invalid state</td>
+    </tr>
+    <tr>
+      <td>
+        <code>warning</code>
+      </td>
+      <td>
+        <code>.warning</code>
+      </td>
+      <td>Requires attention, not yet failed</td>
+    </tr>
+    <tr>
+      <td>
+        <code>information</code>
+      </td>
+      <td>
+        <code>.information</code>
+      </td>
+      <td>Neutral informational state</td>
+    </tr>
   </tbody>
 </table>
 
@@ -121,10 +188,42 @@ Temporal state of an entity.
     </tr>
   </thead>
   <tbody>
-    <tr><td><code>planned</code></td><td><code>.planned</code></td><td>Future or upcoming</td></tr>
-    <tr><td><code>in_progress</code></td><td><code>.inProgress</code></td><td>Active, ongoing</td></tr>
-    <tr><td><code>completed</code></td><td><code>.completed</code></td><td>Finished successfully</td></tr>
-    <tr><td><code>failed</code></td><td><code>.failed</code></td><td>Terminal failure</td></tr>
+    <tr>
+      <td>
+        <code>planned</code>
+      </td>
+      <td>
+        <code>.planned</code>
+      </td>
+      <td>Future or upcoming</td>
+    </tr>
+    <tr>
+      <td>
+        <code>in_progress</code>
+      </td>
+      <td>
+        <code>.inProgress</code>
+      </td>
+      <td>Active, ongoing</td>
+    </tr>
+    <tr>
+      <td>
+        <code>completed</code>
+      </td>
+      <td>
+        <code>.completed</code>
+      </td>
+      <td>Finished successfully</td>
+    </tr>
+    <tr>
+      <td>
+        <code>failed</code>
+      </td>
+      <td>
+        <code>.failed</code>
+      </td>
+      <td>Terminal failure</td>
+    </tr>
   </tbody>
 </table>
 
@@ -134,7 +233,7 @@ Lifecycle modifiers set the secondary foreground tier, text, icon, and border ch
 
 Maturity stage of a feature or component.
 
-<Canvas of={Stories.ReleaseOnChip} />
+No component currently consumes this family.
 
 <table>
   <thead>
@@ -145,10 +244,42 @@ Maturity stage of a feature or component.
     </tr>
   </thead>
   <tbody>
-    <tr><td><code>experimental</code></td><td><code>.experimental</code></td><td>Early exploration, may change significantly</td></tr>
-    <tr><td><code>alpha</code></td><td><code>.alpha</code></td><td>Functionally incomplete</td></tr>
-    <tr><td><code>beta</code></td><td><code>.beta</code></td><td>Feature-complete, not hardened</td></tr>
-    <tr><td><code>stable</code></td><td><code>.stable</code></td><td>Production-ready</td></tr>
+    <tr>
+      <td>
+        <code>experimental</code>
+      </td>
+      <td>
+        <code>.experimental</code>
+      </td>
+      <td>Early exploration, may change significantly</td>
+    </tr>
+    <tr>
+      <td>
+        <code>alpha</code>
+      </td>
+      <td>
+        <code>.alpha</code>
+      </td>
+      <td>Functionally incomplete</td>
+    </tr>
+    <tr>
+      <td>
+        <code>beta</code>
+      </td>
+      <td>
+        <code>.beta</code>
+      </td>
+      <td>Feature-complete, not hardened</td>
+    </tr>
+    <tr>
+      <td>
+        <code>stable</code>
+      </td>
+      <td>
+        <code>.stable</code>
+      </td>
+      <td>Production-ready</td>
+    </tr>
   </tbody>
 </table>
 

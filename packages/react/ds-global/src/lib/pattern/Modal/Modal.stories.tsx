@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef } from "react";
+import { fn } from "storybook/test";
 import { Button } from "../../component/Button/index.js";
 import { Chip } from "../../component/Chip/index.js";
 import { InlineCode } from "../../component/InlineCode/index.js";
@@ -302,9 +303,14 @@ const RichContentStory = () => {
               gap: "var(--dimension-100, 8px)",
             }}
           >
-            <Chip lead="Status" value="Running" criticality="success" />
-            <Chip lead="Image" value="ubuntu:24.04" />
-            <Chip lead="Agent" value="beta" release="beta" />
+            <Chip
+              lead="Status"
+              value="Running"
+              criticality="success"
+              onClick={fn()}
+            />
+            <Chip lead="Image" value="ubuntu:24.04" onClick={fn()} />
+            <Chip lead="Agent" value="beta" onClick={fn()} />
           </div>
         </div>
       </Component.Content>
@@ -347,9 +353,9 @@ const close = () => modalRef.current?.close();
       </p>
       <InlineCode>ssh ubuntu@10.0.1.42 -i ~/.ssh/id_ed25519</InlineCode>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--dimension-100, 8px)" }}>
-        <Chip lead="Status" value="Running" criticality="success" />
-        <Chip lead="Image" value="ubuntu:24.04" />
-        <Chip lead="Agent" value="beta" release="beta" />
+        <Chip lead="Status" value="Running" criticality="success" onClick={fn()} />
+        <Chip lead="Image" value="ubuntu:24.04" onClick={fn()} />
+        <Chip lead="Agent" value="beta" onClick={fn()} />
       </div>
     </div>
   </Modal.Content>
