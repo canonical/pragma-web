@@ -42,7 +42,7 @@ export default function FurtherConjunct({
   const name =
     operator === "isSet"
       ? messages.operatorPhrase({ operator, operands, label: phrase })
-      : messages.filterAlso(phrase, values);
+      : messages.filterAlso({ phrase, values });
   /**
    * Where the Clear leads without scripts: the query the core's own removal
    * makes of the applied one, so the link and the button arrive at the

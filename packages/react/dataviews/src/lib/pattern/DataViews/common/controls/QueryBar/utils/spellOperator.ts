@@ -21,7 +21,7 @@ export default function spellOperator(
   messages: Pick<DataViewsMessages, "operatorShown" | "operatorPhrase">,
 ): { readonly shown: string; readonly spoken: string } {
   return {
-    shown: messages.operatorShown(operator, operands),
+    shown: messages.operatorShown({ operator, operands }),
     spoken: messages.operatorPhrase({ operator, operands }),
   };
 }

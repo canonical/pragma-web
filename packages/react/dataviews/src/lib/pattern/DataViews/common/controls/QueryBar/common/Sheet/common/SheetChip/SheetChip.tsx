@@ -60,7 +60,10 @@ export default function SheetChip({
         return (
           <QueryChip.Segment
             data-part="field"
-            description={messages.clauseRefused(name, shown.issue.reason)}
+            description={messages.clauseRefused({
+              name,
+              reason: shown.issue.reason,
+            })}
           >
             {name}
           </QueryChip.Segment>

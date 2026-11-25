@@ -23,14 +23,16 @@ describe("regression 0080 — a reason ended a message in two full stops", () =>
       expect(english.arrangementUnsaved(reason)).toBe(
         "The arrangement is not being saved: quota exceeded.",
       );
-      expect(english.viewFailed("save", reason)).toBe(
+      expect(english.viewFailed({ command: "save", reason })).toBe(
         "Not saved: quota exceeded.",
       );
       expect(english.sortRefused([reason])).toBe(
         "Sort unchanged: quota exceeded.",
       );
       expect(english.viewNameRefused(reason)).toBe("Quota exceeded.");
-      expect(english.filterRefused([reason], false)).toBe("Quota exceeded.");
+      expect(
+        english.filterRefused({ reasons: [reason], retained: false }),
+      ).toBe("Quota exceeded.");
     }
   });
 
@@ -44,7 +46,12 @@ describe("regression 0080 — a reason ended a message in two full stops", () =>
   });
 
   it("leaves a stop inside the reason alone", () => {
-    expect(english.viewUnreadable("open", "version 1.2 is unreadable")).toBe(
+    expect(
+      english.viewUnreadable({
+        command: "open",
+        reason: "version 1.2 is unreadable",
+      }),
+    ).toBe(
       "Not opened: the stored view cannot be read (version 1.2 is unreadable).",
     );
   });

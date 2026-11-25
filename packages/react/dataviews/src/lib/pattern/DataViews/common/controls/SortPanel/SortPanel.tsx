@@ -76,7 +76,7 @@ export default function SortPanel({
   const baseId = useId();
   /** A term as the panel names it: by its field, with its direction. */
   const describe = ({ field, direction }: SortTerm): string =>
-    messages.sortTerm(field, direction);
+    messages.sortTerm({ name: field, direction });
   /**
    * Apply an ordering one of the panel's controls leads to, and say what it
    * did through the root's announcer, under the ordering's topic: the

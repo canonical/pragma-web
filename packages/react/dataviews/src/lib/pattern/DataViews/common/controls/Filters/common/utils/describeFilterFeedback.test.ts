@@ -102,7 +102,7 @@ describe("describeFilterFeedback", () => {
   it("words the feedback in the messages it is given, with every reason", () => {
     const messages = resolveMessages({
       filterIncomplete: (retained) => `vide ${String(retained)}`,
-      filterRefused: (reasons, retained) =>
+      filterRefused: ({ reasons, retained }) =>
         `refusé ${reasons.join("|")} ${String(retained)}`,
     });
     expect(

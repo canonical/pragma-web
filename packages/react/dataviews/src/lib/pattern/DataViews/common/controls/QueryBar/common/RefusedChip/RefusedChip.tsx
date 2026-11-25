@@ -68,7 +68,7 @@ const RefusedChip = ({
     <QueryChip id={clause.id} label={name} criticality="error" {...clearProps}>
       <QueryChip.Segment
         data-part="field"
-        description={messages.clauseRefused(name, issue.reason)}
+        description={messages.clauseRefused({ name, reason: issue.reason })}
       >
         {name}
       </QueryChip.Segment>

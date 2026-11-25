@@ -52,11 +52,15 @@ describe("fr", () => {
   });
 
   it("states sort precedence with French ordinals", () => {
-    expect(fr.sortPrecedence("asc", 1, 1)).toBe("croissant");
-    expect(fr.sortPrecedence("desc", 1, 2)).toBe(
-      "décroissant, 1er critère sur 2",
+    expect(fr.sortPrecedence({ direction: "asc", position: 1, total: 1 })).toBe(
+      "croissant",
     );
-    expect(fr.sortPrecedence("asc", 2, 2)).toBe("croissant, 2e critère sur 2");
+    expect(
+      fr.sortPrecedence({ direction: "desc", position: 1, total: 2 }),
+    ).toBe("décroissant, 1er critère sur 2");
+    expect(fr.sortPrecedence({ direction: "asc", position: 2, total: 2 })).toBe(
+      "croissant, 2e critère sur 2",
+    );
   });
 
   it("states sort outcomes", () => {
@@ -71,7 +75,9 @@ describe("fr", () => {
     expect(fr.sortDefaulted([{ name: "Nom", direction: "asc" }])).toBe(
       "Trié selon l’ordre de la source : Nom, croissant.",
     );
-    expect(fr.sortTerm("Nom", "desc")).toBe("Nom, décroissant");
+    expect(fr.sortTerm({ name: "Nom", direction: "desc" })).toBe(
+      "Nom, décroissant",
+    );
   });
 
   it("names columns and their moves", () => {
@@ -84,8 +90,10 @@ describe("fr", () => {
     expect(fr.moveNamedColumnRight("Nom")).toBe("Déplacer Nom vers la droite");
     expect(fr.columnAlwaysShown("Nom")).toBe("Nom est toujours affichée");
     expect(fr.columnHidden("Nom")).toBe("Nom masquée");
-    expect(fr.columnShown("Nom", 2, 5)).toBe("Nom affichée, position 2 sur 5");
-    expect(fr.columnMoved("Nom", 1, 5)).toBe(
+    expect(fr.columnShown({ name: "Nom", position: 2, total: 5 })).toBe(
+      "Nom affichée, position 2 sur 5",
+    );
+    expect(fr.columnMoved({ name: "Nom", position: 1, total: 5 })).toBe(
       "Nom déplacée en position 1 sur 5",
     );
   });
@@ -96,10 +104,12 @@ describe("fr", () => {
     expect(fr.filterLowest("1")).toBe("Minimum : 1");
     expect(fr.filterHighest("8")).toBe("Maximum : 8");
     expect(fr.clearFilter("Statut")).toBe("Effacer Statut");
-    expect(fr.filterAlso("Cœurs à partir de", ["4", "8"])).toBe(
-      "Cœurs à partir de 4, 8",
+    expect(
+      fr.filterAlso({ phrase: "Cœurs à partir de", values: ["4", "8"] }),
+    ).toBe("Cœurs à partir de 4, 8");
+    expect(fr.clauseRefused({ name: "Statut", reason: "inconnu." })).toBe(
+      "Statut : inconnu.",
     );
-    expect(fr.clauseRefused("Statut", "inconnu.")).toBe("Statut : inconnu.");
     const phrase = (
       operator: Parameters<typeof fr.operatorPhrase>[0]["operator"],
       operands: readonly (string | boolean)[] = [],
@@ -113,9 +123,9 @@ describe("fr", () => {
     expect(phrase("isNot")).toBe("Nom n’est pas");
     expect(phrase("is")).toBe("Nom est");
     expect(fr.filterMatch("Nom")).toBe("Comment Nom correspond");
-    expect(fr.filterInUnit("Mémoire à partir de", "Mio")).toBe(
-      "Mémoire à partir de (Mio)",
-    );
+    expect(
+      fr.filterInUnit({ name: "Mémoire à partir de", symbol: "Mio" }),
+    ).toBe("Mémoire à partir de (Mio)");
     expect(phrase("isSet", [true])).toBe("Nom a une valeur");
     expect(phrase("isSet", [false])).toBe("Nom n’a pas de valeur");
   });
@@ -134,24 +144,36 @@ describe("fr", () => {
     expect(fr.filterIncomplete(false)).toBe(
       "Saisissez une valeur pour appliquer cette restriction.",
     );
-    expect(fr.filterRefused(["trop grand", "négatif."], true)).toBe(
+    expect(
+      fr.filterRefused({ reasons: ["trop grand", "négatif."], retained: true }),
+    ).toBe(
       "trop grand. négatif. La restriction précédente s’applique toujours.",
     );
-    expect(fr.filterRefused(["trop grand"], false)).toBe("trop grand.");
+    expect(fr.filterRefused({ reasons: ["trop grand"], retained: false })).toBe(
+      "trop grand.",
+    );
   });
 
   it("states the rows shown, counted or not", () => {
-    expect(fr.rowsShown(1, 0, { kind: "unknown" })).toBe("Lignes 0 affichées");
-    expect(fr.rowsShown(3, 1, { kind: "unknown" })).toBe("Ligne 3 affichée");
-    expect(fr.rowsShown(1, 10, { kind: "unknown" })).toBe(
-      "Lignes 1–10 affichées",
-    );
-    expect(fr.rowsShown(3, 1, { kind: "exact", value: 3 })).toBe(
-      "Ligne 3 sur 3",
-    );
-    expect(fr.rowsShown(1, 10, { kind: "at-least", value: 50 })).toBe(
-      "Lignes 1–10 sur au moins 50",
-    );
+    expect(
+      fr.rowsShown({ first: 1, shown: 0, total: { kind: "unknown" } }),
+    ).toBe("Lignes 0 affichées");
+    expect(
+      fr.rowsShown({ first: 3, shown: 1, total: { kind: "unknown" } }),
+    ).toBe("Ligne 3 affichée");
+    expect(
+      fr.rowsShown({ first: 1, shown: 10, total: { kind: "unknown" } }),
+    ).toBe("Lignes 1–10 affichées");
+    expect(
+      fr.rowsShown({ first: 3, shown: 1, total: { kind: "exact", value: 3 } }),
+    ).toBe("Ligne 3 sur 3");
+    expect(
+      fr.rowsShown({
+        first: 1,
+        shown: 10,
+        total: { kind: "at-least", value: 50 },
+      }),
+    ).toBe("Lignes 1–10 sur au moins 50");
   });
 
   it("states saved-view outcomes", () => {
@@ -170,39 +192,49 @@ describe("fr", () => {
     expect(fr.viewOpened("Pannes")).toBe("« Pannes » ouverte.");
     expect(fr.viewSaved("Pannes")).toBe("« Pannes » enregistrée.");
     expect(fr.viewRenamed("Pannes")).toBe("Renommée en « Pannes ».");
-    expect(fr.viewRefused("Pannes", ["a.", "b"])).toBe(
+    expect(fr.viewRefused({ name: "Pannes", reasons: ["a.", "b"] })).toBe(
       "Non ouverte : « Pannes » demande ce que cette collection ne peut pas afficher — a ; b. La requête est inchangée.",
     );
-    expect(fr.viewConflicted("save-as", "Pannes")).toBe(
+    expect(fr.viewConflicted({ command: "save-as", name: "Pannes" })).toBe(
       "Non enregistrée : une autre vue est stockée sous la même identité. Réessayez.",
     );
-    expect(fr.viewConflicted("remove", "Pannes")).toBe(
+    expect(fr.viewConflicted({ command: "remove", name: "Pannes" })).toBe(
       "Non supprimée : « Pannes » a été modifiée ailleurs.",
     );
     expect(fr.viewMissing("open")).toBe("Non ouverte : la vue n’existe plus.");
-    expect(fr.viewUnreadable("save", "JSON.")).toBe(
+    expect(fr.viewUnreadable({ command: "save", reason: "JSON." })).toBe(
       "Non enregistrée : la vue stockée est illisible (JSON).",
     );
-    expect(fr.viewFailed("rename", "quota")).toBe("Non renommée : quota.");
+    expect(fr.viewFailed({ command: "rename", reason: "quota" })).toBe(
+      "Non renommée : quota.",
+    );
   });
 
   it("summarises charts", () => {
     expect(fr.barChartSummary("Statut")).toBe(
       "Statut : un diagramme en barres du nombre d’enregistrements par valeur",
     );
-    expect(fr.rangeChartSummary("Cœurs", 1, 64)).toBe(
+    expect(fr.rangeChartSummary({ label: "Cœurs", min: 1, max: 64 })).toBe(
       "Cœurs : une plage de 1 à 64",
     );
     expect(fr.chartTable("Statut")).toBe("Statut, sous forme de tableau");
   });
   it("words operators, shown and spoken, from their operands", () => {
-    expect(fr.operatorShown("isAny", ["prêt"])).toBe(":");
-    expect(fr.operatorShown("is", ["web"])).toBe(":");
-    expect(fr.operatorShown("isNone", ["prêt"])).toBe("≠");
-    expect(fr.operatorShown("isNot", ["web"])).toBe("≠");
-    expect(fr.operatorShown("gte", [1])).toBe("≥");
-    expect(fr.operatorShown("lte", [1])).toBe("≤");
-    expect(fr.operatorShown("contains", ["web"])).toBe("contient");
+    expect(fr.operatorShown({ operator: "isAny", operands: ["prêt"] })).toBe(
+      ":",
+    );
+    expect(fr.operatorShown({ operator: "is", operands: ["web"] })).toBe(":");
+    expect(fr.operatorShown({ operator: "isNone", operands: ["prêt"] })).toBe(
+      "≠",
+    );
+    expect(fr.operatorShown({ operator: "isNot", operands: ["web"] })).toBe(
+      "≠",
+    );
+    expect(fr.operatorShown({ operator: "gte", operands: [1] })).toBe("≥");
+    expect(fr.operatorShown({ operator: "lte", operands: [1] })).toBe("≤");
+    expect(fr.operatorShown({ operator: "contains", operands: ["web"] })).toBe(
+      "contient",
+    );
     expect(fr.operatorPhrase({ operator: "isAny", operands: ["prêt"] })).toBe(
       "est",
     );
@@ -223,10 +255,10 @@ describe("fr", () => {
   it("words the query bar, its clauses and what its commits did", () => {
     const noun = { singular: "machine", plural: "machines" };
     expect(fr.queryBar(noun)).toBe("Filtrer les machines");
-    expect(fr.queryCleared({ kind: "exact", value: 2 }, noun)).toBe(
+    expect(fr.queryCleared({ count: { kind: "exact", value: 2 }, noun })).toBe(
       "Filtres et recherche effacés. 2 machines.",
     );
-    expect(fr.queryCleared({ kind: "unknown" }, noun)).toBe(
+    expect(fr.queryCleared({ count: { kind: "unknown" }, noun })).toBe(
       "Filtres et recherche effacés.",
     );
     expect(fr.queryClause({ phrase: "Statut est", values: [] })).toBe(
@@ -240,22 +272,36 @@ describe("fr", () => {
     expect(fr.hiddenChips(3)).toBe("+3 de plus");
     expect(fr.clauseOperator("Statut")).toBe("Opérateur de Statut");
     expect(fr.clauseValue("Statut")).toBe("Valeur de Statut");
-    expect(fr.recordCount({ kind: "exact", value: 1 }, noun)).toBe("1 machine");
+    expect(fr.recordCount({ count: { kind: "exact", value: 1 }, noun })).toBe(
+      "1 machine",
+    );
     expect(
-      fr.recordCount(
-        { kind: "at-least", value: 3 },
-        { ...noun, counted: (n) => `machine×${n}` },
-      ),
+      fr.recordCount({
+        count: { kind: "at-least", value: 3 },
+        noun: { ...noun, counted: (n) => `machine×${n}` },
+      }),
     ).toBe("au moins 3 machine×3");
     expect(
-      fr.clauseAdded("Statut est prêt", { kind: "at-least", value: 5 }, noun),
+      fr.clauseAdded({
+        clause: "Statut est prêt",
+        count: { kind: "at-least", value: 5 },
+        noun,
+      }),
     ).toBe("Statut est prêt ajouté. Au moins 5 machines.");
-    expect(fr.clauseChanged("Statut est prêt", { kind: "unknown" }, noun)).toBe(
-      "Remplacé par Statut est prêt.",
-    );
-    expect(fr.clauseRemoved("Statut est prêt", { kind: "unknown" }, noun)).toBe(
-      "Statut est prêt retiré.",
-    );
+    expect(
+      fr.clauseChanged({
+        clause: "Statut est prêt",
+        count: { kind: "unknown" },
+        noun,
+      }),
+    ).toBe("Remplacé par Statut est prêt.");
+    expect(
+      fr.clauseRemoved({
+        clause: "Statut est prêt",
+        count: { kind: "unknown" },
+        noun,
+      }),
+    ).toBe("Statut est prêt retiré.");
     expect(fr.valuePicked("Statut est prêt")).toBe(
       "Statut est prêt. Entrée à nouveau pour l’appliquer.",
     );
