@@ -272,6 +272,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     composeOutcome("Cleared the filters and the search.", count, noun),
   queryClause: ({ phrase, values }) =>
     values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
+  clauseBound: ({ label, bound }) =>
+    `${bound === "lower" ? "Lower" : "Upper"} bound for ${label}`,
+  rangeClause: ({ lower, upper }) => `${lower} and ${upper}`,
   searchClause: (text) => `Search for ${text}`,
   removeClause: (clause) => `Remove ${clause}`,
   hiddenChips: (count) => `+${formatCount(count)} more`,
@@ -285,6 +288,13 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     composeOutcome(`Added ${clause}.`, count, noun),
   clauseChanged: (clause, count, noun) =>
     composeOutcome(`Changed to ${clause}.`, count, noun),
+  filtersDisclosure: ({ applied }) =>
+    applied === 0 ? "Filters" : `Filters (${formatCount(applied)})`,
+  queryContradiction: ({ label }) =>
+    `The ${label} filters cannot all hold, so nothing matches.`,
+  mergeClauses: ({ label }) => `Merge the ${label} filters`,
+  clausesMerged: ({ label, count, noun }) =>
+    composeOutcome(`Merged the ${label} filters.`, count, noun),
   clauseRemoved: (clause, count, noun) =>
     composeOutcome(`Removed ${clause}.`, count, noun),
   readAsAtLeast: "Read as at least",

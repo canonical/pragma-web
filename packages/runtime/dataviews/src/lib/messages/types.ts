@@ -323,6 +323,19 @@ export type DataViewsMessages = {
     readonly phrase: string;
     readonly values: readonly string[];
   }) => string;
+  /** The Entry of one bound of a range chip, by the field's label. */
+  readonly clauseBound: (facts: {
+    readonly label: string;
+    readonly bound: "lower" | "upper";
+  }) => string;
+  /**
+   * A field's lower and upper bound read as one clause: each bound as
+   * `queryClause` speaks it, the upper without the field's label.
+   */
+  readonly rangeClause: (facts: {
+    readonly lower: string;
+    readonly upper: string;
+  }) => string;
   /** The search as a clause, by its text. */
   readonly searchClause: (text: string) => string;
   /** A clause's remove control, by the clause as spoken. */
@@ -353,6 +366,24 @@ export type DataViewsMessages = {
     count: Count,
     noun: RecordNoun,
   ) => string;
+  /**
+   * The query bar's disclosure of the filters form before scripts run, by
+   * how many filter chips the bar shows, a range counting once.
+   */
+  readonly filtersDisclosure: (facts: { readonly applied: number }) => string;
+  /**
+   * A warning that a field's clauses cannot all hold, so the query matches
+   * nothing, by the field's label.
+   */
+  readonly queryContradiction: (facts: { readonly label: string }) => string;
+  /** The action merging a field's clauses into what was likely meant. */
+  readonly mergeClauses: (facts: { readonly label: string }) => string;
+  /** A field's clauses merged, with the result count after it. */
+  readonly clausesMerged: (facts: {
+    readonly label: string;
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /** A clause removed, with the result count after it. */
   readonly clauseRemoved: (
     clause: string,

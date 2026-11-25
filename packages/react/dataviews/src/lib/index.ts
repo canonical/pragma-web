@@ -8,6 +8,7 @@ export type {
   DataViewsFiltersProps,
   DataViewsPaginationProps,
   DataViewsProps,
+  DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
   DataViewsSavedViewsProps,
   DataViewsSearchProps,

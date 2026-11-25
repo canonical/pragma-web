@@ -777,6 +777,11 @@ export const MESSAGE_SAMPLES: {
     [{ phrase: MESSAGE_MARK, values: [] }],
     [{ phrase: MESSAGE_MARK, values: [MESSAGE_MARK, MESSAGE_MARK] }],
   ],
+  clauseBound: [
+    [{ label: MESSAGE_MARK, bound: "lower" }],
+    [{ label: MESSAGE_MARK, bound: "upper" }],
+  ],
+  rangeClause: [[{ lower: MESSAGE_MARK, upper: MESSAGE_MARK }]],
   searchClause: [[MESSAGE_MARK]],
   removeClause: [[MESSAGE_MARK]],
   hiddenChips: [[3]],
@@ -817,6 +822,25 @@ export const MESSAGE_SAMPLES: {
       MESSAGE_MARK,
       { kind: "unknown" },
       { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+    ],
+  ],
+  filtersDisclosure: [[{ applied: 0 }], [{ applied: 3 }]],
+  queryContradiction: [[{ label: MESSAGE_MARK }]],
+  mergeClauses: [[{ label: MESSAGE_MARK }]],
+  clausesMerged: [
+    [
+      {
+        label: MESSAGE_MARK,
+        count: { kind: "exact", value: 7 },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+    [
+      {
+        label: MESSAGE_MARK,
+        count: { kind: "unknown" },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
     ],
   ],
   clauseRemoved: [

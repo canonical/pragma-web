@@ -2,13 +2,15 @@ import { readCondition } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { QueryChip } from "../../../../../QueryChip/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
-import entryFormat from "../../entryFormat.js";
-import listParts from "../../listParts.js";
-import speakClause from "../../speakClause.js";
-import spellOperand from "../../spellOperand.js";
-import spellOperator from "../../spellOperator.js";
 import type { QueryBarPart } from "../../types.js";
-import { readLabelsStandIn } from "../../utils/index.js";
+import {
+  entryFormat,
+  listParts,
+  readLabelsStandIn,
+  speakClause,
+  spellOperand,
+  spellOperator,
+} from "../../utils/index.js";
 import type { DraftChipProps } from "./types.js";
 
 /**
@@ -26,6 +28,7 @@ export default function DraftChip({
   invalid,
   onActivate,
   onRemove,
+  removeHref,
   onTypedChange,
   onEntryKeyDown,
 }: DraftChipProps): ReactElement {
@@ -122,6 +125,7 @@ export default function DraftChip({
       id={id}
       label={spoken}
       onRemove={onRemove}
+      {...(removeHref === undefined ? {} : { removeHref })}
       removeLabel={messages.removeClause(spoken)}
     >
       {listParts(draft).flatMap((at) => {

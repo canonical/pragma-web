@@ -79,6 +79,14 @@ export function MachinesPage({ rows }: { rows: readonly Machine[] }) {
 }
 ```
 
+## Working without JavaScript
+
+Each part renders a baseline before scripts run, and works once they do.
+
+| Part | Before scripts |
+|---|---|
+| `DataViews.QueryBar` | With a location that spells addresses: a GET search form around a plain input holding the search as `q`, the other parameters in hidden fields; each chip's remove control, the clear control and a refused filter's clear as links; a contradiction's Merge as a link to the merged query; and the full filters form in a disclosure, "Filters (n)". In memory, the remove and clear controls render inert, with no address, name or method; there is no Filters disclosure, and Merge waits for scripts. Once scripts run, the links become buttons. |
+
 ## Composition recipes
 
 The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / Recipes** — source in [`src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx`](src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx):

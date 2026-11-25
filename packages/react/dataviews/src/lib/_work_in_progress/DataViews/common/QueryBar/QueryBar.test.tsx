@@ -19,11 +19,23 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import QueryBar from "./QueryBar.js";
+import type { DataViewsQueryBarProps } from "./types.js";
 
 /** Every render of a chip, by its id: the render-count test reads them. */
 const chipRenders = vi.hoisted(() => [] as string[]);
@@ -130,9 +142,11 @@ const hosts: readonly Host[] = [
 const mount = ({
   query,
   location,
+  presets,
 }: {
   readonly query?: string;
   readonly location?: QueryLocation;
+  readonly presets?: DataViewsQueryBarProps["presets"];
 } = {}) => {
   const provider = createDataViewsProvider({
     collection,
@@ -147,7 +161,10 @@ const mount = ({
   });
   const view = render(
     <DataViews provider={provider}>
-      <QueryBar data-testid="bar" />
+      <QueryBar
+        data-testid="bar"
+        {...(presets === undefined ? {} : { presets })}
+      />
       <button type="button">Elsewhere</button>
     </DataViews>,
   );
@@ -212,6 +229,13 @@ describe("QueryBar", () => {
           </DataViews>,
         ),
       ).toThrow('the schema has no field "flavour" to show as a quick filter');
+      expect(() =>
+        render(
+          <DataViews provider={provider}>
+            <QueryBar presets={{ flavour: [] }} />
+          </DataViews>,
+        ),
+      ).toThrow('the schema has no field "flavour" to offer presets for');
       vi.restoreAllMocks();
       render(
         <DataViews provider={provider}>
@@ -917,7 +941,906 @@ describe("QueryBar", () => {
     });
   });
 
+  describe("ranges", () => {
+    const RANGE = "memory at least 8\u00a0GiB and at most 64\u00a0GiB";
+
+    it("shows a field's two bounds as one chip, and edits each bound's value", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      expect(await screen.findByRole("group", { name: RANGE })).toBeVisible();
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      expect(findPart("Upper bound for memory")).toHaveValue("64\u00a0GiB");
+      type(findPart("Upper bound for memory"), "32 GiB");
+      press(findPart("Upper bound for memory"), "Enter");
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [32_768],
+      });
+      // The bound edited takes focus back once its Entry goes.
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 32\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+      // Tab writes the lower bound and moves on; Shift+Tab before the lower
+      // commits and leaves.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at least 8\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      press(findPart("Lower bound for memory"), "Tab", { shiftKey: true });
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      // A lower bound past the upper leaves two chips, the stop on the one
+      // edited.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at least 16\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "128 GiB");
+      press(findPart("Lower bound for memory"), "Enter");
+      await waitFor(() =>
+        expect(findChip(/^memory at least 128.GiB$/)).toBeInTheDocument(),
+      );
+      expect(findChip(/^memory at most 32.GiB$/)).toBeInTheDocument();
+      const edited = findChip(/^memory at least 128.GiB$/) as HTMLElement;
+      expect(
+        within(edited).getByRole("button", { name: "memory" }),
+      ).toHaveAttribute("tabindex", "0");
+      // An added bound the range already holds adds nothing.
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: "Remove memory at least 128\u00a0GiB",
+        }),
+      );
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "1 GiB");
+      press(findPart("Value for memory"), "Enter");
+      await waitFor(() =>
+        expect(
+          findChip(/^memory at least 1.GiB and at most 32.GiB$/),
+        ).toBeInTheDocument(),
+      );
+      await startOn("memory");
+      type(findPart("Operator for memory"), "<=");
+      type(findPart("Value for memory"), "32 GiB");
+      press(findPart("Value for memory"), "Enter");
+      expect(readFilter(provider)).toHaveLength(2);
+    });
+
+    it("walks a range's bounds with Tab and Shift+Tab, writing each, and leaves past either end", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      fireEvent.click(await screen.findByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Upper bound for memory")).toHaveValue("64\u00a0GiB");
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      // Back to the lower, the upper unchanged and unwritten.
+      const edit = vi.spyOn(readProviderHost(provider), "setPredicate");
+      press(findPart("Upper bound for memory"), "Tab", { shiftKey: true });
+      expect(findPart("Lower bound for memory")).toHaveValue("16\u00a0GiB");
+      expect(edit).not.toHaveBeenCalled();
+      edit.mockRestore();
+      // Text that does not read stays, marked.
+      type(findPart("Lower bound for memory"), "lots");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Lower bound for memory")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      // Shift+Tab before the lower leaves the bar.
+      type(findPart("Lower bound for memory"), "");
+      press(findPart("Lower bound for memory"), "Tab", { shiftKey: true });
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      // A lower bound past the upper leaves two chips: Tab opens the other.
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "128 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Value for memory")).toHaveValue("64\u00a0GiB");
+    });
+
+    it("says why a bound the source refuses was kept, and stays on it", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      vi.spyOn(readProviderHost(provider), "setPredicate").mockReturnValue([
+        {
+          part: "filter",
+          code: "undeclared-field",
+          field: null,
+          operator: null,
+          reason: "no",
+        },
+      ]);
+      fireEvent.click(await screen.findByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Lower bound for memory")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      vi.restoreAllMocks();
+    });
+
+    it("ends the open bound as a stop move does when the other bound or the field is pressed", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "at least 8\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "16 GiB");
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      expect(findPart("Upper bound for memory")).toBeInTheDocument();
+      expect(queryPart("Lower bound for memory")).toBeNull();
+      // Text that does not read is cancelled, and the field opens the lower.
+      type(findPart("Upper bound for memory"), "lots");
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      expect(findPart("Lower bound for memory")).toBeInTheDocument();
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [65_536],
+      });
+    });
+
+    it("returns focus to the bound edited when an edit makes a range", async () => {
+      mount({ query: "memory__gte=131072&memory__lte=65536" });
+      fireEvent.click(await screen.findByRole("button", { name: /^64.GiB$/ }));
+      type(findPart("Value for memory"), "256 GiB");
+      press(findPart("Value for memory"), "Enter");
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+      // Escape on a bound's edit returns focus to that bound.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+      );
+      press(findPart("Upper bound for memory"), "Escape");
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+    });
+
+    it("removes both bounds at once, by the remove control or Delete", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536&pool=gpu",
+      });
+      const edit = vi.spyOn(readProviderHost(provider), "editPredicates");
+      fireEvent.click(
+        await screen.findByRole("button", { name: `Remove ${RANGE}` }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+      // One write, so one step undoes it.
+      expect(edit).toHaveBeenCalledOnce();
+      expect(edit).toHaveBeenCalledWith(
+        [
+          { field: "memory", operator: "gte", nth: 0 },
+          { field: "memory", operator: "lte", nth: 0 },
+        ],
+        [],
+      );
+      edit.mockRestore();
+      await waitFor(() => expect(readStatus()).toContain(`Removed ${RANGE}.`));
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "gte",
+          operands: [8192],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      press(await screen.findByRole("button", { name: "memory" }), "Delete");
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+    });
+
+    it("applies an open clause before removing a range, then removes the bounds that still stand", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      // An incomplete draft is cancelled, and the range goes.
+      await startOn("pool");
+      fireEvent.click(screen.getByRole("button", { name: `Remove ${RANGE}` }));
+      expect(readFilter(provider)).toEqual([]);
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "gte",
+          operands: [8192],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      // A second lower bound applied first splits the range: the pressed
+      // bounds still go, in one write, and the new one stays.
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "1 GiB");
+      const edit = vi.spyOn(readProviderHost(provider), "editPredicates");
+      fireEvent.click(
+        await screen.findByRole("button", { name: `Remove ${RANGE}` }),
+      );
+      expect(edit).toHaveBeenCalledOnce();
+      edit.mockRestore();
+      expect(readFilter(provider)).toEqual([
+        { field: "memory", operator: "gte", operands: [1024] },
+      ]);
+      await waitFor(() => expect(readStatus()).toContain(`Removed ${RANGE}.`));
+      // Where neither pressed bound stands, nothing is removed.
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate(
+          { field: "memory", operator: "gte", operands: [8192] },
+          0,
+        );
+      });
+      const range = await screen.findByRole("button", {
+        name: `Remove ${RANGE}`,
+      });
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "2 GiB");
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [32_768],
+        });
+      });
+      fireEvent.click(range);
+      expect(readFilter(provider)).toHaveLength(3);
+    });
+  });
+
+  describe("contradictions", () => {
+    const readLine = () =>
+      document.querySelector(".ds.data-views-query-bar-message-line");
+    const WARNING = "The memory filters cannot all hold, so nothing matches.";
+
+    it("warns once when a commit brings clauses that cannot all hold, and merges them", async () => {
+      const { provider } = mount({ query: "memory__gte=131072" });
+      await startOn("memory");
+      type(findPart("Operator for memory"), "<=");
+      type(findPart("Value for memory"), "64 GiB");
+      press(findPart("Value for memory"), "Enter");
+      expect(readLine()).toHaveTextContent(WARNING);
+      await waitFor(() => expect(readStatus()).toContain(WARNING));
+      // Said once: what the bar draws next says nothing more of it.
+      type(findEntry(), "x");
+      expect(readStatus().split(WARNING)).toHaveLength(2);
+      type(findEntry(), "");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the memory filters" }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "memory", operator: "gte", operands: [65_536] },
+        { field: "memory", operator: "lte", operands: [131_072] },
+      ]);
+      expect(readLine()).toBeNull();
+      await waitFor(() =>
+        expect(readStatus()).toContain("Merged the memory filters."),
+      );
+      // The chip they became takes focus.
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "memory" })).toHaveFocus(),
+      );
+    });
+
+    it("shows what a link arrived with without saying it, and offers no merge where none stands out", async () => {
+      const { provider } = mount({
+        query: "status=deployed&status__isAny__1=ready",
+      });
+      const line = await waitFor(() => {
+        const found = readLine();
+        expect(found).not.toBeNull();
+        return found;
+      });
+      expect(line).toHaveTextContent(
+        "The status filters cannot all hold, so nothing matches.",
+      );
+      expect(readStatus()).not.toContain("cannot all hold");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the status filters" }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed", "ready"] },
+      ]);
+      act(() => {
+        readProviderHost(provider).addPredicate({
+          field: "owner",
+          operator: "isSet",
+          operands: [true],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).addPredicate({
+          field: "owner",
+          operator: "isSet",
+          operands: [false],
+        });
+      });
+      expect(readLine()).toHaveTextContent(
+        "The owner filters cannot all hold, so nothing matches.",
+      );
+      expect(
+        screen.queryByRole("button", { name: "Merge the owner filters" }),
+      ).toBeNull();
+    });
+
+    it("applies an open clause before Merge, and merges what then stands", async () => {
+      const { provider } = mount({
+        query:
+          "status=deployed&status__isAny__1=ready&memory__gte=131072&memory__lte=65536",
+      });
+      // An edit that resolves the contradiction leaves nothing to merge.
+      fireEvent.click(await screen.findByRole("button", { name: /^128.GiB$/ }));
+      type(findPart("Value for memory"), "32 GiB");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the memory filters" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [32_768],
+      });
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [65_536],
+      });
+      // An open draft applies first; the merge then takes what stands.
+      await startOn("pool");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the status filters" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "status",
+        operator: "isAny",
+        operands: ["deployed", "ready"],
+      });
+    });
+
+    it("says why a merge is refused, and keeps the clauses", async () => {
+      const { provider } = mount({
+        query: "status=deployed&status__isAny__1=ready",
+      });
+      vi.spyOn(readProviderHost(provider), "editPredicates").mockReturnValue([
+        {
+          part: "filter",
+          code: "undeclared-field",
+          field: null,
+          operator: null,
+          reason: "no",
+        },
+      ]);
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Merge the status filters" }),
+      );
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "No. The previous restriction still applies.",
+        ),
+      );
+      expect(readFilter(provider)).toHaveLength(2);
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe("refused clauses", () => {
+    it("shows a filter the link carried and the source refused, and clears it", async () => {
+      const location = createMemoryLocation({
+        href: "/hosts?status=melted&pool=gpu",
+      });
+      const { provider } = mount({ location });
+      const clear = await screen.findByRole("button", {
+        name: "Clear status",
+      });
+      expect(clear.closest(".ds.query-chip")).toHaveClass("error");
+      expect(clear).toHaveAccessibleDescription(/^status: .+\.$/);
+      // Backspace on the empty entry lands on its clear control.
+      act(() => findEntry().focus());
+      press(findEntry(), "Backspace");
+      await waitFor(() => expect(clear).toHaveAttribute("tabindex", "0"));
+      fireEvent.click(clear);
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("button", { name: "Clear status" }),
+        ).toBeNull(),
+      );
+      expect(provider.issues.get()).toEqual([]);
+      expect(location.read().toString()).toBe("pool=gpu");
+      await waitFor(() => expect(readStatus()).toContain("Removed status."));
+    });
+
+    it("shows a refused clause's reason below the field, said by nothing", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      mount({ location });
+      const line = await waitFor(() => {
+        const found = document.querySelector(
+          ".ds.data-views-query-bar-message-line",
+        );
+        expect(found).not.toBeNull();
+        return found as HTMLElement;
+      });
+      expect(line).toHaveTextContent(/^status: .*melted.*\.$/);
+      expect(line.querySelector("[role=status], [aria-live]")).toBeNull();
+      expect(readStatus()).not.toContain("melted");
+    });
+
+    it("offers no clear in memory, where there is no parameter to remove", async () => {
+      mount({ query: "status=melted&pool=gpu" });
+      await waitFor(() =>
+        expect(document.querySelector(".ds.query-chip.error")).not.toBeNull(),
+      );
+      expect(screen.queryByRole("button", { name: "Clear status" })).toBeNull();
+      // Backspace on the empty entry lands on the last chip that holds a
+      // stop, and a removal hands it on past the refused chip.
+      act(() => findEntry().focus());
+      press(findEntry(), "Backspace");
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "pool" })).toHaveAttribute(
+          "tabindex",
+          "0",
+        ),
+      );
+      press(screen.getByRole("button", { name: "pool" }), "Delete");
+      await waitFor(() => expect(findEntry()).toHaveAttribute("tabindex", "0"));
+    });
+
+    it("says nothing more when an open clause on its field replaces it", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      const { provider } = mount({ location });
+      const clear = await screen.findByRole("button", { name: "Clear status" });
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      type(findPart("Value for status"), "ready");
+      press(findPart("Value for status"), "Enter");
+      fireEvent.click(clear);
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["ready"] },
+      ]);
+      await waitFor(() =>
+        expect(readStatus()).toContain("Added status is ready"),
+      );
+      expect(readStatus()).not.toContain("Removed status");
+    });
+
+    it("clears it by Delete, an open clause applying first", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      const { provider } = mount({ location });
+      await screen.findByRole("button", { name: "Clear status" });
+      const operator = await startOn("pool");
+      press(operator, "Enter");
+      const value = await screen.findByRole("combobox", {
+        name: "Value for pool",
+      });
+      type(value as HTMLInputElement, "gpu");
+      press(value, "Enter");
+      press(screen.getByRole("button", { name: "Clear status" }), "Delete");
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("button", { name: "Clear status" }),
+        ).toBeNull(),
+      );
+      expect(provider.issues.get()).toEqual([]);
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+    });
+  });
+
+  describe("presets", () => {
+    it("offers a field's presets first, and commits the clause each resolves to", async () => {
+      const since = vi.fn(
+        () => ({ operator: "gte", operands: ["2026-02-01"] }) as const,
+      );
+      const { provider } = mount({
+        presets: {
+          seen: [{ label: "Since February", resolve: since }],
+          status: [
+            {
+              label: "Not deployed",
+              resolve: () => ({ operator: "isNone", operands: ["deployed"] }),
+            },
+          ],
+        },
+      });
+      await startOn("seen");
+      type(findPart("Operator for seen"), ">=");
+      const value = findPart("Value for seen");
+      act(() => value.focus());
+      expect(since).not.toHaveBeenCalled();
+      fireEvent.click(findOption("Since February"));
+      expect(since).toHaveBeenCalledOnce();
+      expect(readFilter(provider)).toEqual([
+        { field: "seen", operator: "gte", operands: ["2026-02-01"] },
+      ]);
+      // Among a choice's values, first; Enter on it commits it.
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      const values = await screen.findByRole("combobox", {
+        name: "Value for status",
+      });
+      act(() => values.focus());
+      expect(
+        screen.getAllByRole("option", { hidden: true }).at(0),
+      ).toHaveTextContent("Not deployed");
+      fireEvent.click(findOption("Not deployed"));
+      expect(readFilter(provider)).toContainEqual({
+        field: "status",
+        operator: "isNone",
+        operands: ["deployed"],
+      });
+    });
+
+    it("takes a preset typed whole, or the one typed text narrows to, on a typed value", async () => {
+      const since = (day: string) => () =>
+        ({ operator: "gte", operands: [day] }) as const;
+      const { provider } = mount({
+        presets: {
+          seen: [
+            { label: "Since February", resolve: since("2026-02-01") },
+            { label: "Since March", resolve: since("2026-03-01") },
+          ],
+        },
+      });
+      await startOn("seen");
+      type(findPart("Operator for seen"), ">=");
+      type(findPart("Value for seen"), "since february");
+      press(findPart("Value for seen"), "Enter");
+      expect(readFilter(provider)).toEqual([
+        { field: "seen", operator: "gte", operands: ["2026-02-01"] },
+      ]);
+      await startOn("seen");
+      type(findPart("Operator for seen"), "<=");
+      type(findPart("Value for seen"), "mar");
+      press(findPart("Value for seen"), "Tab");
+      expect(readFilter(provider)).toContainEqual({
+        field: "seen",
+        operator: "gte",
+        operands: ["2026-03-01"],
+      });
+      // Text that narrows to both, or to none, is still marked invalid.
+      await startOn("seen");
+      type(findPart("Operator for seen"), "<=");
+      type(findPart("Value for seen"), "since");
+      press(findPart("Value for seen"), "Enter");
+      expect(findPart("Value for seen")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+    });
+
+    it("takes the value typed over a preset that only holds its text", async () => {
+      const { provider } = mount({
+        presets: {
+          status: [
+            {
+              label: "Not deployed",
+              resolve: () => ({ operator: "isNone", operands: ["deployed"] }),
+            },
+          ],
+        },
+      });
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      const value = await screen.findByRole("combobox", {
+        name: "Value for status",
+      });
+      type(value as HTMLInputElement, "deployed");
+      press(value, "Enter");
+      press(findPart("Value for status"), "Enter");
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed"] },
+      ]);
+      // Tab narrows the same way: a value first, the preset only after.
+      fireEvent.click(
+        screen.getByRole("button", { name: "Remove status is deployed" }),
+      );
+      expect(readFilter(provider)).toEqual([]);
+      const again = await startOn("status");
+      press(again, "Enter");
+      type(findPart("Value for status"), "deplo");
+      press(findPart("Value for status"), "Tab");
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed"] },
+      ]);
+      expect(queryPart("Value for status")).toBeNull();
+    });
+
+    it("offers presets while an edit's held value stands untouched", async () => {
+      mount({
+        query: "seen__gte=2026-01-01",
+        presets: {
+          seen: [
+            {
+              label: "Since February",
+              resolve: () => ({ operator: "gte", operands: ["2026-02-01"] }),
+            },
+          ],
+        },
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "2026-01-01" }),
+      );
+      act(() => findPart("Value for seen").focus());
+      expect(findPart("Value for seen")).toHaveValue("2026-01-01");
+      expect(findOption("Since February")).toBeInTheDocument();
+    });
+
+    it("offers a range's bound no preset, which would change its operator", async () => {
+      mount({
+        query: "memory__gte=8192&memory__lte=65536",
+        presets: {
+          memory: [
+            {
+              label: "Large",
+              resolve: () => ({ operator: "gte", operands: [131_072] }),
+            },
+          ],
+        },
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      act(() => findPart("Upper bound for memory").focus());
+      expect(
+        screen.queryByRole("option", { hidden: true, name: "Large" }),
+      ).toBeNull();
+    });
+  });
+
+  describe("hydrating the server's markup", () => {
+    /** The bar over a location, drawn by the server, then hydrated. */
+    const hydrate = async (
+      href: string,
+      beforeHydrating: (container: HTMLElement) => void,
+    ) => {
+      const build = () =>
+        createDataViewsProvider({
+          collection,
+          source: createArraySource<Host>({
+            rows: hosts,
+            collection,
+            searchFields: ["name"],
+          }),
+          location: createMemoryLocation({ href }),
+        });
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(
+        <DataViews provider={build()}>
+          <QueryBar />
+        </DataViews>,
+      );
+      document.body.append(container);
+      onTestFinished(() => container.remove());
+      beforeHydrating(container);
+      const error = vi.spyOn(console, "error");
+      const provider = build();
+      const root = await act(async () =>
+        hydrateRoot(
+          container,
+          <DataViews provider={provider}>
+            <QueryBar />
+          </DataViews>,
+        ),
+      );
+      onTestFinished(() => {
+        act(() => root.unmount());
+        error.mockRestore();
+      });
+      return { error, provider };
+    };
+
+    it("hands a removal link's focus to the button that takes its place", async () => {
+      const { error } = await hydrate("/hosts?status=deployed", (container) => {
+        const link = [...container.querySelectorAll("a")].find(
+          (anchor) =>
+            anchor.getAttribute("aria-label") === "Remove status is deployed",
+        );
+        link?.focus();
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "Remove status is deployed" }),
+        ).toHaveFocus(),
+      );
+      expect(error).not.toHaveBeenCalled();
+    });
+
+    it("hands Merge's focus on to its button, by its text", async () => {
+      await hydrate(
+        "/hosts?memory__gte=131072&memory__lte=65536",
+        (container) => {
+          const link = [...container.querySelectorAll("a")].find(
+            (anchor) => anchor.textContent === "Merge the memory filters",
+          );
+          link?.focus();
+        },
+      );
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "Merge the memory filters" }),
+        ).toHaveFocus(),
+      );
+    });
+
+    it("clears a refused filter with the filters, by its link before scripts and its button after", async () => {
+      // A refused sort narrows nothing: no clear is its to drop.
+      const href = "/hosts?status__isNone=melted&pool=gpu&sort=nope";
+      const markup = renderToString(
+        <DataViews
+          provider={createDataViewsProvider({
+            collection,
+            source: createArraySource<Host>({ rows: hosts, collection }),
+            location: createMemoryLocation({ href }),
+          })}
+        >
+          <QueryBar />
+        </DataViews>,
+      );
+      const link = markup
+        .match(/<a [^>]*aria-label="Clear filters and search"[^>]*>/)
+        ?.at(0)
+        ?.match(/href="([^"]*)"/)
+        ?.at(1)
+        ?.replaceAll("&amp;", "&");
+      expect(link).toBeDefined();
+      // Neither the refused filter nor the applied one; the refused sort,
+      // which narrows nothing, falls back and is not spelled.
+      expect([...new URLSearchParams(link).keys()]).toEqual(["page", "size"]);
+      // With scripts, the clear control removes the refusal too.
+      const location = createMemoryLocation({ href });
+      const { provider } = mount({ location });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Clear filters and search" }),
+      );
+      await waitFor(() => expect(provider.issues.get()).toEqual([]));
+      expect(screen.queryByRole("button", { name: "Clear status" })).toBeNull();
+    });
+
+    it("hands focus in the filters' disclosure to the entry once it goes", async () => {
+      await hydrate("/hosts?status=deployed", (container) => {
+        const summary = container.querySelector<HTMLElement>(
+          ".ds.data-views-query-bar-filters-disclosure summary",
+        );
+        summary?.focus();
+      });
+      await waitFor(() => expect(findEntry()).toHaveFocus());
+    });
+
+    it("moves no focus that no link held", async () => {
+      const before = document.activeElement;
+      await hydrate("/hosts?status=deployed", () => {});
+      await screen.findByRole("button", { name: "Remove status is deployed" });
+      expect(document.activeElement).toBe(before);
+    });
+
+    it("keeps what was typed in the plain input before scripts ran", async () => {
+      await hydrate("/hosts?q=web", (container) => {
+        const input = container.querySelector("input[name=q]");
+        if (input instanceof HTMLInputElement) input.value = "web db";
+      });
+      await waitFor(() => expect(findEntry()).toHaveValue("web db"));
+    });
+  });
+
+  describe("with an address", () => {
+    it("keeps the search form once scripts run, its submission held, its links now buttons", async () => {
+      const location = createMemoryLocation({
+        href: "/hosts?status=deployed",
+      });
+      mount({ location });
+      const form = await screen.findByRole("search");
+      expect(form).toHaveAttribute("method", "get");
+      expect(screen.getByTestId("bar")).toHaveAttribute(
+        "data-hydrated",
+        "true",
+      );
+      expect(findEntry()).toHaveAttribute("name", "q");
+      const before = location.read().toString();
+      expect(fireEvent.submit(form)).toBe(false);
+      expect(location.read().toString()).toBe(before);
+      expect(
+        screen.getByRole("button", { name: "Remove status is deployed" }),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe("invalid input and refusals", () => {
+    it("shows below the field what cannot apply, and that what applied still does", async () => {
+      mount({ query: "memory__gte=65536" });
+      const readLine = () =>
+        document.querySelector(".ds.data-views-query-bar-message-line");
+      fireEvent.click(await screen.findByRole("button", { name: /^64.GiB$/ }));
+      type(findPart("Value for memory"), "16 GX");
+      press(findPart("Value for memory"), "Enter");
+      expect(readLine()).toHaveTextContent(
+        'Invalid: "GX" is not a unit; use MiB or GiB. The previous restriction still applies.',
+      );
+      expect(readLine()?.querySelector("[role=alert]")).toBeNull();
+      // Said as shown: the clause before still applies.
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "The previous restriction still applies.",
+        ),
+      );
+      // Typing again clears it; a new clause has nothing standing before it.
+      type(findPart("Value for memory"), "16 G");
+      expect(readLine()).toBeNull();
+      press(findPart("Value for memory"), "Escape");
+      const operator = await startOn("seen");
+      type(operator, ">=");
+      type(findPart("Value for seen"), "soon");
+      press(findPart("Value for seen"), "Enter");
+      expect(readLine()).toHaveTextContent(/^Invalid: .+\.$/);
+      expect(readLine()).not.toHaveTextContent("still applies");
+      // The last thing said is the new clause's, with nothing standing.
+      await waitFor(() => {
+        const said = readStatus();
+        expect(said.slice(said.lastIndexOf("Invalid:"))).not.toContain("GX");
+      });
+      const said = readStatus();
+      expect(said.slice(said.lastIndexOf("Invalid:"))).not.toContain(
+        "still applies",
+      );
+    });
+
     it("marks a typed value that does not read, and keeps the Entry", async () => {
       const { provider } = mount();
       const operator = await startOn("memory");

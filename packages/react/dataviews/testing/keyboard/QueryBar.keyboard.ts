@@ -548,6 +548,236 @@ test.describe("QueryBar, in Chromium", () => {
         return top !== null && element.contains(top);
       }),
     ).toBe(true);
-    expect(await readChips(page)).toHaveLength(8);
+    // Seven chips: memory's two bounds read as one range.
+    expect(await readChips(page)).toHaveLength(7);
+  });
+
+  test("F17: an invalid value is marked, and the line below the field says the clause still applies", async ({
+    page,
+  }) => {
+    await openStory(page, "invalid-input");
+    const rows = await countRows(page);
+    const value = findPart(page, "Value for memory");
+    await expect(value).toBeFocused();
+    await expect(value).toHaveAttribute("aria-invalid", "true");
+    const line = page.locator(
+      "#storybook-root .ds.data-views-query-bar-message-line",
+    );
+    await expect(line).toHaveText(
+      /Invalid: .+ The previous restriction still applies\./,
+    );
+    await expect(line.getByRole("alert")).toHaveCount(0);
+    // The field, focused, never covers it.
+    const field = await page
+      .locator("#storybook-root .ds.query-input .field")
+      .boundingBox();
+    const box = await line.boundingBox();
+    expect(box?.y ?? 0).toBeGreaterThanOrEqual(
+      (field?.y ?? 0) + (field?.height ?? 0) - 1,
+    );
+    // Another invalid value, committed here: the rows the clause narrowed
+    // to stay as they were.
+    expect(rows).toBeLessThan(50);
+    await value.fill("8 GX");
+    await page.keyboard.press("Enter");
+    await expect(value).toHaveAttribute("aria-invalid", "true");
+    // Left, the edit shows the clause that stood before still stands, and
+    // only then are the rows read.
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("group", { name: /^memory at least 64.GiB$/ }),
+    ).toBeVisible();
+    expect(await countRows(page)).toBe(rows);
+  });
+
+  test("F18: clauses that cannot both hold warn, and Merge makes one range", async ({
+    page,
+  }) => {
+    await openStory(page, "contradiction");
+    await recordAnnouncements(page);
+    await expect(
+      page.getByText("The memory filters cannot all hold, so nothing matches."),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Merge the memory filters" })
+      .click();
+    expect(await readChips(page)).toEqual([
+      "memory at least 64\u00a0GiB and at most 128\u00a0GiB",
+    ]);
+    await expect
+      .poll(() => readAnnounced(page))
+      .toMatch(/Merged the memory filters\. \d+ records\./);
+    await expect(
+      page.getByRole("button", { name: "memory", exact: true }),
+    ).toBeFocused();
+    await expect.poll(() => countRows(page)).toBeGreaterThan(0);
+  });
+
+  test("F18b: Merge pressed by pointer while the chips wrap still merges", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 720 });
+    await openStory(page, "contradiction");
+    const field = page.locator("#storybook-root .ds.query-input .field");
+    const resting = (await field.boundingBox())?.height ?? 0;
+    await findEntry(page).focus();
+    // The suggestions closed, the field keeps focus.
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("listbox")).toBeHidden();
+    // Focused, the chips wrap over more than one line.
+    await expect
+      .poll(async () => (await field.boundingBox())?.height ?? 0)
+      .toBeGreaterThan(resting + 8);
+    // A press as a hand makes it: down, a moment, then up where it began.
+    const merge = await page
+      .getByRole("button", { name: "Merge the memory filters" })
+      .boundingBox();
+    expect(merge).not.toBeNull();
+    const x = (merge?.x ?? 0) + (merge?.width ?? 0) / 2;
+    const y = (merge?.y ?? 0) + (merge?.height ?? 0) / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    // Two frames on, the press has been laid out: the field keeps focus and
+    // its wrap, and Merge stays under the pointer.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
+    await expect(findEntry(page)).toBeFocused();
+    await expect
+      .poll(async () => (await field.boundingBox())?.height ?? 0)
+      .toBeGreaterThan(resting + 8);
+    const held = await page
+      .getByRole("button", { name: "Merge the memory filters" })
+      .boundingBox();
+    expect(held).not.toBeNull();
+    expect(x).toBeGreaterThanOrEqual(held?.x ?? 0);
+    expect(x).toBeLessThanOrEqual((held?.x ?? 0) + (held?.width ?? 0));
+    expect(y).toBeGreaterThanOrEqual(held?.y ?? 0);
+    expect(y).toBeLessThanOrEqual((held?.y ?? 0) + (held?.height ?? 0));
+    await page.mouse.up();
+    await expect
+      .poll(() => readChips(page))
+      .toEqual(["memory at least 64\u00a0GiB and at most 128\u00a0GiB"]);
+  });
+
+  test("F19: a range is one chip; each bound edits in place, and removal takes both", async ({
+    page,
+  }) => {
+    await openStory(page, "range");
+    await recordAnnouncements(page);
+    const rows = await countRows(page);
+    // By keys alone: Left onto the chip, Enter opens its lower bound, Tab
+    // moves on to the upper, and Escape leaves it as it was.
+    await findEntry(page).focus();
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Enter");
+    await expect(findPart(page, "Lower bound for memory")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(findPart(page, "Upper bound for memory")).toBeFocused();
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await expectNoEditOpen(page);
+    await page
+      .getByRole("button", { name: "at most 64\u00a0GiB", exact: true })
+      .click();
+    const value = findPart(page, "Upper bound for memory");
+    await expect(value).toBeFocused();
+    await value.fill("32 GiB");
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", { name: "at most 32\u00a0GiB", exact: true }),
+    ).toBeFocused();
+    // Thirty machines hold 8 to 32 GiB, fewer than before.
+    await expect
+      .poll(() => readAnnounced(page))
+      .toContain("Changed to memory at most 32\u00a0GiB. 30 records.");
+    await expect.poll(() => countRows(page)).toBe(30);
+    expect(rows).toBeGreaterThan(30);
+    await page
+      .getByRole("button", {
+        name: "Remove memory at least 8\u00a0GiB and at most 32\u00a0GiB",
+      })
+      .click();
+    expect(await readChips(page)).toEqual([]);
+    // Every machine again, a page of fifty.
+    await expect.poll(() => countRows(page)).toBe(50);
+    await expect(findEntry(page)).toBeFocused();
+    await expect
+      .poll(() => readAnnounced(page))
+      .toContain("Removed memory at least 8\u00a0GiB and at most 32\u00a0GiB.");
+    // One Back brings both bounds back; one more, the bound edited before.
+    await page.goBack();
+    await expect
+      .poll(() => readChips(page))
+      .toEqual(["memory at least 8\u00a0GiB and at most 32\u00a0GiB"]);
+    await page.goBack();
+    await expect
+      .poll(() => readChips(page))
+      .toEqual(["memory at least 8\u00a0GiB and at most 64\u00a0GiB"]);
+  });
+
+  test("F20: a refused link shows a refused chip whose reason is described, and Clear removes it", async ({
+    page,
+  }) => {
+    await openStory(page, "refused-link");
+    const clear = page.getByRole("button", { name: "Clear status" });
+    await expect(clear).toHaveAccessibleDescription(/^status: /);
+    const line = page.locator(
+      "#storybook-root .ds.data-views-query-bar-message-line",
+    );
+    // The reason shows below the field, as well as describing the chip.
+    await expect(line).toContainText(/^status: /);
+    await expect(
+      page.locator("#storybook-root .ds.query-chip.error"),
+    ).toHaveCount(1);
+    await clear.click();
+    await expect(clear).toBeHidden();
+    expect(await readChips(page)).toEqual(["tags is ex-gpu"]);
+    // Cleared, the chip and its reason are gone.
+    await expect(
+      page.locator("#storybook-root .ds.query-chip.error"),
+    ).toHaveCount(0);
+    await expect(line).toHaveCount(0);
+  });
+
+  test("F21b: a date preset typed by its label commits as it resolves", async ({
+    page,
+  }) => {
+    await openStory(page, "presets");
+    // The story's play leaves the deployed value Entry open, presets first.
+    const value = findPart(page, "Value for deployed");
+    await expect(value).toBeFocused();
+    await page.keyboard.type("Deployed this year");
+    await page.keyboard.press("Enter");
+    const year = new Date().getFullYear();
+    expect(await readChips(page)).toEqual([`deployed at least ${year}-01-01`]);
+    await expect(value).toBeHidden();
+  });
+
+  test("F21: a field's presets come first among its values, and commit as they resolve", async ({
+    page,
+  }) => {
+    await openStory(page, "presets");
+    // The story's play leaves a draft open: Escape closes its list, then
+    // drops it.
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await expect(findEntry(page)).toBeFocused();
+    await findEntry(page).click();
+    await page.keyboard.type("status");
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Enter");
+    const value = findPart(page, "Value for status");
+    await expect(value).toBeFocused();
+    await expectListUnder(page, value);
+    await expect(page.getByRole("option").first()).toHaveText(/^Not deployed/);
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    expect(await readChips(page)).toEqual(["status is none of deployed"]);
+    await expect(findEntry(page)).toBeFocused();
   });
 });

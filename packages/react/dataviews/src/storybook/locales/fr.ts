@@ -238,6 +238,9 @@ const fr: DataViewsMessages = {
     outcome("Filtres et recherche effacés.", counted, noun),
   queryClause: ({ phrase, values }) =>
     values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
+  clauseBound: ({ label, bound }) =>
+    `Borne ${bound === "lower" ? "inférieure" : "supérieure"} de ${label}`,
+  rangeClause: ({ lower, upper }) => `${lower} et ${upper}`,
   searchClause: (text) => `Recherche de ${text}`,
   removeClause: (spoken) => `Retirer ${spoken}`,
   hiddenChips: (hidden) => `+${count(hidden)} de plus`,
@@ -252,6 +255,13 @@ const fr: DataViewsMessages = {
     outcome(`${spoken} ajouté.`, counted, noun),
   clauseChanged: (spoken, counted, noun) =>
     outcome(`Remplacé par ${spoken}.`, counted, noun),
+  filtersDisclosure: ({ applied }) =>
+    applied === 0 ? "Filtres" : `Filtres (${count(applied)})`,
+  queryContradiction: ({ label }) =>
+    `Les filtres ${label} ne peuvent pas tous être vrais : rien ne correspond.`,
+  mergeClauses: ({ label }) => `Fusionner les filtres ${label}`,
+  clausesMerged: ({ label, count: counted, noun }) =>
+    outcome(`Filtres ${label} fusionnés.`, counted, noun),
   clauseRemoved: (spoken, counted, noun) =>
     outcome(`${spoken} retiré.`, counted, noun),
   readAsAtLeast: "Lu comme au moins",

@@ -2,6 +2,7 @@ import {
   createArraySource,
   createCollection,
   createDataViewsProvider,
+  createMemoryLocation,
   createPlatformLocation,
   type DataViewsProvider,
   type PlatformLocation,
@@ -9,6 +10,7 @@ import {
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
+import { renderToString } from "react-dom/server";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import {
@@ -65,6 +67,8 @@ type BarConfig = {
   readonly withOutsideChange?: boolean;
   /** Keeps the query in the frame's address, so Back and Forward move it. */
   readonly withHistory?: boolean;
+  /** A location at this address, which spells addresses for links. */
+  readonly href?: string;
 };
 
 /**
@@ -84,18 +88,39 @@ const windowPlatform: PlatformLocation = {
   },
 };
 
+/** The frame's own parameters, which a story's query never replaces. */
+const FRAME_KEYS: readonly string[] = ["id", "viewMode", "args", "globals"];
+
+/**
+ * Start the frame's address on a story's query, so a story that keeps its
+ * query there starts from its own, whatever a story before it left.
+ * Story-only.
+ */
+const startFrameAt = (query: string): void => {
+  const url = new URL(window.location.href);
+  for (const key of [...url.searchParams.keys()]) {
+    if (!FRAME_KEYS.includes(key)) url.searchParams.delete(key);
+  }
+  for (const [key, value] of new URLSearchParams(query)) {
+    url.searchParams.append(key, value);
+  }
+  window.history.replaceState(null, "", url);
+};
+
 /** The query bar over the sixty machines, with their table. */
 function BarMachines({
   query,
   inlineSize,
   withOutsideChange = false,
   withHistory = false,
+  href,
   messages,
   ...args
 }: StoryArgs & BarConfig): ReactElement {
   const words = pickStoryWords({ messages });
-  const [provider] = useState<BarProvider>(() =>
-    createDataViewsProvider({
+  const [provider] = useState<BarProvider>(() => {
+    if (withHistory) startFrameAt(query ?? "");
+    return createDataViewsProvider({
       collection: barMachineCollection,
       source: createArraySource<BarMachine>({
         rows: barMachines,
@@ -106,9 +131,12 @@ function BarMachines({
       ...(withHistory
         ? { location: createPlatformLocation(windowPlatform) }
         : {}),
+      ...(href === undefined
+        ? {}
+        : { location: createMemoryLocation({ href }) }),
       ...(query === undefined ? {} : { snapshot: { query, presentation: {} } }),
-    }),
-  );
+    });
+  });
   return (
     <DataViews provider={provider} {...words}>
       {withOutsideChange && (
@@ -296,7 +324,7 @@ export const OutsideChange: Story = {
 };
 
 /**
- * Overflow: eight chips in a narrow field hold one line while it is not
+ * Overflow: seven chips in a narrow field hold one line while it is not
  * focused, with the count of those hidden; focusing it wraps them.
  */
 export const Overflow: Story = {
@@ -391,4 +419,239 @@ export const WithHistory: Story = {
     query: "status=deployed&status=ready",
     withHistory: true,
   }),
+};
+
+/**
+ * A range: a field's lower and upper bound as one chip. Each bound edits
+ * its own value; removing the chip removes both in one step, which one
+ * Back brings back, the query being kept in the frame's address.
+ */
+export const Range: Story = {
+  render: renderWith({
+    query: "memory__gte=8192&memory__lte=65536",
+    withHistory: true,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("group", {
+        name: "memory at least 8\u00a0GiB and at most 64\u00a0GiB",
+      }),
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * A contradiction: a lower bound above the upper. The line below the field
+ * warns that nothing matches, and Merge swaps the bounds into one range.
+ */
+export const Contradiction: Story = {
+  render: renderWith({ query: "memory__gte=131072&memory__lte=65536" }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByText(
+        "The memory filters cannot all hold, so nothing matches.",
+      ),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Merge the memory filters" }),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * Invalid input: a number typed in a unit the field lacks. The Entry is
+ * marked, and the line below the field says why, and that what applied
+ * still does.
+ */
+export const InvalidInput: Story = {
+  render: renderWith({ query: "memory__gte=65536" }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /^64.GiB$/ }));
+    const value = canvas.getByRole("combobox", { name: "Value for memory" });
+    await userEvent.clear(value);
+    await userEvent.type(value, "16 GX{Enter}");
+    await expect(value).toHaveAttribute("aria-invalid", "true");
+    await expect(
+      canvas.getByText(/The previous restriction still applies\./),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * A refused link: the address asks for a status the machines lack. The
+ * clause shows as a refused chip, its reason described; Clear removes it.
+ */
+export const RefusedLink: Story = {
+  render: renderWith({ href: "/machines?status=melted&tags=ex-gpu" }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("button", { name: "Clear status" }),
+    ).toHaveAccessibleDescription(/^status: /);
+    // The reason shows below the field too.
+    const line = canvasElement.querySelector<HTMLElement>(
+      ".ds.data-views-query-bar-message-line",
+    );
+    await expect(line).toHaveTextContent(/^status: .*melted/);
+    await expect(line).toBeVisible();
+  },
+};
+
+/**
+ * Presets: named values offered first among a field's values. "Deployed
+ * this year" resolves to the year's first day when it is chosen.
+ */
+export const Presets: Story = {
+  args: {
+    presets: {
+      deployed: [
+        {
+          label: "Deployed this year",
+          resolve: () => ({
+            operator: "gte",
+            operands: [`${new Date().getFullYear()}-01-01`],
+          }),
+        },
+      ],
+      status: [
+        {
+          label: "Not deployed",
+          resolve: () => ({ operator: "isNone", operands: ["deployed"] }),
+        },
+      ],
+    },
+  },
+  render: renderWith(),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(findEntry(canvasElement));
+    await userEvent.type(findEntry(canvasElement), "deployed{Enter}");
+    const operator = canvas.getByRole("combobox", {
+      name: "Operator for deployed",
+    });
+    await userEvent.type(operator, ">=");
+    const value = canvas.getByRole("combobox", { name: "Value for deployed" });
+    await waitFor(() => expect(value).toHaveFocus());
+    // The field's preset comes first among its values.
+    await waitFor(() =>
+      expect(
+        within(document.body).getAllByRole("option").at(0),
+      ).toHaveTextContent("Deployed this year"),
+    );
+  },
+};
+
+/** The address a no-scripts story renders, from the frame's own `query`. */
+const readFrameQuery = (fallback: string): string =>
+  new URLSearchParams(window.location.search).get("query") ?? fallback;
+
+/**
+ * The bar's server markup over the machines, at an address or in memory, in
+ * the story's words.
+ */
+function ServerRenderedBar({
+  href,
+  messages,
+  ...args
+}: StoryArgs & { readonly href?: string }): ReactElement {
+  const words = pickStoryWords({ messages });
+  const [markup] = useState(() => {
+    const provider = createDataViewsProvider({
+      collection: barMachineCollection,
+      source: createArraySource<BarMachine>({
+        rows: barMachines,
+        collection: barMachineCollection,
+        searchFields: ["hostname"],
+      }),
+      ...(href === undefined
+        ? { snapshot: { query: "status=deployed&q=web", presentation: {} } }
+        : { location: createMemoryLocation({ href }) }),
+    });
+    return renderToString(
+      <DataViews provider={provider} {...words}>
+        <Component {...args} />
+      </DataViews>,
+    );
+  });
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: the frame only re-addresses the server markup's own links and forms, which keep their roles
+    // biome-ignore lint/a11y/useKeyWithClickEvents: a link followed by keys fires the same click
+    <div
+      className="no-scripts"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: the story shows the server's own markup, before any script takes it over
+      dangerouslySetInnerHTML={{ __html: markup }}
+      onClick={(event) => {
+        const link = (event.target as Element).closest<HTMLAnchorElement>(
+          "a[href]",
+        );
+        if (link === null) return;
+        event.preventDefault();
+        followInFrame(new URL(link.href).search);
+      }}
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.target as HTMLFormElement);
+        const params = new URLSearchParams();
+        for (const [key, value] of data) params.append(key, String(value));
+        followInFrame(`?${params.toString()}`);
+      }}
+    />
+  );
+}
+
+/**
+ * Follow an address the server's markup spells within the frame: as the
+ * story's `query`, the frame's own parameters kept, so the story renders
+ * the page that address leads to. Story-only.
+ */
+const followInFrame = (search: string): void => {
+  const url = new URL(window.location.href);
+  for (const key of [...url.searchParams.keys()]) {
+    if (!FRAME_KEYS.includes(key)) url.searchParams.delete(key);
+  }
+  url.searchParams.set("query", search.replace(/^\?/, ""));
+  window.location.assign(url);
+};
+
+/**
+ * No JavaScript, with an address: the server's markup. The search is a
+ * GET form around a plain input that keeps the filters in hidden fields;
+ * each chip's remove control and the clear control are links; the filters
+ * form sits in a disclosure, "Filters (n)". The frame's `query` parameter
+ * sets the address, so a page with scripting disabled can follow them;
+ * here, a followed link or a submitted form renders the page it leads to.
+ */
+export const NoJavaScriptHref: Story = {
+  name: "No JavaScript, with an address",
+  render: (args) => (
+    <ServerRenderedBar
+      {...args}
+      href={`/machines?${readFrameQuery("status=deployed&memory__gte=8192&memory__lte=65536&q=web")}`}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("search")).toHaveAttribute("method", "get");
+    await expect(
+      canvas.getByRole("link", { name: "Remove status is deployed" }),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * No JavaScript, in memory: the same markup with nothing to lead to. No
+ * form, no address and no name: the controls show the query, inert, and
+ * work once scripts run.
+ */
+export const NoJavaScriptMemory: Story = {
+  name: "No JavaScript, memory",
+  render: (args) => <ServerRenderedBar {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole("search")).toBeNull();
+    await expect(canvas.queryAllByRole("link")).toHaveLength(0);
+  },
 };

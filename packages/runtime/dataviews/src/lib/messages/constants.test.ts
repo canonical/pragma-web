@@ -555,6 +555,29 @@ describe("constants", () => {
     expect(m.queryClause({ phrase: "owner has a value", values: [] })).toBe(
       "owner has a value",
     );
+    expect(m.clauseBound({ label: "memory", bound: "lower" })).toBe(
+      "Lower bound for memory",
+    );
+    expect(m.clauseBound({ label: "memory", bound: "upper" })).toBe(
+      "Upper bound for memory",
+    );
+    expect(
+      m.rangeClause({
+        lower: "memory at least 8 GiB",
+        upper: "at most 64 GiB",
+      }),
+    ).toBe("memory at least 8 GiB and at most 64 GiB");
+    expect(m.filtersDisclosure({ applied: 0 })).toBe("Filters");
+    expect(m.filtersDisclosure({ applied: 1200 })).toBe("Filters (1,200)");
+    expect(m.queryContradiction({ label: "memory" })).toBe(
+      "The memory filters cannot all hold, so nothing matches.",
+    );
+    expect(m.mergeClauses({ label: "memory" })).toBe(
+      "Merge the memory filters",
+    );
+    expect(
+      m.clausesMerged({ label: "memory", count: buildExact(4), noun }),
+    ).toBe("Merged the memory filters. 4 machines.");
     expect(m.searchClause("ex web")).toBe("Search for ex web");
     expect(m.removeClause("status is ready")).toBe("Remove status is ready");
     expect(m.hiddenChips(3)).toBe("+3 more");

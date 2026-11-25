@@ -1,55 +1,97 @@
 import type {
+  Predicate,
   PredicateOperand,
+  QueryIssue,
   SourceRefusal,
 } from "@canonical/dataviews-core";
-import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
+import {
+  isNarrowingIssue,
+  listOfferedOperators,
+  QUERY_KEYS,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import type {
   FocusEvent,
   KeyboardEvent,
   PointerEvent,
   ReactElement,
 } from "react";
-import { useEffect, useRef, useState } from "react";
-import { useStableCallback } from "../../../../hooks/index.js";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+  useStableCallback,
+} from "../../../../hooks/index.js";
 import { QueryChips } from "../../../QueryChips/index.js";
 import { ENTRY_ITEM_ID as ENTRY } from "../../../QueryInput/common/constants.js";
 import { QueryInput } from "../../../QueryInput/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
-import canTakeEntry from "./canTakeEntry.js";
 import { DraftChip } from "./common/DraftChip/index.js";
+import { FiltersDisclosure } from "./common/FiltersDisclosure/index.js";
+import {
+  MessageLine,
+  type MessageLineEntry,
+} from "./common/MessageLine/index.js";
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
+import { RangeChip } from "./common/RangeChip/index.js";
+import { RefusedChip } from "./common/RefusedChip/index.js";
+import { SearchForm } from "./common/SearchForm/index.js";
 import { DRAFT_ID } from "./constants.js";
-import findMissingPart from "./findMissingPart.js";
-import findNextPart from "./findNextPart.js";
 import {
   useAnnounceOutcome,
   useClauseIds,
+  useFieldOverflow,
+  useLinkFocusHandoff,
   useQueryBarSession,
   useQueryGroup,
   useSuggestedFacets,
 } from "./hooks/index.js";
-import listChipClauses from "./listChipClauses.js";
-import readDraftId from "./readDraftId.js";
-import readTypedOperator from "./readTypedOperator.js";
-import resolveTypedSymbol from "./resolveTypedSymbol.js";
-import speakClause from "./speakClause.js";
-import spellOperand from "./spellOperand.js";
-import suggestOptions from "./suggestOptions.js";
 import type {
+  DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
   QueryBarChoice,
   QueryBarDraft,
   QueryBarOption,
   QueryBarPart,
+  QueryClause,
+  QueryContradiction,
   QueryPredicateClause,
+  QueryRangeClause,
+  QueryRefusedClause,
   QuerySearchClause,
+  QueryStateStandIn,
   TypedSymbolReading,
 } from "./types.js";
-import { findTabbableBeyond, readLabelsStandIn } from "./utils/index.js";
-import writeChoice from "./writeChoice.js";
+import {
+  canTakeEntry,
+  findContradictions,
+  findMissingPart,
+  findNextPart,
+  findTabbableBeyond,
+  isRangeBound,
+  listChipClauses,
+  nameRefused,
+  readDraftId,
+  readLabelsStandIn,
+  readRangeBound,
+  readTypedOperator,
+  resolveTypedSymbol,
+  speakClause,
+  speakRange,
+  spellCommandHref,
+  spellOperand,
+  suggestOptions,
+  writeChoice,
+} from "./utils/index.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-query-bar";
+
+/** A field with no presets. */
+const NO_PRESETS: readonly DataViewsQueryBarPreset[] = Object.freeze([]);
+
+/** What a conjunct asks, its operator perhaps not yet chosen. */
+type AskedConjunct = Pick<PredicateDraft, "field" | "operator" | "operands">;
 
 /** A clause on one field: what an Entry builds or edits. */
 type PredicateDraft = Extract<QueryBarDraft, { readonly kind: "predicate" }>;
@@ -83,6 +125,58 @@ const readAppliedDraft = (
         operands: clause.predicate.operands,
       };
 
+/**
+ * Whether two drafts stand for one clause: one chip, and, in a range's
+ * chip, one bound.
+ */
+const isSameClause = (a: QueryBarDraft, b: QueryBarDraft): boolean =>
+  readDraftId(a) === readDraftId(b) &&
+  (a.kind !== "predicate" ||
+    b.kind !== "predicate" ||
+    a.origin?.ref.operator === b.origin?.ref.operator);
+
+/**
+ * The next part an Entry moves to, or null past either end. A range's
+ * bound takes its value alone.
+ */
+const findNextPartOf = (
+  draft: QueryBarDraft,
+  part: QueryBarPart,
+  backward: boolean,
+): QueryBarPart | null =>
+  isRangeBound(draft) ? null : findNextPart(draft, part, backward);
+
+/** Each refused filter or search, by its chip's id. */
+const readRefusedIssues = (
+  state: QueryStateStandIn,
+): readonly { readonly id: string; readonly issue: QueryIssue }[] =>
+  listChipClauses(state).flatMap((clause) =>
+    clause.kind === "refused" ? [{ id: clause.id, issue: clause.issue }] : [],
+  );
+
+/** Two readings of the refusals that say the same. */
+const isSameRefusedIssues = (
+  a: ReturnType<typeof readRefusedIssues>,
+  b: ReturnType<typeof readRefusedIssues>,
+): boolean => JSON.stringify(a) === JSON.stringify(b);
+
+/** Two readings of the contradictions that say the same. */
+const isSameContradictions = (
+  a: readonly QueryContradiction[],
+  b: readonly QueryContradiction[],
+): boolean => JSON.stringify(a) === JSON.stringify(b);
+
+/** A contradiction's key, stable while it stands. */
+const readContradictionId = (contradiction: QueryContradiction): string =>
+  `${contradiction.field}__${contradiction.kind}`;
+
+/**
+ * The toolbar item a chip's stop rests on: its first Segment, under the
+ * chip's id, or a read-only chip's clear control.
+ */
+const readStopItem = (clause: QueryClause): string =>
+  clause.kind === "refused" ? `${clause.id}:remove` : clause.id;
+
 /** Whether an option can be chosen. */
 const isSelectable = (option: QueryBarOption): boolean =>
   option.disabled !== true && option.current !== true;
@@ -97,6 +191,12 @@ const isSameSet = (
   b: readonly PredicateOperand[],
 ): boolean =>
   a.length === b.length && a.every((operand) => b.includes(operand));
+
+/** Two conjuncts asking the same, their values in any order. */
+const isSameConjunct = (a: Predicate, b: AskedConjunct): boolean =>
+  a.field === b.field &&
+  a.operator === b.operator &&
+  isSameSet(a.operands, b.operands);
 
 /**
  * A query bar narrows a collection with typed clauses and free text in one
@@ -119,6 +219,7 @@ const isSameSet = (
 export default function QueryBar({
   label,
   quickFilters,
+  presets,
   className,
   onKeyDown,
   onBlur,
@@ -135,13 +236,71 @@ export default function QueryBar({
       );
     }
   }
+  for (const field of Object.keys(presets ?? {})) {
+    if (schema.findField(field) === undefined) {
+      throw new Error(
+        `DataViews.QueryBar: the schema has no field "${field}" to offer presets for`,
+      );
+    }
+  }
   const labels = readLabelsStandIn();
   const group = useQueryGroup({ provider });
+  const hydrated = useIsHydrated();
+  // Whether the location spells addresses, which every baseline link needs.
+  const hasHref = useMemo(
+    () => group.spellHref(group.state.get()) !== null,
+    [group],
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const entryRef = useRef<HTMLInputElement>(null);
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
+  const readContradictions = useMemo(
+    () => (state: QueryStateStandIn) => findContradictions(state.slice, schema),
+    [schema],
+  );
+  const refusedIssues = useDataViewsValue(
+    group.state,
+    readRefusedIssues,
+    isSameRefusedIssues,
+  );
+  const contradictions = useDataViewsValue(
+    group.state,
+    readContradictions,
+    isSameContradictions,
+  );
+  // The contradictions already said, so each new one is said once; those
+  // a link arrived with are shown, not said.
+  const saidRef = useRef<ReadonlySet<string> | null>(null);
   const announceOutcome = useAnnounceOutcome({ provider, announce });
+  useFieldOverflow({ rootRef });
+  useLinkFocusHandoff({ rootRef, hydrated });
+  // What was typed in the plain input before scripts ran is kept.
+  // @note Impure: reads the entry as the server drew it.
+  useLayoutEffect(() => {
+    const entry = entryRef.current;
+    /* v8 ignore next -- unreachable: the entry renders before its effects run */
+    if (entry === null) return;
+    if (entry.value !== (group.state.get().slice.search ?? "")) {
+      dispatch({ type: "typeText", text: entry.value });
+    }
+  }, [group, dispatch]);
+  // @note Impure: says each contradiction a commit brings, once.
+  useEffect(() => {
+    const ids = new Set(contradictions.map(readContradictionId));
+    const said = saidRef.current;
+    saidRef.current = ids;
+    if (said === null) return;
+    for (const contradiction of contradictions) {
+      if (!said.has(readContradictionId(contradiction))) {
+        announce(
+          messages.queryContradiction({
+            label: labels.readFieldLabel(contradiction.field),
+          }),
+        );
+      }
+    }
+  }, [contradictions, announce, messages, labels]);
   // The latest session, for what a task or a blur reads later.
   const sessionRef = useRef(session);
   sessionRef.current = session;
@@ -193,6 +352,15 @@ export default function QueryBar({
       : null;
   const isListedValue = listedField !== null;
   const facets = useSuggestedFacets({ provider, field: listedField });
+  // A typed value's text as its Entry opens on it: the held value spelled.
+  const heldOperand =
+    isEditing && part === "value" && draft?.kind === "predicate"
+      ? draft.operands.at(0)
+      : undefined;
+  const openingValue =
+    heldOperand === undefined || editedDefinition?.kind === "choices"
+      ? ""
+      : spellOperand(editedDefinition, heldOperand, messages.decimalSeparator);
   const options = suggestOptions({
     part: isEditing ? part : "field",
     draft: isEditing ? draft : null,
@@ -202,6 +370,13 @@ export default function QueryBar({
     messages,
     labels,
     facets,
+    // A range's bound keeps its operator: it takes no preset.
+    presets:
+      isEditing && draft?.kind === "predicate" && !isRangeBound(draft)
+        ? (presets?.[draft.field] ?? NO_PRESETS)
+        : NO_PRESETS,
+    // The value an edit opens with narrows no preset; what is typed does.
+    presetFilter: typed === openingValue ? "" : typed,
   });
   // Only a chip's listed part says it has nothing to offer: a search typed
   // in the entry, or a typed value, says nothing of none. The server's
@@ -276,7 +451,10 @@ export default function QueryBar({
     const current = sessionRef.current;
     /* v8 ignore next -- unreachable: only an open Entry or draft is cancelled */
     if (current.draft === null) return;
-    const { origin } = current.draft;
+    const { draft: open } = current;
+    const { origin } = open;
+    /* v8 ignore next -- unreachable: the search is edited in the free-text entry, never in an Entry */
+    const operator = open.kind === "predicate" ? open.operator : null;
     dispatch(
       origin === null
         ? { type: "close", item: ENTRY, focus: null }
@@ -284,6 +462,7 @@ export default function QueryBar({
             type: "close",
             item: origin.id,
             focus: way === "enter" ? current.part : null,
+            operator,
           },
     );
   };
@@ -313,14 +492,45 @@ export default function QueryBar({
     if (entered.trim() === "" || entered === readOpeningText(current, at)) {
       return current;
     }
+    // A preset's label typed whole takes the preset.
+    const presetOptions = options.filter(
+      ({ choice }) => choice.kind === "preset",
+    );
+    const named = presetOptions.find(
+      ({ label: name }) =>
+        name.toLocaleLowerCase() === entered.trim().toLocaleLowerCase(),
+    );
+    if (named !== undefined) {
+      return writeChoice(current, named.choice, schema, capabilities);
+    }
     const read = schema.validateInput(current.field, entered, decimalSeparator);
     if (read.status === "valid") return { ...current, operands: read.operands };
+    // Text that reads as no value but narrows to one preset takes it.
+    const [only, ...others] = presetOptions;
+    if (only !== undefined && others.length === 0) {
+      return writeChoice(current, only.choice, schema, capabilities);
+    }
     return {
       reason:
         read.status === "invalid"
           ? read.reason
           : messages.filterIncomplete(false),
     };
+  };
+
+  /**
+   * The option typed text narrows to: one whose label it spells whole,
+   * else the first value, a preset only where no value is left, so a
+   * preset never takes the place of the value typed.
+   */
+  const findNarrowed = (entered: string): QueryBarOption | undefined => {
+    const open = options.filter((option) => option.disabled !== true);
+    const wanted = entered.trim().toLocaleLowerCase();
+    return (
+      open.find((option) => option.label.toLocaleLowerCase() === wanted) ??
+      open.find(({ choice }) => choice.kind !== "preset") ??
+      open.at(0)
+    );
   };
 
   /** Write a clause to the query group: the one place the bar commits. */
@@ -336,21 +546,35 @@ export default function QueryBar({
       : group.editPredicates({ remove: [origin.ref], add: [predicate] });
   };
 
-  /** The chip's clause that holds the same conjunct as a clause, if any. */
-  const findHeldClause = (next: PredicateDraft) =>
-    listChipClauses(group.state.get()).find(
-      (clause) =>
+  /**
+   * The applied clause holding a conjunct, as the draft an edit of it
+   * starts from: its own chip's, or one bound of a range's.
+   */
+  const findStanding = (held: AskedConjunct): QueryBarDraft | undefined => {
+    for (const clause of listChipClauses(group.state.get())) {
+      if (
         clause.kind === "predicate" &&
-        clause.predicate.field === next.field &&
-        clause.predicate.operator === next.operator &&
-        isSameSet(clause.predicate.operands, next.operands),
-    );
+        isSameConjunct(clause.predicate, held)
+      ) {
+        return readAppliedDraft(clause);
+      }
+      if (clause.kind === "range") {
+        if (isSameConjunct(clause.lower, held)) {
+          return readRangeBound(clause, 0, clause.lower);
+        }
+        if (isSameConjunct(clause.upper, held)) {
+          return readRangeBound(clause, 1, clause.upper);
+        }
+      }
+    }
+    return undefined;
+  };
 
   /** The id the clause stands under once it applies. */
   const findAppliedId = (next: PredicateDraft): string => {
-    const found = findHeldClause(next);
+    const found = findStanding(next)?.origin?.id;
     /* v8 ignore next -- unreachable: a clause that applied is in the query */
-    return found?.id ?? ENTRY;
+    return found ?? ENTRY;
   };
 
   /**
@@ -383,11 +607,12 @@ export default function QueryBar({
         type: "close",
         item: origin.id,
         focus: way === "enter" ? sessionRef.current.part : null,
+        operator: next.operator,
       });
       return;
     }
     // A clause the query already holds adds nothing, and says nothing.
-    if (origin === null && findHeldClause(next) !== undefined) {
+    if (origin === null && findStanding(next) !== undefined) {
       dispatch({ type: "close", item: ENTRY, focus: null });
       return;
     }
@@ -418,6 +643,7 @@ export default function QueryBar({
       type: "close",
       item: findAppliedId(next),
       focus: way === "enter" ? sessionRef.current.part : null,
+      operator: next.operator,
     });
   };
 
@@ -427,7 +653,14 @@ export default function QueryBar({
    */
   const markInvalid = (reason: string): void => {
     dispatch({ type: "invalid", reason });
-    announce(messages.clauseInvalid(reason));
+    // Said as the line below the field shows it: for an edit, that what
+    // applied before still does.
+    announce(
+      messages.filterRefused(
+        [messages.clauseInvalid(reason)],
+        sessionRef.current.draft?.origin != null,
+      ),
+    );
   };
 
   /** Say why the source refused a command, and that what applied stands. */
@@ -582,13 +815,11 @@ export default function QueryBar({
     const isTakingFirst =
       isListedPart &&
       (isTyped || (at === "operator" && current.draft.origin === null));
-    // What is typed takes the first option it narrows to, the held one
-    // among them, which keeps the clause as it is.
-    const first = isTakingFirst
-      ? options.find((option) => option.disabled !== true)
-      : undefined;
+    // What is typed takes the option it narrows to, the held one among
+    // them, which keeps the clause as it is.
+    const first = isTakingFirst ? findNarrowed(current.typed) : undefined;
     if (first?.current === true) {
-      const target = findNextPart(current.draft, at, false);
+      const target = findNextPartOf(current.draft, at, false);
       if (target === null) commit(current.draft, "enter");
       else {
         openPart(
@@ -635,7 +866,7 @@ export default function QueryBar({
     // one among them, which keeps the clause.
     const narrowed =
       option === undefined && settled === null && isListedPart && isTyped
-        ? options.find((candidate) => candidate.disabled !== true)
+        ? findNarrowed(current.typed)
         : undefined;
     if (
       option === undefined &&
@@ -656,7 +887,18 @@ export default function QueryBar({
           (narrowed !== undefined
             ? current.draft
             : readTypedInto(current.draft, at, current.typed)));
-    const target0 = findNextPart(current.draft, at, backward);
+    // In a range's chip, Tab moves from the lower bound to the upper, and
+    // Shift+Tab back; past either end the range commits.
+    const isLower = current.draft.origin?.ref.operator === "gte";
+    if (isRangeBound(current.draft) && isLower !== backward) {
+      if ("reason" in read) {
+        markInvalid(read.reason);
+        return;
+      }
+      moveToOtherBound(read, isLower);
+      return;
+    }
+    const target0 = findNextPartOf(current.draft, at, backward);
     // Text that does not read is not thrown away past either end.
     if ("reason" in read && target0 === null) {
       markInvalid(read.reason);
@@ -670,7 +912,7 @@ export default function QueryBar({
       if (first === undefined) return;
       written = writeChoice(written, first.choice, schema, capabilities);
     }
-    const target = findNextPart(written, at, backward);
+    const target = findNextPartOf(written, at, backward);
     if (target === null) {
       commit(written, backward ? "backward" : "forward");
       return;
@@ -684,6 +926,40 @@ export default function QueryBar({
       return;
     }
     openPart(target === "value" ? readValueEdit(written) : written, target);
+  };
+
+  /**
+   * Write a range's open bound, then open its other bound, read again from
+   * the query: the two may no longer make a range once one is written.
+   */
+  const moveToOtherBound = (
+    written: PredicateDraft,
+    toUpper: boolean,
+  ): void => {
+    const { origin } = written;
+    /* v8 ignore next -- unreachable: a range's bound edits an applied clause */
+    if (origin === null) return;
+    const range = listChipClauses(group.state.get()).find(
+      (clause): clause is QueryRangeClause => clause.id === origin.id,
+    );
+    /* v8 ignore next -- unreachable: an open bound's range stands until it is written */
+    if (range === undefined) return;
+    const other = toUpper ? range.upper : range.lower;
+    if (!isSameConjunct(origin.held, written)) {
+      const refusals = write(written);
+      if (refusals.length > 0) {
+        markInvalid(refusals.map(({ reason }) => reason).join("; "));
+        return;
+      }
+      const spoken = speakClause(written, schema, labels, messages);
+      announceOutcome((count) =>
+        messages.clauseChanged(spoken, count, labels.recordNoun),
+      );
+    }
+    const standing = findStanding(other);
+    /* v8 ignore next -- unreachable: writing one bound leaves the other standing */
+    if (standing === undefined || standing.kind !== "predicate") return;
+    openPart(standing, "value");
   };
 
   /** A chip's Entry: Escape cancels, Enter and Tab commit, Space picks. */
@@ -768,52 +1044,129 @@ export default function QueryBar({
    */
   const endOtherClause = (pressed: QueryBarDraft): QueryBarDraft => {
     const { draft: open } = sessionRef.current;
-    if (open === null || readDraftId(open) === readDraftId(pressed)) {
-      return pressed;
-    }
+    if (open === null || isSameClause(open, pressed)) return pressed;
     leave(highlighted, true);
-    const standing = listChipClauses(group.state.get()).find((clause) =>
-      pressed.kind === "search"
-        ? clause.kind === "search"
-        : clause.kind === "predicate" &&
-          pressed.origin !== null &&
-          clause.predicate.field === pressed.origin.held.field &&
-          clause.predicate.operator === pressed.origin.held.operator &&
-          isSameSet(clause.predicate.operands, pressed.origin.held.operands),
-    );
+    if (pressed.kind === "search") return pressed;
+    /* v8 ignore next -- unreachable: an applied clause is pressed, never the draft */
+    const standing = pressed.origin && findStanding(pressed.origin.held);
     /* v8 ignore next -- unreachable: ending one clause leaves every other standing */
-    return standing === undefined ? pressed : readAppliedDraft(standing);
+    return standing ?? pressed;
   };
 
+  // A refused chip holds a stop only where its parameter can be cleared.
+  const isClearable = readProviderHost(provider).location !== null;
+  const hasStop = (clause: QueryClause): boolean =>
+    clause.kind !== "refused" || isClearable;
+  /** The chips that hold a stop, in order, as the query now stands. */
+  const listStops = (): readonly QueryClause[] =>
+    listChipClauses(group.state.get()).filter(hasStop);
+
   /**
-   * Remove a clause, and move the stop to the next chip, else the previous,
-   * else the entry, by position, since ids renumber after a removal.
+   * Remove a chip's clause by a write, and move the stop to the next chip,
+   * else the previous, else the entry, by position, since ids renumber
+   * after a removal. The place is read before the write and after any open
+   * clause ended, since that may stand ahead.
    */
-  const remove = useStableCallback((pressed: QueryBarDraft): void => {
-    const applied = endOtherClause(pressed);
-    // Read the place after the open clause ends: it may stand ahead.
-    const index = listChipClauses(group.state.get()).findIndex(
-      ({ id }) => id === applied.origin?.id,
-    );
-    const { origin } = applied;
-    /* v8 ignore next -- unreachable: an applied clause has its place, and a draft is cancelled instead */
-    if (origin === null) return;
-    const refusals =
-      origin.ref === null
-        ? group.setSearch("")
-        : group.removePredicate(origin.ref);
+  const removeChip = (
+    id: string,
+    spoken: string,
+    command: () => readonly SourceRefusal[],
+  ): void => {
+    const index = listStops().findIndex((clause) => clause.id === id);
+    const refusals = command();
     if (refusals.length > 0) {
       announceRefusals(refusals);
       return;
     }
-    const rest = listChipClauses(group.state.get());
+    const rest = listStops();
     const next = rest.at(index) ?? rest.at(index - 1);
-    const spoken = speakClause(applied, schema, labels, messages);
     announceOutcome((count) =>
       messages.clauseRemoved(spoken, count, labels.recordNoun),
     );
-    dispatch({ type: "close", item: next?.id ?? ENTRY, focus: null });
+    dispatch({
+      type: "close",
+      item: next === undefined ? ENTRY : readStopItem(next),
+      focus: null,
+    });
+  };
+
+  /** Remove a clause, a complete open one applying first. */
+  const remove = useStableCallback((pressed: QueryBarDraft): void => {
+    const applied = endOtherClause(pressed);
+    const { origin } = applied;
+    /* v8 ignore next -- unreachable: an applied clause has its place, and a draft is cancelled instead */
+    if (origin === null) return;
+    removeChip(origin.id, speakClause(applied, schema, labels, messages), () =>
+      origin.ref === null
+        ? group.setSearch("")
+        : group.removePredicate(origin.ref),
+    );
   });
+
+  /**
+   * Remove a range: both bounds in one write, so one step undoes it. An
+   * open clause on another chip applies first; where it splits the range,
+   * whichever pressed bounds still stand go, in one write.
+   */
+  const removeRange = useStableCallback((pressed: QueryRangeClause): void => {
+    const { draft: open } = sessionRef.current;
+    if (open !== null && readDraftId(open) !== pressed.id) {
+      leave(highlighted, true);
+    }
+    const standing = listChipClauses(group.state.get()).find(
+      (clause): clause is QueryRangeClause =>
+        clause.kind === "range" && clause.field === pressed.field,
+    );
+    if (standing !== undefined) {
+      removeChip(
+        standing.id,
+        speakRange(standing.lower, standing.upper, schema, labels, messages),
+        () => group.editPredicates({ remove: [...standing.refs], add: [] }),
+      );
+      return;
+    }
+    const bounds = [pressed.lower, pressed.upper].flatMap((bound) => {
+      const found = findStanding(bound);
+      return found?.kind === "predicate" && found.origin !== null
+        ? [found.origin]
+        : [];
+    });
+    const [first] = bounds;
+    if (first === undefined) return;
+    removeChip(
+      first.id,
+      speakRange(pressed.lower, pressed.upper, schema, labels, messages),
+      () =>
+        group.editPredicates({
+          remove: bounds.map(({ ref }) => ref),
+          add: [],
+        }),
+    );
+  });
+
+  /**
+   * Clear a refused parameter the link carried, an open clause applying
+   * first.
+   */
+  const clearRefused = useStableCallback(
+    (pressed: QueryRefusedClause): void => {
+      if (sessionRef.current.draft !== null) leave(highlighted, true);
+      // A clause on its field that applied first replaces the refusal: its
+      // own commit has said so.
+      const standing = listChipClauses(group.state.get()).some(
+        (clause) =>
+          clause.kind === "refused" &&
+          clause.id === pressed.id &&
+          clause.issue.parameter === pressed.issue.parameter,
+      );
+      if (!standing) return;
+      const name = nameRefused(pressed.issue, labels, messages);
+      removeChip(pressed.id, name, () => {
+        readProviderHost(provider).clearRefused(pressed.issue.parameter);
+        return [];
+      });
+    },
+  );
 
   /**
    * A Segment activated: its part takes the Entry, if the chip keeps one.
@@ -830,8 +1183,7 @@ export default function QueryBar({
       }
       const current = sessionRef.current;
       const isSameChip =
-        current.draft !== null &&
-        readDraftId(current.draft) === readDraftId(applied);
+        current.draft !== null && isSameClause(current.draft, applied);
       // What is typed in the open part is read in first, as Tab does.
       let base: PredicateDraft = applied;
       if (isSameChip && current.draft?.kind === "predicate") {
@@ -858,11 +1210,11 @@ export default function QueryBar({
         ? null
         : target.closest<HTMLElement>(".ds.query-chip");
     const chipId = chip?.id;
-    const last = clauses.at(-1);
+    const last = clauses.filter(hasStop).at(-1);
     if (item === ENTRY && event.key === "Backspace" && text === "" && last) {
       // Backspace in the empty entry selects the last chip.
       event.preventDefault();
-      dispatch({ type: "moveStop", item: last.id });
+      dispatch({ type: "moveStop", item: readStopItem(last) });
       return;
     }
     if (
@@ -878,7 +1230,10 @@ export default function QueryBar({
         ({ id }) => id === chipId,
       );
       /* v8 ignore next -- unreachable: every chip but the draft is a clause */
-      if (reading !== undefined) remove(readAppliedDraft(reading));
+      if (reading === undefined) return;
+      if (reading.kind === "range") removeRange(reading);
+      else if (reading.kind === "refused") clearRefused(reading);
+      else remove(readAppliedDraft(reading));
       return;
     }
     if (chipId !== undefined && event.key === "Escape") {
@@ -1027,6 +1382,24 @@ export default function QueryBar({
     document.addEventListener("pointercancel", end);
   };
 
+  const clearHref = hydrated ? null : spellClearHref();
+  /**
+   * Where the clear control leads before scripts: the query without its
+   * filters and search, every refused filter and search the address
+   * carries dropped too, as clearing them with scripts does.
+   */
+  function spellClearHref(): string | null {
+    const href = spellCommandHref(group, {
+      kind: "clear",
+      paths: ["filter", "search"],
+    });
+    if (href === null) return null;
+    const params = new URLSearchParams(href);
+    for (const issue of group.state.get().refused) {
+      if (isNarrowingIssue(issue)) params.delete(issue.parameter);
+    }
+    return `?${params.toString()}`;
+  }
   // The clear control shows only while there is something to clear.
   const clearProps =
     clauses.length > 0 || text !== ""
@@ -1046,50 +1419,162 @@ export default function QueryBar({
             entryRef.current?.focus();
           },
           clearLabel: messages.clearFiltersAndSearch,
+          // Before scripts, a link to the query without either.
+          ...(clearHref === null ? {} : { clearHref }),
         }
       : {};
+
+  /**
+   * Merge a contradiction's clauses into what was likely meant, in one
+   * write, and move focus to the chip they became. An open clause applies
+   * first, as before any other chip's action; the contradiction is read
+   * again after it, since a commit can resolve it or move its clauses.
+   */
+  const merge = (pressed: QueryContradiction): void => {
+    if (sessionRef.current.draft !== null) leave(highlighted, true);
+    const contradiction = findContradictions(
+      group.state.get().slice,
+      schema,
+    ).find(
+      ({ field, kind }) => field === pressed.field && kind === pressed.kind,
+    );
+    const edit = contradiction?.merge;
+    // Resolved, or left with no one reading, by the clause that applied.
+    if (contradiction === undefined || edit === null || edit === undefined) {
+      return;
+    }
+    const refusals = group.editPredicates(edit);
+    if (refusals.length > 0) {
+      announceRefusals(refusals);
+      return;
+    }
+    const label = labels.readFieldLabel(contradiction.field);
+    announceOutcome((count) =>
+      messages.clausesMerged({ label, count, noun: labels.recordNoun }),
+    );
+    const [merged] = edit.add;
+    /* v8 ignore next -- unreachable: a merge adds the clause it becomes */
+    const id = merged && findStanding(merged)?.origin?.id;
+    /* v8 ignore next -- unreachable: the clause a merge adds applies */
+    if (id === undefined) return;
+    dispatch({ type: "close", item: id, focus: "field" });
+  };
+
+  // Each refused filter or search, with its reason, for the eye: the
+  // chip's clear control is described by it, and nothing says it twice.
+  const refusedEntries = refusedIssues.map(
+    ({ id, issue }): MessageLineEntry => ({
+      id,
+      criticality: "error",
+      text: messages.clauseRefused(
+        nameRefused(issue, labels, messages),
+        issue.reason,
+      ),
+    }),
+  );
+
+  /**
+   * Merge as the message line offers it: a button once scripts run; before
+   * they do, a link to the merged query where there is an address, and
+   * nothing where there is none.
+   */
+  const readMergeAction = (
+    contradiction: QueryContradiction,
+    label: string,
+  ): Pick<MessageLineEntry, "action"> => {
+    const { merge: edit } = contradiction;
+    if (edit === null) return {};
+    const name = messages.mergeClauses({ label });
+    if (hydrated) {
+      return { action: { label: name, onAction: () => merge(contradiction) } };
+    }
+    const href = spellCommandHref(group, { kind: "editPredicates", ...edit });
+    return href === null ? {} : { action: { label: name, href } };
+  };
+
+  const contradictionEntries = contradictions.map(
+    (contradiction): MessageLineEntry => {
+      const label = labels.readFieldLabel(contradiction.field);
+      return {
+        id: readContradictionId(contradiction),
+        criticality: "warning",
+        text: messages.queryContradiction({ label }),
+        ...readMergeAction(contradiction, label),
+      };
+    },
+  );
+  // What the open Entry holds that cannot apply, and that what applied
+  // before still does, for as long as the Entry stays open; each refused
+  // filter or search; then each field whose clauses cannot all hold, with
+  // its merge where one stands out.
+  const entries: MessageLineEntry[] = [
+    ...(session.invalid === null || draft === null
+      ? []
+      : [
+          {
+            id: "invalid",
+            criticality: "error",
+            text: messages.filterRefused(
+              [messages.clauseInvalid(session.invalid)],
+              draft.origin !== null,
+            ),
+          } as const,
+        ]),
+    ...refusedEntries,
+    ...contradictionEntries,
+  ];
 
   const edit =
     draft !== null && draft.origin !== null && part !== null
       ? { draft, part, typed, invalid: session.invalid }
       : null;
 
-  return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items
-    <div
-      {...rest}
-      ref={rootRef}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      onKeyDown={handleKeyDown}
-      onBlur={handleBlur}
-      onPointerDownCapture={handlePointerDownCapture}
+  const field = (
+    <QueryInput
+      ref={entryRef}
+      label={label ?? messages.queryBar(labels.recordNoun)}
+      description={messages.queryBarDescription}
+      placeholder={messages.queryBarPlaceholder}
+      // Before scripts, the plain input holds the applied search.
+      value={hydrated ? text : (group.state.get().slice.search ?? "")}
+      {...(hasHref ? { name: QUERY_KEYS.search } : {})}
+      onValueChange={(entered) => dispatch({ type: "typeText", text: entered })}
+      onKeyDown={handleEntryEnter}
+      options={[...options]}
+      onOptionSelect={handleOptionSelect}
+      onHighlightChange={setHighlighted}
+      emptyText={
+        takesSuggestions && !isLoading ? messages.noSuggestions : undefined
+      }
+      {...loadingProps}
+      footer={isListedValue ? messages.multipleValuesHint : undefined}
+      activeItem={session.activeItem}
+      onActiveItemChange={moveStop}
+      hiddenLabel={messages.hiddenChips}
+      {...clearProps}
     >
-      <QueryInput
-        ref={entryRef}
-        label={label ?? messages.queryBar(labels.recordNoun)}
-        description={messages.queryBarDescription}
-        placeholder={messages.queryBarPlaceholder}
-        value={text}
-        onValueChange={(entered) =>
-          dispatch({ type: "typeText", text: entered })
-        }
-        onKeyDown={handleEntryEnter}
-        options={[...options]}
-        onOptionSelect={handleOptionSelect}
-        onHighlightChange={setHighlighted}
-        emptyText={
-          takesSuggestions && !isLoading ? messages.noSuggestions : undefined
-        }
-        {...loadingProps}
-        footer={isListedValue ? messages.multipleValuesHint : undefined}
-        activeItem={session.activeItem}
-        onActiveItemChange={moveStop}
-        hiddenLabel={messages.hiddenChips}
-        {...clearProps}
-      >
-        {(clauses.length > 0 || draft?.origin === null) && (
-          <QueryChips label={messages.appliedFilters}>
-            {clauses.map((clause) => (
+      {(clauses.length > 0 || draft?.origin === null) && (
+        <QueryChips label={messages.appliedFilters}>
+          {clauses.map((clause) =>
+            clause.kind === "refused" ? (
+              <RefusedChip
+                key={clause.id}
+                clause={clause}
+                group={group}
+                onClear={clearRefused}
+              />
+            ) : clause.kind === "range" ? (
+              <RangeChip
+                key={clause.id}
+                clause={clause}
+                group={group}
+                edit={edit?.draft.origin?.id === clause.id ? edit : null}
+                onActivate={activate}
+                onRemove={removeRange}
+                onTypedChange={handleTypedChange}
+                onEntryKeyDown={handleEntryKeyDown}
+              />
+            ) : (
               <QueryBarChip
                 key={clause.id}
                 clause={clause}
@@ -1100,23 +1585,52 @@ export default function QueryBar({
                 onTypedChange={handleTypedChange}
                 onEntryKeyDown={handleEntryKeyDown}
               />
-            ))}
-            {draft !== null && draft.origin === null && (
-              <DraftChip
-                id={DRAFT_ID}
-                draft={draft}
-                part={part}
-                typed={typed}
-                invalid={session.invalid}
-                onActivate={(at) => activate(draft, at)}
-                onRemove={cancel}
-                onTypedChange={handleTypedChange}
-                onEntryKeyDown={handleEntryKeyDown}
-              />
-            )}
-          </QueryChips>
-        )}
-      </QueryInput>
+            ),
+          )}
+          {draft !== null && draft.origin === null && (
+            <DraftChip
+              id={DRAFT_ID}
+              draft={draft}
+              part={part}
+              typed={typed}
+              invalid={session.invalid}
+              onActivate={(at) => activate(draft, at)}
+              onRemove={cancel}
+              onTypedChange={handleTypedChange}
+              onEntryKeyDown={handleEntryKeyDown}
+            />
+          )}
+        </QueryChips>
+      )}
+    </QueryInput>
+  );
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items
+    <div
+      {...rest}
+      ref={rootRef}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      // Until scripts run, nothing moves the rows below the field, so the
+      // field stays in flow.
+      data-hydrated={hydrated || undefined}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      onPointerDownCapture={handlePointerDownCapture}
+    >
+      <SearchForm hasHref={hasHref}>{field}</SearchForm>
+      <MessageLine className="messages" entries={entries} />
+      {hasHref && !hydrated && (
+        <FiltersDisclosure
+          className="filters"
+          // The filter chips shown: a range counts once.
+          applied={
+            clauses.filter(
+              ({ kind }) => kind === "predicate" || kind === "range",
+            ).length
+          }
+        />
+      )}
     </div>
   );
 }

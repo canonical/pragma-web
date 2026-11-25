@@ -1,0 +1,16 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A native disclosure: the summary, then the filters form below it. */
+  .ds.data-views-query-bar-filters-disclosure {
+    margin-block-start: var(--dimension-100);
+
+    /* The summary is a 24px target, as every control is, its marker kept. */
+    & > .summary {
+      display: list-item;
+      align-content: center;
+      min-block-size: var(--dimension-300);
+      cursor: pointer;
+    }
+  }
+}
