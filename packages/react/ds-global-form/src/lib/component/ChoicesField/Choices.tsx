@@ -10,7 +10,8 @@ const componentCssClassName = "ds form-choices";
  * Plain-label option group (radios or checkboxes) with inline/stacked layout.
  * Controlled and form-agnostic: the selected value(s) flow in via `value` and
  * out via `onChange` (a single value for radios, an array for checkboxes).
- * Each option is rendered by the `Option` subcomponent (common/Option).
+ * Each option is rendered by the `Option` subcomponent (common/Option). In the
+ * stacked layout, each option's `description` renders as muted text.
  * @returns {React.ReactElement} - Rendered Choices
  *
  * `import { Choices } from "@canonical/react-ds-global-form";`
@@ -73,6 +74,7 @@ export const Choices = ({
             checked={checked}
             disabled={disabled || Boolean(option.disabled)}
             onChange={handleChange}
+            showDescription={layout === "stacked"}
           />
         );
       })}
