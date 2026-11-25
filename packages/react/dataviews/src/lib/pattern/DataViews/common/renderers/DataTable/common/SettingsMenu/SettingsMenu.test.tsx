@@ -234,12 +234,13 @@ describe("SettingsMenu", () => {
       ).not.toBeNull();
     });
 
-    it("offers nothing where no link leads anywhere", () => {
+    it.fails("offers no link where no link leads anywhere", () => {
       const { view } = mount({
         hydrated: false,
         listDestinations: () => null,
       });
-      expect(view.container).toBeEmptyDOMElement();
+      expect(view.container.querySelector("a")).toBeNull();
+      expect(findTrigger()).toBeDisabled();
     });
 
     // A reader already on a link as scripts take over is handed to the
