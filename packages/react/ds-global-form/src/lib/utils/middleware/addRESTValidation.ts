@@ -17,6 +17,9 @@ interface ValidationOptions {
   debounceWait?: number;
 }
 
+/** The message shown when the endpoint rejects a value without a readable one. */
+const DEFAULT_ERROR_MESSAGE = "Validation failed";
+
 /** A middleware that works with any field. */
 type ValidationMiddleware = <Props extends BaseInputProps>(
   Component: ComponentType<Props>,
@@ -44,10 +47,23 @@ function addRESTFieldValidation(
     method = "POST",
     headers = { "Content-Type": "application/json" },
     bodyFormatter = (value: string) => ({ value }),
-    errorExtractor = () => "Validation failed",
+    errorExtractor = () => DEFAULT_ERROR_MESSAGE,
     minLength = 3,
     debounceWait = 300,
   } = options;
+
+  /**
+   * Reads the message of a rejected value, falling back to the default when
+   * `errorExtractor` cannot read the response, so the value still shows as
+   * rejected.
+   */
+  const readErrorMessage = async (response: Response): Promise<string> => {
+    try {
+      return await errorExtractor(response);
+    } catch {
+      return DEFAULT_ERROR_MESSAGE;
+    }
+  };
 
   /**
    * Sends the value and resolves to the error message, or `null` when valid.
@@ -63,7 +79,7 @@ function addRESTFieldValidation(
       body: JSON.stringify(bodyFormatter(value)),
       signal,
     });
-    return response.ok ? null : errorExtractor(response);
+    return response.ok ? null : readErrorMessage(response);
   };
 
   return <Props extends BaseInputProps>(

@@ -161,6 +161,21 @@ describe("addRESTFieldValidation", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Username taken");
     });
 
+    it("falls back to the default message when errorExtractor fails", async () => {
+      renderText(
+        addRESTFieldValidation("/api/validate", {
+          errorExtractor: async (response) => {
+            const data = (await response.json()) as { error: string };
+            return data.error;
+          },
+        }),
+      );
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 400);
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+
     it("clears the error when the endpoint accepts the value", async () => {
       renderText(addRESTFieldValidation("/api/validate"));
       await typeValue("alice");

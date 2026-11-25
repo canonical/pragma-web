@@ -314,56 +314,48 @@ Usage — a city select that populates when the country field changes:
 
 ### Debouncing API calls
 
-Any middleware that makes API calls on value changes should debounce to avoid flooding the server. The form package uses the `debounce` utility from `@canonical/ds-utils`:
+Any middleware that makes API calls on value changes should debounce to avoid flooding the server, and abort the request in flight when the value changes, so a slow answer for an old value cannot overwrite the answer for the new one. A timer and an `AbortController` in one effect do both, and the effect's cleanup cancels them when the value changes or the field unmounts:
 
 ```typescript
-import { debounce } from "@canonical/ds-utils";
-import { useCallback, useEffect } from "react";
-import { useFormContext } from "react-hook-form";
-import type { Middleware } from "@canonical/react-ds-global-form";
+import { type ComponentType, createElement, useEffect } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+import type { BaseInputProps } from "@canonical/react-ds-global-form";
 
-function withDebouncedValidation(
-  url: string,
-  wait = 300,
-): Middleware<any> {
-  return (WrappedComponent) => {
-    return function DebouncedComponent(props) {
+function withDebouncedValidation(url: string, wait = 300) {
+  return <Props extends BaseInputProps>(
+    WrappedComponent: ComponentType<Props>,
+  ) =>
+    function DebouncedComponent(props: Props) {
       const { name } = props;
-      const { watch, setError, clearErrors } = useFormContext();
-      const value = watch(name);
-
-      // Create a stable debounced function
-      const validate = useCallback(
-        debounce(async (val: string) => {
-          try {
-            const response = await fetch(`${url}?value=${val}`);
-            if (!response.ok) {
-              setError(name, {
-                type: "manual",
-                message: "Validation failed",
-              });
-            } else {
-              clearErrors(name);
-            }
-          } catch {
-            setError(name, {
-              type: "manual",
-              message: "Network error",
-            });
-          }
-        }, wait),
-        [name],
-      );
+      const { setError, clearErrors } = useFormContext();
+      const value: unknown = useWatch({ name });
 
       useEffect(() => {
-        if (value && value.length >= 3) {
-          validate(value);
-        }
-      }, [value, validate]);
+        if (typeof value !== "string" || value.length < 3) return;
+        const controller = new AbortController();
+        const timer = setTimeout(async () => {
+          try {
+            const response = await fetch(`${url}?value=${value}`, {
+              signal: controller.signal,
+            });
+            if (controller.signal.aborted) return;
+            if (response.ok) {
+              clearErrors(name);
+            } else {
+              setError(name, { type: "manual", message: "Validation failed" });
+            }
+          } catch {
+            // Aborted, or the request failed: it says nothing about the value.
+          }
+        }, wait);
+        return () => {
+          clearTimeout(timer);
+          controller.abort();
+        };
+      }, [value, name, setError, clearErrors]);
 
       return createElement(WrappedComponent, props);
     };
-  };
 }
 ```
 

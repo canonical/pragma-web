@@ -1,4 +1,6 @@
 import { act, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { SelectField } from "../../component/SelectField/index.js";
@@ -45,6 +47,15 @@ const respondWith = (index: number, body: unknown, status = 200) =>
   settleRequest(index, () =>
     getRequest(index).resolve(Response.json(body, { status })),
   );
+
+/** Sets an error on a field when it mounts, as a form rule would. */
+const ErrorSetter = ({ name, message }: { name: string; message: string }) => {
+  const { setError } = useFormContext();
+  useEffect(() => {
+    setError(name, { type: "required", message });
+  }, [name, message, setError]);
+  return null;
+};
 
 const renderSelect = (
   middleware: ReturnType<typeof addRESTFieldOptions>,
@@ -129,6 +140,22 @@ describe("addRESTFieldOptions", () => {
       renderSelect(addRESTFieldOptions("/api/fruits"), { disabled: true });
       await respondWith(0, fruits);
       expect(screen.getByRole("combobox", { name: "Fruit" })).toBeDisabled();
+    });
+
+    it("leaves an error it did not set in place", async () => {
+      renderWithForm(
+        <>
+          <SelectField
+            name="fruit"
+            label="Fruit"
+            options={[]}
+            middleware={[addRESTFieldOptions("/api/fruits")]}
+          />
+          <ErrorSetter name="fruit" message="Pick a fruit" />
+        </>,
+      );
+      await respondWith(0, fruits);
+      expect(screen.getByRole("alert")).toHaveTextContent("Pick a fruit");
     });
   });
 
