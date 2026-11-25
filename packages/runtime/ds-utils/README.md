@@ -74,6 +74,21 @@ const query = createLocationQuery(createServerAdapter(request.url));
 
 Create the port once per adapter, not on every render, because each call returns new functions. `write` serialises with `URLSearchParams.toString()`, so spaces become `+`. `read` decodes, so the encoding does not reach consumers.
 
+### phone
+
+`phoneCountries` is the shared ISO 3166-1 country dataset for the design system's phone controls. Each entry carries the ISO code, English name, E.164 dial code and an optional cosmetic display mask.
+
+```typescript
+import { phoneCountries, type PhoneCountry } from "@canonical/ds-utils";
+
+const unitedKingdom: PhoneCountry | undefined = phoneCountries.find(
+  (country) => country.code === "GB",
+);
+// { code: "GB", name: "United Kingdom", dialCode: "+44", format: "#### ######" }
+```
+
+The masks are display-only: `#` marks a digit and separators are cosmetics, never submitted data. They are not a numbering-plan validator, and a host must still validate the number it accepts. The dataset is generated from libphonenumber metadata; do not edit it by hand.
+
 ### debounce
 
 Creates a debounced version of a function that waits until a specified delay has passed since the last call before executing. Useful for search inputs, resize handlers, and other high-frequency events.
