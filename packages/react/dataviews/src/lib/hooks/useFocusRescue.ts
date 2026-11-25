@@ -9,9 +9,9 @@ import type { UseFocusRescueProps, UseFocusRescueResult } from "./types.js";
  *
  * @note Impure: moves focus in a layout effect after every render.
  */
-export default function useFocusRescue({
-  fallback,
-}: UseFocusRescueProps): UseFocusRescueResult {
+export default function useFocusRescue(
+  ...[fallback]: UseFocusRescueProps
+): UseFocusRescueResult {
   const focused = useRef<HTMLElement | null>(null);
   // A layout effect after every render, reading a ref: the render that
   // stranded the focus is not one the effect could name by what it reads.

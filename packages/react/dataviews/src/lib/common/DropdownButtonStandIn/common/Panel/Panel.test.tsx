@@ -38,11 +38,7 @@ const Harness = ({
   triggerId?: string;
   content?: (panel: PanelState) => ReactNode;
 }) => {
-  const panel = usePanelState({
-    panelId: "panel",
-    triggerId,
-    anchorName: "--panel",
-  });
+  const panel = usePanelState("panel", triggerId, "--panel");
   return (
     <>
       <button type="button" id="trigger" popoverTarget="panel">

@@ -14,15 +14,21 @@ export type AnnotatedMenuEntry = Parameters<
 /** Result of {@link useIsMounted}: false until the component has mounted. */
 export type UseIsMountedResult = boolean;
 
-/** What {@link useMenuNavigation} needs: the entries and how to close. */
-export type UseMenuNavigationProps = {
-  /** The menu's items and separators, in order. */
-  items: MenuEntry[];
+/** How {@link useMenuNavigation} moves: whether the arrows wrap. */
+export type UseMenuNavigationOptions = {
   /** Whether the arrow keys wrap at either end. */
-  wrap?: boolean | undefined;
-  /** Closes the menu, on Tab or Escape. */
-  onHide: () => void;
+  readonly wrap?: boolean | undefined;
 };
+
+/**
+ * What {@link useMenuNavigation} needs: the menu's items and separators, in
+ * order, what closes it on Tab or Escape, and its options.
+ */
+export type UseMenuNavigationProps = readonly [
+  items: MenuEntry[],
+  onHide: () => void,
+  options?: UseMenuNavigationOptions,
+];
 
 /** How the menu names itself, and the list's ref. */
 export type MenuNavigationOptions = {

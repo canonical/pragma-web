@@ -20,12 +20,12 @@ const VirtualBody = ({
   tracks,
 }: VirtualBodyProps): ReactElement => {
   const model = useDataViewsValue(rowModel);
-  const { mounted, body, readRowRef, onFocus, onBlur } = useVirtualRows({
+  const { mounted, body, readRowRef, onFocus, onBlur } = useVirtualRows(
     entries,
     estimatedRowHeight,
     model,
-    tracks,
-  });
+    { tracks },
+  );
   // One flat list, keyed by entry id, so a row keeps its element as it
   // moves between runs. The space before the first run and after the last
   // is the body's block padding; the space between runs is the top margin

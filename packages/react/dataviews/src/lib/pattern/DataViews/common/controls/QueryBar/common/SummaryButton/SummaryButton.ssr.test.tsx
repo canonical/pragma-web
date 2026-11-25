@@ -11,7 +11,7 @@ describe("SummaryButton SSR", () => {
       snapshot: { query: "status=running", presentation: {} },
     });
     function Connected(): React.ReactElement {
-      const group = useQueryGroup({ provider: provider as never });
+      const group = useQueryGroup(provider as never);
       return <SummaryButton group={group} sheetId="sheet" onShow={() => {}} />;
     }
     const html = renderToString(

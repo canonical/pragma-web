@@ -20,6 +20,7 @@ export { default as createPendingSource } from "./createPendingSource.js";
 export { default as createSourceWithoutCores } from "./createSourceWithoutCores.js";
 export { default as createUncountedSource } from "./createUncountedSource.js";
 export { machineCollection, storyMachines } from "./fixtures.js";
+export { useMachineProvider, useStoryViewStore } from "./hooks/index.js";
 export { default as readHostName } from "./readHostName.js";
 export { default as readPaginationSummary } from "./readPaginationSummary.js";
 export { default as ServerBackedMachines } from "./ServerBackedMachines.js";
@@ -34,5 +35,3 @@ export type {
   StoryViewStore,
   StoryViewStoreConfig,
 } from "./types.js";
-export { default as useMachineProvider } from "./useMachineProvider.js";
-export { default as useStoryViewStore } from "./useStoryViewStore.js";

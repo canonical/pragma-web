@@ -19,7 +19,7 @@ import useQueryGroup from "./useQueryGroup.js";
 const mount = (config: MachineProviderConfig = {}) => {
   const rooted = renderInRoot(
     "QueryBar",
-    (provider) => useQueryGroup({ provider }),
+    (provider) => useQueryGroup(provider),
     config,
   );
   return { ...rooted, group: rooted.hook.result.current };

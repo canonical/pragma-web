@@ -78,7 +78,7 @@ export default function DataChart<
   }
   const words = useMessages({ messages });
   useEffect(() => provider.observe(), [provider]);
-  const answered = useAnsweredFacets({ provider });
+  const answered = useAnsweredFacets(provider);
   const state = useDataViewsValue(provider.state);
   const pending = state.pendingRequestId !== null;
   const shown = useStableValue(

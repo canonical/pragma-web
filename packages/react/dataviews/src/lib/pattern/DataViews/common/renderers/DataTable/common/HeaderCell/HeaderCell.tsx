@@ -86,7 +86,7 @@ export default function HeaderCell({
   // The link a server rendered and the button replacing it: the button takes
   // the link's focus, or the reader who tabbed to the header before
   // hydration is left on nothing.
-  const { link, button } = useHydrationFocusHandoff({ hydrated });
+  const { link, button } = useHydrationFocusHandoff(hydrated);
   // The reason is a manual popover on the cell while it stands, where
   // anchoring works; elsewhere the stylesheet draws it in the cell.
   const cell = useRef<HTMLTableCellElement>(null);

@@ -106,13 +106,15 @@ const listShownIds = (
 export default function useColumnManagement<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-  columns,
-  headerRow,
-  messages,
-  announce,
-}: UseColumnManagementProps<TFields, TRow>): UseColumnManagementResult {
+>(
+  ...[
+    provider,
+    columns,
+    headerRow,
+    messages,
+    announce,
+  ]: UseColumnManagementProps<TFields, TRow>
+): UseColumnManagementResult {
   const { presentation } = provider;
   const declared = useStableValue(columns, areColumnsEqual);
   // The arrangement alone: a change to the reason re-renders no table.

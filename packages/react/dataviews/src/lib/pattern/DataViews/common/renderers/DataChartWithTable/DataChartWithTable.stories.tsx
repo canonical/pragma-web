@@ -7,10 +7,10 @@ import {
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
 import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
+import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
 import readPaginationSummary from "../../../../../../storybook/machines/readPaginationSummary.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import { DataViews } from "../../../index.js";

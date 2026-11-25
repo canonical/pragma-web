@@ -15,9 +15,9 @@ const selectSort = (state: DataViewsState): readonly SortTerm[] =>
  *
  * @note Impure: subscribes to the provider's state while mounted.
  */
-export default function useAppliedSort({
-  provider,
-}: UseAppliedSortProps): UseAppliedSortResult {
+export default function useAppliedSort(
+  ...[provider]: UseAppliedSortProps
+): UseAppliedSortResult {
   return useDataViewsValue(provider.state, {
     select: selectSort,
     isEqual: areSortListsEqual,

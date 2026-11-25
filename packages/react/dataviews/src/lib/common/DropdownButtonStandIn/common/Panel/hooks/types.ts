@@ -32,13 +32,17 @@ export type PanelState = {
 };
 
 /** What {@link usePanelState} needs: the ids and the anchor name. */
-export type UsePanelStateProps = Pick<
-  PanelState,
-  "panelId" | "triggerId" | "anchorName"
->;
+export type UsePanelStateProps = readonly [
+  panelId: string,
+  triggerId: string,
+  anchorName: string,
+];
 
 /** The shared state. */
 export type UsePanelStateResult = PanelState;
+
+/** What {@link usePanelElement} keeps in step: the shared state. */
+export type UsePanelElementProps = readonly [panel: PanelState];
 
 /** The popover element's ref callback and its toggle listeners. */
 export type UsePanelElementResult = {

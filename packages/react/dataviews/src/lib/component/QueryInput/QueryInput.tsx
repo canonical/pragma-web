@@ -79,11 +79,9 @@ export default function QueryInput({
     return undefined;
   }, []);
   const entryRefs = useMergedRef(attachEntry, { ref });
-  const roving = useActiveItem({
+  const roving = useActiveItem(contentRef, isMounted, {
     activeItem,
     onActiveItemChange,
-    contentRef,
-    isMounted,
   });
   // A move of the stop that StopClaim claims is the host's own: it is not
   // reported back.
@@ -95,20 +93,22 @@ export default function QueryInput({
     },
     [setRovingItem],
   );
-  const layout = useChipLayout({ contentRef });
-  const suggestions = useSuggestions({
+  const layout = useChipLayout(contentRef);
+  const suggestions = useSuggestions(
     options,
-    onOptionSelect,
-    onHighlightChange,
     value,
-    loading,
-    hasEmptyText: Boolean(emptyText),
-    hasFooter: Boolean(footer),
     isMounted,
-    disabled,
     baseId,
     rootRef,
-  });
+    {
+      loading,
+      hasEmptyText: Boolean(emptyText),
+      hasFooter: Boolean(footer),
+      disabled,
+      onOptionSelect,
+      onHighlightChange,
+    },
+  );
   const { hasFocus, getEntryProps } = suggestions;
   const isOverflowing = layout.hiddenCount > 0;
 

@@ -31,9 +31,9 @@ const countRestrictedFields = (
  *
  * @note Impure: subscribes to the provider's state while mounted.
  */
-export default function useRestrictedFields({
-  provider,
-}: UseRestrictedFieldsProps): UseRestrictedFieldsResult {
+export default function useRestrictedFields(
+  ...[provider]: UseRestrictedFieldsProps
+): UseRestrictedFieldsResult {
   return useDataViewsValue(provider.state, {
     select: countRestrictedFields,
     isEqual: areTalliesEqual,

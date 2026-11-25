@@ -25,7 +25,7 @@ function Harness(
 function Connected(
   props: Omit<SummaryButtonProps, "group" | "sheetId">,
 ): React.ReactElement {
-  const group = useQueryGroup({ provider: fixture.provider as never });
+  const group = useQueryGroup(fixture.provider as never);
   return <SummaryButton {...props} group={group} sheetId="sheet" />;
 }
 

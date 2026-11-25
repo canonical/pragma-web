@@ -1,10 +1,9 @@
-import type {
-  QueryEntryContextValue,
-  QueryEntryProviderProps,
-} from "../types.js";
+import type { QueryEntryContextValue } from "../types.js";
 
-/** The props of the provider's state hook: the provider's, without children. */
-export type UseProviderStateProps = Omit<QueryEntryProviderProps, "children">;
+/** What the provider's state hook takes: the provider's input props merger. */
+export type UseProviderStateProps = readonly [
+  getInputProps: QueryEntryContextValue["getInputProps"],
+];
 
 /** The provider's state, which is the context's value. */
 export type UseProviderStateResult = QueryEntryContextValue;

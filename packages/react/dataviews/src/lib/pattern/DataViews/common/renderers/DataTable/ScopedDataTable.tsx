@@ -138,10 +138,7 @@ export default function ScopedDataTable<
   // the interaction or one row scope, nor re-render one cell. The two keys
   // are separate because they answer different questions — a caller's
   // inline `header` node must not cost anyone a new layout.
-  const rendered = useColumnArrangement({
-    presentation: provider.presentation,
-    columns,
-  });
+  const rendered = useColumnArrangement(provider.presentation, columns);
   const model = useStableValue(rendered, areColumnModelsEqual);
 
   const fields = useMemo<readonly string[]>(
@@ -176,7 +173,7 @@ export default function ScopedDataTable<
   // construction would outlive the interaction nothing else holds.
   useEffect(() => interaction.observe(), [interaction]);
 
-  const geometry = useTableGeometry({ layout, interaction, columnIds });
+  const geometry = useTableGeometry(layout, interaction, columnIds);
   const scopes = useRowScopes(provider, fields);
   const state = useDataViewsValue(provider.state);
   // The core's answer, held at one reference while it says the same thing,
@@ -200,14 +197,14 @@ export default function ScopedDataTable<
   // The header row's sort: the ordering in force and what each column shows
   // of it, the column that claims it, refusals, no-JS destinations, and the
   // actions every header shares, each announcing what it did.
-  const headerSort = useHeaderSort({
+  const headerSort = useHeaderSort(
     provider,
-    columns: rendered,
-    slice: state.slice,
-    window: state.window,
+    rendered,
+    state.slice,
+    state.window,
     messages,
     announce,
-  });
+  );
 
   // The columns' visibility and places, as the settings menu offers them
   // and every change to them is announced. The header row takes the focus a
@@ -220,7 +217,7 @@ export default function ScopedDataTable<
     changeColumn,
     resetColumns,
     listDestinations,
-  } = useColumnManagement({ provider, columns, headerRow, messages, announce });
+  } = useColumnManagement(provider, columns, headerRow, messages, announce);
   // One value while none of it changes, so a frame of a resize re-renders
   // no settings menu.
   const menu = useMemo<SettingsMenuProps>(

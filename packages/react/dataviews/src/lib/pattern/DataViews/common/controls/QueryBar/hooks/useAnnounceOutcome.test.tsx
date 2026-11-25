@@ -18,7 +18,7 @@ const mount = () => {
   const stop = fixture.provider.observe();
   const announce = vi.fn();
   const hook = renderHook(() =>
-    useAnnounceOutcome({ provider: fixture.provider as never, announce }),
+    useAnnounceOutcome(fixture.provider as never, announce),
   );
   return { ...fixture, announce, say: hook.result.current, stop };
 };
@@ -105,7 +105,7 @@ describe("useAnnounceOutcome", () => {
     });
     const announce = vi.fn();
     const hook = renderHook(() =>
-      useAnnounceOutcome({ provider: { state } as never, announce }),
+      useAnnounceOutcome({ state } as never, announce),
     );
     act(() => {
       hook.result.current((count) => count.kind);

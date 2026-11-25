@@ -44,9 +44,9 @@ const readStandingOperators = (
  * so typing into a text that stands, or a result arriving, re-renders
  * nothing placed by it.
  */
-export default function useStandingOperators({
-  provider,
-}: UseStandingOperatorsProps): UseStandingOperatorsResult {
+export default function useStandingOperators(
+  ...[provider]: UseStandingOperatorsProps
+): UseStandingOperatorsResult {
   return useDataViewsValue(provider.state, {
     select: readStandingOperators,
     isEqual: areReadingsEqual,

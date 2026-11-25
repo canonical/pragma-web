@@ -1,6 +1,7 @@
 import { createIndexedDBViewStore } from "@canonical/dataviews-core/indexeddb";
 import { useEffect, useState } from "react";
-import type { StoryViewStore, StoryViewStoreConfig } from "./types.js";
+import type { StoryViewStore } from "../types.js";
+import type { UseStoryViewStoreProps } from "./types.js";
 
 /**
  * A saved-view store of the story's own: the browser's IndexedDB, in a
@@ -10,10 +11,11 @@ import type { StoryViewStore, StoryViewStoreConfig } from "./types.js";
  *
  * @note Impure: names a random database, seeds it and deletes it on unmount.
  */
-export default function useStoryViewStore({
-  seed = [],
-  indexedDB = globalThis.indexedDB,
-}: StoryViewStoreConfig = {}): StoryViewStore {
+export default function useStoryViewStore(
+  ...[
+    { seed = [], indexedDB = globalThis.indexedDB } = {},
+  ]: UseStoryViewStoreProps
+): StoryViewStore {
   const [database] = useState(
     () => `dataviews-story-views-${Math.random().toString(36).slice(2)}`,
   );

@@ -47,7 +47,7 @@ export default function ChoicesPanel({
 }: ChoicesPanelProps): ReactElement {
   const { provider, messages } = useDataViewsRoot("QueryBar");
   const { field } = definition;
-  const facets = useFieldFacets({ provider, field });
+  const facets = useFieldFacets(provider, field);
   const hydrated = useIsHydrated();
   const [search, setSearch] = useState("");
   // The set the panel edits: the field's first any-of or none-of set.

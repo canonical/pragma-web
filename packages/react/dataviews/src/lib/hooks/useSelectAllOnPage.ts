@@ -12,10 +12,9 @@ import useDataViewsValue from "./useDataViewsValue.js";
  * elsewhere in the collection alone. Checked only when every one is
  * selected, and never over an empty page; mixed when some are.
  */
-export default function useSelectAllOnPage({
-  selection,
-  ids,
-}: UseSelectAllOnPageProps): UseSelectAllOnPageResult {
+export default function useSelectAllOnPage(
+  ...[selection, ids]: UseSelectAllOnPageProps
+): UseSelectAllOnPageResult {
   const state = useDataViewsValue(selection.state);
   // Counted, not filtered: this runs on every render of its control, and an
   // intermediate array per render is one allocation and one scan the count

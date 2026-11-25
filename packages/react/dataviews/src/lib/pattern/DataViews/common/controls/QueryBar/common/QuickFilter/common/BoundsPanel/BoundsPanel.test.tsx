@@ -46,7 +46,7 @@ function Host({
   readonly onCommit: (refusals: readonly SourceRefusal[]) => void;
   readonly onInvalid: (message: string) => void;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, field),
     [field],

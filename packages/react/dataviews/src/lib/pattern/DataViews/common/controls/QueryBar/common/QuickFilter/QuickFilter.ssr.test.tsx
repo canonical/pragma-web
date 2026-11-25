@@ -25,7 +25,7 @@ function Host({
   readonly arrangement: QuickFilterArrangement;
   readonly hasHref: boolean;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   return (
     <QuickFilter
       field={field}

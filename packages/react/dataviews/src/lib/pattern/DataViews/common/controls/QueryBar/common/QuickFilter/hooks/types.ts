@@ -8,10 +8,10 @@ import type {
 import type { RefObject } from "react";
 
 /** What one field's facets are read for: the provider and the field. */
-export type UseFieldFacetsProps = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-  readonly field: string;
-};
+export type UseFieldFacetsProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+  field: string,
+];
 
 /** One field's facets: the one answering the applied query, and the latest. */
 export type UseFieldFacetsResult = {
@@ -27,6 +27,9 @@ export type UseFieldFacetsResult = {
 };
 
 /** What keeps focus in a panel: the element holding the panel's controls. */
-export type UseFocusRescueProps = {
-  readonly containerRef: RefObject<HTMLElement | null>;
-};
+export type UseFocusRescueProps = readonly [
+  containerRef: RefObject<HTMLElement | null>,
+];
+
+/** Nothing: the hook only moves focus back into the panel. */
+export type UseFocusRescueResult = void;

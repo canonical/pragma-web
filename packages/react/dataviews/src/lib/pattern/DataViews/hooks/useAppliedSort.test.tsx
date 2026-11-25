@@ -18,7 +18,7 @@ import useAppliedSort from "./useAppliedSort.js";
 const mount = (location?: QueryLocation) =>
   renderInRoot(
     "SortPanel",
-    (provider) => useAppliedSort({ provider }),
+    (provider) => useAppliedSort(provider),
     location === undefined ? {} : { location },
   );
 

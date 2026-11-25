@@ -22,8 +22,7 @@ const readGroup = (href: string | null) => {
     }).source,
     ...(href === null ? {} : { location: createMemoryLocation({ href }) }),
   });
-  return renderHook(() => useQueryGroup({ provider: provider as never })).result
-    .current;
+  return renderHook(() => useQueryGroup(provider as never)).result.current;
 };
 
 describe("spellCommandHref", () => {

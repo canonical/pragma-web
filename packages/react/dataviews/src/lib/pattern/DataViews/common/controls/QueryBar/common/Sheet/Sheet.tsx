@@ -118,8 +118,8 @@ export default function Sheet({
     select: listChipClauses,
     isEqual: isSameChips,
   });
-  const count = useAnswerCountStandIn({ provider });
-  const announceOutcome = useAnnounceOutcome({ provider, announce });
+  const count = useAnswerCountStandIn(provider);
+  const announceOutcome = useAnnounceOutcome(provider, announce);
   // Whether the sheet is writing a commit of its own, which says its own
   // outcome; any other commit made inside it, as the filters form's, says
   // the results it brings.

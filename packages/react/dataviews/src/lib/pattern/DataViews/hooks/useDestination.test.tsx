@@ -21,8 +21,7 @@ const mountDestination = (href: string) => {
     location,
     ...renderInRoot(
       "useDestination test",
-      (provider) =>
-        useDestination({ provider, readDestination: leadToFirstPage }),
+      (provider) => useDestination(provider, leadToFirstPage),
       { rows: [], location },
     ),
   };
@@ -32,8 +31,7 @@ describe("useDestination", () => {
   it("is null without a location", () => {
     const { hook } = renderInRoot(
       "useDestination test",
-      (provider) =>
-        useDestination({ provider, readDestination: leadToFirstPage }),
+      (provider) => useDestination(provider, leadToFirstPage),
       { rows: [] },
     );
     expect(hook.result.current).toBeNull();

@@ -44,7 +44,7 @@ const mount = (config: { readonly href?: string; readonly query?: string }) => {
       : { snapshot: { query: config.query, presentation: {} } }),
   });
   const Chip = () => {
-    const group = useQueryGroup({ provider: provider as never });
+    const group = useQueryGroup(provider as never);
     return (
       <QueryInput
         label="Filter"

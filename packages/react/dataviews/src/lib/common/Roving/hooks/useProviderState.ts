@@ -8,13 +8,11 @@ import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
  * arrival came from a claim, and the composite's members, which say whether
  * focus is inside it.
  *
- * @param props - The active item and the host's change handler.
  * @returns The context value, stable while its inputs are.
  */
-export default function useProviderState({
-  activeItem,
-  onActiveItemChange,
-}: UseProviderStateProps): UseProviderStateResult {
+export default function useProviderState(
+  ...[activeItem, onActiveItemChange]: UseProviderStateProps
+): UseProviderStateResult {
   const [initialActiveItem] = useState(activeItem);
   const [hasMoved, setHasMoved] = useState(false);
   // Derived during render, so the first render after the move already sees it.

@@ -19,13 +19,11 @@ const isSameFieldFacets = (
  * whether any are still on their way. A result that leaves the field's
  * facet as it was renders nothing.
  *
- * @param props - The provider, and the field.
  * @returns The field's facets.
  */
-export default function useFieldFacets({
-  provider,
-  field,
-}: UseFieldFacetsProps): UseFieldFacetsResult {
+export default function useFieldFacets(
+  ...[provider, field]: UseFieldFacetsProps
+): UseFieldFacetsResult {
   const read = useMemo(
     () =>
       (state: DataViewsState<object>): UseFieldFacetsResult => {

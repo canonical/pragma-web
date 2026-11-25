@@ -61,9 +61,8 @@ export default function ChoicesFilter({
   // The move link a server rendered and the button replacing it: the button
   // takes the link's focus, or the reader who tabbed to the move before
   // hydration is left on nothing.
-  const { link: moveLink, button: moveButton } = useHydrationFocusHandoff({
-    hydrated,
-  });
+  const { link: moveLink, button: moveButton } =
+    useHydrationFocusHandoff(hydrated);
   const baseId = useId();
   const standing = field.applied.kind === "value";
   const selected = standing ? field.applied.value : NONE_SELECTED;

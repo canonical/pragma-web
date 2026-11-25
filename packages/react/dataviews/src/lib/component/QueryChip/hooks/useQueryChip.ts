@@ -45,22 +45,25 @@ const isEntry = (node: ReactNode): node is ReactElement<QueryChipFault> =>
  * composition, finds the chip's one toolbar item, gives each part its role
  * and description ids, and builds the group and the remove control.
  *
- * @param props - The chip's parts and props.
  * @returns The parts with their context, the plain-text descriptions, and
  * the group's and the remove control's props.
  * @note Impure: claims the roving stop when a part takes focus.
  */
-export default function useQueryChip({
-  children,
-  id,
-  label,
-  criticality,
-  disabled,
-  onRemove,
-  removeHref,
-  removeLabel,
-  ref,
-}: UseQueryChipProps): UseQueryChipResult {
+export default function useQueryChip(
+  ...[
+    children,
+    {
+      disabled = false,
+      id,
+      label,
+      criticality,
+      onRemove,
+      removeHref,
+      removeLabel,
+      ref,
+    } = {},
+  ]: UseQueryChipProps
+): UseQueryChipResult {
   const isMounted = useIsHydrated();
   const baseId = useId();
   const parts = listParts(children);

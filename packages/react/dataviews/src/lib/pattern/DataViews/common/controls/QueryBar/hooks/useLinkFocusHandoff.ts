@@ -1,5 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
-import type { UseLinkFocusHandoffProps } from "./types.js";
+import type {
+  UseLinkFocusHandoffProps,
+  UseLinkFocusHandoffResult,
+} from "./types.js";
 
 /** What a control is called: its label, or else its text. */
 const readName = (control: Element): string | null =>
@@ -21,13 +24,11 @@ const readChipId = (control: Element): string | null =>
  * selector built from a field's name. Focus in the filters' disclosure,
  * which goes once scripts run, goes to its match, or else to the entry.
  *
- * @param props - The bar's root, and whether scripts have taken over.
  */
 // @note Impure: reads and moves focus.
-export default function useLinkFocusHandoff({
-  rootRef,
-  hydrated,
-}: UseLinkFocusHandoffProps): void {
+export default function useLinkFocusHandoff(
+  ...[rootRef, hydrated]: UseLinkFocusHandoffProps
+): UseLinkFocusHandoffResult {
   // What held focus as scripts took over: a link's name and chip, and
   // whether it sat in the filters' disclosure, which goes once they run.
   const handed = useRef<{

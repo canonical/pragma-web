@@ -21,7 +21,7 @@ function Bar({
 }): ReactElement {
   const rootRef = useRef<HTMLDivElement>(null);
   const entryRef = useRef<HTMLInputElement>(null);
-  const isNarrow = useNarrowMode({ rootRef, entryRef, onNarrow, onWide });
+  const isNarrow = useNarrowMode(rootRef, entryRef, onNarrow, onWide);
   return (
     <div ref={rootRef} data-testid="root" data-narrow={isNarrow}>
       <ul className="ds query-chips">

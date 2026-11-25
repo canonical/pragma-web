@@ -14,9 +14,9 @@ import type { UsePanelFocusProps, UsePanelFocusResult } from "./types.js";
  *
  * @note Impure: moves the focus in a layout effect.
  */
-export default function usePanelFocus({
-  pending,
-}: UsePanelFocusProps): UsePanelFocusResult {
+export default function usePanelFocus(
+  ...[pending]: UsePanelFocusProps
+): UsePanelFocusResult {
   const select = useRef<HTMLSelectElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
   // What the focus was last on inside the control, until it leaves. A

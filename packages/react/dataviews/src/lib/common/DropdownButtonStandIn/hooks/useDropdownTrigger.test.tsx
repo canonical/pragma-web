@@ -13,7 +13,7 @@ const createKey = (key: string) =>
 
 describe("useDropdownTrigger", () => {
   it("targets the popover and names the anchor after it", () => {
-    const { result } = renderHook(() => useDropdownTrigger({}));
+    const { result } = renderHook(() => useDropdownTrigger());
     const { triggerProps, panel } = result.current;
     expect(triggerProps.popoverTarget).toBe(panel.panelId);
     expect(triggerProps.style).toEqual({ anchorName: `--${panel.panelId}` });
@@ -32,7 +32,7 @@ describe("useDropdownTrigger", () => {
   });
 
   it("advertises the menu once mounted, following the shared state", () => {
-    const { result } = renderHook(() => useDropdownTrigger({}));
+    const { result } = renderHook(() => useDropdownTrigger());
     expect(result.current.triggerProps).toMatchObject({
       "aria-haspopup": "menu",
       "aria-expanded": false,
@@ -52,7 +52,7 @@ describe("useDropdownTrigger", () => {
   });
 
   it("asks the menu to focus its last item on ArrowUp", () => {
-    const { result } = renderHook(() => useDropdownTrigger({}));
+    const { result } = renderHook(() => useDropdownTrigger());
     const event = createKey("ArrowUp");
     act(() => result.current.triggerProps.onKeyDown(event));
     expect(event.preventDefault).toHaveBeenCalled();
@@ -62,7 +62,7 @@ describe("useDropdownTrigger", () => {
   it("keeps the anchor name a CSS ident under any identifierPrefix", () => {
     let result: ReturnType<typeof useDropdownTrigger> | undefined;
     const Probe = () => {
-      result = useDropdownTrigger({});
+      result = useDropdownTrigger();
       return null;
     };
     const root = createRoot(document.createElement("div"), {

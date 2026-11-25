@@ -1,7 +1,7 @@
 /**
  * Hook domain types for the DataViews domain: every hook's result, and its
- * props: a config object, or a labelled tuple for a hook whose required
- * inputs are positional — the collection, a field and operator, a handle.
+ * props as a labelled tuple: required inputs positional, optional ones in a
+ * trailing options object.
  */
 import type {
   Collection,
@@ -22,14 +22,14 @@ import type {
 import type { MouseEvent, RefObject, ToggleEvent } from "react";
 import type { ContextOptions, DataViewsProps } from "../types.js";
 
-/**
- * What the root's state hook takes: the root's props less its children,
- * which the root renders itself.
- */
+/** What the root's state hook takes: the root's provider, then its messages. */
 export type UseProviderStateProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = Omit<DataViewsProps<TFields, TRow>, "children">;
+> = readonly [
+  provider: DataViewsProvider<TFields, TRow>,
+  options?: Pick<DataViewsProps<TFields, TRow>, "messages">,
+];
 
 /** What the root's state hook hands the root: the value its context carries. */
 export type UseProviderStateResult = ContextOptions;
@@ -41,19 +41,17 @@ export type UseDataViewsRootProps = readonly [part: string];
 export type UseDataViewsRootResult = ContextOptions;
 
 /** What the applied-search hook takes: the provider whose search it reads. */
-export type UseAppliedSearchProps = {
-  /** The provider whose applied state the hook reads. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-};
+export type UseAppliedSearchProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+];
 
 /** What the applied-search hook returns: the applied search, empty for none. */
 export type UseAppliedSearchResult = string;
 
 /** What the applied-sort hook takes: the provider whose ordering it reads. */
-export type UseAppliedSortProps = {
-  /** The provider whose applied state the hook reads. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-};
+export type UseAppliedSortProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+];
 
 /**
  * What the applied-sort hook returns: the applied terms, at one identity while
@@ -62,10 +60,9 @@ export type UseAppliedSortProps = {
 export type UseAppliedSortResult = readonly SortTerm[];
 
 /** What the restricted-fields hook takes: the provider whose query it reads. */
-export type UseRestrictedFieldsProps = {
-  /** The provider whose applied state the hook reads. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-};
+export type UseRestrictedFieldsProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+];
 
 /**
  * What the restricted-fields hook returns: how many predicates the applied
@@ -75,9 +72,9 @@ export type UseRestrictedFieldsProps = {
 export type UseRestrictedFieldsResult = ReadonlyMap<string, number>;
 
 /** What the standing-operators hook reads: the provider whose query it reads. */
-export type UseStandingOperatorsProps = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-};
+export type UseStandingOperatorsProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+];
 
 /**
  * What the standing-operators hook returns: the operators the applied query
@@ -93,12 +90,10 @@ export type UseStandingOperatorsResult = ReadonlyMap<
  * What the More filters pin takes: the marks a pin is placed under, and the
  * fields shown by default, read as the disclosure opens.
  */
-export type UseMoreFiltersPinProps = {
-  /** The primary marks, joined into the one key a pin is placed under. */
-  readonly marks: string;
-  /** The fields shown by default as things stand, read as the disclosure opens. */
-  readonly listShownFields: () => readonly string[];
-};
+export type UseMoreFiltersPinProps = readonly [
+  marks: string,
+  listShownFields: () => readonly string[],
+];
 
 /** What the More filters pin returns. */
 export type UseMoreFiltersPinResult = {
@@ -116,12 +111,10 @@ export type UseMoreFiltersPinResult = {
 };
 
 /** What the destination hook takes: the provider, and the query a state leads to. */
-export type UseDestinationProps = {
-  /** The provider whose applied state the hook reads. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
-  /** The destination's query, from the applied state; held by identity. */
-  readonly readDestination: (state: DataViewsState<object>) => Query;
-};
+export type UseDestinationProps = readonly [
+  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+  readDestination: (state: DataViewsState<object>) => Query,
+];
 
 /** What the destination hook returns: the spelled parameters, or null without a location. */
 export type UseDestinationResult = string | null;

@@ -32,17 +32,14 @@ const Harness = ({
   loading?: boolean;
   options?: QueryInputOption[];
 }) => {
-  const suggestions = useSuggestions({
+  const suggestions = useSuggestions(
     options,
-    value: "",
-    loading,
-    hasEmptyText: true,
-    hasFooter: true,
-    isMounted: true,
-    disabled: false,
-    baseId: "q",
-    rootRef: { current: null },
-  });
+    "",
+    true,
+    "q",
+    { current: null },
+    { loading, hasEmptyText: true, hasFooter: true },
+  );
   return (
     <>
       <input

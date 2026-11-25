@@ -18,7 +18,11 @@ import type { EntryPlacement } from "../types.js";
 import type { UseVirtualRowsProps, UseVirtualRowsResult } from "./types.js";
 
 /** What the rows' heights were last measured against. */
-type Snapshot = Pick<UseVirtualRowsProps, "entries" | "model" | "tracks">;
+type Snapshot = {
+  readonly entries: UseVirtualRowsProps[0];
+  readonly model: UseVirtualRowsProps[2];
+  readonly tracks: string | undefined;
+};
 
 /** A row both models hold, as different records: its height may differ. */
 const wasReplaced = (
@@ -88,12 +92,9 @@ const readViewport = (body: HTMLTableSectionElement | null): HTMLElement =>
  * @note Impure: observes the viewport's scroll and sizes while mounted, and
  * sets its scroll to hold the rows in view.
  */
-export default function useVirtualRows({
-  entries,
-  estimatedRowHeight,
-  model,
-  tracks,
-}: UseVirtualRowsProps): UseVirtualRowsResult {
+export default function useVirtualRows(
+  ...[entries, estimatedRowHeight, model, { tracks } = {}]: UseVirtualRowsProps
+): UseVirtualRowsResult {
   const range = useMemo(
     () =>
       createVirtualRange({

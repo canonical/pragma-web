@@ -4,9 +4,8 @@
  * scripts have taken over, the focus a server's link hands to the button
  * replacing it, the focus a disabled control strands, and the words a root
  * speaks. Each hook declares its result type here, and its props type where
- * it takes arguments: a config object, or a labelled tuple for a hook whose
- * required inputs are positional, its optional ones in a trailing options
- * object.
+ * it takes arguments, as a labelled tuple: required inputs positional,
+ * optional ones in a trailing options object.
  */
 
 import type {
@@ -101,13 +100,14 @@ export type UseDataViewsCellResult<TRow extends object = RowRecord> = {
   readonly selected: ReadonlyChannel<boolean>;
 };
 
-/** What `useSelectAllOnPage` takes: the selection, and the page it acts on. */
-export type UseSelectAllOnPageProps = {
-  /** The collection's selection, which the toggle changes. */
-  readonly selection: Selection;
-  /** The identities on the page — the scope the control acts on. */
-  readonly ids: readonly string[];
-};
+/**
+ * What `useSelectAllOnPage` takes: the selection, and the page's identities it
+ * acts on.
+ */
+export type UseSelectAllOnPageProps = readonly [
+  selection: Selection,
+  ids: readonly string[],
+];
 
 /**
  * What `useSelectAllOnPage` returns: whether every record on the page is
@@ -124,10 +124,7 @@ export type UseSelectAllOnPageResult = {
 };
 
 /** What `useHydrationFocusHandoff` takes: whether scripts have taken over. */
-export type UseHydrationFocusHandoffProps = {
-  /** Whether scripts have taken over, from `useIsHydrated`. */
-  readonly hydrated: boolean;
-};
+export type UseHydrationFocusHandoffProps = readonly [hydrated: boolean];
 
 /**
  * What `useHydrationFocusHandoff` returns: the ref for the link a server
@@ -141,10 +138,9 @@ export type UseHydrationFocusHandoffResult = {
 };
 
 /** What `useFocusRescue` takes: the control stranded focus goes to. */
-export type UseFocusRescueProps = {
-  /** The control that takes the focus a disabled or removed control held. */
-  readonly fallback: RefObject<HTMLElement | null>;
-};
+export type UseFocusRescueProps = readonly [
+  fallback: RefObject<HTMLElement | null>,
+];
 
 /**
  * What `useFocusRescue` returns: the handlers to spread on the group whose
@@ -186,10 +182,7 @@ export type UseAnsweredFacetsProps<
   TFields extends
     readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = {
-  /** The provider whose result answers the applied filter and search. */
-  readonly provider: DataViewsProvider<TFields, TRow>;
-};
+> = readonly [provider: DataViewsProvider<TFields, TRow>];
 
 /** The facets answering the applied filter and search, by field, or null. */
 export type UseAnsweredFacetsResult = Readonly<Record<string, Facet>> | null;

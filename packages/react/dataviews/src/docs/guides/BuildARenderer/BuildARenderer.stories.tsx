@@ -13,8 +13,8 @@ import createFailingSource from "../../../storybook/machines/createFailingSource
 import createMachineSource from "../../../storybook/machines/createMachineSource.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import useMachineProvider from "../../../storybook/machines/hooks/useMachineProvider.js";
 import type { Machine } from "../../../storybook/machines/types.js";
-import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../storybook/types.js";
 import { ConnectedRecordList, PlainList, StatusList } from "./common/index.js";

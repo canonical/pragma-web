@@ -27,7 +27,7 @@ const Harness = ({
   onHide?: () => void;
   label?: string;
 }) => {
-  const menu = useMenuNavigation({ items, wrap: true, onHide });
+  const menu = useMenuNavigation(items, onHide, { wrap: true });
   const entries = menu.annotatedRoot.items ?? [];
   // A section is a plain HTMLElement, as the hook types its refs.
   return (

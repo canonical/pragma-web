@@ -28,7 +28,7 @@ function Host({
   readonly provider: Provider;
   readonly named: boolean;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "name"),
     [],

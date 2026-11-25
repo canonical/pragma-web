@@ -10,7 +10,7 @@ const Group = ({
   readonly state: "shown" | "disabled" | "removed";
 }): ReactElement => {
   const fallback = useRef<HTMLButtonElement>(null);
-  const tracked = useFocusRescue({ fallback });
+  const tracked = useFocusRescue(fallback);
   return (
     <>
       <button ref={fallback} type="button">

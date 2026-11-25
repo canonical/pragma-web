@@ -14,7 +14,7 @@ import useRestrictedFields from "./useRestrictedFields.js";
 /** A root over the machine provider, and a hook reading its restrictions through it. */
 const mount = () => {
   const rooted = renderInRoot("Filters", (provider) =>
-    useRestrictedFields({ provider }),
+    useRestrictedFields(provider),
   );
   return { ...rooted, host: readProviderHost(rooted.provider) };
 };

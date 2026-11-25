@@ -72,7 +72,7 @@ const QuickFilter = ({
   const hydrated = useIsHydrated();
   const wordsId = useId();
   const bodyRef = useRef<HTMLDivElement>(null);
-  useFocusRescue({ containerRef: bodyRef });
+  useFocusRescue(bodyRef);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, field),
     [field],

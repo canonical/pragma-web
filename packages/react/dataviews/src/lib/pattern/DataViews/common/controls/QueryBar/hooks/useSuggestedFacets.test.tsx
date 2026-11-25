@@ -30,7 +30,7 @@ const facetedPage = () => ({
 describe("useSuggestedFacets", () => {
   it("reads none while no field's values are suggested", () => {
     const { hook, source, readRenders } = renderInRoot("QueryBar", (provider) =>
-      useSuggestedFacets({ provider, field: null }),
+      useSuggestedFacets(provider, null),
     );
     const renders = readRenders();
     act(() => {
@@ -43,8 +43,7 @@ describe("useSuggestedFacets", () => {
   it("reads the answered and the latest facets while a field's values are", () => {
     const { provider, source } = createFacetedManual();
     const hook = renderHook(
-      () =>
-        useSuggestedFacets({ provider: provider as never, field: "status" }),
+      () => useSuggestedFacets(provider as never, "status"),
       {
         wrapper: ({ children }: { readonly children: ReactNode }) => (
           <DataViews provider={provider}>{children}</DataViews>

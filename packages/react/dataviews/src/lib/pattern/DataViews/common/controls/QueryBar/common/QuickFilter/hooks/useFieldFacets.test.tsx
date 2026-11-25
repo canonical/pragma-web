@@ -22,7 +22,7 @@ describe("useFieldFacets", () => {
     const provider = createQuickFilterProvider({ facets: ["status"] });
     onTestFinished(provider.observe());
     const { result } = renderHook(() =>
-      useFieldFacets({ provider: provider as never, field: "status" }),
+      useFieldFacets(provider as never, "status"),
     );
     expect(result.current.answered?.kind).toBe("values");
     expect(result.current.latest).toBe(result.current.answered);
@@ -32,7 +32,7 @@ describe("useFieldFacets", () => {
     const provider = createQuickFilterProvider({ facets: ["status"] });
     onTestFinished(provider.observe());
     const { result } = renderHook(() =>
-      useFieldFacets({ provider: provider as never, field: "status" }),
+      useFieldFacets(provider as never, "status"),
     );
     const before = result.current;
     // Searching every host answers the same counts.
@@ -55,7 +55,7 @@ describe("useFieldFacets", () => {
     });
     onTestFinished(provider.observe());
     const { result } = renderHook(() =>
-      useFieldFacets({ provider: provider as never, field: "status" }),
+      useFieldFacets(provider as never, "status"),
     );
     expect(result.current).toEqual({
       answered: null,
@@ -101,7 +101,7 @@ describe("useFieldFacets", () => {
     });
     onTestFinished(provider.observe());
     const { result } = renderHook(() =>
-      useFieldFacets({ provider: provider as never, field: "zone" }),
+      useFieldFacets(provider as never, "zone"),
     );
     act(() => {
       source.readLatest().deliver({

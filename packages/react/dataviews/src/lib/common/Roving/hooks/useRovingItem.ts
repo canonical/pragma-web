@@ -12,18 +12,13 @@ import type { UseRovingItemProps, UseRovingItemResult } from "./types.js";
  * handles no keys: the host owns them. The host's ref and handlers are
  * composed with the item's.
  *
- * @param props - The item's id, or `undefined` while the element is not an
- * item, and the host's ref and handlers.
  * @returns The props to spread onto the item's element, or `undefined`
  * outside a roving context or while the element is not an item.
  * @note Impure: focuses the item's element when the stop arrives on it.
  */
-export default function useRovingItem<T extends HTMLElement = HTMLElement>({
-  id,
-  ref: hostRef,
-  onFocus,
-  onClick,
-}: UseRovingItemProps<T>): UseRovingItemResult<T> | undefined {
+export default function useRovingItem<T extends HTMLElement = HTMLElement>(
+  ...[{ id, ref: hostRef, onFocus, onClick } = {}]: UseRovingItemProps<T>
+): UseRovingItemResult<T> | undefined {
   const context = useContext(Context);
   const activeItem = context?.activeItem;
   // In state, so that an element attaching after the stop arrived is seen.

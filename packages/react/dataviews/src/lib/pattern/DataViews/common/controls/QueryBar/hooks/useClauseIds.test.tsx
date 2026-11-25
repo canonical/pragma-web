@@ -11,7 +11,7 @@ describe("useClauseIds", () => {
   it("holds the chips while their ids stay, and reads them anew when they move", () => {
     const { hook, provider } = renderInRoot(
       "QueryBar",
-      (rooted) => useClauseIds({ group: useQueryGroup({ provider: rooted }) }),
+      (rooted) => useClauseIds(useQueryGroup(rooted)),
       { snapshot: { query: "status=running", presentation: {} } },
     );
     const before = hook.result.current;

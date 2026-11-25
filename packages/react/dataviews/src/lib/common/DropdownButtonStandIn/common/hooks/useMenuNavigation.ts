@@ -24,16 +24,14 @@ const ENABLED_ITEM = '[role="menuitem"]:not([aria-disabled="true"])';
  * Separators enter the tree as presentational nodes, which it skips.
  *
  * @param items The menu's items and separators, in order.
- * @param wrap Whether the arrow keys wrap at either end.
  * @param onHide Closes the menu.
+ * @param options Whether the arrow keys wrap at either end.
  * @returns The annotated tree, the list's ref and the prop getters.
  * @note Impure: moves focus into the menu, and along with its highlight.
  */
-export default function useMenuNavigation({
-  items,
-  wrap = false,
-  onHide,
-}: UseMenuNavigationProps): UseMenuNavigationResult {
+export default function useMenuNavigation(
+  ...[items, onHide, { wrap = false } = {}]: UseMenuNavigationProps
+): UseMenuNavigationResult {
   const popupRef = useRef<HTMLElement>(null);
   const root = useMemo<MenuItem>(
     () => ({

@@ -22,12 +22,9 @@ import type {
 export default function useRedrawOnDestinationInputs<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-}: UseRedrawOnDestinationInputsProps<
-  TFields,
-  TRow
->): UseRedrawOnDestinationInputsResult {
+>(
+  ...[provider]: UseRedrawOnDestinationInputsProps<TFields, TRow>
+): UseRedrawOnDestinationInputsResult {
   const { location, view } = readProviderHost(provider);
   const subscribe = useCallback(
     (listener: () => void) =>

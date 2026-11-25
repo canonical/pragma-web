@@ -18,14 +18,14 @@ describe("useHeaderSort", () => {
     const before = slice.sort;
     const announce = vi.fn();
     const { result } = renderHook(() =>
-      useHeaderSort({
+      useHeaderSort(
         provider,
-        columns: [{ id: "name", header: "Name", sortable: true }],
+        [{ id: "name", header: "Name", sortable: true }],
         slice,
         window,
-        messages: resolveMessages(),
+        resolveMessages(),
         announce,
-      }),
+      ),
     );
     result.current.sortColumn("gone", true);
     result.current.placeColumn("gone", "desc");

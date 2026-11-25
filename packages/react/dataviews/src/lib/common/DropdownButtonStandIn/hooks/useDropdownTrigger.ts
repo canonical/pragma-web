@@ -13,24 +13,21 @@ import type {
  * props.
  * ArrowDown and ArrowUp open the menu with focus on its first or last item.
  *
- * @param id The trigger's own id, used when given.
- * @param style The trigger's own style; the anchor name is applied last.
- * @param onKeyDown The trigger's own key handler; its `preventDefault()`
- * skips the HOC's.
+ * @param options The trigger's own id, used when given; its own style,
+ * under the anchor name applied last; and its own key handler, whose
+ * `preventDefault()` skips the HOC's.
  * @returns The trigger's props and the shared state.
  */
-export default function useDropdownTrigger({
-  id,
-  style,
-  onKeyDown,
-}: UseDropdownTriggerProps): UseDropdownTriggerResult {
+export default function useDropdownTrigger(
+  ...[{ id, style, onKeyDown } = {}]: UseDropdownTriggerProps
+): UseDropdownTriggerResult {
   const generatedId = useId();
   const panelId = useId();
   const triggerId = id ?? generatedId;
   // A root's identifierPrefix lands inside the id, and may hold characters a
   // CSS ident cannot, so they become underscores, the same on both sides.
   const anchorName = `--${panelId.replace(/[^\w-]/g, "_")}`;
-  const panel = usePanelState({ panelId, triggerId, anchorName });
+  const panel = usePanelState(panelId, triggerId, anchorName);
   const isMounted = useIsMounted();
 
   // @note Impure: opens the menu, or moves focus into it, from the arrows.

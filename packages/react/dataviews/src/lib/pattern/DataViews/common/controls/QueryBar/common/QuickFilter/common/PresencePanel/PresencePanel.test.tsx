@@ -40,7 +40,7 @@ function Host({
   readonly named: boolean;
   readonly onCommit: () => void;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "owner"),
     [],

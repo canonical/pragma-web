@@ -15,10 +15,9 @@ import type { UseDestinationProps, UseDestinationResult } from "./types.js";
  * @note Impure: subscribes to the provider's state, its open view and its
  * location while mounted.
  */
-export default function useDestination({
-  provider,
-  readDestination,
-}: UseDestinationProps): UseDestinationResult {
+export default function useDestination(
+  ...[provider, readDestination]: UseDestinationProps
+): UseDestinationResult {
   const { spellQuery, location, view } = readProviderHost(provider);
   const { state } = provider;
   // The destination moves with the query, with the saved view open beside

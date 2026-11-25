@@ -52,7 +52,8 @@ const Provider = Object.assign(
     children,
   }: DataViewsProps<TFields, TRow>): ReactElement {
     const value = useProviderState(
-      messages === undefined ? { provider } : { provider, messages },
+      provider,
+      messages === undefined ? {} : { messages },
     );
     return (
       <Context value={value}>

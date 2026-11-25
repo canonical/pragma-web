@@ -32,8 +32,8 @@ const readLatest = <TRow extends object>(
 export default function useFacets<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({ provider }: UseFacetsProps<TFields, TRow>): UseFacetsResult {
-  const answered = useAnsweredFacets({ provider });
+>(...[provider]: UseFacetsProps<TFields, TRow>): UseFacetsResult {
+  const answered = useAnsweredFacets(provider);
   const latest = useDataViewsValue(provider.state, { select: readLatest });
   return useMemo(() => ({ answered, latest }), [answered, latest]);
 }

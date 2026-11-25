@@ -17,7 +17,7 @@ const mount = () => {
   const fixture = createMachineProvider();
   const stop = fixture.provider.observe();
   const hook = renderHook(() =>
-    useAnswerCountStandIn({ provider: fixture.provider as never }),
+    useAnswerCountStandIn(fixture.provider as never),
   );
   return { ...fixture, hook, stop };
 };
@@ -105,7 +105,7 @@ describe("useAnswerCountStandIn", () => {
       result: { ...settled.result, status: "ready", counts: null },
     });
     const uncounted = renderHook(() =>
-      useAnswerCountStandIn({ provider: { state } as never }),
+      useAnswerCountStandIn({ state } as never),
     );
     expect(uncounted.result.current).toEqual({ kind: "unknown" });
   });

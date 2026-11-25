@@ -26,7 +26,7 @@ export default function MenuList({
   label,
   labelledBy,
 }: MenuListProps): React.ReactElement {
-  const menu = useMenuNavigation({ items, wrap: true, onHide: hide });
+  const menu = useMenuNavigation(items, hide, { wrap: true });
   const entries = assertInvariant(
     menu.annotatedRoot.items,
     "the hook's root carries the items",

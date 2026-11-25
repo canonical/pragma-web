@@ -11,12 +11,11 @@ import type {
  * root's region in it would go silent. With no region, as while the sheet
  * is closed, it speaks through the root's announcer.
  *
- * @param props - The root's announcer.
  * @returns The ref the sheet's region takes, and the redirected announcer.
  */
-export default function useSheetAnnouncer({
-  announce,
-}: UseSheetAnnouncerProps): UseSheetAnnouncerResult {
+export default function useSheetAnnouncer(
+  ...[announce]: UseSheetAnnouncerProps
+): UseSheetAnnouncerResult {
   const regionRef = useRef<AnnouncerHandle>(null);
   const redirected = useCallback<UseSheetAnnouncerResult["announce"]>(
     (message, topic) => {

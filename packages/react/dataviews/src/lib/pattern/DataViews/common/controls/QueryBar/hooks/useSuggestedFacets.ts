@@ -24,13 +24,11 @@ const isSameFacets = (
  * read only while a field's values are suggested, so a result landing
  * re-renders the bar only then.
  *
- * @param props - The provider, and the field whose values are suggested.
  * @returns The facets, or none.
  */
-export default function useSuggestedFacets({
-  provider,
-  field,
-}: UseSuggestedFacetsProps): UseSuggestedFacetsResult {
+export default function useSuggestedFacets(
+  ...[provider, field]: UseSuggestedFacetsProps
+): UseSuggestedFacetsResult {
   const read = useMemo(
     () =>
       field === null

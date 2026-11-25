@@ -10,6 +10,7 @@ import { createRestHandlers } from "../../../../../../storybook/machines/api/ind
 import { SERVER_BACKED_FACETS } from "../../../../../../storybook/machines/constants.js";
 import createMachineSource from "../../../../../../storybook/machines/createMachineSource.js";
 import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
+import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
 import readPaginationSummary from "../../../../../../storybook/machines/readPaginationSummary.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../../../../storybook/machines/sources/index.js";
@@ -17,7 +18,6 @@ import type {
   Machine,
   MachineProviderConfig,
 } from "../../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import { DataViews } from "../../../index.js";

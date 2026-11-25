@@ -32,9 +32,7 @@ const mount = (columns: readonly ColumnToSize[]) => {
   });
   const interaction = createGridInteraction(layout);
   const ids = columns.map((column) => column.id);
-  const hook = renderHook(() =>
-    useTableGeometry({ layout, interaction, columnIds: ids }),
-  );
+  const hook = renderHook(() => useTableGeometry(layout, interaction, ids));
   return { layout, interaction, hook };
 };
 

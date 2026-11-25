@@ -63,7 +63,7 @@ function Bar({
   readonly onRefused: () => void;
   readonly onCommitted: () => void;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   return (
     <>
       {filters.map(([field, arrangement]) => (

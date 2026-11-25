@@ -50,15 +50,12 @@ const isFocusHere = (root: HTMLElement): boolean => {
  * own arrival on the chip's first part; when the Entry moves to another
  * part, it takes focus back.
  *
- * @param props - The provider, whose transitions end the session, and the
- *   bar's root.
  * @returns The session and its dispatch.
  * @note Impure: subscribes to the provider's transitions, and moves focus.
  */
-export default function useQueryBarSession({
-  provider,
-  rootRef,
-}: UseQueryBarSessionProps): UseQueryBarSessionResult {
+export default function useQueryBarSession(
+  ...[provider, rootRef]: UseQueryBarSessionProps
+): UseQueryBarSessionResult {
   const [session, dispatch] = useReducer(reduceSession, IDLE);
   const draftRef = useRef(session.draft);
   draftRef.current = session.draft;

@@ -7,7 +7,7 @@ import useMoreFiltersPin from "./useMoreFiltersPin.js";
 /** More filters, drawn as the filters draw it, listing its pinned fields. */
 const MoreFilters = ({ marks = "name", shown = ["name", "status"] }) => {
   const { pinned, detailsRef, handleSummaryClick, handleToggle } =
-    useMoreFiltersPin({ marks, listShownFields: () => shown });
+    useMoreFiltersPin(marks, () => shown);
   return (
     <details
       ref={detailsRef}

@@ -81,11 +81,9 @@ const observeResize = (
  * Two tables on one provider read one presentation, so they share the
  * arrangement while resolving their own widths against their own container.
  */
-export default function useTableGeometry({
-  layout,
-  interaction,
-  columnIds,
-}: UseTableGeometryProps): UseTableGeometryResult {
+export default function useTableGeometry(
+  ...[layout, interaction, columnIds]: UseTableGeometryProps
+): UseTableGeometryResult {
   const [container, setContainer] = useState<number | null>(null);
   const [reserved, setReserved] = useState(0);
   const interactionState = useDataViewsValue(interaction.state);

@@ -13,14 +13,11 @@ const STATUS = {
 /** The hook mounted in a root that observes a faceted manual provider. */
 const mountAnswered = () => {
   const fixture = createFacetedManual();
-  const hook = renderHook(
-    () => useAnsweredFacets({ provider: fixture.provider }),
-    {
-      wrapper: ({ children }) => (
-        <DataViews provider={fixture.provider}>{children}</DataViews>
-      ),
-    },
-  );
+  const hook = renderHook(() => useAnsweredFacets(fixture.provider), {
+    wrapper: ({ children }) => (
+      <DataViews provider={fixture.provider}>{children}</DataViews>
+    ),
+  });
   return { ...fixture, hook };
 };
 

@@ -56,14 +56,16 @@ type SortRefusal = {
 export default function useHeaderSort<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-  columns,
-  slice,
-  window: queryWindow,
-  messages,
-  announce,
-}: UseHeaderSortProps<TFields, TRow>): UseHeaderSortResult {
+>(
+  ...[
+    provider,
+    columns,
+    slice,
+    queryWindow,
+    messages,
+    announce,
+  ]: UseHeaderSortProps<TFields, TRow>
+): UseHeaderSortResult {
   const declared = provider.capabilities.sort;
   // The last activation the source refused, until the next one is accepted.
   const [refusal, setRefusal] = useState<SortRefusal | null>(null);

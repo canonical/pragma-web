@@ -63,7 +63,7 @@ export default function SavedViews({
   const { listing, current, modified, command } = state;
   const pending = command?.status === "pending";
   const { select, retry, recordOpener, restoreFocus, recordFocus, recordBlur } =
-    usePanelFocus({ pending });
+    usePanelFocus(pending);
   const baseId = useId();
   const saveAsDialog = useRef<HTMLDialogElement>(null);
   const renameDialog = useRef<HTMLDialogElement>(null);

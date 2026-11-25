@@ -48,13 +48,12 @@ export default function QueryChip({
     isRemoveLink,
     isRemoveInert,
     rootRef,
-  } = useQueryChip({
+  } = useQueryChip(children, {
+    disabled,
     ref,
-    children,
     id,
     label,
     criticality,
-    disabled,
     onRemove,
     removeHref,
     removeLabel,

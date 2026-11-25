@@ -38,7 +38,7 @@ const mount = ({ query, alter, provider: given }: MountConfig = {}) => {
   const announceOutcome = vi.fn();
   const onAdded = vi.fn();
   function Harness(): ReactElement {
-    const group = useQueryGroup({ provider: provider as never });
+    const group = useQueryGroup(provider as never);
     const root = useDataViewsRoot("QueryBar");
     // The sheet's context, whose announcer is its own region.
     return (
@@ -387,7 +387,7 @@ describe("AddFilterWalk", () => {
   it("listens for no close request outside a dialog", () => {
     const { provider } = createMachineProvider();
     function Harness(): ReactElement {
-      const group = useQueryGroup({ provider: provider as never });
+      const group = useQueryGroup(provider as never);
       return (
         <AddFilterWalk
           group={group}

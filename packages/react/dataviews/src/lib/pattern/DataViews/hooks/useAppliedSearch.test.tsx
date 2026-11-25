@@ -10,7 +10,7 @@ import useAppliedSearch from "./useAppliedSearch.js";
 
 /** A root over the machine provider, and a hook reading its search through it. */
 const mount = () =>
-  renderInRoot("Search", (provider) => useAppliedSearch({ provider }));
+  renderInRoot("Search", (provider) => useAppliedSearch(provider));
 
 describe("useAppliedSearch", () => {
   it("returns the applied search, empty for none", () => {
