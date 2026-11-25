@@ -31,24 +31,24 @@ const meta = {
 export default meta;
 
 /**
- * Default footer with a secondary and an affirmative action.
+ * Default footer with the affirmative action first.
  */
 export const Default: StoryFn = () => (
   <Component>
-    <Button importance="secondary">First action</Button>
     <Button importance="primary" anticipation="constructive">
-      Second action
+      First action
     </Button>
+    <Button importance="secondary">Second action</Button>
   </Component>
 );
 Default.parameters = {
   docs: {
     source: {
       code: `<Modal.Footer>
-  <Button importance="secondary">First action</Button>
   <Button importance="primary" anticipation="constructive">
-    Second action
+    First action
   </Button>
+  <Button importance="secondary">Second action</Button>
 </Modal.Footer>`,
     },
   },
