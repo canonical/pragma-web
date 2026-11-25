@@ -1,9 +1,10 @@
 import * as React from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type {
   BaseInputProps,
   BaseWrapperProps,
   Condition,
+  Middleware,
   WrappedComponentProps,
   WrapperProps,
 } from "../types.js";
@@ -14,6 +15,14 @@ type WrappedComponentPropsInternal<ComponentProps extends BaseInputProps> =
   Omit<WrappedComponentProps<ComponentProps>, "Component"> & {
     condition?: Condition;
   };
+
+/** Whether two middleware lists hold the same middleware in the same order. */
+const isSameMiddleware = <ComponentProps>(
+  current: Middleware<ComponentProps>[],
+  next: Middleware<ComponentProps>[],
+): boolean =>
+  current.length === next.length &&
+  current.every((hoc, index) => hoc === next.at(index));
 
 const withWrapper = <
   ComponentProps extends BaseInputProps,
@@ -33,20 +42,28 @@ const withWrapper = <
     WrapperComponent = Wrapper,
     ...props
   }: WrappedComponentPropsInternal<ComponentProps>): React.ReactElement {
-    // We apply the middleware to the component in reverse orderso
-    // so that the first middleware in the array is the first to be applied to the component
+    // An inline `middleware={[...]}` array is new on every render. Keep the
+    // previous list while it holds the same middleware, so the composed
+    // component keeps its identity and the input does not remount (which
+    // would drop its state and repeat any request a middleware makes).
+    const [appliedMiddleware, setAppliedMiddleware] = useState(middleware);
+    if (!isSameMiddleware(appliedMiddleware, middleware)) {
+      setAppliedMiddleware(middleware);
+    }
 
+    // We apply the middleware to the component in reverse order
+    // so that the first middleware in the array is the first to be applied to the component
     const ExtendedComponent = useMemo(
       () =>
         // The middleware happens between the Wrapper and the Component,
         // hence the return type of P
-        [...middleware]
+        [...appliedMiddleware]
           .reverse()
           .reduce<React.ComponentType<ComponentProps>>(
             (AccumulatedComponent, hoc) => hoc(AccumulatedComponent),
             MemoizedComponent,
           ),
-      [middleware],
+      [appliedMiddleware],
     );
 
     // Type casting to avoid hard to read overloads.

@@ -24,12 +24,29 @@ type Middleware<ComponentProps> = (
 Middleware is applied at the `Field` level through the `middleware` prop, which takes an array:
 
 ```tsx
+// Create the middleware once, outside the component that renders the field.
+const countryOptions = addRESTOptions("/api/countries", {
+  // HTTP method (default: "GET")
+  method: "GET",
+
+  // Custom headers for the request
+  headers: { Accept: "application/json" },
+
+  // Transform the API response into the { value, label } format
+  // that select/combobox/choices expect
+  transformData: (data) =>
+    data.countries.map((c) => ({
+      value: c.code,
+      label: c.name,
+    })),
+});
+
 <Field
   name="country"
   inputType="select"
   label="Country"
   options={[]}
-  middleware={[myMiddleware, anotherMiddleware]}
+  middleware={[countryOptions]}
 />
 ```
 
@@ -95,7 +112,7 @@ import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
 />
 ```
 
-The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The request is aborted when the field unmounts. A different URL is a new middleware, so create it with `useMemo` (or outside the component) keyed on the URL: the field then remounts and fetches again.
+The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The request is aborted when the field unmounts. Create the middleware once, outside the component or with `useMemo` keyed on the URL: a new middleware remounts the field and fetches again, so one created on every render refetches on every render. A different URL is a new middleware, so the field remounts and fetches the new options.
 
 ### addRESTValidation
 
@@ -104,35 +121,36 @@ Validates the field value against an API endpoint with debouncing. Useful for ch
 ```tsx
 import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
 
+// Create the middleware once, outside the component that renders the field.
+const usernameValidation = addRESTValidation("/api/check-username", {
+  // HTTP method (default: "POST")
+  method: "POST",
+
+  // Minimum input length before validation triggers (default: 3)
+  minLength: 3,
+
+  // Debounce wait in milliseconds (default: 300)
+  debounceWait: 300,
+
+  // Format the request body (default: { value })
+  bodyFormatter: (value) => ({ username: value }),
+
+  // Extract the error message from a failed response
+  errorExtractor: async (response) => {
+    const data = await response.json();
+    return data.message;
+  },
+});
+
 <Field
   name="username"
   inputType="text"
   label="Username"
-  middleware={[
-    addRESTValidation("/api/check-username", {
-      // HTTP method (default: "POST")
-      method: "POST",
-
-      // Minimum input length before validation triggers (default: 3)
-      minLength: 3,
-
-      // Debounce wait in milliseconds (default: 300)
-      debounceWait: 300,
-
-      // Format the request body (default: { value })
-      bodyFormatter: (value) => ({ username: value }),
-
-      // Extract the error message from a failed response
-      errorExtractor: async (response) => {
-        const data = await response.json();
-        return data.message;
-      },
-    }),
-  ]}
+  middleware={[usernameValidation]}
 />
 ```
 
-The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, it calls `clearErrors`. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
+The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, or the value becomes shorter than the minimum, it clears the error it set, leaving errors from the field's rules in place. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
 
 ## Writing custom middleware
 
@@ -327,22 +345,22 @@ function withDebouncedValidation(url: string, wait = 300) {
   ) =>
     function DebouncedComponent(props: Props) {
       const { name } = props;
-      const { setError, clearErrors } = useFormContext();
+      const { setError, clearErrors, getFieldState } = useFormContext();
       const value: unknown = useWatch({ name });
 
       useEffect(() => {
         if (typeof value !== "string" || value.length < 3) return;
+        const requestUrl = `${url}?value=${encodeURIComponent(value)}`;
         const controller = new AbortController();
         const timer = setTimeout(async () => {
           try {
-            const response = await fetch(`${url}?value=${value}`, {
-              signal: controller.signal,
-            });
+            const response = await fetch(requestUrl, { signal: controller.signal });
             if (controller.signal.aborted) return;
-            if (response.ok) {
+            if (!response.ok) {
+              setError(name, { type: "remote", message: "Validation failed" });
+            } else if (getFieldState(name).error?.type === "remote") {
+              // Clear only the error this middleware set.
               clearErrors(name);
-            } else {
-              setError(name, { type: "manual", message: "Validation failed" });
             }
           } catch {
             // Aborted, or the request failed: it says nothing about the value.
@@ -352,7 +370,7 @@ function withDebouncedValidation(url: string, wait = 300) {
           clearTimeout(timer);
           controller.abort();
         };
-      }, [value, name, setError, clearErrors]);
+      }, [value, name, setError, clearErrors, getFieldState]);
 
       return createElement(WrappedComponent, props);
     };

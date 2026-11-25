@@ -89,11 +89,12 @@ export const Default: Story = {
   },
 };
 
-// Story for addRESTOptions middleware
+/** The select gets its options from an endpoint. */
 export const RESTOptions: Story = {
   args: {
     name: "optionsField",
     inputType: "select",
+    label: "Fruit",
     options: [],
     middleware: [fruitOptions],
   },
@@ -143,14 +144,15 @@ export const RESTOptionsFailure: Story = {
   },
 };
 
-// Story for addRESTValidation middleware
+/** The text field is checked by an endpoint once the user stops typing. */
 export const RESTValidation: Story = {
   args: {
     name: "validationField",
     inputType: "text",
+    label: "Username",
     description:
       "If the value entered equals the string `invalid`, the back-end validation should fail.",
-    middleware: [middleware.addRESTValidation("/api/validate")],
+    middleware: [usernameValidation],
   },
   parameters: {
     msw: {

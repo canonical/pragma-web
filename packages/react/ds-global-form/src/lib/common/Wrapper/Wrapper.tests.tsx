@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { TextField as Text } from "../../component/TextField/index.js";
@@ -72,6 +73,43 @@ describe("withWrapper", () => {
     expect(order.filter((v) => v === "A").length).toBe(
       order.filter((v) => v === "B").length,
     );
+  });
+
+  it("keeps the input mounted when an inline middleware list is re-created", () => {
+    let mounts = 0;
+    const countMounts: Middleware<BaseInputProps> = (Component) => {
+      const Wrapped = (props: BaseInputProps) => {
+        useEffect(() => {
+          mounts += 1;
+        }, []);
+        return <Component {...props} />;
+      };
+      return Wrapped;
+    };
+    const { rerender } = renderWithForm(
+      <Text name="test" middleware={[countMounts]} />,
+    );
+    const mountsAfterRender = mounts;
+    rerender(<Text name="test" middleware={[countMounts]} />);
+    expect(mounts).toBe(mountsAfterRender);
+  });
+
+  it("applies new middleware when the list changes", () => {
+    const tag =
+      (label: string): Middleware<BaseInputProps> =>
+      (Component) => {
+        const Wrapped = (props: BaseInputProps) => (
+          <Component {...props} className={label} />
+        );
+        return Wrapped;
+      };
+    const { container, rerender } = renderWithForm(
+      <Text name="test" middleware={[tag("first")]} />,
+    );
+    expect(container.querySelector(".first")).toBeInTheDocument();
+    rerender(<Text name="test" middleware={[tag("second")]} />);
+    expect(container.querySelector(".first")).not.toBeInTheDocument();
+    expect(container.querySelector(".second")).toBeInTheDocument();
   });
 
   it("supports conditional display — shown when condition is true", () => {

@@ -1,6 +1,6 @@
-import { act, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { SelectField } from "../../component/SelectField/index.js";
@@ -243,6 +243,24 @@ describe("addRESTFieldOptions", () => {
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
+    it("ignores a stale success after the new URL fails", async () => {
+      const { rerender } = renderSelect(addRESTFieldOptions("/api/a"));
+      rerender(
+        <SelectField
+          name="fruit"
+          label="Fruit"
+          options={[]}
+          middleware={[addRESTFieldOptions("/api/b")]}
+        />,
+      );
+      await respondWith(1, {}, 500);
+      await respondWith(0, fruits);
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Failed to fetch options",
+      );
+      expect(screen.queryAllByRole("option")).toHaveLength(0);
+    });
+
     it("clears its own error once a new URL succeeds", async () => {
       const { rerender } = renderSelect(addRESTFieldOptions("/api/a"));
       await respondWith(0, {}, 500);
@@ -260,6 +278,38 @@ describe("addRESTFieldOptions", () => {
       await waitFor(() => {
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe("re-rendering", () => {
+    const fruitOptions = addRESTFieldOptions("/api/fruits");
+
+    /** A form that re-renders whenever its errors change, as many forms do. */
+    const ErrorAwareForm = () => {
+      const methods = useForm();
+      const errorCount = Object.keys(methods.formState.errors).length;
+      return (
+        <FormProvider {...methods}>
+          <output>{errorCount}</output>
+          <SelectField
+            name="fruit"
+            label="Fruit"
+            options={[]}
+            middleware={[fruitOptions]}
+          />
+        </FormProvider>
+      );
+    };
+
+    it("does not refetch when a failure re-renders the form", async () => {
+      render(<ErrorAwareForm />);
+      await respondWith(0, {}, 500);
+      await act(async () => {});
+      expect(screen.getByRole("status")).toHaveTextContent("1");
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Failed to fetch options",
+      );
     });
   });
 });
