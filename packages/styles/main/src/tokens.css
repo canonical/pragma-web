@@ -87,6 +87,8 @@
 @import url("@canonical/design-tokens/dist/modifiers.criticality.css");
 @import url("@canonical/design-tokens/dist/modifiers.emphasis.css");
 @import url("@canonical/design-tokens/dist/modifiers.importance.css");
+@import url("@canonical/design-tokens/dist/modifiers.spacing.css");
+@import url("@canonical/design-tokens/dist/modifiers.lifecycle.css");
 /* TEMP shims (remove once generated upstream):
    - states: writes the explicit per-state colour tokens into the modifier
      channel (the generated modifiers only expose root), so hover/active/
