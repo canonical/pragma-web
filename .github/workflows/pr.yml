@@ -128,7 +128,7 @@ jobs:
         # release's package signing depends on this one.
       - name: Check the sigstore patch still applies
         run: |
-          grep -qF '"sigstore@4.1.0": "patches/sigstore@4.1.0.patch"' bun.lock
+          grep -qF '"sigstore@5.0.1": "patches/sigstore@5.0.1.patch"' bun.lock
 
       - name: Check workspace sibling version ranges
         run: bun run check:ranges
