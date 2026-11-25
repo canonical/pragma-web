@@ -17,6 +17,9 @@ interface ValidationOptions {
   debounceWait?: number;
 }
 
+/** The error type the middleware sets, so it only ever clears its own error. */
+const REST_VALIDATION_ERROR_TYPE = "restValidation";
+
 /** The message shown when the endpoint rejects a value without a readable one. */
 const DEFAULT_ERROR_MESSAGE = "Validation failed";
 
@@ -31,7 +34,8 @@ type ValidationMiddleware = <Props extends BaseInputProps>(
  *
  * Each change cancels the pending timer and aborts the request in flight, so
  * only the answer for the latest value can set or clear the error. Unmounting
- * the field does the same.
+ * the field does the same. It only clears the error it set, so an error from
+ * the field's own rules or another middleware stays in place.
  *
  * @param url - The endpoint validating the value.
  * @param options - Request, debounce and error options.
@@ -87,12 +91,18 @@ function addRESTFieldValidation(
   ) => {
     function WithRESTValidation(props: Props) {
       const { name } = props;
-      const { setError, clearErrors } = useFormContext();
+      const { setError, clearErrors, getFieldState } = useFormContext();
       const value: unknown = useWatch({ name });
 
       useEffect(() => {
+        /** Clears the field's error when this middleware set it. */
+        const clearOwnError = () => {
+          if (getFieldState(name).error?.type === REST_VALIDATION_ERROR_TYPE) {
+            clearErrors(name);
+          }
+        };
         if (typeof value !== "string" || value.length < minLength) {
-          clearErrors(name);
+          clearOwnError();
           return;
         }
         const controller = new AbortController();
@@ -101,9 +111,9 @@ function addRESTFieldValidation(
             .then((message) => {
               if (controller.signal.aborted) return;
               if (message === null) {
-                clearErrors(name);
+                clearOwnError();
               } else {
-                setError(name, { type: "manual", message });
+                setError(name, { type: REST_VALIDATION_ERROR_TYPE, message });
               }
             })
             // A request that fails to complete says nothing about the value,
@@ -114,7 +124,7 @@ function addRESTFieldValidation(
           clearTimeout(timer);
           controller.abort();
         };
-      }, [value, name, setError, clearErrors]);
+      }, [value, name, setError, clearErrors, getFieldState]);
 
       return createElement(WrappedComponent, props);
     }

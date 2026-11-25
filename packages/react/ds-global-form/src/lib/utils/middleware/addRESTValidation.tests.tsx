@@ -1,4 +1,6 @@
 import { act, fireEvent, screen } from "@testing-library/react";
+import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { TextField } from "../../component/TextField/index.js";
@@ -52,6 +54,25 @@ const typeValue = (value: string) =>
   act(() => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value } });
   });
+
+/** Sets an error on a field when it mounts, as a form rule would. */
+const ErrorSetter = ({ name, message }: { name: string; message: string }) => {
+  const { setError } = useFormContext();
+  useEffect(() => {
+    setError(name, { type: "required", message });
+  }, [name, message, setError]);
+  return null;
+};
+
+const renderTextWithError = (
+  middleware: ReturnType<typeof addRESTFieldValidation>,
+) =>
+  renderWithForm(
+    <>
+      <TextField name="username" label="Username" middleware={[middleware]} />
+      <ErrorSetter name="username" message="Pick a username" />
+    </>,
+  );
 
 const renderText = (
   middleware: ReturnType<typeof addRESTFieldValidation>,
@@ -196,6 +217,21 @@ describe("addRESTFieldValidation", () => {
       await respondWith(0, 400);
       await typeValue("a");
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("leaves an error it did not set in place when the value is accepted", async () => {
+      renderTextWithError(addRESTFieldValidation("/api/validate"));
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 200);
+      expect(screen.getByRole("alert")).toHaveTextContent("Pick a username");
+    });
+
+    it("leaves an error it did not set in place when the value is too short", async () => {
+      renderTextWithError(addRESTFieldValidation("/api/validate"));
+      await typeValue("al");
+      await advanceTime(300);
+      expect(screen.getByRole("alert")).toHaveTextContent("Pick a username");
     });
 
     it("leaves the error unchanged when the request fails to complete", async () => {
