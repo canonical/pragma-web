@@ -141,7 +141,7 @@ const SettingsMenu = ({
   onChange,
   onReset,
   listDestinations,
-}: SettingsMenuProps): ReactElement | null => {
+}: SettingsMenuProps): ReactElement => {
   const messages = useContext(MessagesContext);
   // Read only before scripts run: after, every item acts in place.
   const destinations = hydrated ? null : listDestinations();
@@ -161,11 +161,9 @@ const SettingsMenu = ({
     },
     [actions],
   );
-  // No location before scripts run: no link leads anywhere, so nothing is
-  // offered.
-  if (!hydrated && destinations === null) {
-    return null;
-  }
+  // No location before scripts run: no link leads anywhere, so the button
+  // is drawn disabled, keeping its name and its place.
+  const disabled = !hydrated && destinations === null;
   return (
     <LabelsContext value={labels}>
       <MenuTrigger
@@ -173,6 +171,7 @@ const SettingsMenu = ({
         importance="tertiary"
         className={componentCssClassName}
         aria-label={messages.tableSettings}
+        disabled={disabled}
         items={items}
         onSelect={choose}
       />

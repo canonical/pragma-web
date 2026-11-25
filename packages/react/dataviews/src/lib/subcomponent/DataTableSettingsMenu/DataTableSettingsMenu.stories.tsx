@@ -114,6 +114,27 @@ export const Default: Story = {
 };
 
 /**
+ * Without a location: no change leads anywhere before scripts run, so the
+ * button is drawn disabled and hidden until scripting can drive it. Here
+ * scripts run, so it shows, enabled, and opens the menu.
+ */
+export const WithoutALocation: Story = {
+  parameters: showConsumerCode({
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    declarations: columnsCode,
+    render: renderCode,
+  }),
+  render: (args) => <Collection {...pickStoryWords(args)} />,
+  play: async ({ canvas }) => {
+    const trigger = await canvas.findByRole("button", {
+      name: "Table settings",
+    });
+    await expect(trigger).toBeVisible();
+    await expect(trigger).toBeEnabled();
+  },
+};
+
+/**
  * Hide a column: choosing Hide Owner takes the column out of every table on
  * the provider, says so politely, and returns focus to the settings button.
  * Nothing is asked of the source: the rows are the same rows.

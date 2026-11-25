@@ -435,6 +435,19 @@
     --focus-outline-offset: calc(-1 * var(--focus-outline-width, 2px));
   }
 
+  /* With no location there is no link, so only scripts can drive the
+     button: drawn disabled until they run, it shows once scripting is
+     enabled, and a page whose script never runs offers no dead button. */
+  .ds.data-table-settings-cell .ds.data-table-settings-menu:disabled {
+    display: none;
+  }
+
+  @media (scripting: enabled) {
+    .ds.data-table-settings-cell .ds.data-table-settings-menu:disabled {
+      display: inline-flex;
+    }
+  }
+
   /* One cell for the whole table, muted; the two failures in the error
      colour. */
   .ds.data-table-status-row {
