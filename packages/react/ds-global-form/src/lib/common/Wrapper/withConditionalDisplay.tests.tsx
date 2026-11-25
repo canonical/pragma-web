@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { TextField } from "../../component/TextField/index.js";
 import { Form } from "../../pattern/Form/index.js";
-import type { Condition } from "../types.js";
+import type { BaseInputProps, Condition, Middleware } from "../types.js";
 
 // TextField is built with withWrapper, which applies withConditionalDisplay,
 // so the HOC is exercised through a real field.
@@ -119,11 +119,25 @@ describe("withConditionalDisplay", () => {
   });
 
   it("does not pass the condition on to the field", () => {
+    const receivedProps: object[] = [];
+    const recordProps: Middleware<BaseInputProps> = (Component) => {
+      const Recorded = (props: BaseInputProps) => {
+        receivedProps.push(props);
+        return <Component {...props} />;
+      };
+      return Recorded;
+    };
     renderWithForm(
-      <TextField name="company" label="Company" condition={() => true} />,
+      <TextField
+        name="company"
+        label="Company"
+        condition={() => true}
+        middleware={[recordProps]}
+      />,
     );
-    expect(
-      screen.getByRole("textbox", { name: "Company" }),
-    ).not.toHaveAttribute("condition");
+    expect(receivedProps.length).toBeGreaterThan(0);
+    for (const props of receivedProps) {
+      expect(props).not.toHaveProperty("condition");
+    }
   });
 });

@@ -306,7 +306,7 @@ Fields can be shown or hidden based on other field values using the `condition` 
 
 <Canvas of={Stories.ConditionalField} />
 
-The `condition` prop takes a predicate that receives every form value. The field renders only while the predicate returns `true`, and it runs again whenever a value changes. A hidden field is not rendered, so it is not submitted.
+The `condition` prop takes a predicate that receives every form value. The field renders only while the predicate returns `true`, and it runs again whenever a value changes. A hidden field is not rendered, and unless `unregisterOnUnmount` is `false` its value is dropped, so it is not submitted.
 
 ## Form layout
 

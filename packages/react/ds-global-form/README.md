@@ -264,7 +264,7 @@ Fields can conditionally render based on other field values:
 />
 ```
 
-`condition` receives every form value and runs again whenever one changes. The field renders only while it returns `true`; a hidden field is not rendered, so it is not submitted.
+`condition` receives every form value and runs again whenever one changes. The field renders only while it returns `true`; a hidden field is not rendered, and unless `unregisterOnUnmount` is `false` its value is dropped, so it is not submitted.
 
 ## Storybook
 

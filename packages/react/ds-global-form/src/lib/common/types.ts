@@ -110,11 +110,13 @@ export type Middleware<ComponentProps> = (
  */
 export type Condition = (values: FieldValues) => boolean;
 
+/** The `condition` prop every built-in field accepts. */
 export type ConditionalDisplayProps = {
   /**
    * Renders the field only while this returns `true`. It receives every form
-   * value and runs again whenever one changes. A hidden field is not rendered
-   * and not submitted.
+   * value and runs again whenever one changes. A hidden field is not rendered,
+   * and unless `unregisterOnUnmount` is `false` its value is dropped, so it is
+   * not submitted.
    */
   condition?: Condition;
 };

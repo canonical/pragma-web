@@ -5,7 +5,8 @@ import type { ConditionalDisplayProps } from "../types.js";
 /**
  * Adds the `condition` prop to a field component. The field renders only while
  * `condition(values)` returns `true`, re-evaluated whenever a form value
- * changes. A hidden field is not rendered, so it is not submitted. Without a
+ * changes. A hidden field is not rendered, and unless `unregisterOnUnmount`
+ * is `false` its value is dropped, so it is not submitted. Without a
  * `condition` the field always renders.
  */
 const withConditionalDisplay = <Props extends object>(
