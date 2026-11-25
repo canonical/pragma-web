@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import type {
   BaseInputProps,
   BaseWrapperProps,
-  Condition,
   WrappedComponentProps,
   WrapperProps,
 } from "../types.js";
@@ -17,9 +16,7 @@ import DefaultWrapper from "./Wrapper.js";
 import withConditionalDisplay from "./withConditionalDisplay.js";
 
 type WrappedComponentPropsInternal<ComponentProps extends BaseInputProps> =
-  Omit<WrappedComponentProps<ComponentProps>, "Component"> & {
-    condition?: Condition;
-  };
+  Omit<WrappedComponentProps<ComponentProps>, "Component" | "condition">;
 
 const withWrapper = <
   ComponentProps extends BaseInputProps,

@@ -24,6 +24,7 @@ export type {
   BaseInputProps,
   BaseWrapperProps,
   Condition,
+  ConditionalDisplayProps,
   InputProps,
   Middleware,
   WrappedComponentProps,

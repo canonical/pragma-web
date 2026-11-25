@@ -218,14 +218,8 @@ export const ConditionalDisplay: Story = {
         inputType: "text",
         label: "Company",
         isOptional: true,
-        condition: [
-          ["email"],
-          (values: unknown[]) => {
-            const value = values[0] as string;
-            if (!value) return false;
-            return value.endsWith("@gmail.com");
-          },
-        ],
+        condition: ({ email }) =>
+          typeof email === "string" && email.endsWith("@gmail.com"),
       }),
       [],
     );

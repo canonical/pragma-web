@@ -140,7 +140,7 @@ const conditionalCheckbox = (
     inputType="checkbox"
     name="enabled"
     label="Enabled"
-    condition={[["title"], ([title]) => Boolean(title)]}
+    condition={({ title }) => Boolean(title)}
     middleware={[]}
   />
 );

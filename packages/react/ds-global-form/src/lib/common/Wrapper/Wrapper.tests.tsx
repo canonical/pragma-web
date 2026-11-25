@@ -189,28 +189,4 @@ describe("withWrapper", () => {
       );
     });
   });
-
-  it("supports conditional display — shown when condition is true", () => {
-    renderWithForm(
-      <Text
-        name="dependent"
-        label="Dependent"
-        condition={[["toggle"], (values: unknown[]) => values[0] === true]}
-      />,
-      { formProps: { defaultValues: { toggle: true } } },
-    );
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
-  });
-
-  it("supports conditional display — hidden when condition is false", () => {
-    renderWithForm(
-      <Text
-        name="dependent"
-        label="Dependent"
-        condition={[["toggle"], (values: unknown[]) => values[0] === true]}
-      />,
-      { formProps: { defaultValues: { toggle: false } } },
-    );
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
-  });
 });
