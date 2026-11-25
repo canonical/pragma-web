@@ -3,14 +3,19 @@
  * given and through the announcer it is given, never resolving its own,
  * and takes its root's native props.
  */
+import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { createStandInViewStore } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  installPopoverStandIn,
+  openMenuFrom,
 } from "../../../../../../../testing/index.js";
+
 import type { DataTableColumn } from "./common/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 
@@ -180,6 +185,97 @@ describe("ScopedDataTable", () => {
     expect(
       screen.getByRole("checkbox", { name: "Select machine m-1 (fr)" }),
     ).toBeInTheDocument();
+  });
+
+  it.fails("keeps a header's menu while a linked view is listed, saying why first", async () => {
+    onTestFinished(installPopoverStandIn());
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        settings={<Menu />}
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const menu = await openMenuFrom(
+      screen.getByRole("button", { name: "Column options for Status" }),
+    );
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
+    expect(items.at(0)).toHaveTextContent(
+      "Columns can change once the linked view has loaded.",
+    );
+    for (const item of items) {
+      expect(item).toHaveClass("disabled");
+    }
+  });
+
+  it.fails("draws no resize handle while a linked view is listed, keeping its place", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    expect(screen.queryByRole("separator", { name: "Name" })).toBeNull();
+    // The handle's place stays, so the label does not move as it returns.
+    expect(
+      screen
+        .getByRole("columnheader", { name: /Name/ })
+        .querySelector(".handle-slot"),
+    ).not.toBeNull();
+  });
+
+  it.fails("keeps holding a header's menu once the linked view's listing fails", async () => {
+    onTestFinished(installPopoverStandIn());
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({
+        list: () => Promise.reject(new Error("offline")),
+      }),
+    });
+    onTestFinished(provider.observe());
+    await vi.waitFor(() =>
+      expect(provider.views?.state.get().listing.status).toBe("failed"),
+    );
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        settings={<Menu />}
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const menu = await openMenuFrom(
+      screen.getByRole("button", { name: "Column options for Status" }),
+    );
+    expect(menu.querySelector('[role="menuitem"]')).toHaveTextContent(
+      "Columns can change once the linked view has loaded.",
+    );
   });
 
   it("takes the native props of its root, merging the class name, style and ref", () => {
