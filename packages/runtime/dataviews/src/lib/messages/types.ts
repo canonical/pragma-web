@@ -63,8 +63,7 @@ export type RecordNoun = {
  * root's `messages` replaces any part of it. A message of two or more
  * facts takes them as one named object, as does every message added since
  * the query bar's quick filters; an older message of one fact takes it as
- * is. Keys are noun phrases, exempt from the verb rule for functions
- * (canonical/pragma-core#127).
+ * is.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -511,7 +510,7 @@ export type DataViewsMessages = {
   readonly renameView: string;
   readonly deleteView: string;
   /** Ask the store for the views, or the arrangement, again. */
-  readonly retryViews: string;
+  readonly refreshViews: string;
   /** The form naming a new view. */
   readonly saveAsForm: string;
   readonly submitSaveAs: string;
@@ -530,7 +529,7 @@ export type DataViewsMessages = {
   /** How many stored views cannot be read. */
   readonly viewsUnreadable: (count: number) => string;
   /** The arrangement is not being saved, and why. */
-  readonly arrangementUnsaved: (reason: string) => string;
+  readonly presentationUnsaved: (reason: string) => string;
   /** A name the collection refused, and why. */
   readonly viewNameRefused: (reason: string) => string;
   /** A command in flight. */
@@ -565,11 +564,11 @@ export type DataViewsMessages = {
 
   // The action bar.
   /** The action bar's name. */
-  readonly selectionActions: string;
+  readonly actionBar: string;
   /** How many rows are selected, across pages. */
   readonly rowsSelected: (count: number) => string;
   /** The button clearing the selection, by how many rows it clears. */
-  readonly deselectRows: (count: number) => string;
+  readonly clearSelection: (count: number) => string;
 
   // The facet charts.
   /** The source answered a result, but counted nothing for the field drawn. */
