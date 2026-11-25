@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Chip } from "../Chip/index.js";
 import Component from "./Card.js";
 
@@ -16,7 +16,7 @@ describe("Card component", () => {
         <Component.Header>Title</Component.Header>
         <Component.Content>Body</Component.Content>
         <Component.Footer>
-          <Chip value="tag" />
+          <Chip value="tag" onClick={vi.fn()} />
         </Component.Footer>
       </Component>,
     );

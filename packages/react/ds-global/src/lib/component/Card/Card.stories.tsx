@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 import * as decorators from "../../../storybook/decorators.js";
 import { Chip } from "../Chip/index.js";
 import Component from "./Card.js";
@@ -62,8 +63,8 @@ export const WithImage: StoryFn<CardProps> = (props) => (
  * pad themselves; the card frame applies no general padding and the image
  * bleeds edge to edge. The header is not a separate visual section: no divider
  * is drawn under it and it merges with the content below, so title and body
- * read as one region. The footer holds tags and labels, not actions — CTAs
- * belong in `Card.Content`.
+ * read as one region. The footer holds tags and labels, not CTAs or links —
+ * those belong in `Card.Content`. The chips filter a catalog by attribute.
  *
  * `Card.Header`, `Card.Image` and `Card.Footer` are **not core API** — the base
  * card is just `Card.Content`; these are optional sections layered on top.
@@ -84,9 +85,9 @@ export const HeaderContentFooter: StoryFn<CardProps> = (props) => (
       </p>
     </Component.Content>
     <Component.Footer>
-      <Chip value="LTS" />
-      <Chip value="Desktop" />
-      <Chip value="Server" />
+      <Chip value="LTS" onClick={fn()} />
+      <Chip value="Desktop" onClick={fn()} />
+      <Chip value="Server" onClick={fn()} />
     </Component.Footer>
   </Component>
 );
