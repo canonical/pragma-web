@@ -21,6 +21,18 @@ describe("TextInput (presentational)", () => {
     );
   });
 
+  it("puts the id on the input, so a label's htmlFor names it", () => {
+    render(
+      <>
+        <label htmlFor="username">Username</label>
+        <TextInput id="username" name="username" />
+      </>,
+    );
+    const input = screen.getByRole("textbox", { name: "Username" });
+    expect(input).toHaveAttribute("id", "username");
+    expect(input.parentElement).not.toHaveAttribute("id");
+  });
+
   it("renders prefix and suffix", () => {
     render(<TextInput name="domain" prefix="https://" suffix=".com" />);
     expect(screen.getByText("https://")).toBeInTheDocument();

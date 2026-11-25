@@ -30,12 +30,13 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ): ReactElement {
     return (
       <div
-        id={id}
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
         {prefix && <span className="prefix">{prefix}</span>}
-        <input type={inputType} ref={ref} {...nativeProps} />
+        {/* `id` goes on the <input> (not the wrapper) so a label's `htmlFor`
+            targets a labelable element. */}
+        <input id={id} type={inputType} ref={ref} {...nativeProps} />
         {suffix && <span className="suffix">{suffix}</span>}
       </div>
     );
