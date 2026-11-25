@@ -187,7 +187,7 @@ describe("ScopedDataTable", () => {
     ).toBeInTheDocument();
   });
 
-  it.fails("keeps a header's menu while a linked view is listed, saying why first", async () => {
+  it("keeps a header's menu while a linked view is listed, saying why first", async () => {
     onTestFinished(installPopoverStandIn());
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -218,7 +218,7 @@ describe("ScopedDataTable", () => {
     }
   });
 
-  it.fails("draws no resize handle while a linked view is listed, keeping its place", () => {
+  it("draws no resize handle while a linked view is listed, keeping its place", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
       location: createMemoryLocation({ href: "/machines?view=v1" }),
@@ -245,7 +245,7 @@ describe("ScopedDataTable", () => {
     ).not.toBeNull();
   });
 
-  it.fails("keeps holding a header's menu once the linked view's listing fails", async () => {
+  it("keeps holding a header's menu once the linked view's listing fails", async () => {
     onTestFinished(installPopoverStandIn());
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],

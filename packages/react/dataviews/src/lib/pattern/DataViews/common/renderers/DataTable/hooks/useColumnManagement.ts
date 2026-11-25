@@ -1,9 +1,11 @@
 import type {
   JsonValue,
   PresentationPatch,
+  ReadonlyChannel,
   RowRecord,
   SchemaFieldDefinition,
   ViewPresentation,
+  ViewsState,
 } from "@canonical/dataviews-core";
 import {
   type ColumnCommandConfig,
@@ -71,6 +73,20 @@ const applyPatch = (
     ),
   );
 
+/** What a provider keeping no views is read as: nothing listed, ever. */
+const NO_VIEWS: ReadonlyChannel<ViewsState | null> = {
+  get: () => null,
+  subscribe: () => () => {},
+};
+
+/** Whether the views are being listed, or failed to be and wait on a refresh. */
+const isListingView = (views: ViewsState | null): boolean =>
+  views?.listing.status === "pending" || views?.listing.status === "failed";
+
+/** The view shown, by its id, or null. */
+const readShownView = (views: ViewsState | null): string | null =>
+  views?.current?.id ?? null;
+
 /** The ids an arrangement shows, in its order. */
 const listShownIds = (
   columns: readonly DataTableColumn[],
@@ -122,6 +138,14 @@ export default function useColumnManagement<
     () => new Map(settings.map(({ column, offers }) => [column.id, offers])),
     [settings],
   );
+  // The view a link opened, while the views are listed and it is not shown:
+  // a change now would land beneath that view's arrangement. Only a table
+  // keeping its arrangement in the provider's presentation waits.
+  const opened = useDataViewsValue(readProviderHost(provider).view);
+  const viewsState = provider.views?.state ?? NO_VIEWS;
+  const listing = useDataViewsValue(viewsState, { select: isListingView });
+  const shownView = useDataViewsValue(viewsState, { select: readShownView });
+  const waiting = shared && listing && opened !== null && shownView !== opened;
   const readOffers = useCallback(
     (columnId: string): ColumnSetting["offers"] => {
       const offers = offersById.get(columnId);
@@ -301,6 +325,7 @@ export default function useColumnManagement<
     settings,
     readOffers,
     resettable,
+    reason: waiting ? messages.columnsPending : null,
     changeColumn,
     resetColumns,
     listDestinations,

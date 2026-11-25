@@ -26,6 +26,7 @@ const Menu = (): null => null;
 const MENU: SettingsMenuProps = {
   settings: [],
   resettable: false,
+  reason: null,
   hydrated: true,
   onChange: () => {},
   onReset: () => {},

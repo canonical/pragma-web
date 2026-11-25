@@ -276,7 +276,7 @@
       padding-inline-end: 0;
     }
 
-    /* Holds the handle's width until hydration; dropped without scripting. */
+    /* Holds the handle's width while no handle is drawn; dropped without scripting. */
     & > .handle-slot {
       display: none;
     }

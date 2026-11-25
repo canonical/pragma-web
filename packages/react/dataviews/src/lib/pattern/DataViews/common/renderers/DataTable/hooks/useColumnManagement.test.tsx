@@ -10,7 +10,11 @@ import {
   createMemoryPresentation,
   resolveMessages,
 } from "@canonical/dataviews-core/bindings";
-import { act, renderHook } from "@testing-library/react";
+import {
+  buildStoredView,
+  createStandInViewStore,
+} from "@canonical/dataviews-core/testing";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
@@ -74,6 +78,143 @@ const buildHeaderRow = (
 };
 
 describe("useColumnManagement", () => {
+  it("says why no column can change while the view a link opened is listed", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement(
+        provider,
+        { table: "t", presentation: provider.presentation, shared: true },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        vi.fn(),
+      ),
+    );
+    expect(provider.views?.state.get().listing.status).toBe("pending");
+    expect(hook.result.current).toHaveProperty(
+      "reason",
+      "Columns can change once the linked view has loaded.",
+    );
+  });
+
+  it("holds through a failed listing until a refresh shows the view", async () => {
+    const view = buildStoredView({ query: "" });
+    let listed = false;
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({
+        list: async () => {
+          if (!listed) {
+            throw new Error("offline");
+          }
+          return { views: [view], unreadable: [] };
+        },
+        get: async () => ({ status: "found", view }),
+      }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement(
+        provider,
+        { table: "t", presentation: provider.presentation, shared: true },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        vi.fn(),
+      ),
+    );
+    await waitFor(() =>
+      expect(provider.views?.state.get().listing.status).toBe("failed"),
+    );
+    expect(hook.result.current).toHaveProperty(
+      "reason",
+      "Columns can change once the linked view has loaded.",
+    );
+    listed = true;
+    act(() => provider.views?.refresh());
+    await waitFor(() =>
+      expect(hook.result.current).toHaveProperty("reason", null),
+    );
+  });
+
+  it("never waits for a table keeping its arrangement to itself", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement(
+        provider,
+        {
+          table: "table",
+          presentation: createMemoryPresentation(),
+          shared: false,
+        },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        vi.fn(),
+      ),
+    );
+    expect(hook.result.current).toHaveProperty("reason", null);
+  });
+
+  it("says nothing once the view a link opened is shown", async () => {
+    const view = buildStoredView({ query: "" });
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({
+        list: async () => ({ views: [view], unreadable: [] }),
+        get: async () => ({ status: "found", view }),
+      }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement(
+        provider,
+        { table: "t", presentation: provider.presentation, shared: true },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        vi.fn(),
+      ),
+    );
+    await waitFor(() =>
+      expect(provider.views?.state.get().current?.id).toBe("v1"),
+    );
+    expect(hook.result.current).toHaveProperty("reason", null);
+  });
+
+  it("says nothing while views are listed and the location opens none", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement(
+        provider,
+        { table: "t", presentation: provider.presentation, shared: true },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        vi.fn(),
+      ),
+    );
+    expect(provider.views?.state.get().listing.status).toBe("pending");
+    expect(hook.result.current).toHaveProperty("reason", null);
+  });
+
   it("changes nothing and announces nothing for a column it does not declare or a change that does nothing", () => {
     const { provider, hook, announce } = mountHook();
     act(() => {

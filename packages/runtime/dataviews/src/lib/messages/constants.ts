@@ -189,6 +189,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   moveNamedColumnRight: (name) => `Move ${name} right`,
   columnAlwaysShown: (name) => `${name} is always shown`,
   resetTableSettings: "Reset table settings",
+  columnsPending: "Columns can change once the linked view has loaded.",
 
   columnHidden: (name) => `${name} hidden`,
   columnShown: ({ name, position, total }) =>

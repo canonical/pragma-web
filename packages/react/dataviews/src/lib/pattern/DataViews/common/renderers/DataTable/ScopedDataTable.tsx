@@ -222,6 +222,7 @@ export default function ScopedDataTable<
     settings: columnSettings,
     readOffers,
     resettable,
+    reason,
     changeColumn,
     resetColumns,
     listDestinations,
@@ -239,6 +240,7 @@ export default function ScopedDataTable<
     () => ({
       settings: columnSettings,
       resettable,
+      reason,
       hydrated,
       onChange: changeColumn,
       onReset: resetColumns,
@@ -247,6 +249,7 @@ export default function ScopedDataTable<
     [
       columnSettings,
       resettable,
+      reason,
       hydrated,
       changeColumn,
       resetColumns,
@@ -275,7 +278,8 @@ export default function ScopedDataTable<
   const renderer = status === null ? showStatus : statusRenderer;
 
   // A header's controls: a sort the source honours, and a resize handle on
-  // every column but the last, whose edge is the table's own.
+  // every column but the last, whose edge is the table's own; the header
+  // keeps the handle's place while column changes wait.
   const isSortable = (column: DataTableColumn): boolean =>
     column.sortable === true && orderable.has(readFieldName(column));
   const isResizable = (column: DataTableColumn, position: number): boolean =>
@@ -390,6 +394,7 @@ export default function ScopedDataTable<
                   onPlace={headerSort.placeColumn}
                   onRemoveFromSort={headerSort.removeFromSort}
                   offers={readOffers(column.id)}
+                  columnsReason={reason}
                   onChangeColumn={changeColumn}
                   interaction={interaction}
                   resizable={isResizable(column, position)}

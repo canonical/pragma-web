@@ -75,11 +75,12 @@ const listItems = (
   {
     settings,
     resettable,
+    reason,
     onChange,
     onReset,
   }: Pick<
     SettingsMenuProps,
-    "settings" | "resettable" | "onChange" | "onReset"
+    "settings" | "resettable" | "reason" | "onChange" | "onReset"
   >,
   messages: DataViewsMessages,
   destinations: SettingsDestinations | null,
@@ -100,7 +101,15 @@ const listItems = (
       ? { ...item, Component: ItemLabel }
       : { ...item, url, Component: ItemLabel };
   };
-  const items = settings.flatMap((setting): DropdownMenuEntry[] => {
+  // Waiting, every item is disabled, and the reason stands first.
+  const waiting = reason !== null;
+  const items: DropdownMenuEntry[] = waiting
+    ? [
+        buildItem("reason", reason, true, undefined),
+        { type: "separator", key: "separator:reason" },
+      ]
+    : [];
+  const changes = settings.flatMap((setting): DropdownMenuEntry[] => {
     const { id, hideable } = setting.column;
     const entries = listChanges(setting).map((change) => {
       const key = spellDestinationKey(id, change);
@@ -112,21 +121,22 @@ const listItems = (
       // and choosing it says so again, so a reader who cannot see a greyed
       // item still hears why.
       return hideable === false && change === "hide"
-        ? buildItem(key, describeAlwaysShown(setting, messages), false, url)
+        ? buildItem(key, describeAlwaysShown(setting, messages), waiting, url)
         : buildItem(
             key,
             describeChange(setting, change, messages),
-            !setting.offers[change],
+            waiting || !setting.offers[change],
             url,
           );
     });
     return [...entries, { type: "separator", key: `separator:${id}` }];
   });
   items.push(
+    ...changes,
     buildItem(
       "reset",
       messages.resetTableSettings,
-      !resettable,
+      waiting || !resettable,
       destinations?.reset,
     ),
   );
@@ -137,6 +147,7 @@ const listItems = (
 const SettingsMenu = ({
   settings,
   resettable,
+  reason,
   hydrated,
   onChange,
   onReset,
@@ -148,11 +159,11 @@ const SettingsMenu = ({
   const { items, actions, labels } = useMemo(
     () =>
       listItems(
-        { settings, resettable, onChange, onReset },
+        { settings, resettable, reason, onChange, onReset },
         messages,
         destinations,
       ),
-    [settings, resettable, onChange, onReset, messages, destinations],
+    [settings, resettable, reason, onChange, onReset, messages, destinations],
   );
   const choose = useCallback(
     (item: DropdownMenuItem) => {
