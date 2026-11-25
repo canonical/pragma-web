@@ -78,7 +78,7 @@ Inside a root, the connected twins (`DataViews.DataTable`, `DataViews.Pagination
 
 ## Messages that state a fact
 
-A message that states a fact is a function of that fact. The part calls it with the fact, and the message words it:
+A message that states facts is a function of one argument. The part calls it with the facts, and the message words them:
 
 | Message | Called with | English |
 | --- | --- | --- |
@@ -86,10 +86,10 @@ A message that states a fact is a function of that fact. The part calls it with 
 | `statusFailed` | the reason | `These rows could not be loaded: the inventory is offline.` |
 | `deselectRows` | a count | `Deselect 3 rows` |
 | `pageCount` | a count | `of 1 page`, `of 12 pages` |
-| `rowsShown` | the first row, how many show, and the total as a `Count` | `Showing 1–5 out of 12 rows` |
-| `sortPrecedence` | a direction, a position and a total | `ascending, 2nd of 3` |
-| `columnMoved` | a column's name, its position and how many show | `Host moved to position 2 of 4` |
-| `filterRefused` | every reason, and whether the earlier restriction still applies | `Must be a number. The previous restriction still applies.` |
+| `rowsShown` | `{ first, shown, total }`, the total a `Count` | `Showing 1–5 out of 12 rows` |
+| `sortPrecedence` | `{ direction, position, total }` | `ascending, 2nd of 3` |
+| `columnMoved` | `{ name, position, total }` | `Host moved to position 2 of 4` |
+| `filterRefused` | `{ reasons, retained }` | `Must be a number. The previous restriction still applies.` |
 | `viewPending` | the saved-view command | `Saving…` |
 | `appliedCount` | `{ count, condition }`: how many values a quick filter applies, and the condition they share | `2 applied`, `none of 2` |
 | `searchOptions` | `{ label }`: the field's label | `Search pool options` |
@@ -100,8 +100,8 @@ The quick filters also word, as text, `allOptions` (`All`), `optionsNone` (`No o
 
 How the facts are passed:
 
-- A new message takes one object of named facts, such as `{ count, condition }` or `{ label }`, so a translation reads each fact by its name, and a fact added later breaks no locale.
-- Older messages take one fact per argument, the subject first, until they move to named facts. For a saved-view message, the command comes first. A `Count` they take, as `rowsShown` and `facetCount` do, is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
+- One argument at most. Two or more facts are passed as one object naming each, so a translation cannot take them in the wrong order, and so are a newer message's, such as `{ label }`. An older message of one fact takes it as is.
+- A `Count` is `exact`, `at-least`, or (for `rowsShown`) `unknown`.
 - A list of like facts as an array, such as the reasons `sortRefused` takes.
 - A name is placed where the message puts it and never altered. It may stand for a column heading drawn as an element, not as text.
 

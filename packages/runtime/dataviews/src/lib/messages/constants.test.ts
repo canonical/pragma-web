@@ -48,9 +48,12 @@ describe("constants", () => {
 
     it("words a followed link's refused clauses as a list of them", () => {
       expect(m.linkRefusals).toBe("Not applied from the link");
-      expect(m.clauseRefused("Status", '"melted" is not an option.')).toBe(
-        'Status: "melted" is not an option.',
-      );
+      expect(
+        m.clauseRefused({
+          name: "Status",
+          reason: '"melted" is not an option.',
+        }),
+      ).toBe('Status: "melted" is not an option.');
       expect(m.grouping).toBe("Grouping");
     });
 
@@ -65,9 +68,15 @@ describe("constants", () => {
     });
 
     it("words a sort's precedence with an English ordinal once there are two terms", () => {
-      expect(m.sortPrecedence("asc", 1, 1)).toBe("ascending");
-      expect(m.sortPrecedence("desc", 2, 3)).toBe("descending, 2nd of 3");
-      expect(m.sortPrecedence("asc", 11, 12)).toBe("ascending, 11th of 12");
+      expect(
+        m.sortPrecedence({ direction: "asc", position: 1, total: 1 }),
+      ).toBe("ascending");
+      expect(
+        m.sortPrecedence({ direction: "desc", position: 2, total: 3 }),
+      ).toBe("descending, 2nd of 3");
+      expect(
+        m.sortPrecedence({ direction: "asc", position: 11, total: 12 }),
+      ).toBe("ascending, 11th of 12");
     });
 
     it("words a refused sort with one full stop, whatever the source ended with", () => {
@@ -85,11 +94,11 @@ describe("constants", () => {
     });
 
     it("drops a blank reason rather than writing a bare stop", () => {
-      expect(m.filterRefused(["", "not a number"], false)).toBe(
-        "Not a number.",
-      );
-      expect(m.filterRefused([" "], false)).toBe("");
-      const retained = m.filterRefused(["  "], true);
+      expect(
+        m.filterRefused({ reasons: ["", "not a number"], retained: false }),
+      ).toBe("Not a number.");
+      expect(m.filterRefused({ reasons: [" "], retained: false })).toBe("");
+      const retained = m.filterRefused({ reasons: ["  "], retained: true });
       expect(retained.startsWith(" ")).toBe(false);
       expect(retained).not.toContain("..");
     });
@@ -124,7 +133,9 @@ describe("constants", () => {
         "Sorted by the source's own order: Name, ascending; Cores, descending.",
       );
       expect(m.sortAbsent).toBe("Not sorted: the source documents no order.");
-      expect(m.sortTerm("name", "desc")).toBe("name, descending");
+      expect(m.sortTerm({ name: "name", direction: "desc" })).toBe(
+        "name, descending",
+      );
     });
 
     it("words a column's header menu and the table's settings menu", () => {
@@ -155,10 +166,10 @@ describe("constants", () => {
 
     it("words what a change to the columns announces, with its place", () => {
       expect(m.columnHidden("Status")).toBe("Status hidden");
-      expect(m.columnShown("Status", 2, 3)).toBe(
+      expect(m.columnShown({ name: "Status", position: 2, total: 3 })).toBe(
         "Status shown, position 2 of 3",
       );
-      expect(m.columnMoved("Status", 1, 3)).toBe(
+      expect(m.columnMoved({ name: "Status", position: 1, total: 3 })).toBe(
         "Status moved to position 1 of 3",
       );
       expect(m.tableSettingsReset).toBe("Table settings reset");
@@ -203,11 +214,16 @@ describe("constants", () => {
       expect(m.matchNoneInstead).toBe("Match none of these instead");
       expect(m.facetCount(buildExact(12))).toBe("12");
       expect(m.facetCount(buildAtLeast(1000))).toBe("at least 1,000");
-      expect(m.filterAlso("Tags is any of", ["ex-gpu", "ex-nvme"])).toBe(
-        "Tags is any of ex-gpu, ex-nvme",
-      );
+      expect(
+        m.filterAlso({
+          phrase: "Tags is any of",
+          values: ["ex-gpu", "ex-nvme"],
+        }),
+      ).toBe("Tags is any of ex-gpu, ex-nvme");
       expect(m.filterMatch("Name")).toBe("How Name matches");
-      expect(m.filterInUnit("Memory from", "MiB")).toBe("Memory from (MiB)");
+      expect(m.filterInUnit({ name: "Memory from", symbol: "MiB" })).toBe(
+        "Memory from (MiB)",
+      );
       expect([m.presenceAny, m.presenceSet, m.presenceUnset]).toEqual([
         "Any",
         "Has a value",
@@ -224,13 +240,18 @@ describe("constants", () => {
       );
       // One message for every refusal, whether the schema gave one reason or
       // the source gave several.
-      expect(m.filterRefused(["not a number"], false)).toBe("Not a number.");
-      expect(m.filterRefused(["not a number"], true)).toBe(
-        "Not a number. The previous restriction still applies.",
-      );
-      expect(m.filterRefused(["no bounds here", "no ranges"], false)).toBe(
-        "No bounds here. No ranges.",
-      );
+      expect(
+        m.filterRefused({ reasons: ["not a number"], retained: false }),
+      ).toBe("Not a number.");
+      expect(
+        m.filterRefused({ reasons: ["not a number"], retained: true }),
+      ).toBe("Not a number. The previous restriction still applies.");
+      expect(
+        m.filterRefused({
+          reasons: ["no bounds here", "no ranges"],
+          retained: false,
+        }),
+      ).toBe("No bounds here. No ranges.");
     });
 
     it("words the search", () => {
@@ -264,26 +285,36 @@ describe("constants", () => {
     });
 
     it("words which rows are on screen, as exactly as the source counts them", () => {
-      expect(m.rowsShown(6, 5, buildExact(12))).toBe(
+      expect(m.rowsShown({ first: 6, shown: 5, total: buildExact(12) })).toBe(
         "Showing 6–10 out of 12 rows",
       );
-      expect(m.rowsShown(1, 0, buildExact(0))).toBe("Showing 0 out of 0 rows");
-      expect(m.rowsShown(6, 1, buildExact(6))).toBe("Showing row 6 out of 6");
-      expect(m.rowsShown(1, 5, buildAtLeast(100))).toBe(
-        "Showing 1–5 out of at least 100 rows",
+      expect(m.rowsShown({ first: 1, shown: 0, total: buildExact(0) })).toBe(
+        "Showing 0 out of 0 rows",
       );
-      expect(m.rowsShown(3, 1, buildAtLeast(3))).toBe(
+      expect(m.rowsShown({ first: 6, shown: 1, total: buildExact(6) })).toBe(
+        "Showing row 6 out of 6",
+      );
+      expect(
+        m.rowsShown({ first: 1, shown: 5, total: buildAtLeast(100) }),
+      ).toBe("Showing 1–5 out of at least 100 rows");
+      expect(m.rowsShown({ first: 3, shown: 1, total: buildAtLeast(3) })).toBe(
         "Showing row 3 out of at least 3",
       );
-      expect(m.rowsShown(1, 5, unknown)).toBe("Showing 1–5 rows");
-      expect(m.rowsShown(2, 1, unknown)).toBe("Showing row 2");
-      expect(m.rowsShown(1, 1, buildExact(1))).toBe("Showing row 1 out of 1");
+      expect(m.rowsShown({ first: 1, shown: 5, total: unknown })).toBe(
+        "Showing 1–5 rows",
+      );
+      expect(m.rowsShown({ first: 2, shown: 1, total: unknown })).toBe(
+        "Showing row 2",
+      );
+      expect(m.rowsShown({ first: 1, shown: 1, total: buildExact(1) })).toBe(
+        "Showing row 1 out of 1",
+      );
     });
 
     it("groups a large count as English writes it", () => {
-      expect(m.rowsShown(1, 50, buildExact(12345))).toBe(
-        "Showing 1–50 out of 12,345 rows",
-      );
+      expect(
+        m.rowsShown({ first: 1, shown: 50, total: buildExact(12345) }),
+      ).toBe("Showing 1–50 out of 12,345 rows");
       expect(m.pageCount(1200)).toBe("of 1,200 pages");
       expect(m.rowsSelected(2500)).toBe("2,500 selected");
       expect(m.columnWidth(1024)).toBe("1,024 pixels");
@@ -355,14 +386,14 @@ describe("constants", () => {
       expect(m.arrangementUnsaved("quota.")).toBe(
         "The arrangement is not being saved: quota.",
       );
-      expect(m.viewFailed("save", "quota exceeded.")).toBe(
+      expect(m.viewFailed({ command: "save", reason: "quota exceeded." })).toBe(
         "Not saved: quota exceeded.",
       );
-      expect(m.viewUnreadable("open", "bad json.")).toBe(
+      expect(m.viewUnreadable({ command: "open", reason: "bad json." })).toBe(
         "Not opened: the stored view cannot be read (bad json).",
       );
       expect(m.viewNameRefused("name is taken.")).toBe("Name is taken.");
-      expect(m.viewRefused("Busy", ["no field."])).toBe(
+      expect(m.viewRefused({ name: "Busy", reasons: ["no field."] })).toBe(
         'Not opened: "Busy" asks for what this collection cannot show — no field. The query is unchanged.',
       );
     });
@@ -383,25 +414,29 @@ describe("constants", () => {
       expect(m.viewSaved("Busy")).toBe('Saved "Busy".');
       expect(m.viewRenamed("Idle")).toBe('Renamed to "Idle".');
       expect(m.viewDeleted).toBe("View deleted.");
-      expect(m.viewRefused("Busy", ["no field", "no operator"])).toBe(
+      expect(
+        m.viewRefused({ name: "Busy", reasons: ["no field", "no operator"] }),
+      ).toBe(
         'Not opened: "Busy" asks for what this collection cannot show — no field; no operator. The query is unchanged.',
       );
-      expect(m.viewConflicted("save", "Busy")).toBe(
+      expect(m.viewConflicted({ command: "save", name: "Busy" })).toBe(
         'Not saved: "Busy" was changed elsewhere. Overwrite it, save your changes as a new view, or discard them.',
       );
-      expect(m.viewConflicted("save-as", "")).toBe(
+      expect(m.viewConflicted({ command: "save-as", name: "" })).toBe(
         "Not saved: a different view is stored under the same identity. Try again.",
       );
-      expect(m.viewConflicted("rename", "Busy")).toBe(
+      expect(m.viewConflicted({ command: "rename", name: "Busy" })).toBe(
         'Not renamed: "Busy" was changed elsewhere. Its latest version is open; try again.',
       );
       expect(m.viewMissing("remove")).toBe(
         "Not deleted: the view no longer exists.",
       );
-      expect(m.viewUnreadable("open", "bad json")).toBe(
+      expect(m.viewUnreadable({ command: "open", reason: "bad json" })).toBe(
         "Not opened: the stored view cannot be read (bad json).",
       );
-      expect(m.viewFailed("save", "quota")).toBe("Not saved: quota.");
+      expect(m.viewFailed({ command: "save", reason: "quota" })).toBe(
+        "Not saved: quota.",
+      );
     });
 
     it("words the facet charts, naming each drawing by its caption", () => {
@@ -415,7 +450,7 @@ describe("constants", () => {
       expect(m.barChartSummary("Machines by status")).toBe(
         "Machines by status: a bar chart of how many records hold each value",
       );
-      expect(m.rangeChartSummary("Cores", 3, 12)).toBe(
+      expect(m.rangeChartSummary({ label: "Cores", min: 3, max: 12 })).toBe(
         "Cores: a range chart from 3 to 12",
       );
       expect(m.chartTable("Cores")).toBe("Cores, as a table");
@@ -465,18 +500,34 @@ describe("constants", () => {
   });
 
   it("shows each operator as its symbol, or its words where it has none", () => {
-    expect(m.operatorShown("isAny", ["ready"])).toBe(":");
-    expect(m.operatorShown("is", ["web"])).toBe(":");
-    expect(m.operatorShown("isNone", ["ready"])).toBe("≠");
-    expect(m.operatorShown("isNot", ["web"])).toBe("≠");
-    expect(m.operatorShown("contains", ["web"])).toBe("contains");
-    expect(m.operatorShown("notContains", ["web"])).toBe("does not contain");
-    expect(m.operatorShown("startsWith", ["web"])).toBe("starts with");
-    expect(m.operatorShown("endsWith", ["web"])).toBe("ends with");
-    expect(m.operatorShown("gte", [1])).toBe("≥");
-    expect(m.operatorShown("lte", [1])).toBe("≤");
-    expect(m.operatorShown("isSet", [true])).toBe("has a value");
-    expect(m.operatorShown("isSet", [false])).toBe("has no value");
+    expect(m.operatorShown({ operator: "isAny", operands: ["ready"] })).toBe(
+      ":",
+    );
+    expect(m.operatorShown({ operator: "is", operands: ["web"] })).toBe(":");
+    expect(m.operatorShown({ operator: "isNone", operands: ["ready"] })).toBe(
+      "≠",
+    );
+    expect(m.operatorShown({ operator: "isNot", operands: ["web"] })).toBe("≠");
+    expect(m.operatorShown({ operator: "contains", operands: ["web"] })).toBe(
+      "contains",
+    );
+    expect(
+      m.operatorShown({ operator: "notContains", operands: ["web"] }),
+    ).toBe("does not contain");
+    expect(m.operatorShown({ operator: "startsWith", operands: ["web"] })).toBe(
+      "starts with",
+    );
+    expect(m.operatorShown({ operator: "endsWith", operands: ["web"] })).toBe(
+      "ends with",
+    );
+    expect(m.operatorShown({ operator: "gte", operands: [1] })).toBe("≥");
+    expect(m.operatorShown({ operator: "lte", operands: [1] })).toBe("≤");
+    expect(m.operatorShown({ operator: "isSet", operands: [true] })).toBe(
+      "has a value",
+    );
+    expect(m.operatorShown({ operator: "isSet", operands: [false] })).toBe(
+      "has no value",
+    );
     expect(Object.keys(OPERATORS_SHOWN)).toEqual(Object.keys(OPERATORS_SPOKEN));
     // An operator shown in words is shown in the words it is spoken by.
     for (const [operator, show] of Object.entries(OPERATORS_SHOWN)) {
@@ -548,12 +599,15 @@ describe("constants", () => {
     expect(m.queryBarPlaceholder).toBe("Search or filter");
     expect(m.appliedFilters).toBe("Applied filters");
     expect(m.clearFiltersAndSearch).toBe("Clear filters and search");
-    expect(m.queryCleared(buildExact(60), noun)).toBe(
+    expect(m.queryCleared({ count: buildExact(60), noun })).toBe(
       "Cleared the filters and the search. 60 machines.",
     );
     // A noun with a form of its own after a count takes it.
     expect(
-      m.recordCount(buildExact(3), { ...noun, counted: (n) => `machine×${n}` }),
+      m.recordCount({
+        count: buildExact(3),
+        noun: { ...noun, counted: (n) => `machine×${n}` },
+      }),
     ).toBe("3 machine×3");
     expect(
       m.queryClause({
@@ -595,19 +649,23 @@ describe("constants", () => {
     expect(m.clauseField).toBe("Field");
     expect(m.clauseOperator("status")).toBe("Operator for status");
     expect(m.clauseValue("status")).toBe("Value for status");
-    expect(m.recordCount(buildExact(1), noun)).toBe("1 machine");
-    expect(m.recordCount(buildAtLeast(1000), noun)).toBe(
+    expect(m.recordCount({ count: buildExact(1), noun })).toBe("1 machine");
+    expect(m.recordCount({ count: buildAtLeast(1000), noun })).toBe(
       "at least 1,000 machines",
     );
-    expect(m.clauseAdded("status is ready", buildExact(12), noun)).toBe(
-      "Added status is ready. 12 machines.",
-    );
-    expect(m.clauseChanged("status is ready", unknown, noun)).toBe(
-      "Changed to status is ready.",
-    );
-    expect(m.clauseRemoved("status is ready", buildAtLeast(2), noun)).toBe(
-      "Removed status is ready. At least 2 machines.",
-    );
+    expect(
+      m.clauseAdded({ clause: "status is ready", count: buildExact(12), noun }),
+    ).toBe("Added status is ready. 12 machines.");
+    expect(
+      m.clauseChanged({ clause: "status is ready", count: unknown, noun }),
+    ).toBe("Changed to status is ready.");
+    expect(
+      m.clauseRemoved({
+        clause: "status is ready",
+        count: buildAtLeast(2),
+        noun,
+      }),
+    ).toBe("Removed status is ready. At least 2 machines.");
     expect(m.readAsAtLeast).toBe("Read as at least");
     expect(m.readAsAtMost).toBe("Read as at most");
     expect(m.valuePicked("status is any of ready, deployed")).toBe(

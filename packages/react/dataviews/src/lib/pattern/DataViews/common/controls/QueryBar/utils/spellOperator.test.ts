@@ -19,7 +19,7 @@ describe("spellOperator", () => {
   it("reads the record it is handed and no other", () => {
     expect(
       spellOperator("isSet", [false], {
-        operatorShown: (operator, operands) => `${operator}:${operands}`,
+        operatorShown: ({ operator, operands }) => `${operator}:${operands}`,
         operatorPhrase: ({ label }) => `spoken${label ?? ""}`,
       }),
     ).toEqual({ shown: "isSet:false", spoken: "spoken" });
