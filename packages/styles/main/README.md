@@ -70,9 +70,8 @@ file with a bare package specifier into `@canonical/ds-assets`:
 @import url("@canonical/styles/fonts");
 ```
 
-Vite, Bun and Turbopack resolve that specifier from `node_modules`. webpack does not: its css-loader reads
-a `url()` as relative, asks for `./@canonical/ds-assets/fonts/ubuntu-sans/UbuntuSans[wdth,wght].woff2`, and
-`next build` stops with `Cannot find module './@canonical/ds-assets/fonts/ubuntu-sans/UbuntuSans[wdth,wght].woff2'`.
+Vite, Bun and Turbopack resolve that specifier from `node_modules`. In a webpack build, css-loader reads
+the `url()` as relative, so Next.js stops with `Can't resolve './@canonical/ds-assets/fonts/ubuntu-sans/UbuntuSans[wdth,wght].woff2'`.
 
 A `NormalModuleReplacementPlugin` in `next.config.js` strips the leading `./`, which hands the request back
 to the module resolver as the package path it is:
@@ -96,9 +95,10 @@ const nextConfig = {
 module.exports = nextConfig;
 ```
 
-The build then copies both `.woff2` files into `.next/static/media`. Turbopack — `next dev --turbopack`
-and `next build --turbopack` — resolves the bare specifier and needs neither the plugin nor a different
-import.
+The webpack build then copies both `.woff2` files into `.next/static/media`. On Next.js 15, `next build`
+uses webpack by default. On Next.js 16, Turbopack is the default for both `next dev` and `next build`; use
+`next build --webpack` (or `next dev --webpack`) if you need to keep the webpack plugin. Turbopack resolves
+the bare specifier without the plugin or a different import.
 
 ## Entry points
 
