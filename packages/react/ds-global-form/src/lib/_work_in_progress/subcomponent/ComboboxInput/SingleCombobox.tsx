@@ -1,8 +1,8 @@
 /* @canonical/generator-ds 0.9.0-experimental.9 */
 import { type UseComboboxStateChange, useCombobox } from "downshift";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import mergeRefs from "../../utils/mergeRefs.js";
-import type { Option } from "../types.js";
+import type { Option } from "../../../subcomponent/types.js";
+import mergeRefs from "../../../utils/mergeRefs.js";
 import { List, ResetButton } from "./common/index.js";
 import { VALUE_KEY } from "./constants.js";
 import type { ComboboxInputProps } from "./types.js";

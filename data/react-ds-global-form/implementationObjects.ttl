@@ -14,12 +14,12 @@ ds:implementation.react-ds-global-form.global.component.choices_field a ds:Imple
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/component/ChoicesField/ChoicesField.tsx".
 ds:implementation.react-ds-global-form.global.component.color_field a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.color_field;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/component/ColorField/ColorField.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/component/ColorField/ColorField.tsx".
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/component/ColorField/ColorField.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/component/ColorField/ColorField.tsx".
 ds:implementation.react-ds-global-form.global.component.combobox_field a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.combobox_field;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/component/ComboboxField/ComboboxField.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/component/ComboboxField/ComboboxField.tsx".
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/component/ComboboxField/ComboboxField.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/component/ComboboxField/ComboboxField.tsx".
 ds:implementation.react-ds-global-form.global.component.date_field a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.date_field;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/component/DateField/DateField.tsx";
@@ -54,8 +54,8 @@ ds:implementation.react-ds-global-form.global.component.range_field a ds:Impleme
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/component/RangeField/RangeField.tsx".
 ds:implementation.react-ds-global-form.global.component.rating_field a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.rating_field;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/component/RatingField/RatingField.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/component/RatingField/RatingField.tsx".
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/component/RatingField/RatingField.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/component/RatingField/RatingField.tsx".
 ds:implementation.react-ds-global-form.global.component.rich_choices_field a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.rich_choices_field;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/component/RichChoicesField/RichChoicesField.tsx";
@@ -97,13 +97,13 @@ ds:implementation.react-ds-global-form.global.subcomponent.checkbox_input a ds:I
     ds:importStatement "import { CheckboxInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.color_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.color_input;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/ColorInput/ColorInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/subcomponent/ColorInput/ColorInput.tsx";
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/ColorInput/ColorInput.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/ColorInput/ColorInput.tsx";
     ds:importStatement "import { ColorInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.combobox_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.combobox_input;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/ComboboxInput/ComboboxInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/subcomponent/ComboboxInput/ComboboxInput.tsx";
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/ComboboxInput/ComboboxInput.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/ComboboxInput/ComboboxInput.tsx";
     ds:importStatement "import { ComboboxInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.date_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.date_input;
@@ -160,8 +160,8 @@ ds:implementation.react-ds-global-form.global.subcomponent.range_input a ds:Impl
     ds:importStatement "import { RangeInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.rating_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.rating_input;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/RatingInput/RatingInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/subcomponent/RatingInput/RatingInput.tsx";
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/RatingInput/RatingInput.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-global-form/src/lib/_work_in_progress/subcomponent/RatingInput/RatingInput.tsx";
     ds:importStatement "import { RatingInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.select_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.select_input;

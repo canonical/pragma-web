@@ -1,4 +1,4 @@
-import type { InputProps } from "../../common/types.js";
+import type { InputProps } from "../../../common/types.js";
 import type { RatingInputProps } from "../../subcomponent/RatingInput/index.js";
 
 /**

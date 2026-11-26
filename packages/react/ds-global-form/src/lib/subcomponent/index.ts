@@ -1,15 +1,22 @@
 // ds:Subcomponent tier barrel. Presentational input parts (no react-hook-form
 // context) + the Field chrome subcomponents (Field.Label/Description/Error).
-// The field/RHF-bound versions live under `component/` (via `fields/`).
+// The field/RHF-bound versions live under `component/` (via `fields/`). The
+// work-in-progress inputs live under `_work_in_progress/` until they are ready.
 
+export type {
+  ColorInputProps,
+  HexFormat,
+} from "../_work_in_progress/subcomponent/ColorInput/index.js";
+export { ColorInput } from "../_work_in_progress/subcomponent/ColorInput/index.js";
+export type { ComboboxInputProps } from "../_work_in_progress/subcomponent/ComboboxInput/index.js";
+export { ComboboxInput } from "../_work_in_progress/subcomponent/ComboboxInput/index.js";
+export type {
+  RatingInputProps,
+  RatingScale,
+} from "../_work_in_progress/subcomponent/RatingInput/index.js";
+export { RatingInput } from "../_work_in_progress/subcomponent/RatingInput/index.js";
 export type { CheckboxInputProps } from "./CheckboxInput/index.js";
-
-// Input subcomponents
 export { CheckboxInput } from "./CheckboxInput/index.js";
-export type { ColorInputProps, HexFormat } from "./ColorInput/index.js";
-export { ColorInput } from "./ColorInput/index.js";
-export type { ComboboxInputProps } from "./ComboboxInput/index.js";
-export { ComboboxInput } from "./ComboboxInput/index.js";
 export type { DateInputProps } from "./DateInput/index.js";
 export { DateInput } from "./DateInput/index.js";
 export type { DateTimeInputProps } from "./DateTimeInput/index.js";
@@ -30,8 +37,6 @@ export type { RadioInputProps } from "./RadioInput/index.js";
 export { RadioInput } from "./RadioInput/index.js";
 export type { RangeInputProps } from "./RangeInput/index.js";
 export { RangeInput } from "./RangeInput/index.js";
-export type { RatingInputProps, RatingScale } from "./RatingInput/index.js";
-export { RatingInput } from "./RatingInput/index.js";
 export type { SelectInputProps } from "./SelectInput/index.js";
 export { SelectInput } from "./SelectInput/index.js";
 export type { SwitchInputProps } from "./SwitchInput/index.js";

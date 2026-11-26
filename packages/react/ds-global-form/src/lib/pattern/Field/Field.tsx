@@ -1,9 +1,10 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
 import type React from "react";
+import { ColorField } from "../../_work_in_progress/component/ColorField/index.js";
+import { ComboboxField } from "../../_work_in_progress/component/ComboboxField/index.js";
+import { RatingField } from "../../_work_in_progress/component/RatingField/index.js";
 import { CheckboxField } from "../../component/CheckboxField/index.js";
 import { ChoicesField } from "../../component/ChoicesField/index.js";
-import { ColorField } from "../../component/ColorField/index.js";
-import { ComboboxField } from "../../component/ComboboxField/index.js";
 import { DateField } from "../../component/DateField/index.js";
 import { DateTimeField } from "../../component/DateTimeField/index.js";
 import { FileUploadField } from "../../component/FileUploadField/index.js";
@@ -12,7 +13,6 @@ import { NumberField } from "../../component/NumberField/index.js";
 import { PasswordField } from "../../component/PasswordField/index.js";
 import { PhoneField } from "../../component/PhoneField/index.js";
 import { RangeField } from "../../component/RangeField/index.js";
-import { RatingField } from "../../component/RatingField/index.js";
 import { RichChoicesField } from "../../component/RichChoicesField/index.js";
 import { SelectField } from "../../component/SelectField/index.js";
 import { SwitchField } from "../../component/SwitchField/index.js";
