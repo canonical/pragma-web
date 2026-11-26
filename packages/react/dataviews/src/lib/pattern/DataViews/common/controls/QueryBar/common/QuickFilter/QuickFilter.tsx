@@ -6,8 +6,8 @@ import type {
 import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
 import type { ReactElement } from "react";
 import { memo, useId, useMemo, useRef } from "react";
-import { FilterButton } from "../../../../../../../_work_in_progress/FilterButton/index.js";
-import { FilterOptions } from "../../../../../../../_work_in_progress/FilterOptions/index.js";
+import { FilterButton } from "../../../../../../../component/FilterButton/index.js";
+import { FilterOptions } from "../../../../../../../component/FilterOptions/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,

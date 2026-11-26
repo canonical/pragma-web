@@ -8,7 +8,7 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import type { Ref } from "react";
-import type { FilterButtonPanelHandle } from "../../../../../../../_work_in_progress/FilterButton/index.js";
+import type { FilterButtonPanelHandle } from "../../../../../../../component/FilterButton/index.js";
 import type { PlacedConjunct, QueryGroupStandIn } from "../../types.js";
 
 /**

@@ -4,7 +4,7 @@
  */
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import type { QueryInputOption } from "../../../../../../../../../_work_in_progress/QueryInput/index.js";
+import type { QueryInputOption } from "../../../../../../../../../component/QueryInput/index.js";
 import StepListbox from "./StepListbox.js";
 
 /** The fields of a step, one held and one disabled. */

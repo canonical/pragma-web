@@ -21,7 +21,6 @@ import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
 import * as restStories from "../../docs/data-sources/Rest.stories.js";
 import * as buildARendererStories from "../../docs/guides/BuildARenderer/BuildARenderer.stories.js";
 import * as compositionStories from "../../docs/guides/Composition.stories.js";
-import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
 import * as actionBarStories from "../../lib/pattern/DataViews/common/controls/ActionBar/ActionBar.stories.js";
 import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
 import * as paginationStories from "../../lib/pattern/DataViews/common/controls/Pagination/Pagination.stories.js";
@@ -35,6 +34,7 @@ import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/
 import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
 import * as rootStories from "../../lib/pattern/DataViews/DataViews.stories.js";
+import * as barStories from "../../lib/subcomponent/PaginationBar/PaginationBar.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,

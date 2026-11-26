@@ -9,8 +9,8 @@ import {
   createMachineProvider,
   installPopoverStandIn,
 } from "../../../../../../../../../testing/index.js";
-import { QueryChips } from "../../../../../../../_work_in_progress/QueryChips/index.js";
-import { QueryInput } from "../../../../../../../_work_in_progress/QueryInput/index.js";
+import { QueryInput } from "../../../../../../../component/QueryInput/index.js";
+import { QueryChips } from "../../../../../../../group/QueryChips/index.js";
 import DataViews from "../../../../../Provider.js";
 import type { QueryBarDraft } from "../../types.js";
 import DraftChip from "./DraftChip.js";

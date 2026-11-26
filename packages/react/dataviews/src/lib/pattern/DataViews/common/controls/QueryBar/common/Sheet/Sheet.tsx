@@ -15,8 +15,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { QueryChips } from "../../../../../../../_work_in_progress/QueryChips/index.js";
 import { Announcer } from "../../../../../../../common/index.js";
+import { QueryChips } from "../../../../../../../group/QueryChips/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,

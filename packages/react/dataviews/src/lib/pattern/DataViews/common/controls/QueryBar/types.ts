@@ -13,7 +13,7 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
-import type { QueryInputOption } from "../../../../../_work_in_progress/QueryInput/index.js";
+import type { QueryInputOption } from "../../../../../component/QueryInput/index.js";
 import type { QuickFilterArrangement } from "./common/QuickFilter/index.js";
 
 /**

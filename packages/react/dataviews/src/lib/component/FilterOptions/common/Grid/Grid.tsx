@@ -15,7 +15,7 @@ const componentCssClassName = "ds filter-options-grid";
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function FilterOptionsGrid({
+export default function Grid({
   children,
   className,
   ...props
@@ -29,3 +29,5 @@ export default function FilterOptionsGrid({
     </div>
   );
 }
+
+Grid.displayName = "FilterOptions.Grid";

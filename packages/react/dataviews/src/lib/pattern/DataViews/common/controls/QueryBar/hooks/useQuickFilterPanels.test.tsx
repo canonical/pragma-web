@@ -1,7 +1,7 @@
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { installPopoverStandIn } from "../../../../../../../../testing/index.js";
-import { FilterButton } from "../../../../../../_work_in_progress/FilterButton/index.js";
+import { FilterButton } from "../../../../../../component/FilterButton/index.js";
 import useQuickFilterPanels from "./useQuickFilterPanels.js";
 
 let uninstall: () => void;

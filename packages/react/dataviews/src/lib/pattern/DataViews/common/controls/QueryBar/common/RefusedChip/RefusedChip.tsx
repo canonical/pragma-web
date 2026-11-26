@@ -1,7 +1,7 @@
 import type { QueryIssue } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { memo, type ReactElement, useMemo } from "react";
-import { QueryChip } from "../../../../../../../_work_in_progress/QueryChip/index.js";
+import { QueryChip } from "../../../../../../../component/QueryChip/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,

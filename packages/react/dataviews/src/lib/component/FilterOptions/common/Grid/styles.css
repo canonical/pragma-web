@@ -2,7 +2,7 @@
 
 @layer ds.components.global {
   /**
-   * FilterOptionsGrid styles
+   * FilterOptions.Grid styles
    *
    * Two tracks: the names, as wide as the widest, and the words. Each
    * filter spans both and takes them as its own through subgrid, so every

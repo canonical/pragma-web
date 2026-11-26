@@ -62,11 +62,11 @@ vi.mock("./common/DraftChip/index.js", async (importOriginal) => {
 
 // Every render of the bar's field: the bar renders it whenever it renders.
 vi.mock(
-  "../../../../../_work_in_progress/QueryInput/index.js",
+  "../../../../../component/QueryInput/index.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../../../../_work_in_progress/QueryInput/index.js")
+        typeof import("../../../../../component/QueryInput/index.js")
       >();
     return {
       ...actual,
@@ -80,11 +80,11 @@ vi.mock(
 
 // Every render of a quick filter's button, by its label.
 vi.mock(
-  "../../../../../_work_in_progress/FilterButton/index.js",
+  "../../../../../component/FilterButton/index.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../../../../_work_in_progress/FilterButton/index.js")
+        typeof import("../../../../../component/FilterButton/index.js")
       >();
     return {
       ...actual,

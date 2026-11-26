@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, within } from "storybook/test";
 import { withServerMarkup } from "../../../storybook/decorators/index.js";
-import { QueryChip } from "../QueryChip/index.js";
+import { QueryChip } from "../../component/QueryChip/index.js";
 import Component from "./QueryChips.js";
 
 const { Segment } = QueryChip;

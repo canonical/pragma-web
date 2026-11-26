@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import FilterOptions from "../../FilterOptions.js";
-import FilterOptionsGrid from "./FilterOptionsGrid.js";
+import Grid from "./Grid.js";
 
-describe("FilterOptionsGrid", () => {
+describe("Grid", () => {
   it("lines up its filters and takes the root's props", () => {
     render(
-      <FilterOptionsGrid className="extra" data-testid="grid">
+      <Grid className="extra" data-testid="grid">
         <FilterOptions
           label="Status"
           options={[{ value: "deployed", label: "deployed", current: true }]}
@@ -15,7 +15,7 @@ describe("FilterOptionsGrid", () => {
           label="Tags"
           options={[{ value: "ex-gpu", label: "ex-gpu", current: false }]}
         />
-      </FilterOptionsGrid>,
+      </Grid>,
     );
     const grid = screen.getByTestId("grid");
     expect(grid).toHaveClass("ds", "filter-options-grid", "extra");

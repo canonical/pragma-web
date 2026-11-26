@@ -3,7 +3,7 @@ import { useId } from "react";
 import { AssistiveText, ConditionMark } from "../../common/index.js";
 import { useIsHydrated } from "../../hooks/index.js";
 import { isPlainClick } from "../../utils/index.js";
-import { FilterOptionsGrid } from "./common/FilterOptionsGrid/index.js";
+import { Grid } from "./common/Grid/index.js";
 import type { FilterOptionsOption, FilterOptionsProps } from "./types.js";
 import "./styles.css";
 
@@ -162,4 +162,4 @@ export default function FilterOptions({
   );
 }
 
-FilterOptions.Grid = FilterOptionsGrid;
+FilterOptions.Grid = Grid;

@@ -1,6 +1,6 @@
 import type { RefCallback } from "react";
 import { useMemo, useRef } from "react";
-import type { FilterButtonPanelHandle } from "../../../../../../_work_in_progress/FilterButton/index.js";
+import type { FilterButtonPanelHandle } from "../../../../../../component/FilterButton/index.js";
 import type { UseQuickFilterPanelsResult } from "./types.js";
 
 /**

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withServerMarkup } from "../../../storybook/decorators/index.js";
 import { QueryBuilder } from "../../../storybook/QueryBuilder/index.js";
+import { QueryChips } from "../../group/QueryChips/index.js";
 import { QueryChip } from "../QueryChip/index.js";
-import { QueryChips } from "../QueryChips/index.js";
 import Component from "./QueryInput.js";
 import type { QueryInputOption, QueryInputProps } from "./types.js";
 

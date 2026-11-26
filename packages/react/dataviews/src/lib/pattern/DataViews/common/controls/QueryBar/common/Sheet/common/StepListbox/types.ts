@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import type { QueryInputOption } from "../../../../../../../../../_work_in_progress/QueryInput/index.js";
+import type { QueryInputOption } from "../../../../../../../../../component/QueryInput/index.js";
 
 /** StepListbox's own props. */
 type OwnProps = {

@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { QueryInputOption } from "../../../../../../../../../_work_in_progress/QueryInput/index.js";
+import type { QueryInputOption } from "../../../../../../../../../component/QueryInput/index.js";
 import type { StepListboxProps } from "./types.js";
 import "./styles.css";
 

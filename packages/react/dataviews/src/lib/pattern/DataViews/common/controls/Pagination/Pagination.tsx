@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { PaginationBar } from "../../../../../_work_in_progress/PaginationBar/index.js";
+import { PaginationBar } from "../../../../../subcomponent/PaginationBar/index.js";
 import { useDataViewsRoot } from "../../../hooks/index.js";
 import type { DataViewsPaginationProps } from "./types.js";
 
