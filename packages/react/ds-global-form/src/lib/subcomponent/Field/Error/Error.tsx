@@ -8,10 +8,14 @@ import "./styles.css";
 const componentCssClassName = "ds field-error";
 
 /**
- * description of the Error component
+ * The validation message of a field: the error shown when an entry is
+ * rejected. Part of the Field chrome, reached as `Field.Error`.
+ *
  * @returns {React.ReactElement} - Rendered Error
  *
- * `import { Error } from "@canonical/react-ds-global-form";`
+ * `import { Field } from "@canonical/react-ds-global-form";`
+ *
+ * @implements ds:global.subcomponent.field-error
  */
 const FieldError = ({
   id,
@@ -33,5 +37,7 @@ const FieldError = ({
     </p>
   );
 };
+
+FieldError.displayName = "Field.Error";
 
 export default FieldError;

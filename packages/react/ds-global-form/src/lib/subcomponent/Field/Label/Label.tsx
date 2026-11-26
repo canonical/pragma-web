@@ -11,10 +11,12 @@ const defaultMessages = {
 };
 
 /**
- * description of the Label component
+ * The label of a field: names the input and carries its required/optional
+ * marking. Part of the Field chrome, reached as `Field.Label`.
+ *
  * @returns {React.ReactElement} - Rendered Label
  *
- * `import { Label } from "@canonical/react-ds-global-form";`
+ * `import { Field } from "@canonical/react-ds-global-form";`
  */
 const Label = ({
   id,
@@ -53,6 +55,8 @@ const Label = ({
     </Element>
   );
 };
+
+Label.displayName = "Field.Label";
 
 /**
  * @implements ds:global.subcomponent.field-label

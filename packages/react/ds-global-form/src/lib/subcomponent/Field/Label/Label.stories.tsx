@@ -3,6 +3,8 @@
 // Needed for function-based story, safe to remove otherwise
 // import type { LabelProps } from './types.js'
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Field } from "../../../index.js";
+import { SelectInput } from "../../SelectInput/index.js";
 import Component from "./Label.js";
 
 // Needed for template-based story, safe to remove otherwise
@@ -65,4 +67,35 @@ export const SemanticLabel: Story = {
     children: "Email",
     tag: "span",
   },
+};
+
+/**
+ * The chrome can label a presentational input directly, without a form: wire
+ * `Field.Label` to the control with `htmlFor`/`id` and point the control's
+ * `aria-describedby` at `Field.Description`. The pieces carry no spacing of
+ * their own — the `Field` wrapper gets the gap between fields from
+ * `--form-field-block-gap` and the gap between label and control from
+ * `--form-field-label-gap` — so lay them out yourself.
+ */
+export const WithStandaloneInput: Story = {
+  args: {
+    name: "language",
+    children: "Language",
+  },
+  render: (args) => (
+    <div style={{ display: "grid", rowGap: "var(--form-field-label-gap)" }}>
+      <Field.Label {...args} htmlFor="standalone-language" />
+      <Field.Description id="standalone-language-description">
+        Shown in the interface.
+      </Field.Description>
+      <SelectInput
+        id="standalone-language"
+        aria-describedby="standalone-language-description"
+        options={[
+          { value: "en", label: "English" },
+          { value: "fr", label: "français" },
+        ]}
+      />
+    </div>
+  ),
 };

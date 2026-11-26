@@ -1,5 +1,5 @@
-// Field chrome subcomponents (ds:Subcomponent, parentComponent = Field). The
-// dotted public names are Field.Label / Field.Description / Field.Error; the
+// Field chrome building blocks (ds:Subcomponent, parentComponent = Field).
+// Consumers reach them as Field.Label / Field.Description / Field.Error; the
 // `Field/` folder namespaces the bare component names.
 
 export * from "./Description/index.js";

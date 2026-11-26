@@ -19,7 +19,12 @@ import { SwitchField } from "../../component/SwitchField/index.js";
 import { TextareaField } from "../../component/TextareaField/index.js";
 import { TextField } from "../../component/TextField/index.js";
 import { TimeField } from "../../component/TimeField/index.js";
-import type { FieldProps } from "./types.js";
+import {
+  Description,
+  Error as FieldError,
+  Label,
+} from "../../subcomponent/Field/index.js";
+import type { FieldComponent, FieldProps } from "./types.js";
 
 const withoutRoutingProps = <T extends { inputType: string }>(
   props: T,
@@ -46,6 +51,11 @@ const withoutRoutingProps = <T extends { inputType: string }>(
  * This router has no single native root; the selected field renders its own root.
  *
  * `import { Field } from "@canonical/react-ds-global-form";`
+ *
+ * The field chrome is attached to the pattern: `Field.Label`,
+ * `Field.Description` and `Field.Error` render the label, help text and
+ * validation message the built-in fields use, so a control driven by
+ * controlled state can carry the same chrome without a `<Form>`.
  *
  * @implements ds:global.pattern.field
  */
@@ -109,4 +119,8 @@ const Field = <P extends { name: string } = { name: string }>(
   }
 };
 
-export default Field;
+Field.Label = Label;
+Field.Description = Description;
+Field.Error = FieldError;
+
+export default Field as FieldComponent;

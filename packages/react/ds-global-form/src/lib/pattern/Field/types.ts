@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentType } from "react";
+import type { ComponentProps, ComponentType, ReactElement } from "react";
 import type { CheckboxField } from "../../component/CheckboxField/index.js";
 import type { ChoicesField } from "../../component/ChoicesField/index.js";
 import type { ColorField } from "../../component/ColorField/index.js";
@@ -18,6 +18,9 @@ import type { SwitchField } from "../../component/SwitchField/index.js";
 import type { TextareaField } from "../../component/TextareaField/index.js";
 import type { TextField } from "../../component/TextField/index.js";
 import type { TimeField } from "../../component/TimeField/index.js";
+import type { DescriptionProps } from "../../subcomponent/Field/Description/types.js";
+import type { ErrorProps } from "../../subcomponent/Field/Error/types.js";
+import type { LabelProps } from "../../subcomponent/Field/Label/types.js";
 import type { NativeInputType } from "../../subcomponent/types.js";
 
 export type {
@@ -95,3 +98,14 @@ type WithoutNativeType<T> = T extends unknown
 export type FieldProps<P extends { name: string } = { name: string }> =
   | WithoutNativeType<BuiltinFields>
   | ([ReservedCustomKeys<P>] extends [never] ? CustomVariant<P> : never);
+
+/**
+ * Field component type with attached chrome subcomponents
+ */
+export type FieldComponent = (<P extends { name: string } = { name: string }>(
+  props: FieldProps<P>,
+) => ReactElement) & {
+  Label: (props: LabelProps) => ReactElement;
+  Description: (props: DescriptionProps) => ReactElement;
+  Error: (props: ErrorProps) => ReactElement;
+};

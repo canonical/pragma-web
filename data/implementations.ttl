@@ -18,7 +18,7 @@ ds:implementation.library.react-ds-global
 ds:implementation.library.react-ds-global-form
     a ds:ImplementationLibrary;
     rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/react-ds-global-form/implementationLibrary.ttl>;
-    ds:implementationCount 41.
+    ds:implementationCount 42.
 
 ds:implementation.library.svelte-ds-global
     a ds:ImplementationLibrary;

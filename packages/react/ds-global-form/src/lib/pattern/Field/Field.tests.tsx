@@ -7,6 +7,7 @@ import {
   type FieldProps,
   Form,
   type InputProps,
+  SelectInput,
 } from "../../../index.js";
 
 type CodeProps = InputProps<{ label: string; maxCharacters: number }>;
@@ -256,5 +257,66 @@ describe("Field component", () => {
       code: "B",
       prefix: "C",
     });
+  });
+});
+
+// The chrome is attached to the pattern as static members, so a control driven
+// by controlled state can be labelled without a <Form>/FormProvider.
+describe("Field chrome (standalone)", () => {
+  it("labels a standalone input through htmlFor", () => {
+    render(
+      <>
+        <Field.Label htmlFor="language" name="language">
+          Language
+        </Field.Label>
+        <SelectInput
+          id="language"
+          options={[
+            { value: "en", label: "English" },
+            { value: "fr", label: "français" },
+          ]}
+        />
+      </>,
+    );
+
+    const input = screen.getByRole("combobox");
+    expect(screen.getByLabelText("Language")).toBe(input);
+    expect(input).toHaveAttribute("id", "language");
+    expect(screen.getByText("Language")).toHaveClass("ds", "field-label");
+  });
+
+  it("renders a description and an error without a form context", () => {
+    render(
+      <>
+        <Field.Description id="language-description">
+          Shown in the interface.
+        </Field.Description>
+        <Field.Error>Choose a language.</Field.Error>
+      </>,
+    );
+
+    expect(screen.getByText("Shown in the interface.")).toHaveClass(
+      "ds",
+      "field-description",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Choose a language.");
+  });
+
+  it("renders the chrome to static HTML", () => {
+    const html = renderToStaticMarkup(
+      <>
+        <Field.Label htmlFor="language" name="language">
+          Language
+        </Field.Label>
+        <SelectInput
+          id="language"
+          options={[{ value: "en", label: "English" }]}
+        />
+      </>,
+    );
+
+    expect(html).toContain("ds field-label");
+    expect(html).toContain('for="language"');
+    expect(html).toContain('id="language"');
   });
 });

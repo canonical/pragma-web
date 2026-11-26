@@ -1,6 +1,8 @@
 // ds:Subcomponent tier barrel. Presentational input parts (no react-hook-form
-// context) + the Field chrome subcomponents (Field.Label/Description/Error).
-// The field/RHF-bound versions live under `component/` (via `fields/`).
+// context) + the Field chrome building blocks, which the package exposes as the
+// `Field.Label`, `Field.Description` and `Field.Error` statics; they are not
+// exported from the package root on their own. The field/RHF-bound versions
+// live under `component/` (via `fields/`).
 
 export type { CheckboxInputProps } from "./CheckboxInput/index.js";
 
@@ -14,7 +16,8 @@ export type { DateInputProps } from "./DateInput/index.js";
 export { DateInput } from "./DateInput/index.js";
 export type { DateTimeInputProps } from "./DateTimeInput/index.js";
 export { DateTimeInput } from "./DateTimeInput/index.js";
-// Field chrome subcomponents (Field.Label / Field.Description / Field.Error)
+// Field chrome building blocks, exposed to consumers as Field.Label /
+// Field.Description / Field.Error
 export * from "./Field/index.js";
 export type { FileUploadInputProps } from "./FileUploadInput/index.js";
 export { FileUploadInput } from "./FileUploadInput/index.js";

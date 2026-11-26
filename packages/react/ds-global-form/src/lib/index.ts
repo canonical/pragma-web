@@ -1,14 +1,16 @@
 // Public package surface: the Field pattern
-// (Field + FieldProps + the shared/machinery types it re-exports), the Form
-// pattern, the form middleware, and the input subcomponents below. The
-// component/ tier is otherwise internal — composed by the Field pattern.
+// (Field + its chrome statics + FieldProps + the shared/machinery types it
+// re-exports), the Form pattern, the form middleware, and the input
+// subcomponents below. The component/ tier is otherwise internal — composed by
+// the Field pattern.
 export * from "./pattern/index.js";
 // The input subcomponents are exposed directly: presentational inputs with no
 // react-hook-form context, for controls that live outside a <Form> — a theme
 // or language picker in an application's chrome, a filter bar, a standalone
 // rating. Each carries the same input chrome the Field pattern composes. The
-// Field chrome subcomponents (Field.Label, Field.Description, Field.Error)
-// stay internal: they are reached through the Field pattern.
+// Field chrome (label, description, error) is exposed as the static members
+// `Field.Label`, `Field.Description` and `Field.Error`, so the same chrome can
+// label a standalone input.
 export type {
   CheckboxInputProps,
   ColorInputProps,

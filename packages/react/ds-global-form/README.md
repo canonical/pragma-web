@@ -177,7 +177,7 @@ Custom components receive the supplied props except `inputType`, `CustomComponen
 
 ### Standalone Inputs
 
-Every input the Field pattern composes is also exported on its own: `TextInput`, `SelectInput`, `CheckboxInput`, `SwitchInput`, `RadioInput`, `NumberInput`, `PasswordInput`, `RangeInput`, `RatingInput`, `DateInput`, `TimeInput`, `DateTimeInput`, `ColorInput`, `ComboboxInput`, `PhoneInput`, `FileUploadInput`, `TextareaInput` and `HiddenInput`, each with its props type. They are presentational: no `<Form>`, no react-hook-form context and no label, so a control outside a form keeps the same input chrome. Name it with `aria-label` or a `<label>` of your own.
+Every input the Field pattern composes is also exported on its own: `TextInput`, `SelectInput`, `CheckboxInput`, `SwitchInput`, `RadioInput`, `NumberInput`, `PasswordInput`, `RangeInput`, `RatingInput`, `DateInput`, `TimeInput`, `DateTimeInput`, `ColorInput`, `ComboboxInput`, `PhoneInput`, `FileUploadInput`, `TextareaInput` and `HiddenInput`, each with its props type. They are presentational: no `<Form>`, no react-hook-form context and no label, so a control outside a form keeps the same input chrome. Name it with `aria-label`, or bring the field chrome with you: the label, description and error the built-in fields render are exported as the static members `Field.Label`, `Field.Description` and `Field.Error`, and work with any input.
 
 ```tsx
 import { SelectInput } from "@canonical/react-ds-global-form";
@@ -194,6 +194,30 @@ import { SelectInput } from "@canonical/react-ds-global-form";
 ```
 
 An option's optional `lang` marks a label written in another language, so assistive technology pronounces it correctly.
+
+Use the chrome when a control needs a visible label or help text but is driven by controlled state rather than react-hook-form. Wire the label to the input with `htmlFor`/`id`, and point the input's `aria-describedby` at the description:
+
+```tsx
+import { Field, SelectInput } from "@canonical/react-ds-global-form";
+
+<Field.Label htmlFor="language" name="language">
+  Language
+</Field.Label>
+<Field.Description id="language-description">
+  Shown in the interface.
+</Field.Description>
+<SelectInput
+  id="language"
+  aria-describedby="language-description"
+  value={locale}
+  onChange={(event) => setLocale(event.target.value)}
+  options={options}
+/>
+```
+
+Show `Field.Error` instead when the value is rejected, and point `aria-errormessage` (or `aria-describedby`) at it; it carries `role="alert"`, so the message is announced when it appears.
+
+These pieces are presentational: they hold no spacing of their own. The `Field` wrapper draws the gap between fields from `--form-field-block-gap` and the gap between a label and its control from `--form-field-label-gap`; a layout built from the standalone pieces supplies those gaps itself, for example with the same tokens.
 
 ## Middleware Pattern
 

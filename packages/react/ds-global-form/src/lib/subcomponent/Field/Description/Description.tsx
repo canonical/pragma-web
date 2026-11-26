@@ -6,10 +6,12 @@ import "./styles.css";
 const componentCssClassName = "ds field-description";
 
 /**
- * description of the Description component
+ * The description of a field: supporting help text shown with the label.
+ * Part of the Field chrome, reached as `Field.Description`.
+ *
  * @returns {React.ReactElement} - Rendered Description
  *
- * `import { Description } from "@canonical/react-ds-global-form";`
+ * `import { Field } from "@canonical/react-ds-global-form";`
  */
 const Description = ({
   id,
@@ -27,6 +29,8 @@ const Description = ({
     </p>
   );
 };
+
+Description.displayName = "Field.Description";
 
 /**
  * @implements ds:global.subcomponent.field-description
