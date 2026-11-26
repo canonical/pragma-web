@@ -138,10 +138,11 @@ Switch the Storybook theme between light and dark. All modifier colors should re
 
 ### Components that only need text/icon color
 
-Simple components like tags or badges may only need the text channel:
+Components that draw text on the page background without changing its fill can
+use the standalone text channel:
 
 ```css
-.ds.tag {
+.ds.my-component {
   color: var(--modifier-color-text, var(--color-text));
 }
 ```
