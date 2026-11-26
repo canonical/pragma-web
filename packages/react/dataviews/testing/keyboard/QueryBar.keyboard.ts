@@ -30,7 +30,7 @@ const readChips = (page: Page): Promise<string[]> =>
 
 /** The table's record rows: every row but the header's. */
 const countRows = async (page: Page): Promise<number> =>
-  (await page.locator("#storybook-root [role=row]").count()) - 1;
+  (await page.locator("#storybook-root").getByRole("row").count()) - 1;
 
 /**
  * Keep every announcement the root's announcer makes, which it clears
@@ -498,7 +498,7 @@ test.describe("QueryBar, in Chromium", () => {
         ]);
     expect(await readTops()).toHaveLength(1);
     const tableTop = (
-      await page.locator("#storybook-root [role=table]").boundingBox()
+      await page.locator("#storybook-root").getByRole("table").boundingBox()
     )?.y;
     await findEntry(page).focus();
     await expect
@@ -507,7 +507,8 @@ test.describe("QueryBar, in Chromium", () => {
     // Focused, they wrap, and overlay what follows rather than push it.
     expect((await readTops()).length).toBeGreaterThan(1);
     expect(
-      (await page.locator("#storybook-root [role=table]").boundingBox())?.y,
+      (await page.locator("#storybook-root").getByRole("table").boundingBox())
+        ?.y,
     ).toBe(tableTop);
     const clear = page.getByRole("button", {
       name: "Clear filters and search",

@@ -25,6 +25,7 @@ describe("openQueryBarStory", () => {
   it("opens the story alone, waits for its play, then for a row", async () => {
     const settled: boolean[] = [];
     const nth = vi.fn(() => "second row");
+    const getByRole = vi.fn(() => ({ nth }));
     const page = {
       goto: vi.fn(async () => null),
       waitForFunction: vi.fn(
@@ -40,14 +41,15 @@ describe("openQueryBarStory", () => {
           settled.push(isSettled(phases));
         },
       ),
-      locator: vi.fn(() => ({ nth })),
+      locator: vi.fn(() => ({ getByRole })),
     };
     await openQueryBarStory(page as unknown as Page, "default");
     expect(page.goto).toHaveBeenCalledWith(
       "/iframe.html?id=work-in-progress-dataviews-querybar--default&viewMode=story",
     );
     expect(settled).toEqual([false, false, true]);
-    expect(page.locator).toHaveBeenCalledWith("#storybook-root [role=row]");
+    expect(page.locator).toHaveBeenCalledWith("#storybook-root");
+    expect(getByRole).toHaveBeenCalledWith("row");
     expect(nth).toHaveBeenCalledWith(1);
     expect(toBeVisible).toHaveBeenCalledTimes(1);
   });

@@ -37,7 +37,7 @@ const findSheet = (page: Page): Locator =>
 
 /** The table's record rows: every row but the header's. */
 const countRows = async (page: Page): Promise<number> =>
-  (await page.locator("#storybook-root [role=row]").count()) - 1;
+  (await page.locator("#storybook-root").getByRole("row").count()) - 1;
 
 /**
  * Keep every announcement the sheet's region makes, which it replaces as

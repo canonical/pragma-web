@@ -14,7 +14,7 @@ import openStory from "./openQueryBarStory.js";
 
 /** The table's record rows: every row but the header's. */
 const countRows = async (page: Page): Promise<number> =>
-  (await page.locator("#storybook-root [role=row]").count()) - 1;
+  (await page.locator("#storybook-root").getByRole("row").count()) - 1;
 
 /** One quick filter's words, by the field's label. */
 const findWords = (page: Page, label: string): Locator =>
@@ -123,7 +123,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
     await page.keyboard.press("Shift+Tab");
     await expect(panel).toBeVisible();
     // A click outside closes it.
-    await page.locator("#storybook-root [role=row]").nth(3).click();
+    await page.locator("#storybook-root").getByRole("row").nth(3).click();
     await expect(panel).toBeHidden();
   });
 
