@@ -61,6 +61,45 @@ systems out of each other's way, and bridges the theme signal between them. A te
 binds its copy to the files here so the two cannot drift. Nothing about that arrangement changes this
 package or the markup of a page that does not need it.
 
+## Webpack and Next.js
+
+The fonts are opt-in: `@canonical/styles/fonts` declares the Ubuntu Sans faces, and each `src` names its
+file with a bare package specifier into `@canonical/ds-assets`:
+
+```css
+@import url("@canonical/styles/fonts");
+```
+
+Vite, Bun and Turbopack resolve that specifier from `node_modules`. webpack does not: its css-loader reads
+a `url()` as relative, asks for `./@canonical/ds-assets/fonts/ubuntu-sans/UbuntuSans[wdth,wght].woff2`, and
+`next build` stops with `Cannot find module './@canonical/ds-assets/fonts/ubuntu-sans/UbuntuSans[wdth,wght].woff2'`.
+
+A `NormalModuleReplacementPlugin` in `next.config.js` strips the leading `./`, which hands the request back
+to the module resolver as the package path it is:
+
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack(config, { webpack }) {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^\.\/@canonical\/ds-assets\//,
+        (resource) => {
+          resource.request = resource.request.replace(/^\.\//, "");
+        },
+      ),
+    );
+    return config;
+  },
+};
+
+module.exports = nextConfig;
+```
+
+The build then copies both `.woff2` files into `.next/static/media`. Turbopack — `next dev --turbopack`
+and `next build --turbopack` — resolves the bare specifier and needs neither the plugin nor a different
+import.
+
 ## Entry points
 
 Five. `@canonical/styles` is the one an ordinary page wants: the whole stylesheet, in the order
