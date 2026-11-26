@@ -10,7 +10,12 @@
 
 import { createCollection } from "@canonical/dataviews-core";
 import buildBarMachines from "./buildBarMachines.js";
-import type { BarMachine, Machine, SpareMachine } from "./types.js";
+import type {
+  BarMachine,
+  Machine,
+  PooledMachine,
+  SpareMachine,
+} from "./types.js";
 
 /** Twelve story machines, every status represented; one story pages them by five. */
 export const storyMachines = [
@@ -244,5 +249,31 @@ export const barMachineCollection = createCollection({
     { field: "owner", kind: "presence" },
     { field: "hostname", kind: "text" },
     { field: "deployed", kind: "date" },
+  ],
+});
+
+/** The twelve pools the pooled machines take in turn. */
+const POOLS = Array.from(
+  { length: 12 },
+  (_, index) => `ex-pool-${String(index + 1).padStart(2, "0")}`,
+);
+
+/** The query bar's sixty machines, each in the next of twelve pools. */
+export const pooledMachines: readonly PooledMachine[] = barMachines.map(
+  (machine, index) => ({
+    ...machine,
+    pool: POOLS.at(index % POOLS.length) as string,
+  }),
+);
+
+/**
+ * The quick filters' machine collection: the query bar's fields and a pool,
+ * one of twelve, more than a filter's panel lists without a search.
+ */
+export const pooledMachineCollection = createCollection({
+  identify: (machine: PooledMachine) => machine.id,
+  fields: [
+    ...barMachineCollection.schema.fields,
+    { field: "pool", kind: "choices", options: POOLS },
   ],
 });

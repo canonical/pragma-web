@@ -1,0 +1,14 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /** The quick filter's panel form: the controls, then Apply below them. */
+  .ds.data-views-quick-filter-form {
+    display: grid;
+    gap: var(--dimension-200);
+    margin: 0;
+
+    & > .apply {
+      justify-self: start;
+    }
+  }
+}

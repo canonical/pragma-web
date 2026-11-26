@@ -126,7 +126,7 @@ describe("FilterButton", () => {
       const trigger = screen.getByRole("button", { name: "Status" });
       expect(trigger.querySelector(".ds.badge")).toBeNull();
       expect(trigger.querySelector(".mark")).toBeNull();
-      expect(trigger.querySelector(".assistive")).toBeNull();
+      expect(trigger.querySelector(".assistive-text")).toBeNull();
     });
 
     it("names the trigger with the applied words and hides the Badge", () => {

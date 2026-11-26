@@ -301,6 +301,19 @@ const fr: DataViewsMessages = {
   },
   filterStepChosen: ({ chosen, step }) => `${chosen} choisi. ${step}.`,
 
+  appliedCount: ({ count: applied, condition }) =>
+    condition === "exclusion"
+      ? `aucun des ${count(applied)}`
+      : `${count(applied)} ${choosePlural(applied, "appliqué", "appliqués")}`,
+  allOptions: "Tous",
+  searchOptions: ({ label }) => `Rechercher parmi les options de ${label}`,
+  optionsNone: "Aucune option",
+  optionsPending: "Chargement des options",
+  optionExcluded: ({ value }) => `${value}, exclu`,
+  optionsShown: ({ count: shown }) =>
+    `${count(shown)} ${choosePlural(shown, "option", "options")}`,
+  submitQuickFilter: "Appliquer",
+
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",
   submitPageSize: "Appliquer la taille de page",

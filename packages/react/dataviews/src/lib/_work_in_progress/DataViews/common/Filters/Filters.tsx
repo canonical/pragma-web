@@ -28,9 +28,9 @@ import {
   useRestrictedFields,
   useStandingOperators,
 } from "../../hooks/index.js";
+import { NO_RECORDS } from "../constants.js";
 import { HiddenQueryFields } from "../HiddenQueryFields/index.js";
-import { findFilterHandle } from "../utils/index.js";
-import { NO_RECORDS } from "./common/constants.js";
+import { findFilterHandle, listFacetOptions } from "../utils/index.js";
 import {
   BoundFilter,
   ChoicesFilter,
@@ -40,7 +40,6 @@ import {
   TextFilter,
   type TextFilterOperator,
 } from "./common/index.js";
-import { listFacetOptions } from "./common/utils/index.js";
 import type { DataViewsFiltersProps } from "./types.js";
 import "./styles.css";
 

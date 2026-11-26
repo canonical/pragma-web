@@ -14,6 +14,7 @@ import type {
 } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
 import type { QueryInputOption } from "../../../QueryInput/index.js";
+import type { QuickFilterArrangement } from "./common/QuickFilter/index.js";
 
 /**
  * The query state the bar reads: the query, the saved view open beside it,
@@ -296,12 +297,41 @@ export type QueryBarSessionAction =
 /** A command an invoker button runs on the sheet's dialog. */
 export type InvokerCommand = "show-modal" | "close";
 
+/**
+ * How a quick filter shows its field: its values as words beside its name,
+ * or a filter button opening a panel of controls.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsQueryBarQuickFilterArrangement = QuickFilterArrangement;
+
+/**
+ * A quick filter with its arrangement asked for: its values as words
+ * beside its name, or a filter button opening a panel. Without one, a
+ * choice of one value among two to five declared shows as words, and any
+ * other field as a filter button.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsQueryBarQuickFilter = {
+  /** The field, which the schema declares. */
+  readonly field: string;
+  /** How it shows; words need a choice with declared values. */
+  readonly arrangement: DataViewsQueryBarQuickFilterArrangement;
+};
+
 /** The query bar's own props. */
 type OwnProps = {
   /** The field's name; the messages' `queryBar` by default. */
   readonly label?: string;
-  /** The fields shown as quick filters beside the field; each must be in the schema. */
-  readonly quickFilters?: readonly string[];
+  /**
+   * The fields shown as quick filters beside the field, in order; each must
+   * be in the schema. A name takes the arrangement its field suits; an
+   * entry with an `arrangement` takes that one.
+   */
+  readonly quickFilters?: readonly (string | DataViewsQueryBarQuickFilter)[];
   /**
    * Named values per field name, offered first among its value options and
    * resolved when committed; each field must be in the schema.

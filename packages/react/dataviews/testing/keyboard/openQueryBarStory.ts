@@ -32,5 +32,7 @@ export default async function openQueryBarStory(
     const phase = preview?.currentRender?.phase;
     return phase !== undefined && phases.includes(phase);
   }, SETTLED_PHASES);
-  await expect(page.locator("#storybook-root [role=row]").nth(1)).toBeVisible();
+  await expect(
+    page.locator("#storybook-root").getByRole("row").nth(1),
+  ).toBeVisible();
 }

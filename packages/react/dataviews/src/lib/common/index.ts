@@ -6,13 +6,16 @@
  * private parts, the switch that shows one collection through the renderer a
  * reader chooses, the status a renderer shows above what it draws, the
  * settings menu a table installs in its settings cell and what it was given
- * as its settings reads, and the contract a virtualization descriptor
+ * as its settings reads, a Condition's mark and text for assistive
+ * technology only, and the contract a virtualization descriptor
  * carries between the table and the entry point that writes it. Any tier may
  * depend on `common/` downward; `common/` never depends on a tier.
  */
 
 export * from "./Announcer/index.js";
+export * from "./AssistiveText/index.js";
 export * from "./CellContext/index.js";
+export * from "./ConditionMark/index.js";
 export * from "./DisplayField/index.js";
 export * from "./MessagesContext/index.js";
 export * from "./QueryEntry/index.js";

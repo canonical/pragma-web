@@ -3,6 +3,8 @@ import {
   barMachineCollection,
   barMachines,
   machineCollection,
+  pooledMachineCollection,
+  pooledMachines,
   spareMachineCollection,
   spareMachines,
   storyMachines,
@@ -71,5 +73,18 @@ describe("barMachineCollection", () => {
     expect(barMachineCollection.identify(barMachines.at(0) as never)).toBe(
       "bm-01",
     );
+  });
+});
+
+describe("pooledMachineCollection", () => {
+  it("adds a pool of twelve to the query bar's machines", () => {
+    expect(pooledMachines).toHaveLength(60);
+    expect(pooledMachines.at(13)?.pool).toBe("ex-pool-02");
+    expect(pooledMachineCollection.schema.findField("pool")).toMatchObject({
+      kind: "choices",
+    });
+    expect(
+      pooledMachineCollection.identify(pooledMachines.at(0) as never),
+    ).toBe("bm-01");
   });
 });

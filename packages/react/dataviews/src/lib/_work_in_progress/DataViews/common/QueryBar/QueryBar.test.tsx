@@ -12,7 +12,10 @@ import {
   type QueryLocation,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
-import { createManualSource } from "@canonical/dataviews-core/testing";
+import {
+  buildPage,
+  createManualSource,
+} from "@canonical/dataviews-core/testing";
 import {
   act,
   fireEvent,
@@ -66,6 +69,19 @@ vi.mock("../../../QueryInput/index.js", async (importOriginal) => {
     QueryInput: (props: Parameters<typeof actual.QueryInput>[0]) => {
       chipRenders.push("bar");
       return actual.QueryInput(props);
+    },
+  };
+});
+
+// Every render of a quick filter's button, by its label.
+vi.mock("../../../FilterButton/index.js", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../../FilterButton/index.js")>();
+  return {
+    ...actual,
+    FilterButton: (props: Parameters<typeof actual.FilterButton>[0]) => {
+      chipRenders.push(`button:${String(props.label)}`);
+      return actual.FilterButton(props);
     },
   };
 });
@@ -1659,6 +1675,7 @@ describe("QueryBar", () => {
     const hydrate = async (
       href: string,
       beforeHydrating: (container: HTMLElement) => void,
+      props: DataViewsQueryBarProps = {},
     ) => {
       const build = () =>
         createDataViewsProvider({
@@ -1673,7 +1690,7 @@ describe("QueryBar", () => {
       const container = document.createElement("div");
       container.innerHTML = renderToString(
         <DataViews provider={build()}>
-          <QueryBar />
+          <QueryBar {...props} />
         </DataViews>,
       );
       document.body.append(container);
@@ -1685,7 +1702,7 @@ describe("QueryBar", () => {
         hydrateRoot(
           container,
           <DataViews provider={provider}>
-            <QueryBar />
+            <QueryBar {...props} />
           </DataViews>,
         ),
       );
@@ -1710,6 +1727,43 @@ describe("QueryBar", () => {
         ).toHaveFocus(),
       );
       expect(error).not.toHaveBeenCalled();
+    });
+
+    it("hands a word link's focus to its own quick filter's button, not another's", async () => {
+      const { error } = await hydrate(
+        "/hosts",
+        (container) => {
+          const [, poolAll] = [...container.querySelectorAll("a")].filter(
+            (anchor) => anchor.textContent === "All",
+          );
+          poolAll?.focus();
+        },
+        { quickFilters: ["status", "pool"] },
+      );
+      const pool = screen.getByRole("group", { name: "pool" });
+      await waitFor(() =>
+        expect(within(pool).getByRole("button", { name: "All" })).toHaveFocus(),
+      );
+      expect(error).not.toHaveBeenCalled();
+    });
+
+    it("hands focus on a quick filter panel's Apply to the panel's first control", async () => {
+      await hydrate(
+        "/hosts",
+        (container) => {
+          const panel = container.querySelector<HTMLElement>(
+            ".ds.filter-button-panel",
+          );
+          panel?.showPopover();
+          panel?.querySelector<HTMLElement>('button[type="submit"]')?.focus();
+        },
+        { quickFilters: [{ field: "status", arrangement: "button" }] },
+      );
+      await waitFor(() =>
+        expect(
+          screen.getByRole("checkbox", { hidden: true, name: "deployed" }),
+        ).toHaveFocus(),
+      );
     });
 
     it("hands Merge's focus on to its button, by its text", async () => {
@@ -2851,6 +2905,268 @@ describe("QueryBar", () => {
       await waitFor(() => expect(queryPart("Operator for status")).toBeNull());
       await waitFor(() => expect(findEntry()).toHaveFocus());
       expect(readFilter(provider)).toEqual([]);
+    });
+
+    it("keeps the quick filters while narrow, and hides an open panel as the sheet shows", async () => {
+      render(
+        <DataViews
+          provider={createDataViewsProvider({
+            collection,
+            source: createArraySource<Host>({ rows: hosts, collection }),
+          })}
+        >
+          <QueryBar
+            data-testid="bar"
+            quickFilters={[{ field: "pool", arrangement: "button" }]}
+          />
+        </DataViews>,
+      );
+      resizeBar(320);
+      const trigger = screen.getByRole("button", { name: "pool" });
+      fireEvent.click(trigger);
+      const panel = document.getElementById(
+        trigger.getAttribute("aria-controls") ?? "",
+      );
+      await waitFor(() => expect(panel?.matches(":popover-open")).toBe(true));
+      fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
+      await waitFor(() => expect(panel?.matches(":popover-open")).toBe(false));
+      expect(
+        screen.getByRole("dialog", { name: "Filter records" }),
+      ).toHaveAttribute("open");
+    });
+  });
+
+  describe("quick filters", () => {
+    const provider = (query?: string) =>
+      createDataViewsProvider({
+        collection,
+        source: createArraySource<Host>({ rows: hosts, collection }),
+        ...(query === undefined
+          ? {}
+          : { snapshot: { query, presentation: {} } }),
+      });
+
+    it("shows each beside the field, as its field suits or as asked", () => {
+      const { container } = render(
+        <DataViews provider={provider()}>
+          <QueryBar
+            quickFilters={[
+              "status",
+              "memory",
+              { field: "pool", arrangement: "button" },
+            ]}
+          />
+        </DataViews>,
+      );
+      const line = container.querySelector(".ds.data-views-query-bar > .line");
+      expect(line?.querySelector(".ds.query-input")).not.toBeNull();
+      const quick = line?.querySelector(".quick-filters") as HTMLElement;
+      expect(
+        within(quick).getByRole("group", { name: "status" }),
+      ).toBeInTheDocument();
+      expect(within(quick).getByRole("button", { name: "memory" })).toHaveClass(
+        "filter-button",
+      );
+      expect(within(quick).getByRole("button", { name: "pool" })).toHaveClass(
+        "filter-button",
+      );
+    });
+
+    it("refuses words for a field without declared values", () => {
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      expect(() =>
+        render(
+          <DataViews provider={provider()}>
+            <QueryBar
+              quickFilters={[{ field: "owner", arrangement: "words" }]}
+            />
+          </DataViews>,
+        ),
+      ).toThrow('the quick filter "owner" can show as words only');
+      expect(() =>
+        render(
+          <DataViews provider={provider()}>
+            <QueryBar
+              quickFilters={[
+                "status",
+                { field: "status", arrangement: "button" },
+              ]}
+            />
+          </DataViews>,
+        ),
+      ).toThrow('the quick filter "status" is listed twice');
+      vi.restoreAllMocks();
+    });
+
+    it("says what a quick filter's commit did, with the count", async () => {
+      render(
+        <DataViews provider={provider()}>
+          <QueryBar
+            quickFilters={[
+              "status",
+              { field: "memory", arrangement: "button" },
+            ]}
+          />
+        </DataViews>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "ready" }));
+      await waitFor(() =>
+        expect(readStatus()).toContain("Added status is ready. 1 record."),
+      );
+      fireEvent.click(screen.getByRole("button", { name: "deployed" }));
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "Changed to status is deployed. 1 record.",
+        ),
+      );
+      fireEvent.click(screen.getByRole("button", { name: "All" }));
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "Removed status is deployed. 3 records.",
+        ),
+      );
+    });
+
+    it("says nothing for a quick filter's commit that changes nothing", async () => {
+      render(
+        <DataViews provider={provider("memory__gte=65536")}>
+          <QueryBar
+            quickFilters={[{ field: "memory", arrangement: "button" }]}
+          />
+        </DataViews>,
+      );
+      // Everything the announcer says, kept as it is said.
+      const said: string[] = [];
+      const announcer = document.querySelector(
+        ".ds.data-views-announcer",
+      ) as Element;
+      const observer = new MutationObserver(() => {
+        const text = announcer.textContent ?? "";
+        if (text !== "") said.push(text);
+      });
+      observer.observe(announcer, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+      onTestFinished(() => observer.disconnect());
+      const from = screen.getByRole("textbox", {
+        hidden: true,
+        name: "memory from",
+      });
+      fireEvent.change(from, { target: { value: "65536" } });
+      fireEvent.keyDown(from, { key: "Enter" });
+      // A commit that changes something is said once its result lands.
+      fireEvent.change(from, { target: { value: "8192" } });
+      fireEvent.keyDown(from, { key: "Enter" });
+      // Waits for the real commit's own words: a no-op said first would
+      // be an extra entry, or one that speaks of 64 GiB.
+      await waitFor(() => expect(said.join("\n")).toMatch(/8\sGiB|8192/));
+      expect(said).toEqual([
+        expect.stringMatching(/^Changed to memory.*(8\sGiB|8192)/),
+      ]);
+    });
+
+    it("ends a clause in the field before a quick filter is pressed", async () => {
+      render(
+        <DataViews provider={provider()}>
+          <QueryBar quickFilters={["status"]} />
+        </DataViews>,
+      );
+      const operator = await startOn("status");
+      const word = screen.getByRole("button", { name: "ready" });
+      fireEvent.blur(operator, { relatedTarget: word });
+      await waitFor(() => expect(queryPart("Operator for status")).toBeNull());
+      fireEvent.click(word);
+      expect(findChip("status is ready")).not.toBeNull();
+    });
+
+    it("says why a quick filter's typed value cannot apply", async () => {
+      render(
+        <DataViews provider={provider()}>
+          <QueryBar
+            quickFilters={[{ field: "memory", arrangement: "button" }]}
+          />
+        </DataViews>,
+      );
+      const from = screen.getByRole("textbox", {
+        hidden: true,
+        name: "memory from",
+      });
+      fireEvent.change(from, { target: { value: "lots" } });
+      fireEvent.keyDown(from, { key: "Enter" });
+      await waitFor(() => expect(readStatus()).toContain("Invalid:"));
+    });
+
+    it("says why a quick filter's commit was refused", async () => {
+      const source = createManualSource<Host>({
+        capabilities: declareCapabilities(collection, {
+          filter: { status: ["isAny"] },
+        }),
+        answer: () => buildPage(hosts),
+        listRefusals: ({ slice }) =>
+          slice.filter.length > 0
+            ? [
+                {
+                  part: "filter",
+                  code: "unsupported-combination",
+                  field: "status",
+                  operator: "isAny",
+                  reason: "status is not filtered today",
+                },
+              ]
+            : [],
+      });
+      render(
+        <DataViews
+          provider={createDataViewsProvider({
+            collection,
+            source: source.source,
+          })}
+        >
+          <QueryBar quickFilters={["status"]} />
+        </DataViews>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "ready" }));
+      await waitFor(() =>
+        expect(readStatus()).toContain("Status is not filtered today."),
+      );
+    });
+
+    it("renders no other quick filter when the bar renders for a commit", async () => {
+      const held = provider("status=deployed");
+      render(
+        <DataViews provider={held}>
+          <QueryBar
+            quickFilters={[
+              { field: "status", arrangement: "button" },
+              { field: "pool", arrangement: "button" },
+            ]}
+          />
+        </DataViews>,
+      );
+      chipRenders.length = 0;
+      act(() => {
+        readProviderHost(held).setPredicate({
+          field: "status",
+          operator: "isAny",
+          operands: ["ready", "broken"],
+        });
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "status, 2 applied" }),
+        ).toBeInTheDocument(),
+      );
+      expect(chipRenders).toContain("button:status");
+      expect(chipRenders).not.toContain("button:pool");
+      // Removing a chip renders the bar, and still not the pool's button.
+      chipRenders.length = 0;
+      act(() => {
+        readProviderHost(held).removePredicate("status", "isAny", 0);
+      });
+      await waitFor(() => expect(chipRenders).toContain("bar"));
+      expect(chipRenders).not.toContain("button:pool");
     });
   });
 });

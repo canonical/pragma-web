@@ -40,6 +40,11 @@ import {
   type MessageLineEntry,
 } from "./common/MessageLine/index.js";
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
+import {
+  chooseArrangement,
+  listFieldConjuncts,
+  QuickFilter,
+} from "./common/QuickFilter/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
 import { RefusedChip } from "./common/RefusedChip/index.js";
 import { SearchForm } from "./common/SearchForm/index.js";
@@ -205,6 +210,16 @@ const isSelectable = (option: QueryBarOption): boolean =>
 const isComplete = (draft: QueryBarDraft): boolean =>
   findMissingPart(draft) === null;
 
+/**
+ * Whether a node is part of the bar's field: inside its root, and not in
+ * a quick filter beside it, which a clause in the field ends before, as
+ * it does before anything outside the bar.
+ */
+const isInField = (root: Element, node: Node | null): boolean =>
+  node !== null &&
+  root.contains(node) &&
+  !(node instanceof Element && node.closest(".quick-filters") !== null);
+
 /** Two operand lists holding the same values, in any order. */
 const isSameSet = (
   a: readonly PredicateOperand[],
@@ -257,13 +272,34 @@ export default function QueryBar({
   });
   const { schema } = provider.collection;
   const { capabilities } = provider;
-  for (const field of quickFilters ?? []) {
-    if (schema.findField(field) === undefined) {
+  // Each quick filter with the arrangement it takes, each field once.
+  const quickFields = new Set<string>();
+  const quick = (quickFilters ?? []).map((entry) => {
+    const { field, arrangement } =
+      typeof entry === "string"
+        ? { field: entry, arrangement: undefined }
+        : entry;
+    const definition = schema.findField(field);
+    if (definition === undefined) {
       throw new Error(
         `DataViews.QueryBar: the schema has no field "${field}" to show as a quick filter`,
       );
     }
-  }
+    if (quickFields.has(field)) {
+      throw new Error(
+        `DataViews.QueryBar: the quick filter "${field}" is listed twice`,
+      );
+    }
+    quickFields.add(field);
+    return {
+      field,
+      arrangement: chooseArrangement(
+        definition,
+        arrangement,
+        listOfferedOperators(definition, capabilities),
+      ),
+    };
+  });
   for (const field of Object.keys(presets ?? {})) {
     if (schema.findField(field) === undefined) {
       throw new Error(
@@ -283,8 +319,8 @@ export default function QueryBar({
   const entryRef = useRef<HTMLInputElement>(null);
   // The narrow form's sheet, which the summary button shows.
   const sheetId = useId();
-  // The quick filters' panels, hidden as the sheet shows.
-  const { hidePanels } = useQuickFilterPanels();
+  // Each quick filter's panel, held so they hide as the sheet shows.
+  const { collectPanel, hidePanels } = useQuickFilterPanels();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
@@ -751,6 +787,51 @@ export default function QueryBar({
       ),
     );
   };
+  // At one identity, so a quick filter's props stay the same.
+  const announceQuickRefusals = useStableCallback(announceRefusals);
+  /**
+   * Say what a quick filter's commit did, with the result count once it
+   * lands, as a commit in the bar does: the field's clauses added, changed
+   * or removed.
+   */
+  const announceQuickCommit = useStableCallback(
+    (name: string, before: readonly Predicate[]): void => {
+      const after = listFieldConjuncts(group.state.get(), name).map(
+        ({ predicate }) => predicate,
+      );
+      // A commit that changed nothing says nothing.
+      if (JSON.stringify(after) === JSON.stringify(before)) return;
+      const speak = (said: readonly Predicate[]): string =>
+        said
+          .map(({ field: at, operator, operands }) =>
+            speakClause(
+              {
+                kind: "predicate",
+                origin: null,
+                field: at,
+                operator,
+                operands,
+              },
+              schema,
+              labels,
+              messages,
+            ),
+          )
+          .join(", ");
+      const noun = labels.recordNoun;
+      announceOutcome((count) =>
+        before.length === 0
+          ? messages.clauseAdded(speak(after), count, noun)
+          : after.length === 0
+            ? messages.clauseRemoved(speak(before), count, noun)
+            : messages.clauseChanged(speak(after), count, noun),
+      );
+    },
+  );
+  // Said as the line below a field shows it, once per commit that fails.
+  const announceQuickInvalid = useStableCallback((message: string): void => {
+    announce(message);
+  });
 
   /** Say that a typed `>` or `<` reads as the bound it stops short of. */
   const announceWidened = (reading: TypedSymbolReading): void => {
@@ -1449,11 +1530,11 @@ export default function QueryBar({
         ? highlighted
         : undefined;
     if (next) {
-      if (!root.contains(next)) leave(optionId);
+      if (!isInField(root, next)) leave(optionId);
       return;
     }
     const check = (): void => {
-      if (!root.contains(document.activeElement)) leave(optionId);
+      if (!isInField(root, document.activeElement)) leave(optionId);
     };
     // During a press in the bar, the check waits for the press to end.
     if (pressRef.current) pressRef.current.check = check;
@@ -1720,6 +1801,8 @@ export default function QueryBar({
     </QueryInput>
   );
 
+  const search = <SearchForm hasHref={hasHref}>{field}</SearchForm>;
+
   return (
     <>
       {/* biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items */}
@@ -1734,7 +1817,28 @@ export default function QueryBar({
         onBlur={handleBlur}
         onPointerDownCapture={handlePointerDownCapture}
       >
-        <SearchForm hasHref={hasHref}>{field}</SearchForm>
+        {quick.length === 0 ? (
+          search
+        ) : (
+          <div className="line">
+            {search}
+            <div className="quick-filters">
+              {quick.map(({ field: name, arrangement }) => (
+                <QuickFilter
+                  key={name}
+                  field={name}
+                  arrangement={arrangement}
+                  group={group}
+                  hasHref={hasHref}
+                  panelRef={collectPanel(name)}
+                  onRefused={announceQuickRefusals}
+                  onCommitted={announceQuickCommit}
+                  onInvalid={announceQuickInvalid}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         <SummaryButton
           className="summary"
           sheetId={sheetId}

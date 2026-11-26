@@ -274,3 +274,28 @@ export type ResizeObserverStandIn = {
   /** Remove the stand-in and restore the observer it replaced. */
   readonly uninstall: () => void;
 };
+
+/** One host of the quick filters' collection. */
+export type QuickHost = {
+  readonly id: string;
+  readonly name: string;
+  readonly status: string;
+  readonly pool: string;
+  readonly tags: readonly string[];
+  readonly zone: string;
+  readonly memory: number;
+  readonly seen: string;
+  readonly owner?: string;
+};
+
+/** How one quick filters' provider starts. */
+export type QuickFilterProviderConfig = {
+  /** The query the provider starts on, as canonical text. */
+  readonly query?: string | undefined;
+  /** A location, which spells addresses for links. */
+  readonly location?: QueryLocation | undefined;
+  /** The fields the source counts beside `zone`, which it always counts. */
+  readonly facets?:
+    | readonly Exclude<keyof QuickHost, "id" | "name">[]
+    | undefined;
+};

@@ -25,6 +25,12 @@
 @import url("./_work_in_progress/DataViews/common/Filters/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/FiltersDisclosure/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/MessageLine/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/BoundsPanel/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/ChoicesPanel/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/PanelForm/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/PresencePanel/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/TextPanel/styles.css");
+@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/TypedInput/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/AddFilterWalk/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/StepListbox/styles.css");
 @import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/styles.css");
@@ -34,6 +40,8 @@
 @import url("./_work_in_progress/DataViews/common/SavedViews/styles.css");
 @import url("./_work_in_progress/DataViews/common/Search/styles.css");
 @import url("./_work_in_progress/FilterButton/styles.css");
+@import url("./_work_in_progress/FilterOptions/common/FilterOptionsGrid/styles.css");
+@import url("./_work_in_progress/FilterOptions/styles.css");
 @import url("./_work_in_progress/PaginationBar/common/PageControl/styles.css");
 @import url("./_work_in_progress/PaginationBar/styles.css");
 @import url("./_work_in_progress/QueryChip/common/Entry/styles.css");
@@ -44,6 +52,8 @@
 @import url("./_work_in_progress/QueryInput/common/Suggestions/styles.css");
 @import url("./_work_in_progress/QueryInput/styles.css");
 @import url("./common/Announcer/styles.css");
+@import url("./common/AssistiveText/styles.css");
+@import url("./common/ConditionMark/styles.css");
 @import url("./common/DropdownButtonStandIn/common/Menu/styles.css");
 @import url("./common/DropdownButtonStandIn/common/MenuItem/styles.css");
 @import url("./common/DropdownButtonStandIn/common/Panel/styles.css");

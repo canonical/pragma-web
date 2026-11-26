@@ -6,6 +6,8 @@ export * from "./Pagination/index.js";
 export {
   type DataViewsQueryBarPreset,
   type DataViewsQueryBarProps,
+  type DataViewsQueryBarQuickFilter,
+  type DataViewsQueryBarQuickFilterArrangement,
   QueryBar,
 } from "./QueryBar/index.js";
 export * from "./SavedViews/index.js";

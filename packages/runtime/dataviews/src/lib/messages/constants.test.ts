@@ -657,4 +657,22 @@ describe("constants", () => {
       }),
     ).toBe("status chosen. Choose an operator for status.");
   });
+
+  it("words the quick filters", () => {
+    expect(m.appliedCount({ count: 2 })).toBe("2 applied");
+    expect(m.appliedCount({ count: 1_200, condition: "inclusion" })).toBe(
+      "1,200 applied",
+    );
+    expect(m.appliedCount({ count: 2, condition: "exclusion" })).toBe(
+      "none of 2",
+    );
+    expect(m.allOptions).toBe("All");
+    expect(m.searchOptions({ label: "pool" })).toBe("Search pool options");
+    expect(m.optionsNone).toBe("No options");
+    expect(m.optionsPending).toBe("Loading options");
+    expect(m.optionExcluded({ value: "broken" })).toBe("broken, excluded");
+    expect(m.optionsShown({ count: 1 })).toBe("1 option");
+    expect(m.optionsShown({ count: 1_200 })).toBe("1,200 options");
+    expect(m.submitQuickFilter).toBe("Apply");
+  });
 });

@@ -1,0 +1,59 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * The quick filter's choices panel: the search above a column of options,
+   * each a label around its checkbox, its text and its count, at least a
+   * 24 px target.
+   */
+  .ds.data-views-quick-filter-choices {
+    display: grid;
+    gap: var(--dimension-100);
+
+    /* The search icon before the search, which takes the rest. */
+    & > .search {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+
+      & > :last-child {
+        flex: 1;
+      }
+    }
+
+    & > .options {
+      display: grid;
+      margin: 0;
+      padding: 0;
+      border: none;
+      min-inline-size: 0;
+    }
+
+    & .legend {
+      padding: 0;
+      margin-block-end: var(--dimension-050);
+      color: var(--color-text-muted);
+    }
+
+    & .option {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+      min-block-size: var(--dimension-300);
+    }
+
+    & .count {
+      margin-inline-start: auto;
+      color: var(--color-text-muted);
+    }
+
+    & .status {
+      margin: 0;
+      color: var(--color-text-muted);
+    }
+
+    & > .switch {
+      justify-self: start;
+    }
+  }
+}

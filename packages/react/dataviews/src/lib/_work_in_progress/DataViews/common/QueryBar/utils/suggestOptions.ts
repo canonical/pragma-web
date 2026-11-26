@@ -9,7 +9,7 @@ import type {
 } from "@canonical/dataviews-core";
 import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
 import type { UseFacetsResult } from "../../../../../hooks/index.js";
-import { listFacetOptions } from "../../Filters/common/utils/index.js";
+import { listFacetOptions } from "../../utils/index.js";
 import { OPERATOR_SYMBOLS } from "../constants.js";
 import type {
   DataViewsQueryBarPreset,
