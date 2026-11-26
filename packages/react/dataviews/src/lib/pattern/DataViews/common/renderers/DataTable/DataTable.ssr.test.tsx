@@ -81,7 +81,7 @@ describe("DataTable SSR", () => {
     expect(html).toContain("alpha");
   });
 
-  it.fails("sends the frame: the table, then the footer, then the announcer", () => {
+  it("sends the frame: the table, then the footer, then the announcer", () => {
     const { provider } = createMachineProvider();
     const html = renderToString(
       <DataTable

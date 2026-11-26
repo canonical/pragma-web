@@ -279,7 +279,7 @@ describe("ScopedDataTable", () => {
     );
   });
 
-  it.fails("frames the table, then the footer, then the announcer it is handed", () => {
+  it("frames the table, then the footer, then the announcer it is handed", () => {
     const { provider } = createMachineProvider({ rows: [] });
     const { container } = render(
       <ScopedDataTable
@@ -306,7 +306,7 @@ describe("ScopedDataTable", () => {
     expect(frame.children.item(1)).toHaveTextContent("1 of 1");
   });
 
-  it.fails("writes its footer's measured height on the frame while it has one", () => {
+  it("writes its footer's measured height on the frame while it has one", () => {
     const standIn = installResizeObserverStandIn();
     onTestFinished(standIn.uninstall);
     const { provider } = createMachineProvider({ rows: [] });

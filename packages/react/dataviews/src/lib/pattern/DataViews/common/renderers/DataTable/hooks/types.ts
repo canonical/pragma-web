@@ -208,3 +208,13 @@ export type UseTableArrangementResult = {
   /** Whether that is the provider's, which saved views and links carry. */
   readonly shared: boolean;
 };
+
+/**
+ * What the footer reserve hook reads: the frame it writes to, the footer it
+ * measures, and whether the footer is drawn.
+ */
+export type UseFooterReserveProps = readonly [
+  frame: RefObject<HTMLDivElement | null>,
+  footer: RefObject<HTMLDivElement | null>,
+  drawn: boolean,
+];

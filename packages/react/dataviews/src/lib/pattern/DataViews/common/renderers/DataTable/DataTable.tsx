@@ -18,7 +18,7 @@ import type { DataTableProps } from "./types.js";
  * its parts is documented as a separate subcomponent.
  *
  * This implementation renders one provider's rows as a native table, with
- * sorting, selection, resizing, column settings and optional
+ * sorting, selection, resizing, column settings, a footer and optional
  * virtualization; no inline editing or grouping yet.
  *
  * `import { DataTable } from "@canonical/dataviews-react";`
@@ -35,17 +35,13 @@ export default function DataTable<
   const words = useMessages({ messages });
   const { ref, announce } = useAnnouncer();
   return (
-    <>
-      <ScopedDataTable
-        {...props}
-        messages={words}
-        announce={announce}
-        settingsMenu={DataTableSettingsMenu}
-      />
-      {/* Beside the table rather than in it: a table's children are its row
-          groups. */}
-      <Announcer ref={ref} />
-    </>
+    <ScopedDataTable
+      {...props}
+      messages={words}
+      announce={announce}
+      settingsMenu={DataTableSettingsMenu}
+      announcer={<Announcer ref={ref} />}
+    />
   );
 }
 

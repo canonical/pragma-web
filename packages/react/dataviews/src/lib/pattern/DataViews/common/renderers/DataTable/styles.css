@@ -2,10 +2,70 @@
 
 @layer ds.components.global {
   /**
+   * The frame: one border around the table, then its footer. The table stays
+   * the scroll viewport; the footer sits outside it, sticky at the bottom.
+   */
+  .ds.data-table-frame {
+    /* shim: design-tokens stroke */
+    --data-table-frame-border-width: var(
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
+    );
+    --data-table-frame-border-color: var(--color-border-muted);
+    --data-table-frame-footer-background: var(
+      --surface-color-background,
+      var(--color-background)
+    );
+    /* shim: design-tokens stacking */
+    --data-table-frame-stacking-sticky: var(--stacking-sticky, 1);
+    /* The footer's height, kept clear of what it would cover: none without
+       a footer, and measured by the table once scripts run. */
+    --data-table-frame-footer-reserve: 0px;
+    display: flex;
+    flex-direction: column;
+    /* Shrinks in a grid or flex parent, as the bare table did. */
+    min-inline-size: 0;
+    min-block-size: 0;
+    border: var(--data-table-frame-border-width) solid
+      var(--data-table-frame-border-color);
+
+    /* Until measured, a drawn footer reserves one bar and its rule. */
+    &:where(:has(> .footer:not(:empty))) {
+      /* shim: design-tokens size */
+      --data-table-frame-footer-reserve: calc(
+        var(--size-footer-reserve, var(--dimension-600)) +
+        var(--data-table-frame-border-width)
+      );
+    }
+
+    & > .footer {
+      position: sticky;
+      inset-block-end: 0;
+      z-index: var(--data-table-frame-stacking-sticky);
+      background-color: var(--data-table-frame-footer-background);
+      border-block-start: var(--data-table-frame-border-width) solid
+        var(--data-table-frame-border-color);
+    }
+
+    /* A footer whose content renders nothing draws no second rule. */
+    & > .footer:empty {
+      display: none;
+    }
+
+    /* The flush join: what the footer holds drops its own edges, so the
+       frame's one rule divides it from the rows. */
+    & > .footer > * {
+      border: none;
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+
+  /**
    * DataTable styles. Values bind `DataTable.anatomy.yaml`. A native table:
-   * the root and row groups are blocks; each row is a grid on the
+   * the table and row groups are blocks; each row is a grid on the
    * `--data-table-columns` tracks the solver writes inline. Density comes
-   * from `.dense` on the root.
+   * from `.dense` on the table.
    */
   .ds.data-table {
     /* Component tier. Semantic tokens not yet in design-tokens are read
@@ -64,14 +124,20 @@
     /* The surface it sits on, so a table inside a layered surface steps its
        background with it. */
     background-color: var(--surface-color-background, var(--color-background));
-    border: var(--data-table-border-width) solid var(--color-border-muted);
   }
 
-  /* Bounded: own scroll viewport, capped at 100svh, no browser anchoring. */
+  /* Bounded: own scroll viewport, capped at 100svh less the footer's
+     reserve and the frame's borders, no browser anchoring. A caller's own
+     maximum wins. Both values are the frame's, inherited. */
   .ds.data-table.bounded {
     position: relative;
     overflow-anchor: none;
-    max-block-size: 100svh;
+    max-block-size: calc(
+      100svh -
+      var(--data-table-frame-footer-reserve, 0px) -
+      2 *
+      var(--data-table-frame-border-width, 0px)
+    );
   }
 
   /* Rows take their width from the track list, not from the scroll
@@ -470,6 +536,21 @@
     &[data-status="failed"] > .cell,
     &[data-status="refresh-failed"] > .cell {
       color: var(--color-text-error);
+    }
+  }
+
+  /* The frame over its table, after the table's own rules. */
+  .ds.data-table-frame {
+    /* The table fills the frame, so the footer keeps to its bottom edge. */
+    & > .ds.data-table {
+      flex-grow: 1;
+    }
+
+    /* What takes focus, the table's own tab stop included, stops clear of
+       the footer that would cover it. */
+    &:where(:has(> .footer:not(:empty))) > .ds.data-table,
+    &:where(:has(> .footer:not(:empty))) > .ds.data-table * {
+      scroll-margin-block-end: var(--data-table-frame-footer-reserve);
     }
   }
 }

@@ -282,7 +282,7 @@ describe("DataTable", () => {
     expect(table.id).toBe("machines");
   });
 
-  it.fails("frames the table, then its footer, then its announcer", () => {
+  it("frames the table, then its footer, then its announcer", () => {
     const { view } = renderLoadedTable([buildMachine("m-1", "alpha")], {
       footer: <nav aria-label="Pages">1 of 1</nav>,
       className: "host",
@@ -311,7 +311,7 @@ describe("DataTable", () => {
     );
   });
 
-  it.fails.each([
+  it.each([
     ["undefined", undefined],
     ["null", null],
     ["an empty string", ""],
@@ -332,7 +332,7 @@ describe("DataTable", () => {
     ]);
   });
 
-  it.fails("keeps its footer out of the table and out of a virtualized row count", () => {
+  it("keeps its footer out of the table and out of a virtualized row count", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
     });
@@ -3369,7 +3369,7 @@ describe("DataTable", () => {
       await expectNoAxeViolations(view.container);
     });
 
-    it.fails("has no axe violation with a pagination bar in its footer", async () => {
+    it("has no axe violation with a pagination bar in its footer", async () => {
       const { provider } = createMachineProvider({
         rows: [buildMachine("m-1", "alpha")],
       });

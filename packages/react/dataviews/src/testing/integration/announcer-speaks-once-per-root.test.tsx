@@ -81,7 +81,7 @@ describe("the announcer speaks once per root", () => {
     expect(listRegions()).toHaveLength(2);
   });
 
-  it.fails("puts a standalone table's region in its frame, after its footer, the page's only one", () => {
+  it("puts a standalone table's region in its frame, after its footer, the page's only one", () => {
     const provider = createProvider();
     render(
       <DataTable

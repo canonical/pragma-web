@@ -7,8 +7,11 @@
 # their own files beside their components; this file only references them.
 #
 # Names — one per part, the same in the design, the DOM and here:
-#   DataTable       design "DataTable"    DOM `ds data-table dense`
-#   header row group                      DOM `thead.header`, a part of the root
+#   DataTable       design "DataTable"    DOM `ds data-table-frame`, the
+#                                         border around the table and footer
+#   table                                 DOM `ds data-table dense`, the
+#                                         scroll viewport; takes caller props
+#   header row group                      DOM `thead.header`, in the table
 #   header row, row                       DOM `ds data-table-row`
 #   select-all cell                       DOM `ds data-table-select-all-cell`
 #   body row group                        DOM `ds data-table-body`
@@ -20,7 +23,9 @@
 #                   top margin; no element
 #   settings cell   design "settings action cell"
 #                   DOM `ds data-table-settings-cell`
-#   announcement    DOM `ds data-views-announcer`, beside the root, read
+#   footer          DOM `.footer`, after the table: what the caller passes
+#                   as `footer`, absent without one; no role
+#   announcement    DOM `ds data-views-announcer`, last in the frame, read
 #                   and not drawn: a standalone table's own, or none, where a
 #                   connected table speaks through its root's
 # The status row is its own part, its status a data state. Its cell and
@@ -34,12 +39,12 @@
 # `--density-padding-inline`). The DSL has no way to say "channel", so the
 # path names it and this note records the deviation.
 #
-# Density: the root carries the design system's `.dense` class, so the table
+# Density: the table carries the design system's `.dense` class, so the table
 # is dense wherever it sits. It reads the channel and defines no density rule
 # of its own. `.dense` is a class, not a state; nothing changes structurally.
 #
 # Accessibility (DataViews component coverage):
-#   root, rows, cells   "DataTable/header/row/cell"
+#   table, rows, cells  "DataTable/header/row/cell"
 #                       (1.3.1-1.3.2, 2.1.1-2.1.2, 2.4.3, 2.4.7, 4.1.2)
 #                       — a tab stop (0) only where nothing inside is
 #                       tabbable, else -1
@@ -57,26 +62,29 @@
 #                       `DataTable.SettingsMenu` as its `settings`; the settings
 #                       menu's own file states its contract
 #   announcement        "DataTable.SettingsMenu", "Column header menu" and the
-#                       sort (4.1.3): one polite live region per root, after
-#                       the table, coalescing what is said in one moment and
+#                       sort (4.1.3): one polite live region per root, last
+#                       in the frame, coalescing what is said in one moment and
 #                       adding each announcement as a new node, saying what
 #                       has no place on screen to be read from — the new
 #                       ordering, why a sort changed nothing, a column hidden,
 #                       shown or moved with its new position, always shown,
 #                       reset. It never repeats the status row. Every word
 #                       comes from the messages record
+#   footer              (1.3.1, 2.4.3): no role and outside the table, so
+#                       neither `aria-rowcount` nor table navigation counts
+#                       it; its controls follow the table's in tab order
 #   virtualized body    "DataTable virtualized rows" (1.3.1, 2.1.1, 2.4.3,
-#                       4.1.2): the root reports `aria-rowcount` and every
+#                       4.1.2): the table reports `aria-rowcount` and every
 #                       mounted row its `aria-rowindex` in logical order, the
 #                       header row being 1, so a gap is never read as the
 #                       table's end; the row holding focus stays mounted;
 #                       the body is busy until its mounted rows are measured.
 #
 # Virtualized: a table given `virtualization` mounts only the entries near its
-# viewport. Its root takes the `bounded` class, and its body keeps the
+# viewport. The table takes the `bounded` class, and its body keeps the
 # space of the entries it does not mount: as its block padding before the
 # first run and after the last, and as the top margin of a later run's
-# first row. The root becomes the
+# first row. The table becomes the
 # scroll viewport the range is measured against. None of this changes a
 # table without `virtualization`.
 #
@@ -85,20 +93,29 @@
 #     `--surface-color-background`, falling back to `color/background`.
 #   - Borders are two keys (width, colour): the package has no composite
 #     border token.
-#   - `layout.position: sticky` on the header row group: the key is valid
-#     under the DSL's open key pattern but outside its documented
-#     vocabulary.
+#   - `layout.position: sticky` on the header row group and the footer: the
+#     key is valid under the DSL's open key pattern but outside its
+#     documented vocabulary.
 #   - Row tracks come from `--data-table-columns`, the solver's per-render
 #     publication — component-local geometry no stylesheet can know. The
 #     selection track precedes it and the settings track follows it, both
 #     the stylesheet's own and both present only when the header holds
 #     their cell; every body row keeps the settings track, empty.
-#   - The announcement is hidden by clipping, unthemable geometry, and is
-#     rendered beside the root rather than inside it, since a table's
-#     children are its row groups: the DSL has no node for a region read and
-#     never drawn, nor for one outside the root it describes. A connected
-#     table renders none of its own: the root's is the one it speaks
-#     through, which the DSL cannot state either.
+#   - The announcement is hidden by clipping, unthemable geometry: the DSL
+#     has no node for a region read and never drawn. A connected table
+#     renders none of its own: the root's is the one it speaks through,
+#     which the DSL cannot state either.
+#   - The footer sticks to the bottom of whatever scrolls it
+#     (`inset-block-end: 0`) and strips the border, margin and radius of
+#     what it holds, so a pagination bar joins the frame flush. The DSL
+#     has no key for styling a slot's content.
+#   - The footer's reserve is its height, measured once scripts run and
+#     written on the frame; before then, a drawn footer reserves
+#     `--size-footer-reserve` (falling back to `dimension/600`) plus the
+#     frame's border width. With a footer, the table and what takes focus
+#     in it keep a bottom scroll margin of the reserve, so the footer never
+#     covers them. The DSL has no scroll-margin key and no
+#     measured value.
 #   - A selected row under the pointer takes
 #     `color/foreground/secondary/information/hover`; compound states
 #     (`@selected@hover`) are reserved, not permitted, in 0.3.0.
@@ -128,13 +145,14 @@
 #   - A gap's height is the range's per-render publication, the height of
 #     the entries it stands for, written inline as padding or margin:
 #     geometry no stylesheet can know, as `--data-table-columns` is.
-#   - The virtualized root is positioned (`layout.position: relative`), so the
+#   - The virtualized table is positioned (`layout.position: relative`), so the
 #     body's offset is measured from it, and it opts out of the browser's
 #     scroll anchoring (`overflow-anchor: none`): the range anchors the
 #     scroll itself, and two corrections would move it twice. By default it
-#     is no taller than the viewport (`100svh`), so the range stays bounded
-#     wherever it sits; a caller's own maximum wins. `virtual` is a class,
-#     not a registry state, and the DSL has no key for scroll anchoring.
+#     is no taller than the viewport (`100svh`) less the footer's reserve
+#     and the frame's borders, so the range stays bounded wherever it
+#     sits; a caller's own maximum wins. `virtual` is a class, not a
+#     registry state, and the DSL has no key for scroll anchoring.
 #
 # Rows take a minimum height from the density line, never a fixed one, so a
 # taller cell grows its row (see BodyCell). One status row covers the four
@@ -145,61 +163,121 @@
 node:
   uri: apps.pattern.datatable
   styles:
-    layout.overflow: auto
-    typography.color: color/text
-    typography.family: typography/text/primary/font-family
-    typography.size: typography/text/primary/font-size
-    typography.weight: typography/text/primary/font-weight
-    appearance.background: color/background
+    layout.type: stack
+    layout.direction: column
     appearance.border.width: dimension/stroke/thickness/medium
     appearance.border.color: color/border/muted
   edges:
     - node:
-        role: header row group
+        role: table
         styles:
-          layout.position: sticky
-          appearance.background: color/background/layer2
-          appearance.border.bottom.width: dimension/stroke/thickness/medium
-          appearance.border.bottom.color: color/border/muted
+          layout.overflow: auto
+          typography.color: color/text
+          typography.family: typography/text/primary/font-family
+          typography.size: typography/text/primary/font-size
+          typography.weight: typography/text/primary/font-weight
+          appearance.background: color/background
         edges:
           - node:
-              role: header row
+              role: header row group
               styles:
-                layout.type: grid
-                layout.align: center
-                size.min.height: density/line-height-effective
+                layout.position: sticky
+                appearance.background: color/background/layer2
+                appearance.border.bottom.width: dimension/stroke/thickness/medium
+                appearance.border.bottom.color: color/border/muted
               edges:
                 - node:
-                    role: select-all cell
+                    role: header row
                     styles:
-                      layout.type: stack
+                      layout.type: grid
                       layout.align: center
-                      layout.justify: center
-                      layout.overflow: visible
-                      size.width: dimension/400
-                      spacing.internal.inline: 0
+                      size.min.height: density/line-height-effective
                     edges:
-                      # Unchecked, mixed or checked over the displayed rows —
-                      # the checkbox's own states and tokens.
-                      - uri: global.subcomponent.checkbox_input
+                      - node:
+                          role: select-all cell
+                          styles:
+                            layout.type: stack
+                            layout.align: center
+                            layout.justify: center
+                            layout.overflow: visible
+                            size.width: dimension/400
+                            spacing.internal.inline: 0
+                          edges:
+                            # Unchecked, mixed or checked over the displayed
+                            # rows: the checkbox's own states and tokens.
+                            - uri: global.subcomponent.checkbox_input
+                              relation:
+                                cardinality: "1"
                         relation:
-                          cardinality: "1"
+                          cardinality: "0..1"
+                      - uri: apps.subcomponent.data_table-header_cell
+                        relation:
+                          cardinality: "1..*"
+                      - node:
+                          role: settings cell
+                          styles:
+                            layout.type: stack
+                            layout.align: center
+                            layout.justify: center
+                            layout.overflow: visible
+                            size.width: dimension/400
+                            spacing.internal.inline: 0
+                          edges:
+                            - uri: apps.subcomponent.data_table-settings_menu
+                              relation:
+                                cardinality: "1"
+                        relation:
+                          cardinality: "0..1"
                   relation:
-                    cardinality: "0..1"
-                - uri: apps.subcomponent.data_table-header_cell
-                  relation:
-                    cardinality: "1..*"
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+          - node:
+              role: body row group
+              edges:
                 - node:
-                    role: settings cell
+                    role: row
                     styles:
-                      layout.type: stack
+                      layout.type: grid
                       layout.align: center
-                      layout.justify: center
-                      layout.overflow: visible
-                      size.width: dimension/400
-                      spacing.internal.inline: 0
+                      size.min.height: density/line-height-effective
+                      appearance.border.bottom.width: dimension/stroke/thickness/medium
+                      appearance.border.bottom.color: color/border/muted
+                      appearance.background@hover: color/foreground/ghost/hover
+                      appearance.background@selected: color/foreground/secondary/information
                     edges:
-                      - uri: apps.subcomponent.data_table-settings_menu
+                      - node:
+                          role: selection cell
+                          styles:
+                            layout.type: stack
+                            layout.align: center
+                            layout.justify: center
+                            layout.overflow: visible
+                            size.width: dimension/400
+                            spacing.internal.inline: 0
+                          edges:
+                            # Unchecked or checked: the checkbox's own states
+                            # and tokens. No table-specific checkbox styles.
+                            - uri: global.subcomponent.checkbox_input
+                              relation:
+                                cardinality: "1"
+                        relation:
+                          cardinality: "0..1"
+                      - uri: apps.subcomponent.data_table-body_cell
+                        relation:
+                          cardinality: "1..*"
+                  relation:
+                    cardinality: "0..*"
+                - node:
+                    role: status row
+                    edges:
+                      - node:
+                          role: status cell
+                          styles:
+                            spacing.internal.block: dimension/300
+                            spacing.internal.inline: density/padding-inline
+                            typography.color: color/text/muted
+                            typography.align: center
                         relation:
                           cardinality: "1"
                   relation:
@@ -209,58 +287,15 @@ node:
       relation:
         cardinality: "1"
     - node:
-        role: body row group
-        edges:
-          - node:
-              role: row
-              styles:
-                layout.type: grid
-                layout.align: center
-                size.min.height: density/line-height-effective
-                appearance.border.bottom.width: dimension/stroke/thickness/medium
-                appearance.border.bottom.color: color/border/muted
-                appearance.background@hover: color/foreground/ghost/hover
-                appearance.background@selected: color/foreground/secondary/information
-              edges:
-                - node:
-                    role: selection cell
-                    styles:
-                      layout.type: stack
-                      layout.align: center
-                      layout.justify: center
-                      layout.overflow: visible
-                      size.width: dimension/400
-                      spacing.internal.inline: 0
-                    edges:
-                      # Unchecked or checked — the checkbox's own states and
-                      # tokens. No table-specific checkbox styles.
-                      - uri: global.subcomponent.checkbox_input
-                        relation:
-                          cardinality: "1"
-                  relation:
-                    cardinality: "0..1"
-                - uri: apps.subcomponent.data_table-body_cell
-                  relation:
-                    cardinality: "1..*"
-            relation:
-              cardinality: "0..*"
-          - node:
-              role: status row
-              edges:
-                - node:
-                    role: status cell
-                    styles:
-                      spacing.internal.block: dimension/300
-                      spacing.internal.inline: density/padding-inline
-                      typography.color: color/text/muted
-                      typography.align: center
-                  relation:
-                    cardinality: "1"
-            relation:
-              cardinality: "0..1"
+        role: footer
+        styles:
+          layout.position: sticky
+          appearance.background: color/background
+          appearance.border.top.width: dimension/stroke/thickness/medium
+          appearance.border.top.color: color/border/muted
       relation:
-        cardinality: "1"
+        cardinality: "0..1"
     - node:
         role: announcement
       relation:
-        cardinality: "1"
+        cardinality: "0..1"

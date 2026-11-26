@@ -48,7 +48,7 @@ describe("DataViews.DataTable", () => {
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
   });
 
-  it.fails("frames the table with no footer and no announcer of its own", () => {
+  it("frames the table with no footer and no announcer of its own", () => {
     const { provider } = createMachineProvider();
     render(
       <DataViews provider={provider}>
@@ -63,7 +63,7 @@ describe("DataViews.DataTable", () => {
     expect(frame.children).toHaveLength(1);
   });
 
-  it.fails("draws the footer it is given beneath the table", () => {
+  it("draws the footer it is given beneath the table", () => {
     const { provider } = createMachineProvider();
     render(
       <DataViews provider={provider}>
