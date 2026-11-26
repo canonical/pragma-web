@@ -49,6 +49,8 @@ type OwnProps<
    * as none.
    */
   readonly id?: string | undefined;
+  /** Beneath the rows, inside the table's border; sticky, its content flush. */
+  readonly footer?: ReactNode;
 };
 
 /**
@@ -76,6 +78,8 @@ export type ScopedDataTableProps<
     readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
     /** `DataTable.SettingsMenu`, drawn as the menu when given as `settings`. */
     readonly settingsMenu: JSXElementConstructor<never>;
+    /** A standalone table's own live region. */
+    readonly announcer?: ReactNode;
   };
 
 /**
@@ -91,7 +95,7 @@ export type DataTableProps<
   TRow extends object = RowRecord,
 > = Omit<
   ScopedDataTableProps<TFields, TRow>,
-  "messages" | "announce" | "settingsMenu"
+  "messages" | "announce" | "settingsMenu" | "announcer"
 > & {
   /** The words the table renders and announces, over the English record. */
   readonly messages?: Partial<DataViewsMessages>;

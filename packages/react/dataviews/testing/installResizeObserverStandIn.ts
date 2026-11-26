@@ -2,10 +2,10 @@ import type { ResizeObserverStandIn } from "./types.js";
 
 /**
  * Installs a `ResizeObserver` that a test drives, since jsdom lays nothing
- * out: `resize` reports an element's content inline size to every observer
- * observing it, as the platform does once a frame, with the content rect
- * and the content box size both set; `observing` counts the observers
- * observing an element.
+ * out: `resize` reports an element's inline size, and block size when
+ * given, to its observers as the content rect and every box size, border
+ * box included, as the platform does once a frame; `observing` counts an
+ * element's observers.
  *
  * @returns The way to resize, and to uninstall.
  * @note Impure: replaces `globalThis.ResizeObserver` until uninstalled.
@@ -40,15 +40,18 @@ export default function installResizeObserverStandIn(): ResizeObserverStandIn {
   globalThis.ResizeObserver = ResizeObserverStandInImpl;
 
   return {
-    resize: (element, inlineSize) => {
+    resize: (element, inlineSize, blockSize = 0) => {
       for (const observer of [...observers]) {
         if (!observer.targets.has(element)) continue;
-        const size = { inlineSize, blockSize: 0 };
+        const size = { inlineSize, blockSize };
         observer.callback(
           [
             {
               target: element,
-              contentRect: { width: inlineSize, height: 0 } as DOMRectReadOnly,
+              contentRect: {
+                width: inlineSize,
+                height: blockSize,
+              } as DOMRectReadOnly,
               contentBoxSize: [size],
               borderBoxSize: [size],
               devicePixelContentBoxSize: [size],

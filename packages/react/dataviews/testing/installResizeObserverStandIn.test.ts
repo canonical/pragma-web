@@ -27,6 +27,18 @@ describe("installResizeObserverStandIn", () => {
     expect(entry?.target).toBe(element);
     expect(entry?.contentRect.width).toBe(320);
     expect(entry?.contentBoxSize.at(0)?.inlineSize).toBe(320);
+    expect(entry?.borderBoxSize.at(0)?.blockSize).toBe(0);
+  });
+
+  it("reports a block size when one is given", () => {
+    standIn = installResizeObserverStandIn();
+    const element = document.createElement("div");
+    const heard = vi.fn<ResizeObserverCallback>();
+    new ResizeObserver(heard).observe(element);
+    standIn.resize(element, 320, 48);
+    const [entries] = heard.mock.calls.at(0) ?? [[]];
+    expect(entries.at(0)?.borderBoxSize.at(0)?.blockSize).toBe(48);
+    expect(entries.at(0)?.contentRect.height).toBe(48);
   });
 
   it("reports nothing once unobserved or disconnected", () => {

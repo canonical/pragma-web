@@ -25,6 +25,7 @@ import {
 import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
+import { PaginationBar } from "../../lib/subcomponent/PaginationBar/index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },
@@ -78,6 +79,23 @@ describe("the announcer speaks once per root", () => {
       </>,
     );
     expect(listRegions()).toHaveLength(2);
+  });
+
+  it.fails("puts a standalone table's region in its frame, after its footer, the page's only one", () => {
+    const provider = createProvider();
+    render(
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Alone"
+        footer={<PaginationBar provider={provider} />}
+      />,
+    );
+    const regions = Array.from(listRegions());
+    expect(regions).toHaveLength(1);
+    const region = elementAt(regions, 0);
+    expect(region.parentElement).toHaveClass("ds", "data-table-frame");
+    expect(region.previousElementSibling).toHaveClass("footer");
   });
 
   it("says a sort in the root that commanded it, and nothing in a second root over the provider", async () => {

@@ -4,7 +4,7 @@
  * binding, which is the whole of the part.
  */
 import { buildPage } from "@canonical/dataviews-core/testing";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   buildMachine,
@@ -46,6 +46,45 @@ describe("DataViews.DataTable", () => {
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table).toHaveClass("ds", "data-table", "rows");
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
+  });
+
+  it.fails("frames the table with no footer and no announcer of its own", () => {
+    const { provider } = createMachineProvider();
+    render(
+      <DataViews provider={provider}>
+        <DataTable columns={columns} label="Machines" />
+      </DataViews>,
+    );
+    const frame = screen.getByRole("table", { name: "Machines" }).parentElement;
+    if (!(frame instanceof HTMLElement)) {
+      throw new Error("expected the frame");
+    }
+    expect(frame).toHaveClass("ds", "data-table-frame");
+    expect(frame.children).toHaveLength(1);
+  });
+
+  it.fails("draws the footer it is given beneath the table", () => {
+    const { provider } = createMachineProvider();
+    render(
+      <DataViews provider={provider}>
+        <DataTable
+          columns={columns}
+          label="Machines"
+          footer={<DataViews.Pagination />}
+        />
+      </DataViews>,
+    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    const footer = table.nextElementSibling;
+    if (!(footer instanceof HTMLElement)) {
+      throw new Error("expected a footer after the table");
+    }
+    expect(footer).toHaveClass("footer");
+    expect(within(footer).getByRole("navigation")).toHaveClass(
+      "ds",
+      "data-table-pagination-bar",
+    );
+    expect(footer.nextElementSibling).toBeNull();
   });
 
   it("names each row from a record typed by its columns", () => {

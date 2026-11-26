@@ -79,6 +79,8 @@ import {
   useDataViewsCell,
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
+import { PaginationBar } from "../../../../../subcomponent/PaginationBar/index.js";
+import { virtualizeRows } from "../../../../../virtualization/index.js";
 import { DataViews } from "../../../index.js";
 import createColumns from "./createColumns.js";
 import DataTable from "./DataTable.js";
@@ -268,7 +270,7 @@ describe("DataTable", () => {
     expect(table.querySelector("td[style]")).toBeNull();
   });
 
-  it("merges the caller's class name and inline style onto the root", () => {
+  it("merges the caller's class name and inline style onto the table", () => {
     renderLoadedTable([buildMachine("m-1", "alpha")], {
       className: "host",
       style: { opacity: 0.5 },
@@ -280,7 +282,76 @@ describe("DataTable", () => {
     expect(table.id).toBe("machines");
   });
 
-  it("hands the root to a caller's callback ref without losing its own", () => {
+  it.fails("frames the table, then its footer, then its announcer", () => {
+    const { view } = renderLoadedTable([buildMachine("m-1", "alpha")], {
+      footer: <nav aria-label="Pages">1 of 1</nav>,
+      className: "host",
+      id: "machines",
+    });
+    const table = screen.getByRole("table", { name: "Machines" });
+    const parts = Array.from(view.container.children);
+    expect(parts).toHaveLength(1);
+    const frame = elementAt(parts, 0);
+    // The caller's props stay on the table; the frame takes none.
+    expect(frame.outerHTML).toMatch(/^<div class="ds data-table-frame">/);
+    expect(Array.from(frame.children, (part) => part.className)).toEqual([
+      "ds data-table dense host",
+      "footer",
+      "ds data-views-announcer",
+    ]);
+    expect(frame.firstElementChild).toBe(table);
+    const footer = frame.querySelector(":scope > .footer");
+    if (!(footer instanceof HTMLElement)) {
+      throw new Error("expected a footer in the frame");
+    }
+    expect(footer.tagName).toBe("DIV");
+    expect(footer).not.toHaveAttribute("role");
+    expect(within(footer).getByRole("navigation", { name: "Pages" })).toBe(
+      screen.getByRole("navigation", { name: "Pages" }),
+    );
+  });
+
+  it.fails.each([
+    ["undefined", undefined],
+    ["null", null],
+    ["an empty string", ""],
+    ["whitespace", " "],
+    ["false", false],
+    ["true", true],
+  ])("draws no footer for %s", (_, footer) => {
+    const { view } = renderLoadedTable([buildMachine("m-1", "alpha")], {
+      footer,
+    });
+    const frame = view.container.querySelector(".ds.data-table-frame");
+    if (!(frame instanceof HTMLElement)) {
+      throw new Error("expected the frame");
+    }
+    expect(Array.from(frame.children, (part) => part.className)).toEqual([
+      "ds data-table dense",
+      "ds data-views-announcer",
+    ]);
+  });
+
+  it.fails("keeps its footer out of the table and out of a virtualized row count", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
+    });
+    render(
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        virtualization={virtualizeRows({ estimatedRowHeight: 10 })}
+        footer={<PaginationBar provider={provider} />}
+      />,
+    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    expect(table).toHaveAttribute("aria-rowcount", "3");
+    expect(within(table).queryByRole("navigation")).toBeNull();
+    expect(screen.getByRole("navigation")).toBeInTheDocument();
+  });
+
+  it("hands the table to a caller's callback ref without losing its own", () => {
     const { provider } = createMachineProvider();
     const seen: (HTMLDivElement | null)[] = [];
     const { unmount } = render(
@@ -3295,6 +3366,22 @@ describe("DataTable", () => {
       expect(
         view.container.querySelector('[data-status="refused"]'),
       ).toHaveTextContent("This link could not be followed");
+      await expectNoAxeViolations(view.container);
+    });
+
+    it.fails("has no axe violation with a pagination bar in its footer", async () => {
+      const { provider } = createMachineProvider({
+        rows: [buildMachine("m-1", "alpha")],
+      });
+      const view = render(
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          footer={<PaginationBar provider={provider} />}
+        />,
+      );
+      expect(view.container.querySelector(".footer > nav")).not.toBeNull();
       await expectNoAxeViolations(view.container);
     });
 
