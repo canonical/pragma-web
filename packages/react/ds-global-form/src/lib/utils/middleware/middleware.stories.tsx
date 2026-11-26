@@ -44,20 +44,16 @@ const respondWithValidation = async ({
 
 const readOptions = (data: OptionsResponse) => data.options;
 
-const fruitOptions = middleware.addRESTOptions("/api/options", {
-  transformData: readOptions,
-});
-
-const usernameValidation = middleware.addRESTValidation("/api/validate", {
-  errorExtractor: async (response) => {
-    const data = (await response.json()) as { error: string };
-    return data.error;
-  },
-});
+const readValidationError = async (response: Response) => {
+  const data = (await response.json()) as { error: string };
+  return data.error;
+};
 
 /**
  * Both middleware on one form: the select gets its options from an endpoint,
  * and the text field is checked by an endpoint once the user stops typing.
+ * The middleware are created inline: the fields keep one instance across
+ * re-renders, so they neither remount nor send the request again.
  */
 export const Default: Story = {
   args: { name: "fruit", inputType: "select", options: [] },
@@ -68,14 +64,22 @@ export const Default: Story = {
         inputType="select"
         label="Fruit"
         options={[]}
-        middleware={[fruitOptions]}
+        middleware={[
+          middleware.addRESTOptions("/api/options", {
+            transformData: readOptions,
+          }),
+        ]}
       />
       <Field
         name="username"
         inputType="text"
         label="Username"
         description="Enter `invalid` to see the endpoint reject the value."
-        middleware={[usernameValidation]}
+        middleware={[
+          middleware.addRESTValidation("/api/validate", {
+            errorExtractor: readValidationError,
+          }),
+        ]}
       />
     </>
   ),
@@ -96,7 +100,9 @@ export const RESTOptions: Story = {
     inputType: "select",
     label: "Fruit",
     options: [],
-    middleware: [fruitOptions],
+    middleware: [
+      middleware.addRESTOptions("/api/options", { transformData: readOptions }),
+    ],
   },
   parameters: {
     msw: {
@@ -112,7 +118,9 @@ export const RESTOptionsLoading: Story = {
     inputType: "select",
     label: "Fruit",
     options: [],
-    middleware: [fruitOptions],
+    middleware: [
+      middleware.addRESTOptions("/api/options", { transformData: readOptions }),
+    ],
   },
   parameters: {
     msw: {
@@ -133,7 +141,9 @@ export const RESTOptionsFailure: Story = {
     inputType: "select",
     label: "Fruit",
     options: [],
-    middleware: [fruitOptions],
+    middleware: [
+      middleware.addRESTOptions("/api/options", { transformData: readOptions }),
+    ],
   },
   parameters: {
     msw: {
@@ -152,7 +162,11 @@ export const RESTValidation: Story = {
     label: "Username",
     description:
       "If the value entered equals the string `invalid`, the back-end validation should fail.",
-    middleware: [usernameValidation],
+    middleware: [
+      middleware.addRESTValidation("/api/validate", {
+        errorExtractor: readValidationError,
+      }),
+    ],
   },
   parameters: {
     msw: {

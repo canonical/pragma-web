@@ -1,6 +1,11 @@
-import { act, fireEvent, screen } from "@testing-library/react";
-import { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { useEffect, useState } from "react";
+import {
+  FormProvider,
+  type RegisterOptions,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
 import { TextField } from "../../component/TextField/index.js";
@@ -281,6 +286,247 @@ describe("addRESTFieldValidation", () => {
       unmount();
       expect(getRequest(0).init.signal?.aborted).toBe(true);
       await respondWith(0, 400);
+    });
+  });
+
+  describe("previous message", () => {
+    it("keeps the previous message when a request fails to complete", async () => {
+      renderText(addRESTFieldValidation("/api/validate"));
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 400);
+      await typeValue("alice2");
+      await advanceTime(300);
+      await settleRequest(() =>
+        getRequest(1).reject(new TypeError("Network down")),
+      );
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+  });
+
+  describe("submitting", () => {
+    const onSubmit = vi.fn();
+
+    afterEach(() => {
+      onSubmit.mockClear();
+    });
+
+    /** A form that records its submissions. */
+    const SubmitForm = ({
+      middleware,
+      registerProps,
+    }: {
+      middleware: ReturnType<typeof addRESTFieldValidation>;
+      registerProps?: RegisterOptions;
+    }) => {
+      const methods = useForm();
+      return (
+        <FormProvider {...methods}>
+          <form
+            aria-label="Account"
+            onSubmit={methods.handleSubmit((values) => onSubmit(values))}
+          >
+            <TextField
+              name="username"
+              label="Username"
+              isOptional
+              registerProps={registerProps}
+              middleware={[middleware]}
+            />
+          </form>
+        </FormProvider>
+      );
+    };
+
+    const submit = () =>
+      act(async () => {
+        fireEvent.submit(screen.getByRole("form", { name: "Account" }));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+    it("blocks the submit of a value the endpoint rejected", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 400);
+      await submit();
+      await advanceTime(300);
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+
+    it("checks a value submitted before the debounce ends", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await submit();
+      await advanceTime(300);
+      expect(fetchMock).toHaveBeenCalledOnce();
+      await respondWith(0, 409);
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+
+    it("submits a value the endpoint accepted", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 200);
+      await submit();
+      expect(onSubmit).toHaveBeenCalledWith({ username: "alice" });
+    });
+
+    it("submits a value too short to check", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("al");
+      await submit();
+      expect(onSubmit).toHaveBeenCalledWith({ username: "al" });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("submits when the check fails to complete and no message was set", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await submit();
+      await advanceTime(300);
+      await settleRequest(() =>
+        getRequest(0).reject(new TypeError("Network down")),
+      );
+      expect(onSubmit).toHaveBeenCalledOnce();
+    });
+
+    it("keeps blocking with the previous message when the check fails", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await advanceTime(300);
+      await respondWith(0, 400);
+      await typeValue("alice2");
+      await submit();
+      await advanceTime(300);
+      await settleRequest(() =>
+        getRequest(1).reject(new TypeError("Network down")),
+      );
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+
+    it("asks again on submit after a check failed to complete", async () => {
+      render(
+        <SubmitForm middleware={addRESTFieldValidation("/api/validate")} />,
+      );
+      await typeValue("alice");
+      await advanceTime(300);
+      await settleRequest(() =>
+        getRequest(0).reject(new TypeError("Network down")),
+      );
+      await submit();
+      await advanceTime(300);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      await respondWith(1, 400);
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it("keeps the field's own validate function", async () => {
+      render(
+        <SubmitForm
+          middleware={addRESTFieldValidation("/api/validate")}
+          registerProps={{
+            validate: (value) => value !== "admin" || "Reserved name",
+          }}
+        />,
+      );
+      await typeValue("admin");
+      await advanceTime(300);
+      await respondWith(0, 200);
+      await submit();
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent("Reserved name");
+    });
+
+    it("keeps the field's own validate rules", async () => {
+      render(
+        <SubmitForm
+          middleware={addRESTFieldValidation("/api/validate")}
+          registerProps={{
+            validate: {
+              reserved: (value) => value !== "admin" || "Reserved name",
+            },
+          }}
+        />,
+      );
+      await typeValue("admin");
+      await advanceTime(300);
+      await respondWith(0, 200);
+      await submit();
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent("Reserved name");
+    });
+  });
+
+  describe("inline middleware", () => {
+    /** A form that builds the middleware inline and re-renders on demand. */
+    const InlineForm = ({ url }: { url: string }) => {
+      const methods = useForm();
+      const [renders, setRenders] = useState(0);
+      return (
+        <FormProvider {...methods}>
+          <button type="button" onClick={() => setRenders(renders + 1)}>
+            Re-render
+          </button>
+          <TextField
+            name="username"
+            label="Username"
+            middleware={[addRESTFieldValidation(url)]}
+          />
+        </FormProvider>
+      );
+    };
+
+    const reRender = () =>
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: "Re-render" }));
+      });
+
+    it("sends once and keeps the field mounted across re-renders", async () => {
+      render(<InlineForm url="/api/validate" />);
+      const textbox = screen.getByRole("textbox");
+      await typeValue("alice");
+      await reRender();
+      await advanceTime(300);
+      await reRender();
+      await respondWith(0, 400);
+      await reRender();
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(screen.getByRole("textbox")).toBe(textbox);
+      expect(screen.getByRole("alert")).toHaveTextContent("Validation failed");
+    });
+
+    it("checks the value again when the URL changes", async () => {
+      const { rerender } = render(<InlineForm url="/api/a" />);
+      await typeValue("alice");
+      await advanceTime(300);
+      rerender(<InlineForm url="/api/b" />);
+      await advanceTime(300);
+      expect(requests.map((request) => request.url)).toEqual([
+        "/api/a",
+        "/api/b",
+      ]);
+      expect(getRequest(0).init.signal?.aborted).toBe(true);
+      await respondWith(1, 200);
+      await respondWith(0, 400);
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
   });
 });
