@@ -1,3 +1,4 @@
+import type React from "react";
 import type {
   CountryData,
   KnownCountryCode,
@@ -12,83 +13,100 @@ export type {
   KnownCountryCode,
 } from "../../utils/countries/index.js";
 
+/**
+ * ARIA wiring for the national-number input. The field tier supplies these, so
+ * the number is named by the field label and described by its description and
+ * error.
+ */
+type PhoneNumberAriaProps = Pick<
+  React.AriaAttributes,
+  | "aria-labelledby"
+  | "aria-describedby"
+  | "aria-errormessage"
+  | "aria-invalid"
+  | "aria-required"
+>;
+
 /** Props for the presentational Phone input (controlled, no react-hook-form). */
-export type PhoneInputProps = BaseProps & {
-  /**
-   * Name for the national-number input. The field tier supplies this; it is what
-   * gives the control a name in a plain HTML submission, so the entry is not
-   * silently dropped when scripting is unavailable.
-   */
-  name?: string;
+export type PhoneInputProps = BaseProps &
+  PhoneNumberAriaProps & {
+    /**
+     * Name for the national-number input. The field tier supplies this; it is what
+     * gives the control a name in a plain HTML submission, so the entry is not
+     * silently dropped when scripting is unavailable. The country `<select>` is
+     * named `<name>-country`, so a server can rebuild the full number from a
+     * plain submission.
+     */
+    name?: string;
 
-  /** Controlled value — E.164 string or structured object. */
-  value?: string | PhoneValue;
+    /** Controlled value — E.164 string or structured object. */
+    value?: string | PhoneValue;
 
-  /** Called with the next value in the configured `valueFormat`. */
-  onChange?: (value: string | PhoneValue) => void;
+    /** Called with the next value in the configured `valueFormat`. */
+    onChange?: (value: string | PhoneValue) => void;
 
-  /**
-   * Called when the national-number input loses focus. The field tier supplies
-   * this; without it react-hook-form never marks the field touched, so
-   * `mode: "onTouched"` never validates it and a touched-gated error never shows.
-   */
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+    /**
+     * Called when the national-number input loses focus. The field tier supplies
+     * this; without it react-hook-form never marks the field touched, so
+     * `mode: "onTouched"` never validates it and a touched-gated error never shows.
+     */
+    onBlur?: React.FocusEventHandler<HTMLInputElement>;
 
-  /** Default country (a known ISO 3166-1 alpha-2 code from the dataset). */
-  defaultCountry?: KnownCountryCode;
+    /** Default country (a known ISO 3166-1 alpha-2 code from the dataset). */
+    defaultCountry?: KnownCountryCode;
 
-  /**
-   * Restrict the selector to ONLY these countries (a whitelist of known ISO
-   * 3166-1 alpha-2 codes) — they form the visible universe. When omitted, the
-   * full dataset is available. Composes with `preferredCountries`, which then
-   * hoists favourites within this filtered set.
-   */
-  filteredCountries?: KnownCountryCode[];
+    /**
+     * Restrict the selector to ONLY these countries (a whitelist of known ISO
+     * 3166-1 alpha-2 codes) — they form the visible universe. When omitted, the
+     * full dataset is available. Composes with `preferredCountries`, which then
+     * hoists favourites within this filtered set.
+     */
+    filteredCountries?: KnownCountryCode[];
 
-  /**
-   * Hoist these countries to the TOP of the selector, in the order given (known
-   * ISO 3166-1 alpha-2 codes); the remaining countries follow, sorted by dial
-   * code. Unlike `filteredCountries`, this does not remove any country.
-   */
-  preferredCountries?: KnownCountryCode[];
+    /**
+     * Hoist these countries to the TOP of the selector, in the order given (known
+     * ISO 3166-1 alpha-2 codes); the remaining countries follow, sorted by dial
+     * code. Unlike `filteredCountries`, this does not remove any country.
+     */
+    preferredCountries?: KnownCountryCode[];
 
-  /**
-   * Custom country list. Defaults to the bundled `utils/countries` dataset.
-   * Codes must be ISO 3166-1 alpha-2 (see {@link CountryData.code}).
-   */
-  countries?: CountryData[];
+    /**
+     * Custom country list. Defaults to the bundled `utils/countries` dataset.
+     * Codes must be ISO 3166-1 alpha-2 (see {@link CountryData.code}).
+     */
+    countries?: CountryData[];
 
-  /** Value format: E.164 string or structured object. */
-  valueFormat?: "e164" | "structured";
+    /** Value format: E.164 string or structured object. */
+    valueFormat?: "e164" | "structured";
 
-  /**
-   * How each country is labelled in the selector, after its dial code:
-   * `"code"` (default) shows the ISO code (e.g. `+1 US`), `"name"` shows the
-   * full country name (`+1 United States`), `"flag"` shows its emoji flag.
-   *
-   * `"flag"` requires every country's `code` to be a valid **ISO 3166-1
-   * alpha-2** code (see {@link CountryData.code}) — the flag is built from the
-   * two letters' regional-indicator symbols. If you supply a custom country
-   * list with non-alpha-2 codes, the flags will not render correctly; prefer
-   * `"code"` or `"name"` in that case.
-   */
-  countryDisplay?: "code" | "name" | "flag";
+    /**
+     * How each country is labelled in the selector, after its dial code:
+     * `"code"` (default) shows the ISO code (e.g. `+1 US`), `"name"` shows the
+     * full country name (`+1 United States`), `"flag"` shows its emoji flag.
+     *
+     * `"flag"` requires every country's `code` to be a valid **ISO 3166-1
+     * alpha-2** code (see {@link CountryData.code}) — the flag is built from the
+     * two letters' regional-indicator symbols. If you supply a custom country
+     * list with non-alpha-2 codes, the flags will not render correctly; prefer
+     * `"code"` or `"name"` in that case.
+     */
+    countryDisplay?: "code" | "name" | "flag";
 
-  /**
-   * Opt in to live national-number grouping using the selected country's display
-   * pattern (cosmetic spacing/dashes; see {@link CountryData.format}). Defaults
-   * to `false`, which shows the number as raw digits.
-   *
-   * The submitted value is always raw digits / E.164 either way — the grouping is
-   * a display projection only, applied through `utils/formatter` and kept
-   * caret-stable by `useFormattedValue`, so the number stays editable in the
-   * middle rather than forcing the cursor to the end.
-   */
-  mask?: boolean;
+    /**
+     * Opt in to live national-number grouping using the selected country's display
+     * pattern (cosmetic spacing/dashes; see {@link CountryData.format}). Defaults
+     * to `false`, which shows the number as raw digits.
+     *
+     * The submitted value is always raw digits / E.164 either way — the grouping is
+     * a display projection only, applied through `utils/formatter` and kept
+     * caret-stable by `useFormattedValue`, so the number stays editable in the
+     * middle rather than forcing the cursor to the end.
+     */
+    mask?: boolean;
 
-  /** Whether the input is disabled. */
-  disabled?: boolean;
-};
+    /** Whether the input is disabled. */
+    disabled?: boolean;
+  };
 
 export type PhoneValue = {
   countryCode: string;

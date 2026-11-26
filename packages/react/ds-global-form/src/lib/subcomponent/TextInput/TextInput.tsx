@@ -9,6 +9,8 @@ const componentCssClassName = "ds input text chrome";
  *
  * Usable standalone (controlled via `value`/`onChange`, or uncontrolled) or via
  * the field tier, which spreads react-hook-form's `register()` result onto it.
+ * The `id` goes on the native `<input>`, not the chrome wrapper, so a
+ * `<label for>` names and focuses the real control.
  * @returns {ReactElement} - Rendered Text
  *
  * `import { TextInput } from "@canonical/react-ds-global-form";`
@@ -30,12 +32,11 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ): ReactElement {
     return (
       <div
-        id={id}
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
         {prefix && <span className="prefix">{prefix}</span>}
-        <input type={inputType} ref={ref} {...nativeProps} />
+        <input id={id} type={inputType} ref={ref} {...nativeProps} />
         {suffix && <span className="suffix">{suffix}</span>}
       </div>
     );

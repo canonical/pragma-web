@@ -218,6 +218,49 @@ describe("PhoneInput (presentational)", () => {
     );
   });
 
+  it("names the country select after the field, so a plain submission carries it", () => {
+    render(<PhoneInput defaultCountry="GB" name="mobile" />);
+    expect(screen.getByLabelText("Country code")).toHaveAttribute(
+      "name",
+      "mobile-country",
+    );
+  });
+
+  it("leaves the country select unnamed when the input has no name", () => {
+    render(<PhoneInput defaultCountry="GB" />);
+    expect(screen.getByLabelText("Country code")).not.toHaveAttribute("name");
+  });
+
+  it("puts the id on the number input, so a label targets the real control", () => {
+    render(<PhoneInput id="mobile" defaultCountry="US" />);
+    const number = screen.getByLabelText("Phone number");
+    expect(number).toHaveAttribute("id", "mobile");
+    expect(number.parentElement).not.toHaveAttribute("id");
+  });
+
+  it("names the number input by the field label when aria-labelledby is given", () => {
+    render(
+      <>
+        <span id="mobile-label">Mobile</span>
+        <span id="mobile-description">Work number</span>
+        <PhoneInput
+          id="mobile"
+          defaultCountry="US"
+          aria-labelledby="mobile-label"
+          aria-describedby="mobile-description"
+          aria-invalid
+          aria-required
+        />
+      </>,
+    );
+    const number = screen.getByRole("textbox", { name: "Mobile" });
+    expect(number).not.toHaveAttribute("aria-label");
+    expect(number).toHaveAccessibleDescription("Work number");
+    expect(number).toHaveAttribute("aria-invalid", "true");
+    expect(number).toHaveAttribute("aria-required", "true");
+    expect(screen.getByLabelText("Country code")).toBeInTheDocument();
+  });
+
   it("keeps the caret in place when a masked number is edited in the middle", () => {
     // Controlled by the parent, as PhoneField binds it — this is what makes the
     // value round-trip through a reformat on every keystroke.

@@ -13,6 +13,11 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+/**
+ * The label names the number input; the country select keeps its own
+ * "Country code" label. In a plain HTML submission the number posts as `phone`
+ * and the selected country code as `phone-country`.
+ */
 export const Default: Story = {
   args: { name: "phone", label: "Phone number" },
 };
