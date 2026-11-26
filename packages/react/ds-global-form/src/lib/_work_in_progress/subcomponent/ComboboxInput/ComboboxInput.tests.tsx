@@ -3,8 +3,8 @@ import type React from "react";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { describe, expect, it, vi } from "vitest";
+import type { Option } from "../../../subcomponent/types.js";
 import { ComboboxField } from "../../component/ComboboxField/index.js";
-import type { Option } from "../types.js";
 import { ComboboxInput } from "./ComboboxInput.js";
 
 const fruits: Option[] = [

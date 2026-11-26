@@ -1,7 +1,7 @@
 import { useCombobox, useMultipleSelection } from "downshift";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import type { Option } from "../types.js";
+import type { Option } from "../../../subcomponent/types.js";
 import { List, ResetButton } from "./common/index.js";
 import { VALUE_KEY } from "./constants.js";
 import type { ComboboxInputProps } from "./types.js";

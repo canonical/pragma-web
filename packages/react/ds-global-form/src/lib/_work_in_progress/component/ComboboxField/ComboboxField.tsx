@@ -1,5 +1,5 @@
-import bindField from "../../common/bindField/index.js";
-import withWrapper from "../../common/Wrapper/withWrapper.js";
+import bindField from "../../../common/bindField/index.js";
+import withWrapper from "../../../common/Wrapper/withWrapper.js";
 import { ComboboxInput } from "../../subcomponent/ComboboxInput/index.js";
 import type { ComboboxFieldProps } from "./types.js";
 

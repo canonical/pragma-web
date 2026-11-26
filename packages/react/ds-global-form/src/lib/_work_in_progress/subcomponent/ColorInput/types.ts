@@ -1,4 +1,4 @@
-import type { BaseProps } from "../types.js";
+import type { BaseProps } from "../../../subcomponent/types.js";
 
 export type HexFormat = "hex6" | "hex3" | "hex8";
 

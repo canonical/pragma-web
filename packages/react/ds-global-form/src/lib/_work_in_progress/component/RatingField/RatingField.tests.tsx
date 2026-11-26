@@ -1,6 +1,6 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { renderWithForm } from "../../../testing/renderWithForm.js";
+import { renderWithForm } from "../../../../testing/renderWithForm.js";
 import { RatingField } from "./index.js";
 
 describe("RatingField", () => {

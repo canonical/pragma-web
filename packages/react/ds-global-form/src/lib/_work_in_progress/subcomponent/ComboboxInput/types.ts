@@ -1,5 +1,9 @@
 /* @canonical/generator-ds 0.9.0-experimental.9 */
-import type { BaseProps, Option, OptionsProps } from "../types.js";
+import type {
+  BaseProps,
+  Option,
+  OptionsProps,
+} from "../../../subcomponent/types.js";
 import type * as utils from "./utils/index.js";
 
 /** Controlled value props — supplied by the field tier, or directly when standalone. */
