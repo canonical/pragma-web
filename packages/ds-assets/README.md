@@ -54,6 +54,23 @@ Icons can be referenced directly via SVG's `<use>` element:
 
 See [docs/ICONS.md](docs/ICONS.md) for the complete icon specification, naming conventions, and migration notes from Vanilla.
 
+### Custom Icons
+
+If an icon would be useful to more than one product, add it to this package instead. An application can add icons of its own on top of the ones shipped here. Declare their names once by extending the `CustomIcons` interface, and every component that takes an `IconName` (`Icon`, `Button`, `SideNavigation`, …) will accept them. Autocomplete and typo checks work for them too:
+
+```typescript
+// src/types/icons.d.ts
+import "@canonical/ds-assets";
+
+declare module "@canonical/ds-assets" {
+  interface CustomIcons {
+    "maas-cluster": true;
+  }
+}
+```
+
+Serve each SVG next to the built-in ones, at `/icons/maas-cluster.svg`. With Vite, that means putting it in `public/icons/`. Each file follows the same [specification](docs/ICONS.md#specification) as the built-in icons: a 16x16 viewBox, a `<g id="maas-cluster">` wrapper and `currentColor` fills. Start every name with your product (`maas-`), so it can never collide with an icon this package adds later. Only an application should declare custom icons: a published library that did would give every consumer the names without the SVG files behind them. `ICON_NAMES` and `ICON_METADATA` list only the built-in icons (`BuiltInIconName`), so custom icons don't appear in the icon search.
+
 ## Fonts
 
 Variable woff2 fonts for Ubuntu Sans and Ubuntu Sans Mono live in `fonts/ubuntu-sans/`.

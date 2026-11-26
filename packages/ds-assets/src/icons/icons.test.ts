@@ -4,7 +4,7 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 import { ICON_CATEGORIES, ICON_NAMES } from "./constants.js";
 import { ICON_METADATA } from "./metadata.js";
-import type { IconMetadata, IconName } from "./types.js";
+import type { BuiltInIconName, IconMetadata } from "./types.js";
 
 describe("icons", () => {
   it("each icon in `ICON_NAMES` exists in the icons directory", () => {
@@ -27,7 +27,7 @@ describe("icons", () => {
     svgFiles.forEach((svgFile) => {
       const iconName = svgFile.replace(".svg", "");
       expect(
-        ICON_NAMES.includes(iconName as IconName),
+        ICON_NAMES.includes(iconName as BuiltInIconName),
         `Icon ${iconName} exists in the icons directory but is not listed in ICON_NAMES`,
       ).toBe(true);
     });
@@ -127,7 +127,7 @@ const badReplacements = (
     .map(([name, meta]) => `${name} -> ${meta.deprecated?.replacedBy}`);
 
 describe("metadata", () => {
-  // `ICON_METADATA` is typed `Record<IconName, IconMetadata>`, so TypeScript
+  // `ICON_METADATA` is typed `Record<BuiltInIconName, IconMetadata>`, so TypeScript
   // already rejects a missing or extra key. These two run anyway: TypeScript's
   // message inlines all 167 entries and truncates, while these name the icon,
   // and they still hold for JavaScript consumers and for anything that reaches
@@ -140,7 +140,7 @@ describe("metadata", () => {
 
   it("`ICON_METADATA` has no entries that are not in `ICON_NAMES`", () => {
     const extra = Object.keys(ICON_METADATA).filter(
-      (iconName) => !ICON_NAMES.includes(iconName as IconName),
+      (iconName) => !ICON_NAMES.includes(iconName as BuiltInIconName),
     );
 
     expect(extra, "ICON_METADATA entries with no icon").toEqual([]);
@@ -242,7 +242,7 @@ describe("metadata", () => {
         offenders.push(`${iconName}: repeats an alias`);
 
       for (const alias of aliases) {
-        if (ICON_NAMES.includes(alias as IconName))
+        if (ICON_NAMES.includes(alias as BuiltInIconName))
           offenders.push(`${iconName}: alias "${alias}" is a live icon name`);
 
         const owner = owners.get(alias);
@@ -294,7 +294,7 @@ describe("metadata", () => {
         [
           [
             "close",
-            { ...stub, deprecated: { replacedBy: "gone" as IconName } },
+            { ...stub, deprecated: { replacedBy: "gone" as BuiltInIconName } },
           ],
           ["edit", { ...stub, deprecated: { replacedBy: "edit" } }],
           ["copy", { ...stub, deprecated: { replacedBy: "close" } }],

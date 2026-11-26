@@ -47,7 +47,9 @@ Icons use `currentColor` for fill, inheriting the text colour of their parent el
 The `src/icons/` folder exports:
 
 - `ICON_NAMES` - Array of all icon names as a const
-- `IconName` - Union type of all icon names
+- `IconName` - Union type of every icon name, built-in and custom (see the README's "Custom Icons")
+- `BuiltInIconName` - Union type of the icons this package ships
+- `CustomIcons` - Interface an application extends to add its own icons
 - `ICON_CATEGORIES` - Array of the categories an icon can belong to
 - `IconCategory` - Union type of those categories
 - `ICON_METADATA` - Metadata for every icon, keyed by icon name

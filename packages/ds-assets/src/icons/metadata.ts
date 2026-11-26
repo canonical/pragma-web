@@ -1,4 +1,4 @@
-import type { IconMetadata, IconName } from "./types.js";
+import type { BuiltInIconName, IconMetadata } from "./types.js";
 
 /**
  * Searchable metadata for every icon in `ICON_NAMES`, in the same order.
@@ -9,7 +9,7 @@ import type { IconMetadata, IconName } from "./types.js";
  * glyphs; the file is maintained by hand from here on, under the rules in
  * `docs/ICONS.md` and the invariants in `icons.test.ts`.
  */
-export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
+export const ICON_METADATA: Readonly<Record<BuiltInIconName, IconMetadata>> = {
   "add-canvas": {
     tags: [
       "add",

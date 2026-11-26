@@ -1,13 +1,38 @@
 import type { ICON_CATEGORIES, ICON_NAMES } from "./constants.js";
 
-export type IconName = (typeof ICON_NAMES)[number];
+/** The name of an icon this package ships, e.g. `"search"`. */
+export type BuiltInIconName = (typeof ICON_NAMES)[number];
+
+/**
+ * Icons an application adds on top of the ones this package ships. Empty
+ * here; an application fills it in by module augmentation, one key per
+ * icon, and serves each SVG next to the built-in ones:
+ *
+ * ```ts
+ * declare module "@canonical/ds-assets" {
+ *   interface CustomIcons {
+ *     "maas-cluster": true;
+ *   }
+ * }
+ * ```
+ *
+ * Prefix every name with the product (`maas-`) so it can never collide with
+ * an icon this package adds later. Only applications augment this: a
+ * published library that did would hand its icon names to every consumer
+ * without the SVGs behind them.
+ */
+// biome-ignore lint/suspicious/noEmptyInterface: filled in by consumers through module augmentation
+export interface CustomIcons {}
+
+/** The name of any icon: one this package ships, or one in `CustomIcons`. */
+export type IconName = BuiltInIconName | Extract<keyof CustomIcons, string>;
 
 export type IconCategory = (typeof ICON_CATEGORIES)[number];
 
 /** An icon on its way out, and what to reach for instead. */
 export interface IconDeprecation {
   /** The icon to use instead, e.g. `"delete"`. */
-  readonly replacedBy?: IconName;
+  readonly replacedBy?: BuiltInIconName;
 
   /** The package version the icon was deprecated in, e.g. `"0.38.0"`. */
   readonly since?: string;
