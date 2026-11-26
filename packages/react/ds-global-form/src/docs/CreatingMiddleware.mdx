@@ -29,9 +29,11 @@ Middleware is applied at the `Field` level through the `middleware` prop, which 
   inputType="select"
   label="Country"
   options={[]}
-  middleware={[myMiddleware, anotherMiddleware]}
+  middleware={[addRESTOptions("/api/countries")]}
 />
 ```
+
+Middleware can be created inline, as above. The field keeps one instance across re-renders, so the input neither remounts nor repeats its requests; see [Settings that change](#settings-that-change).
 
 ### Where middleware sits in the component tree
 
@@ -51,12 +53,10 @@ The first middleware in the array is the outermost wrapper. Each middleware rece
 
 That distinction matters. `bindField` is where `register()` or `useController` runs, so `value`, `onChange` and the element `ref` are all created *below* every middleware. Middleware sees the props going into the binding — `name`, `registerProps`, the ARIA props — and can add to them; it cannot intercept the value on its way out, and it never has the DOM node.
 
-This ordering is handled by `withWrapper`, which reverses the array and reduces it:
+This ordering is handled by `withWrapper`, which reduces the array from the right:
 
 ```typescript
-[...middleware]
-  .reverse()
-  .reduce((Accumulated, hoc) => hoc(Accumulated), InputComponent);
+middleware.reduceRight((Accumulated, hoc) => hoc(Accumulated), InputComponent);
 ```
 
 ## Built-in middleware
@@ -95,7 +95,7 @@ import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
 />
 ```
 
-The middleware manages loading and error states internally. While the fetch is in progress, it renders a loading indicator instead of the input. If the fetch fails, it renders an error message. Once the data arrives, the input renders with the fetched options.
+The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The field stays enabled, so the user can see the error and the form stays usable. The fetch is keyed on the URL: re-rendering the field with a middleware created inline fetches nothing, and a different URL fetches the new options without remounting the field, dropping any answer still on its way for the previous URL. The request is aborted when the field unmounts. Its error type is `restOptions`, so it only ever clears its own error.
 
 ### addRESTValidation
 
@@ -132,7 +132,9 @@ import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
 />
 ```
 
-The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, it calls `clearErrors`.
+The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field with the error type `restValidation`, which triggers the `.danger` error state. If the server returns OK, or the value becomes shorter than the minimum, it clears the error it set, leaving errors from the field's rules in place. A request that fails to complete says nothing about the value, so the previous message stays. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
+
+The check is also added to the field's `validate` rules, under the name `restValidation`, next to any `validate` rules the field already has. Submitting runs the rules again, so a value the server rejected blocks the submit instead of having its error cleared. A value submitted before its check has run waits for the answer, which the typing and the submit share, so they send one request.
 
 ## Writing custom middleware
 
@@ -171,9 +173,43 @@ function withAnalytics(eventName: string): Middleware<any> {
 ```
 
 The three levels serve different purposes:
-- **Factory** (`withAnalytics(eventName)`) — captures configuration. Called once at field definition time.
-- **HOC** (`(WrappedComponent) => ...`) — receives the component to wrap. Called once during middleware composition.
+- **Factory** (`withAnalytics(eventName)`) — captures configuration.
+- **HOC** (`(WrappedComponent) => ...`) — receives the component to wrap. Called during middleware composition.
 - **Enhanced component** (`function AnalyticsComponent(props)`) — renders on every update. This is where hooks, state, and side effects live.
+
+A field compares a plain middleware by identity. Called inline, `withAnalytics(eventName)` makes a new middleware on every render, so the field composes a new component and the input remounts. Build the middleware with `createMiddleware` to avoid that.
+
+### Settings that change
+
+`createMiddleware` turns the HOC into a factory taking settings. The HOC receives a `useSettings` hook alongside the component, and the field compares middleware from the same factory by their HOC, so an inline call keeps the same component and `useSettings` returns the settings of the newest call. Key effects on the settings that should restart them, as `addRESTOptions` keys its fetch on the URL.
+
+```typescript
+import { createElement, useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+import { createMiddleware } from "@canonical/react-ds-global-form";
+
+const withAnalytics = createMiddleware<string>(
+  (WrappedComponent, useSettings) =>
+    function AnalyticsComponent(props) {
+      const eventName = useSettings();
+      const { watch } = useFormContext();
+      const value = watch(props.name);
+
+      useEffect(() => {
+        if (value !== undefined) {
+          trackEvent(eventName, { field: props.name, value });
+        }
+      }, [eventName, value, props.name]);
+
+      return createElement(WrappedComponent, props);
+    },
+);
+
+// Safe inline: the input keeps its state across re-renders.
+<Field name="search" label="Search" middleware={[withAnalytics("search")]} />
+```
+
+Called outside a field, a middleware from `createMiddleware` uses the settings it was made with.
 
 ### Accessing form context
 
@@ -314,56 +350,48 @@ Usage — a city select that populates when the country field changes:
 
 ### Debouncing API calls
 
-Any middleware that makes API calls on value changes should debounce to avoid flooding the server. The form package uses the `debounce` utility from `@canonical/ds-utils`:
+Any middleware that makes API calls on value changes should debounce to avoid flooding the server, and abort the request in flight when the value changes, so a slow answer for an old value cannot overwrite the answer for the new one. A timer and an `AbortController` in one effect do both, and the effect's cleanup cancels them when the value changes or the field unmounts:
 
 ```typescript
-import { debounce } from "@canonical/ds-utils";
-import { useCallback, useEffect } from "react";
-import { useFormContext } from "react-hook-form";
-import type { Middleware } from "@canonical/react-ds-global-form";
+import { type ComponentType, createElement, useEffect } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+import type { BaseInputProps } from "@canonical/react-ds-global-form";
 
-function withDebouncedValidation(
-  url: string,
-  wait = 300,
-): Middleware<any> {
-  return (WrappedComponent) => {
-    return function DebouncedComponent(props) {
+function withDebouncedValidation(url: string, wait = 300) {
+  return <Props extends BaseInputProps>(
+    WrappedComponent: ComponentType<Props>,
+  ) =>
+    function DebouncedComponent(props: Props) {
       const { name } = props;
-      const { watch, setError, clearErrors } = useFormContext();
-      const value = watch(name);
+      const { setError, clearErrors, getFieldState } = useFormContext();
+      const value: unknown = useWatch({ name });
 
-      // Create a stable debounced function
-      const validate = useCallback(
-        debounce(async (val: string) => {
+      useEffect(() => {
+        if (typeof value !== "string" || value.length < 3) return;
+        const requestUrl = `${url}?value=${encodeURIComponent(value)}`;
+        const controller = new AbortController();
+        const timer = setTimeout(async () => {
           try {
-            const response = await fetch(`${url}?value=${val}`);
+            const response = await fetch(requestUrl, { signal: controller.signal });
+            if (controller.signal.aborted) return;
             if (!response.ok) {
-              setError(name, {
-                type: "manual",
-                message: "Validation failed",
-              });
-            } else {
+              setError(name, { type: "remote", message: "Validation failed" });
+            } else if (getFieldState(name).error?.type === "remote") {
+              // Clear only the error this middleware set.
               clearErrors(name);
             }
           } catch {
-            setError(name, {
-              type: "manual",
-              message: "Network error",
-            });
+            // Aborted, or the request failed: it says nothing about the value.
           }
-        }, wait),
-        [name],
-      );
-
-      useEffect(() => {
-        if (value && value.length >= 3) {
-          validate(value);
-        }
-      }, [value, validate]);
+        }, wait);
+        return () => {
+          clearTimeout(timer);
+          controller.abort();
+        };
+      }, [value, name, setError, clearErrors, getFieldState]);
 
       return createElement(WrappedComponent, props);
     };
-  };
 }
 ```
 
