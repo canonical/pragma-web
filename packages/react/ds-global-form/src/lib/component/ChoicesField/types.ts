@@ -1,7 +1,11 @@
 /* @canonical/generator-ds 0.9.0-experimental.9 */
 
 import type { InputProps } from "../../common/types.js";
-import type { BaseProps, OptionsProps } from "../../subcomponent/types.js";
+import type {
+  BaseProps,
+  GroupAriaProps,
+  OptionsProps,
+} from "../../subcomponent/types.js";
 
 type AdditionalChoicesProps = OptionsProps & {
   /** Field name shared by every option input in the group */
@@ -35,7 +39,9 @@ type AdditionalChoicesProps = OptionsProps & {
 };
 
 /** Props for the presentational Choices (controlled, no react-hook-form). */
-export type ChoicesPresentationProps = BaseProps & AdditionalChoicesProps;
+export type ChoicesPresentationProps = BaseProps &
+  GroupAriaProps &
+  AdditionalChoicesProps;
 
 /** Props for the react-hook-form-bound Choices field. */
 export type ChoicesFieldProps = InputProps<ChoicesPresentationProps>;

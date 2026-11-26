@@ -27,10 +27,12 @@ const InvisibleWrapper = <ComponentProps extends BaseInputProps>({
     unregisterOnUnmount,
   });
 
+  // Only the id: a hidden input has no label, description or error to
+  // reference, so the field's ARIA wiring would point at nothing.
   const componentProps = {
     name,
     registerProps,
-    ...ariaProps.input,
+    id: ariaProps.input.id,
     ...otherProps,
   } as ComponentProps;
 

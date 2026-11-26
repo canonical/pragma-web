@@ -5,8 +5,8 @@ import type { RichChoicesFieldProps } from "./types.js";
 
 /**
  * RichChoices bound to react-hook-form (controlled), wrapped with field chrome.
- * The label is mocked into the fieldset legend, as the per-option labels are
- * rendered by the individual options.
+ * The field label is rendered as plain text (`mockLabel`), as each option
+ * carries its own label; the fieldset is named by it through `aria-labelledby`.
  *
  * `import { RichChoicesField } from "@canonical/react-ds-global-form";`
  *

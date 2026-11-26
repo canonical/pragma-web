@@ -4,7 +4,9 @@ import useFieldAriaProperties from "./useFieldAriaProperties.js";
 
 describe("useFieldAriaProperties", () => {
   it("returns consistent IDs for a given name", () => {
-    const { result } = renderHook(() => useFieldAriaProperties("email", false));
+    const { result } = renderHook(() =>
+      useFieldAriaProperties("email", false, false, true),
+    );
     const { input, label, description } = result.current;
 
     expect(label.htmlFor).toBe(input.id);
@@ -12,8 +14,15 @@ describe("useFieldAriaProperties", () => {
     expect(input["aria-describedby"]).toBe(description.id);
   });
 
+  it("references no description when none is rendered", () => {
+    const { result } = renderHook(() => useFieldAriaProperties("email", false));
+    expect(result.current.input["aria-describedby"]).toBeUndefined();
+  });
+
   it("includes error ID in aria-describedby when isError is true", () => {
-    const { result } = renderHook(() => useFieldAriaProperties("email", true));
+    const { result } = renderHook(() =>
+      useFieldAriaProperties("email", true, false, true),
+    );
     const { input, description, error } = result.current;
 
     expect(input["aria-describedby"]).toContain(description.id);
@@ -23,7 +32,9 @@ describe("useFieldAriaProperties", () => {
   });
 
   it("omits error references when isError is false", () => {
-    const { result } = renderHook(() => useFieldAriaProperties("email", false));
+    const { result } = renderHook(() =>
+      useFieldAriaProperties("email", false, false, true),
+    );
     const { input, error } = result.current;
 
     expect(input["aria-describedby"]).not.toContain(error.id);

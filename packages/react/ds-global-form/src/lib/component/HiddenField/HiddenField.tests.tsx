@@ -16,6 +16,14 @@ describe("HiddenField", () => {
     );
   });
 
+  it("carries no ARIA references, as nothing labels or describes it", () => {
+    const { container } = renderWithForm(<HiddenField name="secret" />);
+    const input = container.querySelector('input[type="hidden"]');
+    expect(input).toHaveAttribute("id");
+    expect(input).not.toHaveAttribute("aria-labelledby");
+    expect(input).not.toHaveAttribute("aria-describedby");
+  });
+
   it("receives default value from the form", () => {
     const { container } = renderWithForm(<HiddenField name="secret" />, {
       formProps: { defaultValues: { secret: "hidden-value" } },

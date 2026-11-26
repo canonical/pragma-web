@@ -9,6 +9,17 @@ describe("CheckboxField", () => {
     expect(screen.getByRole("checkbox")).toBeInTheDocument();
   });
 
+  it("renders the heading as plain text, not a legend outside a fieldset", () => {
+    const { container } = renderWithForm(
+      <CheckboxField name="agree" label="Terms" controlLabel="I agree" />,
+    );
+    expect(container.querySelector("legend")).toBeNull();
+    expect(screen.getByText("Terms").tagName).toBe("SPAN");
+    expect(
+      screen.getByRole("checkbox", { name: "I agree" }),
+    ).toBeInTheDocument();
+  });
+
   it("registers with react-hook-form", () => {
     renderWithForm(<CheckboxField name="agree" label="Agree" />);
     expect(screen.getByRole("checkbox")).toHaveAttribute("name", "agree");

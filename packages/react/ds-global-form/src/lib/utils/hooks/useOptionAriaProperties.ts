@@ -3,7 +3,9 @@ import { useId, useMemo } from "react";
 /**
  * Generates ARIA properties for a specific option in a choice-style field.
  * Pure (no react-hook-form) — lives in the presentational tier so option-group
- * inputs (Choices, RichChoices) can use it standalone.
+ * inputs (Choices, RichChoices) can use it standalone. Options carry no
+ * `aria-describedby`: the field description describes the whole group, so it is
+ * referenced from the group's fieldset instead.
  * @param {string} name - The base name of the input field.
  * @param {string} optionValue - The value of the specific option.
  * @returns An object containing ARIA attributes for the option.
@@ -12,8 +14,6 @@ const useOptionAriaProps = (name: string, optionValue: string) => {
   const uniqueId = useId();
   const props = useMemo(() => {
     const baseId = `${uniqueId}-${name}`;
-    const descriptionId = `${baseId}-description`;
-
     const optionBaseId = `${baseId}-${optionValue}`;
     const optionLabelId = `${optionBaseId}-label`;
 
@@ -21,7 +21,6 @@ const useOptionAriaProps = (name: string, optionValue: string) => {
       input: {
         id: optionBaseId,
         "aria-labelledby": optionLabelId,
-        "aria-describedby": descriptionId,
       },
       label: {
         id: optionLabelId,

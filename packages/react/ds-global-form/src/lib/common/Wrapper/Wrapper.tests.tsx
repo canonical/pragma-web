@@ -16,6 +16,30 @@ describe("withWrapper", () => {
     expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
 
+  it("describes the input by the description only when one renders", () => {
+    renderWithForm(
+      <>
+        <Text name="email" label="Email" description="Enter your email" />
+        <Text name="name" label="Name" />
+      </>,
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Email" }),
+    ).toHaveAccessibleDescription("Enter your email");
+    expect(screen.getByRole("textbox", { name: "Name" })).not.toHaveAttribute(
+      "aria-describedby",
+    );
+  });
+
+  it("points the label at the native input", () => {
+    renderWithForm(<Text name="email" label="Email" />);
+    const input = screen.getByRole("textbox", { name: "Email" });
+    expect(screen.getByText("Email").closest("label")).toHaveAttribute(
+      "for",
+      input.id,
+    );
+  });
+
   it("renders the optional indicator in optional-marking mode", () => {
     renderWithForm(
       <Text

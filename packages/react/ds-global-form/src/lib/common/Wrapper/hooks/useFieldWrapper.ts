@@ -10,6 +10,8 @@ import messages from "../messages.js";
 type UseFieldWrapperOptions = {
   label?: string;
   isOptional?: boolean;
+  /** Whether the field renders a description, so the input may reference it. */
+  hasDescription?: boolean;
   userRegisterProps?: RegisterOptions;
   nestedRegisterProps?: RegisterOptions;
   unregisterOnUnmount?: boolean;
@@ -27,6 +29,7 @@ const useFieldWrapper = (
   const {
     label,
     isOptional = false,
+    hasDescription = false,
     userRegisterProps = {},
     nestedRegisterProps = {},
     unregisterOnUnmount = true,
@@ -38,7 +41,12 @@ const useFieldWrapper = (
 
   // Optionality is the source of truth for required-ness (see `registerProps`
   // below, which maps `!isOptional` to RHF's `required` rule).
-  const ariaProps = useFieldAriaProperties(name, isError, !isOptional);
+  const ariaProps = useFieldAriaProperties(
+    name,
+    isError,
+    !isOptional,
+    hasDescription,
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Comparing the `name` suffices
   const registerProps = useMemo(() => {

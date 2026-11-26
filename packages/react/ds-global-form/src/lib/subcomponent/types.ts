@@ -9,6 +9,16 @@ export type BaseProps = {
   style?: React.CSSProperties;
 };
 
+/**
+ * ARIA wiring for an option group's fieldset. The field tier supplies these, so
+ * the group is named by the field label and described by its description and
+ * error.
+ */
+export type GroupAriaProps = Pick<
+  React.AriaAttributes,
+  "aria-labelledby" | "aria-describedby"
+>;
+
 /** A selectable option for choice-style inputs (Select, Combobox, Choices…). */
 export type Option = {
   value: string;

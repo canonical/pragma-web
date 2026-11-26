@@ -8,12 +8,6 @@
     flex-direction: column;
     row-gap: var(--form-group-gap);
 
-    /* The heading is a mock label (a <legend>): reset the fieldset default so it
-       flows like the other block children. */
-    & > .field-toggle-heading {
-      padding: 0;
-    }
-
     /* Control row: `align-items: center` centres the control on the row, and a
        multi-line (sentence) label wraps below it (AV-325). Spacing belongs to
        the FIELD, not the label or control: the row's column-gap separates

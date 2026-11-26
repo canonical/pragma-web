@@ -348,11 +348,11 @@
    *
    * EXCEPTION — the borderless choices fieldset. A choices group (radios/checkboxes)
    * has no single input border to paint (each option is its own borderless control),
-   * so its `<legend>` (a `.ds.field-label`) is the ONLY place an error can be shown
+   * so its label (a `.ds.field-label`) is the ONLY place an error can be shown
    * without lighting up every option box. Such a group renders its Wrapper label as
-   * a `<legend>` (the `mockLabel` path), so the recolour is SCOPED to a legend
-   * label — a normal field's `<label>` is untouched. */
-  .danger > legend.ds.field-label {
+   * plain text, not a `<label>` (the `mockLabel` path), so the recolour is SCOPED
+   * to a non-`<label>` field label — a normal field's `<label>` is untouched. */
+  .danger > .ds.field-label:not(label) {
     color: var(--form-error-color);
 
     /* The required "*" marker recolours WITH the label (it pins its own colour to

@@ -22,6 +22,27 @@ describe("RichChoices (presentational)", () => {
     expect(screen.getAllByRole("radio")).toHaveLength(3);
   });
 
+  it("forwards the group ARIA wiring to the fieldset, not the options", () => {
+    render(
+      <>
+        <span id="colour-label">Colour</span>
+        <span id="colour-description">Pick one</span>
+        <RichChoices
+          name="color"
+          options={options}
+          aria-labelledby="colour-label"
+          aria-describedby="colour-description"
+        />
+      </>,
+    );
+    expect(
+      screen.getByRole("group", { name: "Colour" }),
+    ).toHaveAccessibleDescription("Pick one");
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio).not.toHaveAttribute("aria-describedby");
+    }
+  });
+
   it("renders checkbox inputs when isMultiple", () => {
     render(<RichChoices name="colors" options={options} isMultiple />);
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
