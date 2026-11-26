@@ -12,15 +12,15 @@
   import { Tooltip } from "./index.js";
   import {
     DEFAULT_PLACEMENTS,
-    useDelayedOpenClose,
+    useDelayedOpen,
     useTooltipPosition,
   } from "./utils/index.js";
 
   let {
     id: idProp,
     class: className,
+    trigger,
     children,
-    message,
     preferredDirections = DEFAULT_PLACEMENTS,
     autoFit = false,
     activateDelay = 400,
@@ -35,15 +35,8 @@
 
   const fallbackId = $props.id();
   const id = $derived(idProp || fallbackId);
-  let tooltipRef = $state<HTMLElement>();
+  let tooltipRef = $state<HTMLDivElement>();
   let triggerRef = $state<HTMLElement>();
-
-  const tooltipRefAttachment: Attachment<HTMLElement> = (element) => {
-    tooltipRef = element;
-    return () => {
-      tooltipRef = undefined;
-    };
-  };
 
   let isTriggerFocused = $state(false);
   let isTriggerHovered = $state(false);
@@ -101,19 +94,19 @@
   );
 
   const {
-    triggerAttachment: tooltipPositionTriggerAttachment,
-    targetAttachment,
     tooltipPosition,
     getTooltipPlacement,
   } = useTooltipPosition(
     // Start positioning even before the tooltip is actually shown (`delayedOpen`)
     () => open,
+    () => triggerRef,
+    () => tooltipRef,
     () => preferredDirections,
     () => autoFit,
     () => distanceAsPixelsNumber,
   );
 
-  const getDelayedOpen = useDelayedOpenClose(
+  const getDelayedOpen = useDelayedOpen(
     () => open,
     () => activateDelay,
     () => deactivateDelay,
@@ -132,27 +125,23 @@
   }}
 />
 
-{@render children({
+{@render trigger({
   "aria-describedby": id,
-  [createAttachmentKey()]: tooltipPositionTriggerAttachment,
   [createAttachmentKey()]: listenersTriggerAttachment,
 })}
 
 <Tooltip
-  {...rest}
-  {...{
-    [createAttachmentKey()]: targetAttachment,
-    [createAttachmentKey()]: tooltipRefAttachment,
-  }}
+  bind:ref={tooltipRef}
   {id}
   class={className}
   isOpen={getDelayedOpen()}
   style={`${style ?? ""}; top: ${tooltipPosition.top}; left: ${tooltipPosition.left}; --distance-to-trigger: ${distanceAsPixelsNumber}px;`}
   onmouseenter={tooltipOnmouseenter}
   onmouseleave={tooltipOnmouseleave}
-  data-placement={getTooltipPlacement()}
+  position={getTooltipPlacement()}
+  {...rest}
   >
-  {@render message()}
+  {@render children()}
 </Tooltip>  
 
 <!-- @component
@@ -173,5 +162,6 @@ The tooltip enables "chaining" while it is visible and for a short window (~400m
 </TooltipEngine>
 ```
 
+@implements ds:global.component.tooltip
 @implements ds:global.component.tooltip_wrapper
 -->

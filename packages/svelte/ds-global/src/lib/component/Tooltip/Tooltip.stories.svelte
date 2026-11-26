@@ -7,7 +7,7 @@
     title: "Components/Tooltip",
     tags: ["autodocs"],
     component: Component,
-    args: { arrow: "down", isOpen: true },
+    args: { position: "top", isOpen: true },
     argTypes: {
       children: {
         control: false,
@@ -30,9 +30,9 @@
 <Story name="With Icon">
   {#snippet template({ children: _, icon: __, ...rest })}
     <Component {...rest}>
-     {#snippet icon()}
-          <InformationIcon />
-        {/snippet}
+      {#snippet icon()}
+        <InformationIcon />
+      {/snippet}
       Lorem ipsum dolor sit amet
     </Component>
   {/snippet}
@@ -41,9 +41,9 @@
 <Story name="Multiline">
   {#snippet template({ children: _, icon: __, ...rest })}
     <Component {...rest}>
-     {#snippet icon()}
-          <InformationIcon />
-        {/snippet}
+      {#snippet icon()}
+        <InformationIcon />
+      {/snippet}
       The standard tooltip explains an icon or control, or adds a short clarification that runs across several lines when the content is long.
     </Component>
   {/snippet}

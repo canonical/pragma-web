@@ -1,9 +1,9 @@
 import { flushSync } from "svelte";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChainingManager } from "./ChainingManager.js";
-import { useDelayedOpenClose } from "./useDelayedOpenClose.svelte.js";
+import { useDelayedOpen } from "./useDelayedOpen.svelte.js";
 
-describe("useDelayedOpenClose", () => {
+describe("useDelayedOpen", () => {
   let chainingManager: ChainingManager;
   let destroy: (() => void) | undefined;
 
@@ -20,7 +20,7 @@ describe("useDelayedOpenClose", () => {
 
   it.each([false, true])("returns the initial open state: %s", (open) => {
     destroy = $effect.root(() => {
-      const getDelayedOpen = useDelayedOpenClose(
+      const getDelayedOpen = useDelayedOpen(
         () => open,
         () => 500,
         () => 500,
@@ -35,7 +35,7 @@ describe("useDelayedOpenClose", () => {
   it("opens and closes after their respective delays", () => {
     let open = $state(false);
     destroy = $effect.root(() => {
-      const getDelayedOpen = useDelayedOpenClose(
+      const getDelayedOpen = useDelayedOpen(
         () => open,
         () => 500,
         () => 500,
@@ -70,13 +70,13 @@ describe("useDelayedOpenClose", () => {
     let firstOpen = $state(false);
     let secondOpen = $state(false);
     destroy = $effect.root(() => {
-      const getFirst = useDelayedOpenClose(
+      const getFirst = useDelayedOpen(
         () => firstOpen,
         () => 500,
         () => 500,
         chainingManager,
       );
-      const getSecond = useDelayedOpenClose(
+      const getSecond = useDelayedOpen(
         () => secondOpen,
         () => 500,
         () => 500,
@@ -111,7 +111,7 @@ describe("useDelayedOpenClose", () => {
   it("opens during cooldown without allowing it to expire while visible", () => {
     let open = $state(true);
     destroy = $effect.root(() => {
-      const getDelayedOpen = useDelayedOpenClose(
+      const getDelayedOpen = useDelayedOpen(
         () => open,
         () => 500,
         () => 500,
@@ -135,7 +135,7 @@ describe("useDelayedOpenClose", () => {
   it("cancels a pending opening without enabling chaining", () => {
     let open = $state(false);
     destroy = $effect.root(() => {
-      const getDelayedOpen = useDelayedOpenClose(
+      const getDelayedOpen = useDelayedOpen(
         () => open,
         () => 500,
         () => 500,
@@ -157,7 +157,7 @@ describe("useDelayedOpenClose", () => {
     let open = $state(false);
     let delay = $state(500);
     destroy = $effect.root(() => {
-      const getDelayedOpen = useDelayedOpenClose(
+      const getDelayedOpen = useDelayedOpen(
         () => open,
         () => delay,
         () => 500,
@@ -189,7 +189,7 @@ describe("useDelayedOpenClose", () => {
 
   it("releases its registration when destroyed while visible", () => {
     destroy = $effect.root(() => {
-      useDelayedOpenClose(
+      useDelayedOpen(
         () => true,
         () => 500,
         () => 500,
@@ -209,7 +209,7 @@ describe("useDelayedOpenClose", () => {
   it("cancels its opening timer when destroyed before becoming visible", () => {
     let open = $state(false);
     destroy = $effect.root(() => {
-      useDelayedOpenClose(
+      useDelayedOpen(
         () => open,
         () => 500,
         () => 500,

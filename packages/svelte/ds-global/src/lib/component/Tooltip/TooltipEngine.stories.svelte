@@ -26,10 +26,10 @@
       },
     },
     argTypes: {
-      children: {
+      trigger: {
         control: false,
       },
-      message: {
+      children: {
         control: false,
       },
       icon: {
@@ -51,51 +51,45 @@
 </script>
 
 <Story name="Default">
-  {#snippet template({ children: _, message: __, ...args })}
+  {#snippet template({ trigger: _, children: __, ...args })}
     <div style="height: 100vh; display: grid; place-items: center;">
       <Component {...args}>
-        {#snippet children(triggerProps)}
+        {#snippet trigger(triggerProps)}
           <Button {...triggerProps}>Hover or focus me</Button>
         {/snippet}
-        {#snippet message()}
-          Hello there!
-        {/snippet}
+        Hello there!
       </Component>
     </div>
   {/snippet}
 </Story>
 
 <Story name="With icon">
-  {#snippet template({ children: _, message: __, icon: ___,...args })}
+  {#snippet template({ trigger: _, children: __, icon: ___,...args })}
     <div style="height: 100vh; display: grid; place-items: center;">
       <Component {...args}>
         {#snippet icon()}
           <InformationIcon />
         {/snippet}
-        {#snippet children(triggerProps)}
+        {#snippet trigger(triggerProps)}
           <Button {...triggerProps}>Hover or focus me</Button>
         {/snippet}
-        {#snippet message()}
-          Hello there!
-        {/snippet}
+        Hello there!
       </Component>
     </div>
   {/snippet}
 </Story>
 
 <Story name="Multiline">
-  {#snippet template({ children: _, message: __, icon: ___,...args })}
+  {#snippet template({ trigger: _, children: __, icon: ___,...args })}
     <div style="height: 100vh; display: grid; place-items: center;">
       <Component {...args}>
         {#snippet icon()}
           <InformationIcon />
         {/snippet}
-        {#snippet children(triggerProps)}
+        {#snippet trigger(triggerProps)}
           <Button {...triggerProps}>Hover or focus me</Button>
         {/snippet}
-        {#snippet message()}
-          The standard tooltip explains an icon or control, or adds a short clarification that runs across several lines when the content is long.
-        {/snippet}
+        The standard tooltip explains an icon or control, or adds a short clarification that runs across several lines when the content is long.
       </Component>
     </div>
   {/snippet}
@@ -103,22 +97,19 @@
 
 <Story
   name="With different positions"
-   argTypes={{ preferredDirections: { control: false } }}
- 
+  argTypes={{ preferredDirections: { control: false } }}
 >
-  {#snippet template({ children: _, message: __, preferredDirections:___, ...args })}
+  {#snippet template({ trigger: _, children: __, preferredDirections:___, ...args })}
     <div
       style="padding: 4rem; display: grid; grid-template-columns: repeat(2, 1fr); row-gap: 4rem; place-items: center;"
     >
       {#each ["top", "bottom", "top-start", "top-end", "bottom-start", "bottom-end", "left", "right"] as const as position (position)}
         <Component preferredDirections={[position]} {...args}>
-      {#snippet children(triggerProps)}
-        <Button {...triggerProps}>{position}</Button>
-      {/snippet}
-      {#snippet message()}
-        Hello there!
-      {/snippet}
-    </Component>
+          {#snippet trigger(triggerProps)}
+            <Button {...triggerProps}>{position}</Button>
+          {/snippet}
+          Hello there!
+        </Component>
       {/each}
     </div>
   {/snippet}
@@ -131,7 +122,7 @@
     autoFit: true,
   }}
 >
-  {#snippet template({ children: _, message: __, ...args })}
+  {#snippet template({ trigger: _, children: __, ...args })}
     <div
       class="placeholder-box"
       style="height: 250px; overflow: auto;"
@@ -140,14 +131,12 @@
       <div
         style="height: 200%; width: 200%; display: grid; place-items: center; position: relative;"
       >
-          <Component {...args}>
-      {#snippet children(triggerProps)}
-        <Button {...triggerProps}>Click me</Button>
-      {/snippet}
-         {#snippet message()}
-        And now scroll the container
-      {/snippet}
-    </Component>
+        <Component {...args}>
+          {#snippet trigger(triggerProps)}
+            <Button {...triggerProps}>Click me</Button>
+          {/snippet}
+          And now scroll the container
+        </Component>
       </div>
     </div>
   {/snippet}

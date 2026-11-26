@@ -14,7 +14,7 @@ import type { ChainingManager } from "./ChainingManager.js";
  * @param chainingManager - Shared manager tracking whether chaining is active.
  * @returns A function that returns the (possibly delayed) open boolean.
  */
-export function useDelayedOpenClose(
+export function useDelayedOpen(
   getOpen: () => boolean,
   getActivateDelay: () => number,
   getDeactivateDelay: () => number,

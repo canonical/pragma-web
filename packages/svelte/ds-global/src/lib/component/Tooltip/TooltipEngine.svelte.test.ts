@@ -48,8 +48,8 @@ describe("TooltipEngine component", () => {
   });
 
   const baseProps = {
-    children: trigger,
-    message: children,
+    trigger,
+    children,
   } satisfies ComponentProps<typeof Component>;
 
   it("renders", async () => {

@@ -11,6 +11,8 @@ export type TooltipTriggerProps = {
 };
 
 export interface TooltipProps extends BaseProps {
+  /** Reference to the tooltip's root element. */
+  ref?: HTMLDivElement;
   /** Content displayed inside the tooltip. */
   children: Snippet;
   /** An optional decorative leading icon. */
@@ -19,17 +21,16 @@ export interface TooltipProps extends BaseProps {
   isOpen?: boolean;
   /** Override the z-index of the tooltip. */
   zIndex?: number;
-  /** Arrow element*/
-  arrow?: "left" | "right" | "up" | "down";
-
+  /** Placement of the tooltip relative to the target element */
+  position: Placement;
   /** Maximum width of the tooltip in px. */
   maxWidth?: string;
 }
 
 export interface TooltipEngineProps
-  extends Omit<TooltipProps, "children" | "isOpen" | "arrow"> {
-  children: Snippet<[triggerProps: TooltipTriggerProps]>;
-  message: Snippet;
+  extends Omit<TooltipProps, "isOpen" | "position" | "ref"> {
+  /** The trigger element for the tooltip. */
+  trigger: Snippet<[triggerProps: TooltipTriggerProps]>;
   /**
    * Ordered preferred placements for the tooltip.
    *

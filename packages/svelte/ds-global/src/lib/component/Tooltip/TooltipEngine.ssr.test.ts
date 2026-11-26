@@ -9,8 +9,8 @@ import type { TooltipEngineProps } from "./types.js";
 
 describe("TooltipEngine SSR", () => {
   const baseProps = {
-    children: trigger,
-    message: children,
+    trigger,
+    children,
   } satisfies TooltipEngineProps;
 
   it("doesn't throw", () => {

@@ -5,21 +5,24 @@ import Tooltip from "./Tooltip.svelte";
 import { children, childrenLabel } from "./test.fixtures.svelte";
 
 describe("Tooltip SSR", () => {
-  it.each([
-    ["left", "right"],
-    ["right", "left"],
-    ["up", "bottom"],
-    ["down", "top"],
-  ] as const)("maps the %s arrow to the %s placement", (arrow, placement) => {
-    const page = render(Tooltip, { props: { children, arrow } });
+  it("sets data-placement from the position prop", () => {
+    const page = render(Tooltip, {
+      props: { children, position: "top-start" },
+    });
     expect(componentLocator(page).getAttribute("data-placement")).toBe(
-      placement,
+      "top-start",
     );
   });
 
   it("renders independently with native attributes and content", () => {
     const page = render(Tooltip, {
-      props: { children, id: "message", class: "custom", isOpen: true },
+      props: {
+        children,
+        id: "message",
+        class: "custom",
+        isOpen: true,
+        position: "top-start",
+      },
     });
     const tooltip = componentLocator(page);
     expect(tooltip.id).toBe("message");
@@ -30,7 +33,9 @@ describe("Tooltip SSR", () => {
   });
 
   it("is hidden by default", () => {
-    const page = render(Tooltip, { props: { children } });
+    const page = render(Tooltip, {
+      props: { children, position: "top-start" },
+    });
     expect(componentLocator(page).getAttribute("aria-hidden")).toBe("true");
   });
 });

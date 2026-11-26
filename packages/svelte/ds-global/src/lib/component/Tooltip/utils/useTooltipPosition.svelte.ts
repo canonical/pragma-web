@@ -11,17 +11,19 @@ import { DEFAULT_PLACEMENTS } from "./constants.js";
  * Compute reactive tooltip positioning using Floating UI, with optional automatic fitting into the viewport.
  *
  * @param getActive - Getter indicating if the tooltip should currently be positioned.
+ * @param getTrigger - Getter returning the trigger element.
+ * @param getTarget - Getter returning the tooltip element.
  * @param getPreferredDirections - Getter returning the preferred logical directions.
  * @param getAutoFit - Getter determining whether the tooltip should automatically fit into the viewport, after it exhausted the preffered directions.
  * @param getDistanceToTrigger - Getter returning pixel offset distance between trigger element and tooltip.
  * @returns
- *  - triggerAttachment - Attachment to be applied to the tooltip trigger element.
- *  - targetAttachment - Attachment to be applied to the tooltip target element.
  *  - tooltipPosition - Reactive style object containing the current position of the tooltip.
  *  - getTooltipPlacement - Getter for the current placement of the tooltip (after any auto-adjustment).
  */
 export function useTooltipPosition(
   getActive: () => boolean,
+  getTrigger: () => HTMLElement | undefined,
+  getTarget: () => HTMLElement | undefined,
   getPreferredDirections: () => readonly Placement[],
   getAutoFit: () => boolean,
   getDistanceToTrigger: () => number,
@@ -50,8 +52,10 @@ export function useTooltipPosition(
       ],
     };
   });
-  const { triggerAttachment, targetAttachment } = useFloatingUI(
+  useFloatingUI(
     getActive,
+    getTrigger,
+    getTarget,
     () => floatingUiConfig,
     ({ x, y, placement }) => {
       tooltipPosition.top = `${y}px`;
@@ -61,8 +65,6 @@ export function useTooltipPosition(
   );
 
   return {
-    triggerAttachment,
-    targetAttachment,
     tooltipPosition,
     getTooltipPlacement: () => tooltipPlacement,
   };

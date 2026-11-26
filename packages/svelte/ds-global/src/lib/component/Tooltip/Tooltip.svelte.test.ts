@@ -12,7 +12,10 @@ import {
 } from "./test.fixtures.svelte";
 
 describe("Tooltip component", () => {
-  const baseProps = { children } satisfies ComponentProps<typeof Component>;
+  const baseProps = {
+    children,
+    position: "top-start",
+  } satisfies ComponentProps<typeof Component>;
 
   describe("attributes", () => {
     it.each([
@@ -74,20 +77,15 @@ describe("Tooltip component", () => {
       await expect.element(tooltip.getByText(iconLabel)).toBeInTheDocument();
     });
 
-    it.each([
-      ["left", "right"],
-      ["right", "left"],
-      ["up", "bottom"],
-      ["down", "top"],
-    ] as const)("arrow pointing %s", async (arrow, placement) => {
+    it("sets data-placement from the position prop", async () => {
       const page = await render(Component, {
         ...baseProps,
-        arrow,
+        position: "top-start",
         isOpen: true,
       });
       await expect
         .element(componentLocator(page))
-        .toHaveAttribute("data-placement", placement);
+        .toHaveAttribute("data-placement", "top-start");
     });
   });
 });
