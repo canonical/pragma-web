@@ -1,4 +1,3 @@
-import type { DataViewsMessages } from "@canonical/dataviews-core";
 import {
   spellWireKey,
   spellWireValues,
@@ -9,23 +8,11 @@ import {
   useDataViewsRoot,
   useFilterHandle,
 } from "../../../../../hooks/index.js";
+import { PRESENCE_CHOICES } from "../../../../constants.js";
 import type { PresenceFilterProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-filters-presence";
-
-/**
- * The three choices, in order: no restriction, records that hold a value,
- * records that hold none. Each with the operand it applies, null for none.
- */
-const CHOICES = [
-  { applied: null, message: "presenceAny" },
-  { applied: true, message: "presenceSet" },
-  { applied: false, message: "presenceUnset" },
-] as const satisfies readonly {
-  readonly applied: boolean | null;
-  readonly message: keyof DataViewsMessages;
-}[];
 
 /**
  * One presence filter: a group of three radios, any record, records that
@@ -82,7 +69,7 @@ export default function PresenceFilter({
       }}
     >
       <legend className="legend">{label}</legend>
-      {CHOICES.map((choice) => (
+      {PRESENCE_CHOICES.map((choice) => (
         <div key={String(choice.applied)} className="option">
           <label>
             <input

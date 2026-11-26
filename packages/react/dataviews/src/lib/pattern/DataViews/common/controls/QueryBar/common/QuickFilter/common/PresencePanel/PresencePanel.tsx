@@ -8,20 +8,11 @@ import type { ReactElement } from "react";
 import { useId } from "react";
 import { useIsHydrated } from "../../../../../../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
+import { PRESENCE_CHOICES } from "../../../../../../constants.js";
 import type { PresencePanelProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-quick-filter-presence";
-
-/**
- * The three choices, in order: no restriction, records that hold a value,
- * records that hold none, each with the operand it applies.
- */
-const CHOICES = [
-  { applied: null, message: "presenceAny" },
-  { applied: true, message: "presenceSet" },
-  { applied: false, message: "presenceUnset" },
-] as const;
 
 /**
  * A presence's panel: a group of three radios, any record, records that
@@ -72,7 +63,7 @@ export default function PresencePanel({
   return (
     <fieldset className={componentCssClassName}>
       <legend className="legend">{label}</legend>
-      {CHOICES.map((choice) => (
+      {PRESENCE_CHOICES.map((choice) => (
         // biome-ignore lint/a11y/noLabelWithoutControl: the label wraps RadioInput, a native radio the rule cannot see through
         <label key={String(choice.applied)} className="option">
           <RadioInput

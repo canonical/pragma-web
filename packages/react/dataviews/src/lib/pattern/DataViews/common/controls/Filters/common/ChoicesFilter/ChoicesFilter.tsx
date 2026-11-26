@@ -1,7 +1,4 @@
-import type {
-  DataViewsMessages,
-  PredicateOperand,
-} from "@canonical/dataviews-core";
+import type { PredicateOperand } from "@canonical/dataviews-core";
 import {
   applyQueryCommand,
   spellWireKey,
@@ -18,24 +15,17 @@ import {
   useDataViewsRoot,
   useFilterHandle,
 } from "../../../../../hooks/index.js";
-import { NO_RECORDS } from "../../../../constants.js";
+import {
+  ALTERNATIVE_SET_OPERATOR,
+  NO_RECORDS,
+  SET_OPERATOR_SWITCH_MESSAGES,
+} from "../../../../constants.js";
 import { phraseOperator } from "../utils/index.js";
 import type { ChoicesFilterProps } from "./types.js";
 
 const componentCssClassName = "ds data-views-filters-choices";
 
 const NONE_SELECTED: ReadonlySet<PredicateOperand> = new Set();
-
-/** The other set operator, which a standing set may move to. */
-const ALTERNATIVE_OPERATOR = { isAny: "isNone", isNone: "isAny" } as const;
-
-/** The message naming the control that moves a set to each operator. */
-const SWITCH_MESSAGES = {
-  isAny: "matchAnyInstead",
-  isNone: "matchNoneInstead",
-} as const satisfies Readonly<
-  Record<ChoicesFilterProps["operator"], keyof DataViewsMessages>
->;
 
 /**
  * One closed-set filter: a checkbox per option, named as the wire spells
@@ -120,8 +110,8 @@ export default function ChoicesFilter({
     ) {
       return null;
     }
-    const alternative = ALTERNATIVE_OPERATOR[operator];
-    const text = messages[SWITCH_MESSAGES[alternative]];
+    const alternative = ALTERNATIVE_SET_OPERATOR[operator];
+    const text = messages[SET_OPERATOR_SWITCH_MESSAGES[alternative]];
     if (hydrated) {
       return (
         <Button

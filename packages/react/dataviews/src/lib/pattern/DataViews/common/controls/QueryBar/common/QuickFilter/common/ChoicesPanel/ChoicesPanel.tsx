@@ -11,7 +11,11 @@ import { AssistiveText } from "../../../../../../../../../common/index.js";
 import { useIsHydrated } from "../../../../../../../../../hooks/index.js";
 import { spellCount } from "../../../../../../../../../utils/index.js";
 import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
-import { NO_RECORDS } from "../../../../../../constants.js";
+import {
+  ALTERNATIVE_SET_OPERATOR,
+  NO_RECORDS,
+  SET_OPERATOR_SWITCH_MESSAGES,
+} from "../../../../../../constants.js";
 import { listFacetOptions } from "../../../../../../utils/index.js";
 import { useFieldFacets } from "../../hooks/index.js";
 import type { ChoicesPanelProps } from "./types.js";
@@ -21,15 +25,6 @@ const componentCssClassName = "ds data-views-quick-filter-choices";
 
 /** Past this many options, a search narrows them. */
 const SEARCH_PAST = 10;
-
-/** The other set operator, which a standing set may move to. */
-const ALTERNATIVE = { isAny: "isNone", isNone: "isAny" } as const;
-
-/** The message naming the control that moves a set to each operator. */
-const SWITCH_MESSAGES = {
-  isAny: "matchAnyInstead",
-  isNone: "matchNoneInstead",
-} as const;
 
 /**
  * A choice's panel: a checkbox per option, the schema's or, where they are
@@ -135,7 +130,7 @@ export default function ChoicesPanel({
     stops.at(event.key === "ArrowDown" ? at + 1 : Math.max(at - 1, 0))?.focus();
   };
 
-  const alternative = ALTERNATIVE[operator];
+  const alternative = ALTERNATIVE_SET_OPERATOR[operator];
   const renderSwitch = (): ReactElement | null =>
     hydrated && standing !== undefined && offered.includes(alternative) ? (
       <Button
@@ -151,7 +146,7 @@ export default function ChoicesPanel({
           )
         }
       >
-        {messages[SWITCH_MESSAGES[alternative]]}
+        {messages[SET_OPERATOR_SWITCH_MESSAGES[alternative]]}
       </Button>
     ) : null;
 
