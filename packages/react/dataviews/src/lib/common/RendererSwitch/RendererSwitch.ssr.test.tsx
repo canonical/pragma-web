@@ -12,9 +12,9 @@ import {
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { buildFleet, machines } from "../../../../testing/index.js";
-import type { DataTableColumn } from "../../_work_in_progress/DataTable/index.js";
-import { DataCards } from "../../_work_in_progress/DataViews/common/DataCards/index.js";
 import { DataViews } from "../../_work_in_progress/DataViews/index.js";
+import { ConnectedDataCards as DataCards } from "../../pattern/DataViews/common/renderers/DataCards/index.js";
+import type { DataTableColumn } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
 import type { DisplayField } from "../DisplayField/index.js";
 import RendererSwitch from "./RendererSwitch.js";
 import type { RendererChoice } from "./types.js";

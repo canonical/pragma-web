@@ -6,7 +6,7 @@
  * source its endpoint is reached through.
  */
 
-import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
+import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 /** The machine columns, each ordered by the header where the source can. */
 export const SERVER_BACKED_COLUMNS = [

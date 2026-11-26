@@ -14,11 +14,11 @@ import {
   elementAt,
   type Machine,
 } from "../../../testing/index.js";
+import type { DisplayFieldCellProps } from "../common/index.js";
 import {
   DataTable,
   type DataTableColumn,
-} from "../_work_in_progress/DataTable/index.js";
-import type { DisplayFieldCellProps } from "../common/index.js";
+} from "../pattern/DataViews/common/renderers/DataTable/index.js";
 import virtualizeRows from "./virtualizeRows.js";
 
 const rows: readonly Machine[] = Array.from({ length: 10_000 }, (_, position) =>

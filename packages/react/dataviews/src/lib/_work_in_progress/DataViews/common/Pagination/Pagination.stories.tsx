@@ -6,7 +6,7 @@ import {
   withMachineRoot,
 } from "../../../../../storybook/decorators/index.js";
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
-import type { DataTableColumn } from "../../../DataTable/index.js";
+import type { DataTableColumn } from "../../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Pagination.js";
 import type { DataViewsPaginationProps } from "./types.js";

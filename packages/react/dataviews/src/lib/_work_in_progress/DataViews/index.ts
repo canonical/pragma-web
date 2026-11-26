@@ -1,8 +1,8 @@
 import Provider from "./Provider.js";
 import type { DataViewsComponent } from "./types.js";
 
+export type { DataViewsDataTableProps } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
 export type { DataViewsActionBarProps } from "./common/ActionBar/index.js";
-export type { DataViewsDataTableProps } from "./common/DataTable/index.js";
 export type { DataViewsFiltersProps } from "./common/Filters/index.js";
 export type { DataViewsPaginationProps } from "./common/Pagination/index.js";
 export type {

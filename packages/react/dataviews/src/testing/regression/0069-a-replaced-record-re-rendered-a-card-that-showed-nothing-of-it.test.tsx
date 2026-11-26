@@ -10,11 +10,11 @@ import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
 } from "../../lib/common/index.js";
+import { DataCards } from "../../lib/pattern/DataViews/common/renderers/DataCards/index.js";
 
 describe("regression 0069 — a replaced record re-rendered a card that showed nothing of it", () => {
   it("re-renders no card that shows nothing of what changed", () => {

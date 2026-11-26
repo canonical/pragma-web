@@ -18,7 +18,10 @@ import type {
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
-import { DataTable, type DataTableColumn } from "../DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../pattern/DataViews/common/renderers/DataTable/index.js";
 import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
 

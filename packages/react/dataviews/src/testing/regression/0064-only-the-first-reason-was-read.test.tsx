@@ -17,8 +17,8 @@ import {
   fakeAnnouncerClock,
   readAnnouncements,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },

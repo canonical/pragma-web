@@ -19,7 +19,10 @@ import useMachineProvider from "../../../../../storybook/machines/useMachineProv
 import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../storybook/types.js";
 import "../../../../../storybook/noScripts.css";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Filters.js";
 import type { DataViewsFiltersProps } from "./types.js";

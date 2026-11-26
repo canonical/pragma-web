@@ -16,10 +16,6 @@ import {
 import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
 import * as restStories from "../../docs/data-sources/Rest.stories.js";
 import * as compositionStories from "../../docs/guides/Composition.stories.js";
-import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
-import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
-import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
-import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
@@ -30,6 +26,10 @@ import * as filterOptionsStories from "../../lib/_work_in_progress/FilterOptions
 import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
 import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
 import * as queryInputStories from "../../lib/_work_in_progress/QueryInput/QueryInput.stories.js";
+import * as dataCardsStories from "../../lib/pattern/DataViews/common/renderers/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
+import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,

@@ -17,8 +17,8 @@ import {
   installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0057 — hiding a column left focus on a heading with no control", () => {
   let uninstallPopovers: () => void;

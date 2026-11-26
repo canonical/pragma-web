@@ -25,7 +25,10 @@ import type {
 } from "../../../../../storybook/machines/types.js";
 import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../storybook/types.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../Provider.js";
 import { ActionBar } from "../ActionBar/index.js";
 import Component from "./QueryBar.js";

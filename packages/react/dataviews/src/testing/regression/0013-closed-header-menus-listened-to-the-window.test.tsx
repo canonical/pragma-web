@@ -14,7 +14,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0013 — closed header menus listened to the window", () => {
   it("registers no window listener and draws no menu until one opens", () => {

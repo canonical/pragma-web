@@ -9,7 +9,7 @@ import type { ReactElement, ReactNode, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../../common/index.js";
 import type {
   ActionBar,
-  DataTable,
+  ConnectedDataTable,
   Filters,
   Pagination,
   SavedViews,
@@ -114,7 +114,7 @@ export type DataViewsComponent = (<
    * @experimental Pre-release: the whole surface is still settling, and this
    * name may change or move before the first release.
    */
-  readonly DataTable: typeof DataTable;
+  readonly DataTable: typeof ConnectedDataTable;
   /**
    * The connected query-editing part of the composition.
    *

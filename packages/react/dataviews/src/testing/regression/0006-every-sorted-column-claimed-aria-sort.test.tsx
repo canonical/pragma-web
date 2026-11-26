@@ -16,7 +16,7 @@ import {
   declareMachineOrdering,
   elementAt,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0006 — every sorted column claimed aria-sort", () => {
   it("puts aria-sort on the first term's header alone", () => {

@@ -9,7 +9,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createFacetedManual, deliverFacets } from "../../../testing/index.js";
-import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
+import { DataChart } from "../../lib/pattern/DataViews/common/renderers/DataChart/index.js";
 
 /** The ends a source should never answer with, and once did. */
 const unusable: readonly (readonly [number, number])[] = [

@@ -8,11 +8,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
 } from "../../lib/common/index.js";
+import { DataCards } from "../../lib/pattern/DataViews/common/renderers/DataCards/index.js";
 
 describe("regression 0068 — a selection re-rendered every card", () => {
   it("re-renders no card's values", () => {

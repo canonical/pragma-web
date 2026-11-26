@@ -16,8 +16,8 @@ import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Profiler } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 afterEach(cleanup);
 

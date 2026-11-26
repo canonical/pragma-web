@@ -8,7 +8,7 @@ import {
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { useDataViewsValue } from "../../hooks/index.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import type { DataTableColumn } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
 import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 

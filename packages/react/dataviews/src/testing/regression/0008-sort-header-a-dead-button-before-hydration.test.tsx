@@ -15,7 +15,7 @@ import {
   declareMachineOrdering,
   machines,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0008 — a sort header was a dead button before hydration", () => {
   it("sends a link to the next ordering in place of a button", () => {

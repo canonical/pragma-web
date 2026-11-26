@@ -7,7 +7,7 @@ import { Announcer } from "../../common/index.js";
 import Context from "./Context.js";
 import {
   ActionBar,
-  DataTable,
+  ConnectedDataTable,
   Filters,
   Pagination,
   QueryBar,
@@ -63,7 +63,7 @@ const Provider = Object.assign(
   },
   {
     ActionBar,
-    DataTable,
+    DataTable: ConnectedDataTable,
     Filters,
     Pagination,
     QueryBar,

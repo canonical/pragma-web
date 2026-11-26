@@ -14,7 +14,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0012 — a stale Shift made a click additive", () => {
   it("forgets the Shift once its Enter is released or the control is left", () => {

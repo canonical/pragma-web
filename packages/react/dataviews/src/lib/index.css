@@ -11,11 +11,11 @@
  * loaded route paints before its CSS arrives. Linking this file means no
  * route can ever render unstyled.
  *
- * A hand-written list of the exported parts' stylesheets. Add a component,
- * add its line, alphabetically.
+ * A hand-written list of the exported parts' stylesheets, in cascade order:
+ * add a component's line where its rules belong, and move none.
  */
 
-@import url("./_work_in_progress/common/ScopedDataTable/styles.css");
+@import url("./pattern/DataViews/common/renderers/DataTable/styles.css");
 @import url("./_work_in_progress/DataViews/common/ActionBar/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/BoundFilter/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/FurtherConjuncts/common/FurtherConjunct/styles.css");

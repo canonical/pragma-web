@@ -10,7 +10,7 @@
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0018 — a resize handle focusable before hydration", () => {
   it("sends no separator and nothing focusable for a resizable column", () => {

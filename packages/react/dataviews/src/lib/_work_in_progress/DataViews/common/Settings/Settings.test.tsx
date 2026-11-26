@@ -38,7 +38,10 @@ import {
   waitForFocus,
   waitForFrames,
 } from "../../../../../../testing/index.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../Provider.js";
 
 const columns: readonly DataTableColumn[] = [

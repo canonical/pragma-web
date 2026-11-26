@@ -30,16 +30,16 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
-import HeaderCell from "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import HeaderCell from "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 vi.mock(
-  "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js",
+  "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js")
+        typeof import("../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js")
       >();
     return { default: vi.fn(actual.default) };
   },

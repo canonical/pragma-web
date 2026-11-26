@@ -20,8 +20,8 @@ import {
   installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import MenuList from "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 // Each call of the spied list is a render of the open column menu.
 vi.mock(

@@ -37,8 +37,8 @@ import {
   type MachineProvider,
   openMenuFrom,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 const english = resolveMessages();
 

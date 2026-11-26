@@ -25,12 +25,12 @@ import {
   type MachineFields,
   type MachineProvider as Provider,
 } from "../../../../../testing/index.js";
+import type { DisplayFieldCellProps } from "../../../common/index.js";
 import {
   DataTable,
   type DataTableColumn,
   type DataTableProps,
-} from "../../../_work_in_progress/DataTable/index.js";
-import type { DisplayFieldCellProps } from "../../../common/index.js";
+} from "../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
 
 /** `count` machines from `m-<from>`, each named `host-<n>`. */

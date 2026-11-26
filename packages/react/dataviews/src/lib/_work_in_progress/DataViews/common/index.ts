@@ -1,5 +1,5 @@
+export { ConnectedDataTable } from "../../../pattern/DataViews/common/renderers/DataTable/index.js";
 export * from "./ActionBar/index.js";
-export * from "./DataTable/index.js";
 export * from "./Filters/index.js";
 export * from "./HiddenQueryFields/index.js";
 export * from "./Pagination/index.js";
