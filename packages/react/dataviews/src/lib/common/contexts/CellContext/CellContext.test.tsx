@@ -5,7 +5,7 @@ import {
   buildMachine,
   createFakeChannel,
   machines,
-} from "../../../../testing/index.js";
+} from "../../../../../testing/index.js";
 import CellContext from "./CellContext.js";
 
 describe("CellContext", () => {
