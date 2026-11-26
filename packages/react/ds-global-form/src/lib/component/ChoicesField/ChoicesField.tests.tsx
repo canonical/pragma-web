@@ -20,6 +20,30 @@ describe("ChoicesField", () => {
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
   });
 
+  it("names the group by the field label, rendered outside any legend", () => {
+    const { container } = renderWithForm(
+      <ChoicesField
+        name="color"
+        label="Colour"
+        description="Pick one"
+        options={options}
+      />,
+    );
+    const group = screen.getByRole("group", { name: "Colour" });
+    expect(group).toHaveAccessibleDescription("Pick one");
+    expect(container.querySelector("legend")).toBeNull();
+    expect(screen.getByText("Colour").tagName).toBe("SPAN");
+  });
+
+  it("gives options no aria-describedby pointing at a missing id", () => {
+    renderWithForm(
+      <ChoicesField name="color" label="Colour" options={options} />,
+    );
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio).not.toHaveAttribute("aria-describedby");
+    }
+  });
+
   it("renders labels for each option", () => {
     renderWithForm(<ChoicesField name="color" options={options} />);
     expect(screen.getByText("Red")).toBeInTheDocument();

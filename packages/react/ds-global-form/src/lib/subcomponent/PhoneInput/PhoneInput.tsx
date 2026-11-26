@@ -70,6 +70,12 @@ function getCountryLabel(
  *
  * The forwarded ref reaches the national-number input — the field's focusable
  * element, and what react-hook-form needs for `setFocus` and focus-on-error.
+ * The `id` and the field's ARIA wiring go on that input too, so the field label
+ * names it; the country `<select>` keeps its own "Country code" label. Without
+ * `aria-labelledby` the number input falls back to a "Phone number" label.
+ *
+ * With a `name`, both controls post in a plain HTML submission: the number as
+ * `<name>` and the selected country code as `<name>-country`.
  * @returns {React.ReactElement} - Rendered Phone
  *
  * `import { PhoneInput } from "@canonical/react-ds-global-form";`
@@ -94,6 +100,11 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       countryDisplay = "code",
       mask = false,
       disabled = false,
+      "aria-labelledby": ariaLabelledBy,
+      "aria-describedby": ariaDescribedBy,
+      "aria-errormessage": ariaErrorMessage,
+      "aria-invalid": ariaInvalid,
+      "aria-required": ariaRequired,
     },
     ref,
   ): React.ReactElement {
@@ -198,12 +209,12 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
 
     return (
       <div
-        id={id}
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
         <select
           className="country-select p"
+          name={name ? `${name}-country` : undefined}
           value={selectedCountry}
           onChange={handleCountryChange}
           disabled={disabled}
@@ -217,6 +228,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           ))}
         </select>
         <input
+          id={id}
           type="tel"
           className="number-input p"
           name={name}
@@ -231,7 +243,12 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           onBlur={onBlur}
           ref={mergeRefs(number.ref, ref)}
           disabled={disabled}
-          aria-label="Phone number"
+          aria-label={ariaLabelledBy ? undefined : "Phone number"}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          aria-errormessage={ariaErrorMessage}
+          aria-invalid={ariaInvalid}
+          aria-required={ariaRequired}
         />
       </div>
     );

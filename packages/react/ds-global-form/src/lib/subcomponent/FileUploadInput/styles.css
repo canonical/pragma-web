@@ -28,16 +28,6 @@
         border-color var(--motion-duration-fast) ease,
         background-color var(--motion-duration-fast) ease;
 
-      & > input[type="file"] {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-      }
-
       &:hover:not(:disabled) {
         background-color: var(
           --hover--color-foreground-input,
@@ -64,6 +54,18 @@
         color: var(--form-input-color-disabled);
         cursor: not-allowed;
       }
+    }
+
+    /* The native file input stays in the document (it carries the name and
+       `required`, and the drop zone opens it) but is visually hidden. */
+    & > input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     & > .file-list {

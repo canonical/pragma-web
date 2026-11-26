@@ -241,9 +241,9 @@ Custom components are rendered directly and provide their own binding and presen
     <tr><td><code>"date"</code></td><td>DateInput</td><td>HTML5 date picker</td></tr>
     <tr><td><code>"time"</code></td><td>TimeInput</td><td>HTML5 time picker</td></tr>
     <tr><td><code>"datetime"</code></td><td>DateTimeInput</td><td>HTML5 datetime-local picker</td></tr>
-    <tr><td><code>"file"</code></td><td>FileUpload</td><td>File picker with validation (<code>accept</code>, <code>maxSize</code>, <code>maxFiles</code>)</td></tr>
+    <tr><td><code>"file"</code></td><td>FileUpload</td><td>File picker with validation (<code>accept</code>, <code>maxSize</code>, <code>maxFiles</code>). Posting without scripting needs <code>enctype="multipart/form-data"</code> on the form</td></tr>
     <tr><td><code>"color"</code></td><td>Color</td><td>Color picker with swatches and optional hex input</td></tr>
-    <tr><td><code>"phone"</code></td><td>Phone</td><td>International phone with country selector</td></tr>
+    <tr><td><code>"phone"</code></td><td>Phone</td><td>International phone with country selector. Without scripting, the country code posts as <code>&lt;name&gt;-country</code></td></tr>
     <tr><td><code>"hidden"</code></td><td>Hidden</td><td>Hidden form value (no visible UI)</td></tr>
     <tr><td><code>"custom"</code></td><td>Your component</td><td>Custom input via <code>CustomComponent</code> prop</td></tr>
   </tbody>

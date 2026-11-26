@@ -28,7 +28,17 @@ describe("PhoneField", () => {
   it("renders the phone input with its label", () => {
     renderWithForm(<PhoneField name="phone" label="Phone" />);
     expect(screen.getByText("Phone")).toBeInTheDocument();
-    expect(screen.getByLabelText("Phone number")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Phone" })).toBeInTheDocument();
+  });
+
+  it("points the label at the number input and keeps the country select labelled", () => {
+    renderWithForm(<PhoneField name="phone" label="Phone" />);
+    const number = screen.getByRole("textbox", { name: "Phone" });
+    const label = screen.getByText("Phone").closest("label");
+    expect(label).toHaveAttribute("for", number.id);
+    expect(
+      screen.getByRole("combobox", { name: "Country code" }),
+    ).toHaveAttribute("name", "phone-country");
   });
 
   it("gives react-hook-form a real element, so setFocus reaches the input", async () => {
@@ -46,7 +56,7 @@ describe("PhoneField", () => {
     // RHF defers the focus call to a timeout, so this cannot be asserted
     // synchronously.
     await waitFor(() =>
-      expect(screen.getByLabelText("Phone number")).toHaveFocus(),
+      expect(screen.getByRole("textbox", { name: "Phone" })).toHaveFocus(),
     );
   });
 
@@ -63,7 +73,7 @@ describe("PhoneField", () => {
     );
     expect(screen.getByTestId("touched")).toHaveTextContent("false");
 
-    fireEvent.blur(screen.getByLabelText("Phone number"));
+    fireEvent.blur(screen.getByRole("textbox", { name: "Phone" }));
 
     await waitFor(() =>
       expect(screen.getByTestId("touched")).toHaveTextContent("true"),

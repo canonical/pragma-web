@@ -5,12 +5,14 @@ import { useId, useMemo } from "react";
  * @param {string} name - The name of the field.
  * @param {boolean} isError - Indicates if the field is in an error state.
  * @param {boolean} [isRequired] - Whether the field is required (drives `aria-required`, independent of error state).
+ * @param {boolean} [hasDescription] - Whether a description is rendered. `aria-describedby` only references ids that are in the document.
  * @returns An object containing ARIA attributes for input, label, description, and error state.
  */
 const useFieldAriaProps = (
   name: string,
   isError: boolean,
   isRequired = false,
+  hasDescription = false,
 ) => {
   const uniqueId = useId();
   const props = useMemo(() => {
@@ -24,8 +26,9 @@ const useFieldAriaProps = (
         id: baseId,
         "aria-labelledby": labelId,
         "aria-describedby":
-          [descriptionId, isError ? errorId : ""].filter(Boolean).join(" ") ||
-          undefined,
+          [hasDescription ? descriptionId : "", isError ? errorId : ""]
+            .filter(Boolean)
+            .join(" ") || undefined,
         "aria-errormessage": isError ? errorId : undefined,
         "aria-invalid": isError,
         // Required state is a property of the field's optionality, NOT its
@@ -43,7 +46,7 @@ const useFieldAriaProps = (
         // role: "alert",
       },
     };
-  }, [name, isError, isRequired, uniqueId]);
+  }, [name, isError, isRequired, hasDescription, uniqueId]);
   return props;
 };
 

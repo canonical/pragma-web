@@ -1,6 +1,6 @@
 import type React from "react";
 import type { InputProps } from "../../common/types.js";
-import type { BaseProps } from "../../subcomponent/types.js";
+import type { BaseProps, GroupAriaProps } from "../../subcomponent/types.js";
 
 export type RichChoiceOption = {
   value: string;
@@ -31,6 +31,7 @@ type AdditionalRichChoicesProps = {
 
 /** Props for the presentational RichChoices (controlled, no react-hook-form). */
 export type RichChoicesPresentationProps = BaseProps &
+  GroupAriaProps &
   AdditionalRichChoicesProps;
 
 /** Props for the react-hook-form-bound RichChoices field. */

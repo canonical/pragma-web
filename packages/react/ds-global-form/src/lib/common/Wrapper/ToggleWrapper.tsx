@@ -60,6 +60,7 @@ const ToggleWrapper = <ComponentProps extends BaseInputProps>({
     {
       label: inlineLabel,
       isOptional,
+      hasDescription: Boolean(description),
       userRegisterProps,
       nestedRegisterProps,
       unregisterOnUnmount,
@@ -83,9 +84,10 @@ const ToggleWrapper = <ComponentProps extends BaseInputProps>({
         .filter(Boolean)
         .join(" ")}
     >
-      {/* Optional heading above the control (mock label — no htmlFor). */}
+      {/* Optional heading above the control (mock label — no htmlFor). A
+          plain span: a <legend> is only valid as a fieldset's first child. */}
       {headingLabel && (
-        <Label name={name} tag="legend" className="field-toggle-heading">
+        <Label name={name} tag="span" className="field-toggle-heading">
           {headingLabel}
         </Label>
       )}

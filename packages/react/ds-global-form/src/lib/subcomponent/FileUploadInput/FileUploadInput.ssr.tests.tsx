@@ -14,6 +14,13 @@ describe("FileUploadInput (SSR)", () => {
     expect(html).toContain('accept="image/*"');
   });
 
+  it("server-renders a named, required file input, so files post without scripting", () => {
+    const html = renderToString(<FileUploadInput name="docs" required />);
+    expect(html).toMatch(/<input[^>]*type="file"[^>]*name="docs"/);
+    expect(html).toMatch(/<input[^>]*type="file"[^>]*required/);
+    expect(html).not.toMatch(/<button[^>]*required/);
+  });
+
   it("renders the dropzone prompt text in the SSR output", () => {
     const html = renderToString(<FileUploadInput />);
     expect(html).toContain("Drop files here or click to browse");

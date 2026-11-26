@@ -89,7 +89,8 @@ export type WrapperProps<ComponentProps> = BaseWrapperProps<ComponentProps> & {
   /* Whether to unregister the field on unmount */
   unregisterOnUnmount?: boolean;
 
-  /* Whether to mock the label */
+  /* Render the label as plain text, not a <label>: for a group whose options
+   * carry their own labels. The group references it with aria-labelledby. */
   mockLabel?: boolean;
 } & ComponentProps;
 

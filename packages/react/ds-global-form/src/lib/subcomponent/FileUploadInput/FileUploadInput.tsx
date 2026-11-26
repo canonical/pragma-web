@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FileUploadInputProps } from "./types.js";
 import "./styles.css";
 
@@ -9,6 +9,12 @@ const componentCssClassName = "ds input file-upload";
  * Presentational file upload input with drag-and-drop zone, file list, and
  * image preview. Controlled via `value`/`onChange` (no react-hook-form). The
  * field tier supplies the binding.
+ *
+ * The native file `<input>` sits beside the drop-zone `<button>`, not inside it,
+ * and carries the `id`, `name` and `required`, so a `<label for>` reaches it
+ * and the selection posts without scripting. Its files are kept in step with
+ * `value`, including files added by drag and drop. A plain HTML submission
+ * only sends files when the form has `enctype="multipart/form-data"`.
  * @returns {React.ReactElement} - Rendered FileUploadInput
  *
  * `import { FileUploadInput } from "@canonical/react-ds-global-form";`
@@ -29,12 +35,24 @@ export const FileUploadInput = ({
   maxFiles,
   multiple = false,
   disabled = false,
+  name,
+  required,
   ...otherProps
 }: FileUploadInputProps): React.ReactElement => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const files: File[] = Array.isArray(value) ? value : [];
+
+  // Mirror the controlled files into the native input, so a plain submission
+  // posts them and `required` sees them, whichever way they were added.
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input || typeof DataTransfer === "undefined") return;
+    const transfer = new DataTransfer();
+    for (const file of files) transfer.items.add(file);
+    input.files = transfer.files;
+  }, [files]);
 
   /* Presentational only: report the chosen files up via `onChange`. Constraint
    * validation (maxFiles/maxSize) lives on the FIELD as a react-hook-form
@@ -111,7 +129,6 @@ export const FileUploadInput = ({
 
   return (
     <div
-      id={id}
       style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
@@ -133,17 +150,20 @@ export const FileUploadInput = ({
             ? "Drop files here"
             : "Drop files here or click to browse"}
         </span>
-        <input
-          ref={inputRef}
-          type="file"
-          accept={accept}
-          multiple={multiple}
-          disabled={disabled}
-          onChange={handleInputChange}
-          tabIndex={-1}
-          aria-hidden="true"
-        />
       </button>
+      <input
+        ref={inputRef}
+        id={id}
+        type="file"
+        name={name}
+        required={required}
+        accept={accept}
+        multiple={multiple}
+        disabled={disabled}
+        onChange={handleInputChange}
+        tabIndex={-1}
+        aria-hidden="true"
+      />
 
       {files.length > 0 && (
         <ul className="file-list">

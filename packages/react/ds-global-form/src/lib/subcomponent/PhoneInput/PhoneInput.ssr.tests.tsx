@@ -20,6 +20,7 @@ describe("PhoneInput (SSR)", () => {
       <PhoneInput defaultCountry="US" name="mobile" />,
     );
     expect(html).toContain('name="mobile"');
+    expect(html).toContain('name="mobile-country"');
     // Matched case-insensitively: HTML attribute names are, and which casing
     // React emits for these is its business, not this component's contract.
     expect(html).toMatch(/autocomplete="tel-national"/i);

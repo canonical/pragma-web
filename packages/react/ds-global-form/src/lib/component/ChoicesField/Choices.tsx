@@ -27,6 +27,8 @@ export const Choices = ({
   options,
   value,
   onChange,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
 }: ChoicesPresentationProps): React.ReactElement => {
   const type = isMultiple ? "checkbox" : "radio";
 
@@ -43,6 +45,8 @@ export const Choices = ({
   return (
     <fieldset
       id={id}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
       style={layoutStyle}
       className={[componentCssClassName, layout, className]
         .filter(Boolean)
