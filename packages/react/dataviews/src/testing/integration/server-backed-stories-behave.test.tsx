@@ -14,9 +14,9 @@ import {
   FACETED_FILTER_STORIES,
   serveMockApi,
 } from "../../../testing/index.js";
+import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
+import * as restStories from "../../docs/data-sources/Rest.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
-import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
-import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,

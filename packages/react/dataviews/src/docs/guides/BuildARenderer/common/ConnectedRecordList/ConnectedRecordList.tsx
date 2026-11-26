@@ -3,7 +3,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
-import { useDataViews } from "../../../DataViews/index.js";
+import { useDataViews } from "../../../../../lib/_work_in_progress/DataViews/index.js";
 import { ScopedRecordList } from "../ScopedRecordList/index.js";
 import type { ConnectedRecordListProps } from "./types.js";
 

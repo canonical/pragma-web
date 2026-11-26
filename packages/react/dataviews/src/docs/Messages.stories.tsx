@@ -2,12 +2,15 @@ import type { DataViewsMessages } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
-import fr from "../../../storybook/locales/fr.js";
-import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
-import { DataTable, type DataTableColumn } from "../DataTable/index.js";
-import { PaginationBar } from "../PaginationBar/index.js";
-import Component from "./Provider.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../lib/_work_in_progress/DataTable/index.js";
+import Component from "../lib/_work_in_progress/DataViews/Provider.js";
+import { PaginationBar } from "../lib/_work_in_progress/PaginationBar/index.js";
+import { withAppScope } from "../storybook/decorators/index.js";
+import fr from "../storybook/locales/fr.js";
+import useMachineProvider from "../storybook/machines/useMachineProvider.js";
 
 const meta = {
   title: "_work_in_progress/Messages and internationalization",

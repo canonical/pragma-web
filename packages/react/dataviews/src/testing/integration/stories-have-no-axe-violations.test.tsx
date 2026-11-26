@@ -13,6 +13,9 @@ import {
   installPopoverStandIn,
   serveMockApi,
 } from "../../../testing/index.js";
+import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
+import * as restStories from "../../docs/data-sources/Rest.stories.js";
+import * as compositionStories from "../../docs/guides/Composition.stories.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
@@ -21,9 +24,6 @@ import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Fi
 import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
-import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
-import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
-import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
 import * as filterOptionsStories from "../../lib/_work_in_progress/FilterOptions/FilterOptions.stories.js";

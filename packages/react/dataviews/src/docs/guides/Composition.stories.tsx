@@ -5,16 +5,16 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
-import QueryInTheLocation from "../../../storybook/machines/QueryInTheLocation.js";
-import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
-import type { MachineProvider } from "../../../storybook/machines/types.js";
-import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
-import useStoryViewStore from "../../../storybook/machines/useStoryViewStore.js";
-import pickStoryWords from "../../../storybook/pickStoryWords.js";
-import type { StoryWords } from "../../../storybook/types.js";
-import type { DataTableColumn } from "../DataTable/index.js";
-import Component from "./Provider.js";
+import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
+import Component from "../../lib/_work_in_progress/DataViews/Provider.js";
+import { withAppScope } from "../../storybook/decorators/index.js";
+import QueryInTheLocation from "../../storybook/machines/QueryInTheLocation.js";
+import showConsumerCode from "../../storybook/machines/showConsumerCode.js";
+import type { MachineProvider } from "../../storybook/machines/types.js";
+import useMachineProvider from "../../storybook/machines/useMachineProvider.js";
+import useStoryViewStore from "../../storybook/machines/useStoryViewStore.js";
+import pickStoryWords from "../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../storybook/types.js";
 
 const meta = {
   title: "_work_in_progress/Composition",

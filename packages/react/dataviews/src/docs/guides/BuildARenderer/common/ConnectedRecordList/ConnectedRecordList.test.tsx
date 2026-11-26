@@ -6,7 +6,7 @@ import {
   machines,
   silenceRenderErrors,
 } from "../../../../../../testing/index.js";
-import { DataViews } from "../../../DataViews/index.js";
+import { DataViews } from "../../../../../lib/_work_in_progress/DataViews/index.js";
 import ConnectedRecordList from "./ConnectedRecordList.js";
 
 describe("ConnectedRecordList", () => {

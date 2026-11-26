@@ -10,7 +10,7 @@ import {
   resolveMessages,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useEffect, useMemo, useState } from "react";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue } from "../../../../../lib/hooks/index.js";
 import { useIsScripted } from "../../hooks/index.js";
 import { ListStatus } from "../ListStatus/index.js";
 import { RecordItem } from "../RecordItem/index.js";

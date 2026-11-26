@@ -8,7 +8,7 @@ import {
   resolveMessages,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useEffect, useMemo } from "react";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue } from "../../../../../lib/hooks/index.js";
 import { ListStatus } from "../ListStatus/index.js";
 import type { StatusListProps } from "./types.js";
 

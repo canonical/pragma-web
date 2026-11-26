@@ -2,22 +2,22 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
+import Component from "../../lib/_work_in_progress/DataViews/Provider.js";
+import { withAppScope } from "../../storybook/decorators/index.js";
 import {
   answerBehind,
   createGraphQLHandlers,
-} from "../../../storybook/machines/api/index.js";
+} from "../../storybook/machines/api/index.js";
 import {
   SERVER_BACKED_COLUMNS_CODE,
   SERVER_BACKED_FACETS,
   SERVER_BACKED_RENDER_CODE,
-} from "../../../storybook/machines/constants.js";
-import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
-import ServerBackedMachines from "../../../storybook/machines/ServerBackedMachines.js";
-import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
-import { createGraphQLMachineSource } from "../../../storybook/machines/sources/index.js";
-import pickStoryWords from "../../../storybook/pickStoryWords.js";
-import Component from "./Provider.js";
+} from "../../storybook/machines/constants.js";
+import readPaginationSummary from "../../storybook/machines/readPaginationSummary.js";
+import ServerBackedMachines from "../../storybook/machines/ServerBackedMachines.js";
+import showConsumerCode from "../../storybook/machines/showConsumerCode.js";
+import { createGraphQLMachineSource } from "../../storybook/machines/sources/index.js";
+import pickStoryWords from "../../storybook/pickStoryWords.js";
 
 const meta = {
   title: "_work_in_progress/GraphQL API",

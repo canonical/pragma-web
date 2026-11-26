@@ -3,7 +3,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import { type ReactElement, useEffect } from "react";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue } from "../../../../../lib/hooks/index.js";
 import type { PlainListProps } from "./types.js";
 
 /**

@@ -1,5 +1,5 @@
 import { memo, type ReactElement } from "react";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue } from "../../../../../lib/hooks/index.js";
 import type { RecordItemProps } from "./types.js";
 
 /**
