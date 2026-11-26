@@ -12,7 +12,7 @@ import {
   useId,
   useRef,
 } from "react";
-import { useDataViewsRoot } from "../../../../../../../../../_work_in_progress/DataViews/hooks/index.js";
+import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
 import { useSuggestedFacets } from "../../../../hooks/index.js";
 import type {
   DataViewsQueryBarPreset,

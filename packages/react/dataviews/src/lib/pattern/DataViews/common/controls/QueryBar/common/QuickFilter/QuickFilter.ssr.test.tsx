@@ -6,7 +6,7 @@ import {
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { createQuickFilterProvider } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import { useQueryGroup } from "../../hooks/index.js";
 import QuickFilter from "./QuickFilter.js";
 import type { QuickFilterArrangement } from "./types.js";

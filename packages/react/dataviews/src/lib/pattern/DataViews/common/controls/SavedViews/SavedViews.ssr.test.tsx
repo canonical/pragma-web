@@ -12,7 +12,7 @@ import {
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import { createMachineProvider } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import SavedViews from "./SavedViews.js";
 
 describe("DataViews.SavedViews SSR", () => {

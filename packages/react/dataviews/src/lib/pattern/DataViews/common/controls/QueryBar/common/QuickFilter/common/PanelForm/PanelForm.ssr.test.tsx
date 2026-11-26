@@ -2,7 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { createQuickFilterProvider } from "../../../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../../../Provider.js";
 import type { PlacedConjunct } from "../../../../types.js";
 import PanelForm from "./PanelForm.js";
 

@@ -22,7 +22,6 @@ import type {
 import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
-import { DataViews } from "../../../../../_work_in_progress/DataViews/index.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
@@ -32,6 +31,7 @@ import {
   useDataViewsCell,
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
+import { DataViews } from "../../../index.js";
 import Component from "./DataCards.js";
 import { ConnectedDataCards as ConnectedCards } from "./index.js";
 import type { DataCardsProps } from "./types.js";

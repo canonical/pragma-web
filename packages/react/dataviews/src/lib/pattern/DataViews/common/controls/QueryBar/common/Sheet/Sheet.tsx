@@ -15,14 +15,14 @@ import {
   useRef,
   useState,
 } from "react";
-import Context from "../../../../../../../_work_in_progress/DataViews/Context.js";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { QueryChips } from "../../../../../../../_work_in_progress/QueryChips/index.js";
 import { Announcer } from "../../../../../../../common/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,
 } from "../../../../../../../hooks/index.js";
+import Context from "../../../../../Context.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import { Filters } from "../../../Filters/index.js";
 import {
   useAnnounceOutcome,

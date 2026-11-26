@@ -9,9 +9,9 @@ import {
   createMachineProvider,
   installPopoverStandIn,
 } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
 import { QueryChips } from "../../../../../../../_work_in_progress/QueryChips/index.js";
 import { QueryInput } from "../../../../../../../_work_in_progress/QueryInput/index.js";
+import DataViews from "../../../../../Provider.js";
 import useQueryGroup from "../../hooks/useQueryGroup.js";
 import type { QueryRefusedClause } from "../../types.js";
 import RefusedChip from "./RefusedChip.js";

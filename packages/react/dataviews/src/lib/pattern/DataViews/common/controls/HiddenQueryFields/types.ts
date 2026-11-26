@@ -2,7 +2,7 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { UseDestinationProps } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
+import type { UseDestinationProps } from "../../../hooks/index.js";
 
 /**
  * Props of the hidden query fields of one GET form.

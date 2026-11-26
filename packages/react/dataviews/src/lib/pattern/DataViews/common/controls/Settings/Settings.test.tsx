@@ -38,7 +38,7 @@ import {
   waitForFocus,
   waitForFrames,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import {
   DataTable,
   type DataTableColumn,

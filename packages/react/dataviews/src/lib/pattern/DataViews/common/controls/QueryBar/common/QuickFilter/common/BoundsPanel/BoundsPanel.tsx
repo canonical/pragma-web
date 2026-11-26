@@ -1,7 +1,7 @@
 import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
 import type { ReactElement } from "react";
 import { useId } from "react";
-import { useDataViewsRoot } from "../../../../../../../../../_work_in_progress/DataViews/hooks/index.js";
+import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
 import { TypedInput } from "../TypedInput/index.js";
 import type { BoundsPanelProps } from "./types.js";
 import "./styles.css";

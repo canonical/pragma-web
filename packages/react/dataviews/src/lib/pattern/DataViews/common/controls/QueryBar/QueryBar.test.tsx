@@ -42,7 +42,7 @@ import {
   installResizeObserverStandIn,
   type ResizeObserverStandIn,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import QueryBar from "./QueryBar.js";
 import type { DataViewsQueryBarProps } from "./types.js";
 

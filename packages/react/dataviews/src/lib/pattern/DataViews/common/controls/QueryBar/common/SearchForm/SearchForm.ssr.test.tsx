@@ -2,7 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import SearchForm from "./SearchForm.js";
 
 describe("SearchForm SSR", () => {

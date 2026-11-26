@@ -5,8 +5,8 @@ import {
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../../testing/index.js";
-import { useDataViewsRoot } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import { useDataViewsRoot } from "../../../hooks/index.js";
+import DataViews from "../../../Provider.js";
 import HiddenQueryFields from "./HiddenQueryFields.js";
 
 /** The applied query less its search, from the first page. */

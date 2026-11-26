@@ -1,6 +1,6 @@
 import type { ComponentProps, RefObject } from "react";
-import type { ContextOptions } from "../../../../../../../_work_in_progress/DataViews/types.js";
 import type { AnnouncerHandle } from "../../../../../../../common/index.js";
+import type { ContextOptions } from "../../../../../types.js";
 import type { QueryGroupStandIn } from "../../types.js";
 
 /** Sheet's own props. */

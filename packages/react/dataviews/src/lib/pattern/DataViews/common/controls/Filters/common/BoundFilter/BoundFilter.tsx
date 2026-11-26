@@ -5,7 +5,7 @@ import { type ReactElement, useId, useRef } from "react";
 import {
   useDataViewsRoot,
   useFilterHandle,
-} from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
+} from "../../../../../hooks/index.js";
 import { describeFilterFeedback, phraseOperator } from "../utils/index.js";
 import type { BoundFilterProps } from "./types.js";
 import "./styles.css";

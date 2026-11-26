@@ -20,12 +20,12 @@ export type {
   DataViewsSortPanelProps,
   UseDataViewsFilterResult,
   UseDataViewsResult,
-} from "./DataViews/index.js";
+} from "../pattern/DataViews/index.js";
 export {
   DataViews,
   useDataViews,
   useDataViewsFilter,
-} from "./DataViews/index.js";
+} from "../pattern/DataViews/index.js";
 export type {
   FilterButtonCondition,
   FilterButtonPanelHandle,

@@ -21,7 +21,7 @@ import {
   type Machine,
   machines,
 } from "../../../testing/index.js";
-import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../lib/pattern/DataViews/Provider.js";
 
 afterEach(cleanup);
 

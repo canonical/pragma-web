@@ -13,7 +13,7 @@ import type { MachineProviderConfig } from "../../../../../../storybook/machines
 import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
-import { DataViews } from "../../../../../_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../../index.js";
 import type { DataChartProps } from "../DataChart/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import Component from "./DataChartWithTable.js";

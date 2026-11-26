@@ -24,7 +24,7 @@ import {
   answerFacetValues,
   type IdentifiedRecord as Placed,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const places = createCollection({
   identify: (row: Placed) => row.id,

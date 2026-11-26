@@ -7,7 +7,7 @@ import {
 } from "../../../../../../storybook/decorators/index.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../../storybook/machines/types.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 import Component from "./SortPanel.js";
 

@@ -13,7 +13,7 @@ import {
   buildMachine,
   createMachineProvider,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 
 const columns: readonly DataTableColumn[] = [

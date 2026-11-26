@@ -4,11 +4,11 @@ import {
   spellWireValues,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useId, useState } from "react";
+import { spellCount } from "../../../../../../../utils/index.js";
 import {
   useDataViewsRoot,
   useFilterHandle,
-} from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
-import { spellCount } from "../../../../../../../utils/index.js";
+} from "../../../../../hooks/index.js";
 import type { PresenceFilterProps } from "./types.js";
 import "./styles.css";
 

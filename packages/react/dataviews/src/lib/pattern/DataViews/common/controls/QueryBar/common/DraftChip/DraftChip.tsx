@@ -1,7 +1,7 @@
 import { readCondition } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { QueryChip } from "../../../../../../../_work_in_progress/QueryChip/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import type { QueryBarPart } from "../../types.js";
 import {
   entryFormat,

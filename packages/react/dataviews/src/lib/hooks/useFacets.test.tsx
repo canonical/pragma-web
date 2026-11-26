@@ -2,7 +2,7 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createFacetedManual, deliverFacets } from "../../../testing/index.js";
-import DataViews from "../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../pattern/DataViews/Provider.js";
 import useFacets from "./useFacets.js";
 
 const STATUS = {

@@ -5,8 +5,8 @@ import {
   createMachineProvider,
   silenceRenderErrors,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
 import type { DisplayField } from "../../../../../common/index.js";
+import DataViews from "../../../Provider.js";
 import DataCards from "./ConnectedDataCards.js";
 
 const fields: readonly DisplayField[] = [

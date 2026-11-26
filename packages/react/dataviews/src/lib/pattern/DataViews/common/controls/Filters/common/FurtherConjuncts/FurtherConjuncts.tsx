@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { useDataViewsValue } from "../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import { phraseOperator } from "../utils/index.js";
 import { FurtherConjunct } from "./common/index.js";
 import type { FurtherConjunctsProps } from "./types.js";

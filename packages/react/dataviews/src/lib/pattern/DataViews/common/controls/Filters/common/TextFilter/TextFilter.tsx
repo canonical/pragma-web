@@ -2,13 +2,13 @@ import { spellWireKey } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useEffect, useId, useRef, useState } from "react";
 import {
-  useDataViewsRoot,
-  useFilterHandle,
-} from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
-import {
   useDataViewsValue,
   useIsHydrated,
 } from "../../../../../../../hooks/index.js";
+import {
+  useDataViewsRoot,
+  useFilterHandle,
+} from "../../../../../hooks/index.js";
 import { describeFilterFeedback, phraseOperator } from "../utils/index.js";
 import type { TextFilterOperator, TextFilterProps } from "./types.js";
 import "./styles.css";

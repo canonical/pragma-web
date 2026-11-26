@@ -10,7 +10,7 @@ import {
   buildMachine,
   createMachineProvider,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import Pagination from "./Pagination.js";
 
 const firstOfTwo = { ...DEFAULT_WINDOW, page: 1, size: 2 };

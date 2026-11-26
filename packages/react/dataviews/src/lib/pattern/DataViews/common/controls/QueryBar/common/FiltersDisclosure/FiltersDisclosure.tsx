@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import { Filters } from "../../../Filters/index.js";
 import type { FiltersDisclosureProps } from "./types.js";
 import "./styles.css";

@@ -33,7 +33,7 @@ import {
   quickHostCollection,
   quickHosts,
 } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import { useQueryGroup } from "../../hooks/index.js";
 import QuickFilter from "./QuickFilter.js";
 import type { QuickFilterArrangement } from "./types.js";

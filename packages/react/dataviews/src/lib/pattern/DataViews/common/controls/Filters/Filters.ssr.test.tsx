@@ -22,7 +22,7 @@ import {
   COUNTED_EXACTLY,
   type IdentifiedRecord as Row,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import Filters from "./Filters.js";
 
 const collection = createCollection({

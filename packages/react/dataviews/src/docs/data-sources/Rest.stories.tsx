@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import Component from "../../lib/_work_in_progress/DataViews/Provider.js";
+import Component from "../../lib/pattern/DataViews/Provider.js";
 import { withAppScope } from "../../storybook/decorators/index.js";
 import {
   answerBehind,

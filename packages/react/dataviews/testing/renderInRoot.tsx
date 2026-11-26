@@ -4,8 +4,8 @@ import type {
 } from "@canonical/dataviews-core";
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { useDataViewsRoot } from "../src/lib/_work_in_progress/DataViews/hooks/index.js";
-import DataViews from "../src/lib/_work_in_progress/DataViews/Provider.js";
+import { useDataViewsRoot } from "../src/lib/pattern/DataViews/hooks/index.js";
+import DataViews from "../src/lib/pattern/DataViews/Provider.js";
 import createMachineProvider from "./createMachineProvider.js";
 import type { MachineProviderConfig, RootedHook } from "./types.js";
 

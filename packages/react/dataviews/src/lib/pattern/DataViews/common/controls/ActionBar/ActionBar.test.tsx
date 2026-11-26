@@ -9,7 +9,7 @@ import {
   createMachineProvider,
   type MachineProvider,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import ActionBar from "./ActionBar.js";
 import type { DataViewsActionBarProps } from "./types.js";
 

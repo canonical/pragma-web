@@ -7,7 +7,7 @@ import type { MachineProvider } from "../../../../../../storybook/machines/types
 import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 import Component from "./Settings.js";
 

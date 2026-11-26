@@ -1,8 +1,8 @@
 import type { DataViewsState, Query } from "@canonical/dataviews-core";
 import { QUERY_KEYS } from "@canonical/dataviews-core/bindings";
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { interceptSubmit } from "../../../../../../../utils/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import { HiddenQueryFields } from "../../../HiddenQueryFields/index.js";
 import type { SearchFormProps } from "./types.js";
 

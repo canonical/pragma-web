@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
+import { useDataViewsRoot } from "../../../hooks/index.js";
 import Standalone from "./DataChart.js";
 import type { DataViewsDataChartProps } from "./types.js";
 

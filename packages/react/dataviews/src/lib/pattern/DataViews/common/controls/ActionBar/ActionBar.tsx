@@ -1,8 +1,8 @@
 import { TooltipEngine } from "@canonical/react-ds-global";
 import { type FocusEvent, type ReactElement, useCallback, useRef } from "react";
-import { useDataViewsRoot } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { IconButtonStandIn } from "../../../../../common/IconButtonStandIn/index.js";
 import { useDataViewsValue, useMergedRef } from "../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../hooks/index.js";
 import type { DataViewsActionBarProps } from "./types.js";
 import "./styles.css";
 

@@ -27,7 +27,7 @@ import {
   type MachineProvider,
   machines,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import Search from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
 

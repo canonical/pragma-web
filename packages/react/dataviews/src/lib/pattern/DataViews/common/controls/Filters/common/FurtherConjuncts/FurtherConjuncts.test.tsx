@@ -21,7 +21,7 @@ import {
   expectNoAxeViolations,
   type IdentifiedRecord,
 } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import Filters from "../../Filters.js";
 import FurtherConjuncts from "./FurtherConjuncts.js";
 

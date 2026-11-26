@@ -15,24 +15,21 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { Fragment, type ReactElement, useMemo, useRef, useState } from "react";
-import { NO_RECORDS } from "../../../../../_work_in_progress/DataViews/common/constants.js";
-import {
-  findFilterHandle,
-  listFacetOptions,
-} from "../../../../../_work_in_progress/DataViews/common/utils/index.js";
-import type { UseStandingOperatorsResult } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
-import {
-  useDataViewsRoot,
-  useMoreFiltersPin,
-  useRestrictedFields,
-  useStandingOperators,
-} from "../../../../../_work_in_progress/DataViews/hooks/index.js";
 import {
   type UseFacetsResult,
   useDataViewsValue,
   useFacets,
 } from "../../../../../hooks/index.js";
 import { interceptSubmit } from "../../../../../utils/index.js";
+import type { UseStandingOperatorsResult } from "../../../hooks/index.js";
+import {
+  useDataViewsRoot,
+  useMoreFiltersPin,
+  useRestrictedFields,
+  useStandingOperators,
+} from "../../../hooks/index.js";
+import { NO_RECORDS } from "../../constants.js";
+import { findFilterHandle, listFacetOptions } from "../../utils/index.js";
 import { HiddenQueryFields } from "../HiddenQueryFields/index.js";
 import {
   BoundFilter,

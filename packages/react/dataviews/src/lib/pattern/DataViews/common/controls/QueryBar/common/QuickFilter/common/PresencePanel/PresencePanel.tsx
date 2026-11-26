@@ -6,8 +6,8 @@ import {
 import { RadioInput } from "@canonical/react-ds-global-form";
 import type { ReactElement } from "react";
 import { useId } from "react";
-import { useDataViewsRoot } from "../../../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { useIsHydrated } from "../../../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
 import type { PresencePanelProps } from "./types.js";
 import "./styles.css";
 

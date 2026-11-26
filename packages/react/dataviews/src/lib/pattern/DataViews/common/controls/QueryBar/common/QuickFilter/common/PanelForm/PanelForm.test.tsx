@@ -2,7 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createQuickFilterProvider } from "../../../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../../../Provider.js";
 import PanelForm from "./PanelForm.js";
 
 describe("PanelForm", () => {

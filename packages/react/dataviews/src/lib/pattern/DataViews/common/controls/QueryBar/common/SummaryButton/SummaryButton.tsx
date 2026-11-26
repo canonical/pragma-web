@@ -1,7 +1,7 @@
 import { Badge, Button } from "@canonical/react-ds-global";
 import type { MouseEvent, ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { useDataViewsValue } from "../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import type { QueryStateStandIn } from "../../types.js";
 import {
   countAppliedFilters,

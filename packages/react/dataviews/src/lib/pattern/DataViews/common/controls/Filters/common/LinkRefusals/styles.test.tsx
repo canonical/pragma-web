@@ -11,7 +11,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import Filters from "../../Filters.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));

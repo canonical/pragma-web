@@ -3,7 +3,7 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createMachineProvider } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import { useQueryGroup } from "../../hooks/index.js";
 import SummaryButton from "./SummaryButton.js";
 import type { SummaryButtonProps } from "./types.js";

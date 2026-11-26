@@ -11,7 +11,7 @@ import {
   createFacetedManual,
   renderInRoot,
 } from "../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../Provider.js";
 import useSuggestedFacets from "./useSuggestedFacets.js";
 
 /** A page with a facet over the status. */

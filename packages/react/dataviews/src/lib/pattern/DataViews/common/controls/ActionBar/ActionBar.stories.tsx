@@ -17,9 +17,9 @@ import {
 } from "../../../../../../storybook/machines/fixtures.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type { Machine } from "../../../../../../storybook/machines/types.js";
-import { useDataViews } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
 import { useDataViewsValue } from "../../../../../hooks/index.js";
+import { useDataViews } from "../../../hooks/index.js";
+import DataViews from "../../../Provider.js";
 import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 import Pagination from "../Pagination/Pagination.js";
 import Component from "./ActionBar.js";

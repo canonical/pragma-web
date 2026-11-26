@@ -24,8 +24,8 @@ import {
   quickHostCollection,
   quickHosts,
 } from "../../../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../../../_work_in_progress/DataViews/Provider.js";
 import { useDataViewsValue } from "../../../../../../../../../hooks/index.js";
+import DataViews from "../../../../../../../Provider.js";
 import { useQueryGroup } from "../../../../hooks/index.js";
 import type { QueryStateStandIn } from "../../../../types.js";
 import { isSameConjuncts, listFieldConjuncts } from "../../utils/index.js";

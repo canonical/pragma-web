@@ -20,7 +20,7 @@ import {
   type MachineProvider,
   readAnnouncements,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import SortPanel from "./SortPanel.js";
 
 /** A panel inside a root over a source ordering by all three fields. */

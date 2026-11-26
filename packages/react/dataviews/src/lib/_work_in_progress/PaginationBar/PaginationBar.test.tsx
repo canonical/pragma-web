@@ -26,7 +26,7 @@ import {
   type MachineFixture,
   type MachineProvider as Provider,
 } from "../../../../testing/index.js";
-import { DataViews } from "../DataViews/index.js";
+import { DataViews } from "../../pattern/DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
 

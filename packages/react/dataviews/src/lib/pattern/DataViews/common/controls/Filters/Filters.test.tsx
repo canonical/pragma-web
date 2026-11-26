@@ -47,7 +47,7 @@ import {
   type IdentifiedRecord as Row,
   toggleDisclosure,
 } from "../../../../../../../testing/index.js";
-import DataViews from "../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../Provider.js";
 import Filters from "./Filters.js";
 
 /** A collection with a field of every kind, so every control is exercised. */

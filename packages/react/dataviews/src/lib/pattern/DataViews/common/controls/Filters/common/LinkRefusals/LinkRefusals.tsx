@@ -5,8 +5,8 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId, useLayoutEffect, useRef } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { useIsHydrated } from "../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import type { LinkRefusalsProps } from "./types.js";
 import "./styles.css";
 

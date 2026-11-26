@@ -18,7 +18,7 @@ import {
   buildMachine,
   createMachineProvider,
 } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import { useQueryGroup, useSheetAnnouncer } from "../../hooks/index.js";
 import type { QueryGroupStandIn } from "../../types.js";
 import { spellInvoker } from "../../utils/index.js";

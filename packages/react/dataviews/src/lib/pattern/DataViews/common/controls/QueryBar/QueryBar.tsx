@@ -24,7 +24,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { useDataViewsRoot } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { QueryChips } from "../../../../../_work_in_progress/QueryChips/index.js";
 import { ENTRY_ITEM_ID as ENTRY } from "../../../../../_work_in_progress/QueryInput/common/constants.js";
 import { QueryInput } from "../../../../../_work_in_progress/QueryInput/index.js";
@@ -33,6 +32,7 @@ import {
   useIsHydrated,
   useStableCallback,
 } from "../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../hooks/index.js";
 import { DraftChip } from "./common/DraftChip/index.js";
 import { FiltersDisclosure } from "./common/FiltersDisclosure/index.js";
 import {

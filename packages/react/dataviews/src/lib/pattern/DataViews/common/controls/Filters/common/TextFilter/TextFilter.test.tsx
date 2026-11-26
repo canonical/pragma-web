@@ -24,9 +24,9 @@ import {
   type TextFilterHarnessProps as HarnessProps,
   type IdentifiedRecord as Row,
 } from "../../../../../../../../../testing/index.js";
-import { findFilterHandle } from "../../../../../../../_work_in_progress/DataViews/common/utils/index.js";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
+import DataViews from "../../../../../Provider.js";
+import { findFilterHandle } from "../../../../utils/index.js";
 import TextFilter from "./TextFilter.js";
 import type { TextFilterOperator } from "./types.js";
 

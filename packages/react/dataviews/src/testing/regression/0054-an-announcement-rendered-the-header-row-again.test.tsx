@@ -30,9 +30,9 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 import HeaderCell from "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 vi.mock(
   "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js",

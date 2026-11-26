@@ -2,11 +2,8 @@ import type { DataViewsState, Query } from "@canonical/dataviews-core";
 import { QUERY_KEYS } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId } from "react";
-import {
-  useAppliedSearch,
-  useDataViewsRoot,
-} from "../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { interceptSubmit } from "../../../../../utils/index.js";
+import { useAppliedSearch, useDataViewsRoot } from "../../../hooks/index.js";
 import { HiddenQueryFields } from "../HiddenQueryFields/index.js";
 import type { DataViewsSearchProps } from "./types.js";
 import "./styles.css";

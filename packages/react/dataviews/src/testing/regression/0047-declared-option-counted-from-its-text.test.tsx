@@ -17,7 +17,7 @@ import {
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { TaggedRecord as Tagged } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const tagged = createCollection({
   identify: (row: Tagged) => row.id,

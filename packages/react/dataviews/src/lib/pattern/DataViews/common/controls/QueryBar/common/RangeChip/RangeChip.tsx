@@ -1,12 +1,12 @@
 import type { Predicate } from "@canonical/dataviews-core";
 import { listConjuncts } from "@canonical/dataviews-core/bindings";
 import { memo, type ReactElement, useMemo } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { QueryChip } from "../../../../../../../_work_in_progress/QueryChip/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,
 } from "../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import type { QueryStateStandIn } from "../../types.js";
 import {
   entryFormat,

@@ -68,12 +68,12 @@ import {
   readAnnouncements,
   waitForFocus,
 } from "../../../../../../../testing/index.js";
-import { DataViews } from "../../../../../_work_in_progress/DataViews/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import {
   useDataViewsCell,
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
+import { DataViews } from "../../../index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 

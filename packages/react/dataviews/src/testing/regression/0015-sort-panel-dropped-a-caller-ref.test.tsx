@@ -14,7 +14,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0015 — the sort panel dropped a caller's ref", () => {
   it("hands the section to a caller's ref and keeps its own", () => {

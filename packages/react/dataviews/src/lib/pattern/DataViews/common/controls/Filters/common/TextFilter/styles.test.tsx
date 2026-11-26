@@ -15,7 +15,7 @@ import {
   createMachineProvider,
   machines,
 } from "../../../../../../../../../testing/index.js";
-import DataViews from "../../../../../../../_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../../../../Provider.js";
 import Filters from "../../Filters.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));

@@ -6,13 +6,13 @@ import type {
 import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
 import type { ReactElement } from "react";
 import { memo, useId, useMemo, useRef } from "react";
-import { useDataViewsRoot } from "../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { FilterButton } from "../../../../../../../_work_in_progress/FilterButton/index.js";
 import { FilterOptions } from "../../../../../../../_work_in_progress/FilterOptions/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,
 } from "../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../hooks/index.js";
 import type { QueryStateStandIn } from "../../types.js";
 import { readLabelsStandIn, spellCommandHref } from "../../utils/index.js";
 import { BoundsPanel } from "./common/BoundsPanel/index.js";

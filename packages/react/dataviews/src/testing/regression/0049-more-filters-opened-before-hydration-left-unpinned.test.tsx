@@ -26,7 +26,7 @@ import {
   type IdentifiedRecord as Row,
   toggleDisclosure,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const collection = createCollection({
   identify: (row: Row) => row.id,

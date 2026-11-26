@@ -5,10 +5,10 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { Dispatch, RefCallback, RefObject } from "react";
-import type { ContextOptions } from "../../../../../../_work_in_progress/DataViews/types.js";
 import type { FilterButtonPanelHandle } from "../../../../../../_work_in_progress/FilterButton/index.js";
 import type { AnnouncerHandle } from "../../../../../../common/index.js";
 import type { UseFacetsResult } from "../../../../../../hooks/index.js";
+import type { ContextOptions } from "../../../../types.js";
 import type {
   QueryBarSession,
   QueryBarSessionAction,

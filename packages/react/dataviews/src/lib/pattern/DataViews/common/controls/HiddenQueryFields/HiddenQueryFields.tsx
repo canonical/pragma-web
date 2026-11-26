@@ -1,6 +1,6 @@
 import { type ReactElement, useMemo } from "react";
-import { useDestination } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
 import { listHiddenFields } from "../../../../../utils/index.js";
+import { useDestination } from "../../../hooks/index.js";
 import type { HiddenQueryFieldsProps } from "./types.js";
 
 /**

@@ -5,11 +5,11 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
-import { useDataViewsRoot } from "../../../../../../../../../_work_in_progress/DataViews/hooks/index.js";
 import {
   useHydrationFocusHandoff,
   useIsHydrated,
 } from "../../../../../../../../../hooks/index.js";
+import { useDataViewsRoot } from "../../../../../../../hooks/index.js";
 import type { FurtherConjunctProps } from "./types.js";
 import "./styles.css";
 

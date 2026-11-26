@@ -16,7 +16,6 @@ import {
 import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
 import * as restStories from "../../docs/data-sources/Rest.stories.js";
 import * as compositionStories from "../../docs/guides/Composition.stories.js";
-import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
 import * as filterOptionsStories from "../../lib/_work_in_progress/FilterOptions/FilterOptions.stories.js";
 import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
@@ -30,6 +29,7 @@ import * as dataCardsStories from "../../lib/pattern/DataViews/common/renderers/
 import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
+import * as rootStories from "../../lib/pattern/DataViews/DataViews.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,

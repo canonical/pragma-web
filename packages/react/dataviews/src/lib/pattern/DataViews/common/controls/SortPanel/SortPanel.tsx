@@ -10,15 +10,12 @@ import {
   useRef,
 } from "react";
 import {
-  useAppliedSort,
-  useDataViewsRoot,
-} from "../../../../../_work_in_progress/DataViews/hooks/index.js";
-import {
   ORDERING_TOPIC,
   SORT_REFUSAL_TOPIC,
 } from "../../../../../common/index.js";
 import { useIsHydrated, useMergedRef } from "../../../../../hooks/index.js";
 import { describeOrdering } from "../../../../../utils/index.js";
+import { useAppliedSort, useDataViewsRoot } from "../../../hooks/index.js";
 import chooseFocusFallback from "./chooseFocusFallback.js";
 import type { DataViewsSortPanelProps } from "./types.js";
 
