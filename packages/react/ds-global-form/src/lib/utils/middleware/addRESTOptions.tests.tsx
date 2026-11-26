@@ -1,5 +1,11 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
-import { useEffect } from "react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithForm } from "../../../testing/renderWithForm.js";
@@ -193,6 +199,38 @@ describe("addRESTFieldOptions", () => {
       await respondWith(0, fruits);
       expect(screen.getByRole("alert")).toHaveTextContent("Unreadable options");
     });
+
+    it("does not block the submit", async () => {
+      const onSubmit = vi.fn();
+      /** A form whose only field fetches its options. */
+      const SubmitForm = () => {
+        const methods = useForm();
+        return (
+          <FormProvider {...methods}>
+            <form
+              aria-label="Order"
+              onSubmit={methods.handleSubmit((values) => onSubmit(values))}
+            >
+              <SelectField
+                name="fruit"
+                label="Fruit"
+                options={[]}
+                isOptional
+                middleware={[addRESTFieldOptions("/api/fruits")]}
+              />
+            </form>
+          </FormProvider>
+        );
+      };
+      render(<SubmitForm />);
+      await respondWith(0, {}, 500);
+      await act(async () => {
+        fireEvent.submit(screen.getByRole("form", { name: "Order" }));
+      });
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
+    });
   });
 
   describe("cancellation", () => {
@@ -281,6 +319,27 @@ describe("addRESTFieldOptions", () => {
     });
   });
 
+  describe("URL change", () => {
+    it("drops the previous URL's error while the new options load", async () => {
+      const { rerender } = renderSelect(addRESTFieldOptions("/api/a"));
+      await respondWith(0, {}, 500);
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+
+      rerender(
+        <SelectField
+          name="fruit"
+          label="Fruit"
+          options={[]}
+          middleware={[addRESTFieldOptions("/api/b")]}
+        />,
+      );
+      await waitFor(() => {
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
+      expect(screen.getByRole("combobox")).toHaveAttribute("aria-busy", "true");
+    });
+  });
+
   describe("re-rendering", () => {
     const fruitOptions = addRESTFieldOptions("/api/fruits");
 
@@ -310,6 +369,76 @@ describe("addRESTFieldOptions", () => {
       expect(screen.getByRole("alert")).toHaveTextContent(
         "Failed to fetch options",
       );
+    });
+  });
+
+  describe("inline middleware", () => {
+    /** A form that builds the middleware inline and re-renders on demand. */
+    const InlineForm = ({ url }: { url: string }) => {
+      const methods = useForm();
+      const [renders, setRenders] = useState(0);
+      return (
+        <FormProvider {...methods}>
+          <button type="button" onClick={() => setRenders(renders + 1)}>
+            Re-render
+          </button>
+          <SelectField
+            name="fruit"
+            label="Fruit"
+            options={[]}
+            middleware={[addRESTFieldOptions(url)]}
+          />
+        </FormProvider>
+      );
+    };
+
+    const reRender = () =>
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: "Re-render" }));
+      });
+
+    const readOptions = () =>
+      screen.getAllByRole("option").map((option) => option.textContent);
+
+    it("fetches once and keeps the field mounted across re-renders", async () => {
+      render(<InlineForm url="/api/fruits" />);
+      const select = screen.getByRole("combobox", { name: "Fruit" });
+      await respondWith(0, fruits);
+      await reRender();
+      await reRender();
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(screen.getByRole("combobox", { name: "Fruit" })).toBe(select);
+      expect(readOptions()).toEqual(["Apple", "Banana"]);
+    });
+
+    it("refetches once when the URL changes and drops the stale answer", async () => {
+      const { rerender } = render(<InlineForm url="/api/a" />);
+      const select = screen.getByRole("combobox", { name: "Fruit" });
+      rerender(<InlineForm url="/api/b" />);
+      await reRender();
+      expect(requests.map((request) => request.url)).toEqual([
+        "/api/a",
+        "/api/b",
+      ]);
+      expect(getRequest(0).init.signal?.aborted).toBe(true);
+      expect(select).toBeDisabled();
+
+      await respondWith(1, [banana]);
+      await respondWith(0, [apple]);
+      expect(screen.getByRole("combobox", { name: "Fruit" })).toBe(select);
+      expect(select).toBeEnabled();
+      expect(readOptions()).toEqual(["Banana"]);
+    });
+
+    it("loads the new URL's options in place of the previous ones", async () => {
+      const { rerender } = render(<InlineForm url="/api/a" />);
+      await respondWith(0, [apple]);
+      rerender(<InlineForm url="/api/b" />);
+      const select = screen.getByRole("combobox", { name: "Fruit" });
+      expect(select).toBeDisabled();
+      expect(screen.queryAllByRole("option")).toHaveLength(0);
+      await respondWith(1, [banana]);
+      expect(readOptions()).toEqual(["Banana"]);
     });
   });
 });
