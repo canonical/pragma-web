@@ -26,6 +26,8 @@ Each component brings its own stylesheet when you import it. The package stylesh
 import "@canonical/react-ds-global-form/dist/esm/index.css";
 ```
 
+Testing with Jest? `@canonical/react-ds-global`'s [Testing with Jest](../ds-global/README.md#testing-with-jest) section covers the ESM transform, the stylesheet stub and the mapper entries that this package needs too.
+
 ### How component CSS reaches the page
 
 This package puts CSS on the page two ways. `dist/esm/index.css` — the file the snippet above imports — is the package-level stylesheet: the `--form-*` token block, the field grid, the shared input chrome, and `density.css`, which sizes every control to the context and density cell on the root. Each component module then imports its own stylesheet (`import "./styles.css"`), so importing a component is what puts that component's CSS on the page; a bundler collects those imports into the application's CSS. Nothing here is injected at runtime, and a component you never import ships no CSS.
