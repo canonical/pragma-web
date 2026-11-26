@@ -24,6 +24,8 @@ import * as compositionStories from "../../docs/guides/Composition.stories.js";
 import * as actionBarStories from "../../lib/pattern/DataViews/common/controls/ActionBar/ActionBar.stories.js";
 import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
 import * as paginationStories from "../../lib/pattern/DataViews/common/controls/Pagination/Pagination.stories.js";
+import * as queryBarNarrowStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.narrow.stories.js";
+import * as queryBarQuickStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.quick.stories.js";
 import * as queryBarStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.stories.js";
 import * as savedViewsStories from "../../lib/pattern/DataViews/common/controls/SavedViews/SavedViews.stories.js";
 import * as searchStories from "../../lib/pattern/DataViews/common/controls/Search/Search.stories.js";
@@ -58,6 +60,8 @@ const parts = {
   Filters: composeStories(filtersStories),
   Pagination: composeStories(paginationStories),
   QueryBar: composeStories(queryBarStories),
+  "QueryBar/Narrow": composeStories(queryBarNarrowStories),
+  "QueryBar/Quick filters": composeStories(queryBarQuickStories),
   SavedViews: composeStories(savedViewsStories),
   Search: composeStories(searchStories),
   Settings: composeStories(settingsStories),

@@ -1,4 +1,5 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as NarrowStories from "./QueryBar.narrow.stories";
 import * as Stories from "./QueryBar.stories";
 
 <Meta of={Stories} name="Usage" />
@@ -40,4 +41,4 @@ Each chip is one conjunct, so two chips on the same field both hold: a machine t
 
 Below a container width of 37.5rem the chips give way: the entry searches only, and a summary button beside it, "Filters, 2 applied", opens the sheet, a full-screen dialog. It lists the applied chips, each removable, offers "Add filter", which walks field, operator and value one list at a time, and holds the filters form. Every change applies at once, and the rows behind it update; "Show 12 results" closes it, as Escape and the back gesture do, and closing changes nothing. Clear all clears the filters and keeps the search.
 
-<Canvas of={Stories.Mobile} />
+<Canvas of={NarrowStories.Narrow} />

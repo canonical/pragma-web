@@ -22,6 +22,8 @@ import * as queryChipStories from "../../lib/component/QueryChip/QueryChip.stori
 import * as queryInputStories from "../../lib/component/QueryInput/QueryInput.stories.js";
 import * as queryChipsStories from "../../lib/group/QueryChips/QueryChips.stories.js";
 import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
+import * as queryBarNarrowStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.narrow.stories.js";
+import * as queryBarQuickStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.quick.stories.js";
 import * as queryBarStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.stories.js";
 import * as settingsStories from "../../lib/pattern/DataViews/common/controls/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/pattern/DataViews/common/controls/SortPanel/SortPanel.stories.js";
@@ -140,7 +142,15 @@ describe("the query controls' played stories have no axe violations", () => {
   }
 
   // Each as first drawn, then once its play has run.
-  for (const [name, Story] of Object.entries(composeStories(queryBarStories))) {
+  for (const [name, Story] of [
+    ...Object.entries(composeStories(queryBarStories)),
+    ...Object.entries(composeStories(queryBarNarrowStories)).map(
+      ([story, composed]) => [`Narrow ${story}`, composed] as const,
+    ),
+    ...Object.entries(composeStories(queryBarQuickStories)).map(
+      ([story, composed]) => [`Quick filters ${story}`, composed] as const,
+    ),
+  ]) {
     it(`QueryBar ${name}`, async () => {
       const { container, unmount } = render(<Story />);
       await expectNoAxeViolations(container);

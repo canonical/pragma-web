@@ -2,40 +2,25 @@ import {
   createArraySource,
   createCollection,
   createDataViewsProvider,
-  createMemoryLocation,
-  createPlatformLocation,
-  type DataViewsProvider,
-  type PlatformLocation,
 } from "@canonical/dataviews-core";
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
-import { renderToString } from "react-dom/server";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../../storybook/decorators/index.js";
+import type { BarStoryArgs } from "../../../../../../storybook/bar/index.js";
 import {
-  barMachineCollection,
-  barMachines,
-  pooledMachineCollection,
-  pooledMachines,
-} from "../../../../../../storybook/machines/fixtures.js";
-import type {
-  BarMachine,
-  PooledMachine,
-} from "../../../../../../storybook/machines/types.js";
+  countRows,
+  readFrameQuery,
+  renderBarWith,
+  ServerRenderedBar,
+} from "../../../../../../storybook/bar/index.js";
+import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
-import type { StoryWords } from "../../../../../../storybook/types.js";
 import DataViews from "../../../Provider.js";
 import {
   DataTable,
   type DataTableColumn,
 } from "../../renderers/DataTable/index.js";
-import { ActionBar } from "../ActionBar/index.js";
 import Component from "./QueryBar.js";
-import type { DataViewsQueryBarProps } from "./types.js";
-
-/** The part's props, and the words the story's root speaks. */
-type StoryArgs = DataViewsQueryBarProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/QueryBar",
@@ -46,180 +31,10 @@ const meta = {
   parameters: {
     docs: { story: { inline: false, iframeHeight: "560px" } },
   },
-} satisfies Meta<StoryArgs>;
+} satisfies Meta<BarStoryArgs>;
 
 export default meta;
-type Story = StoryObj<StoryArgs>;
-
-/** The machines' provider, as an application builds one. */
-type BarProvider = DataViewsProvider<
-  typeof barMachineCollection.schema.fields,
-  BarMachine
->;
-
-const columns: readonly DataTableColumn[] = [
-  { id: "hostname", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "memory", header: "Memory (MiB)" },
-  { id: "tags", header: "Tags" },
-  { id: "owner", header: "Owner" },
-  { id: "deployed", header: "Deployed" },
-];
-
-/** How one story's machines start. */
-type BarConfig = {
-  /** The query the provider starts on, as canonical text. */
-  readonly query?: string;
-  /** A width that makes the chips overflow. */
-  readonly inlineSize?: string;
-  /** Renders a button that changes the status from outside the bar. */
-  readonly withOutsideChange?: boolean;
-  /** Keeps the query in the frame's address, so Back and Forward move it. */
-  readonly withHistory?: boolean;
-  /** A location at this address, which spells addresses for links. */
-  readonly href?: string;
-  /** Rows selected as the story starts, with the action bar over them. */
-  readonly selected?: readonly string[];
-  /** Puts each machine in one of twelve pools, a field to search in a panel. */
-  readonly withPools?: boolean;
-};
-
-/**
- * The frame's own address and history as a platform the location reads
- * and writes, so a story's query moves with Back and Forward. Story-only.
- */
-const windowPlatform: PlatformLocation = {
-  getLocation: () => window.location.href,
-  navigate: (url, options) => {
-    if (options?.replace === true) window.history.replaceState(null, "", url);
-    else window.history.pushState(null, "", url);
-  },
-  subscribe: (listener) => {
-    const handlePopState = (): void => listener(window.location.href);
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  },
-};
-
-/** The frame's own parameters, which a story's query never replaces. */
-const FRAME_KEYS: readonly string[] = ["id", "viewMode", "args", "globals"];
-
-/**
- * Start the frame's address on a story's query, so a story that keeps its
- * query there starts from its own, whatever a story before it left.
- * Story-only.
- */
-const startFrameAt = (query: string): void => {
-  const url = new URL(window.location.href);
-  for (const key of [...url.searchParams.keys()]) {
-    if (!FRAME_KEYS.includes(key)) url.searchParams.delete(key);
-  }
-  for (const [key, value] of new URLSearchParams(query)) {
-    url.searchParams.append(key, value);
-  }
-  window.history.replaceState(null, "", url);
-};
-
-/** The query bar over the sixty machines, with their table. */
-function BarMachines({
-  query,
-  inlineSize,
-  withOutsideChange = false,
-  withHistory = false,
-  href,
-  withPools = false,
-  messages,
-  selected,
-  ...args
-}: StoryArgs & BarConfig): ReactElement {
-  const words = pickStoryWords({ messages });
-  const [provider] = useState<BarProvider>(() => {
-    if (withHistory) startFrameAt(query ?? "");
-    // The pooled machines are bar machines with one field more, which the
-    // bar's own provider type does not name.
-    const data = (withPools
-      ? {
-          collection: pooledMachineCollection,
-          source: createArraySource<PooledMachine>({
-            rows: pooledMachines,
-            collection: pooledMachineCollection,
-            searchFields: ["hostname"],
-          }),
-          facets: ["status", "tags", "pool"],
-        }
-      : {
-          collection: barMachineCollection,
-          source: createArraySource<BarMachine>({
-            rows: barMachines,
-            collection: barMachineCollection,
-            searchFields: ["hostname"],
-          }),
-          facets: ["status", "tags"],
-        }) as unknown as {
-      readonly collection: typeof barMachineCollection;
-      readonly source: ReturnType<typeof createArraySource<BarMachine>>;
-      readonly facets: readonly ("status" | "tags")[];
-    };
-    const built = createDataViewsProvider({
-      ...data,
-      ...(withHistory
-        ? { location: createPlatformLocation(windowPlatform) }
-        : {}),
-      ...(href === undefined
-        ? {}
-        : { location: createMemoryLocation({ href }) }),
-      ...(query === undefined ? {} : { snapshot: { query, presentation: {} } }),
-    });
-    if (selected !== undefined) built.selection.add(selected);
-    return built;
-  });
-  return (
-    <DataViews provider={provider} {...words}>
-      {selected !== undefined && (
-        <ActionBar>
-          <button type="button">Tag</button>
-        </ActionBar>
-      )}
-      {withOutsideChange && (
-        <button
-          type="button"
-          // A control elsewhere that, like a toolbar's, takes no focus on a
-          // press, so the edit in the bar keeps it.
-          onPointerDown={(event) => event.preventDefault()}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() =>
-            readProviderHost(provider).setPredicate({
-              field: "tags",
-              operator: "isAny",
-              operands: ["ex-ssd"],
-            })
-          }
-        >
-          Show only machines tagged ex-ssd
-        </button>
-      )}
-      <div style={inlineSize === undefined ? undefined : { inlineSize }}>
-        <Component {...args} />
-      </div>
-      <DataTable
-        provider={provider}
-        columns={columns}
-        label="Machines"
-        {...words}
-        selectable={selected !== undefined}
-      />
-    </DataViews>
-  );
-}
-
-/** Render a story's machines as configured. */
-const renderWith =
-  (config: BarConfig = {}): NonNullable<Story["render"]> =>
-  (args) => <BarMachines {...args} {...config} />;
-
-/** The table's record rows: every row but the header's. */
-const countRows = (canvasElement: HTMLElement): number =>
-  within(canvasElement).getAllByRole("row").length - 1;
+type Story = StoryObj<BarStoryArgs>;
 
 /** The bar's own entry. */
 const findEntry = (canvasElement: HTMLElement): HTMLElement =>
@@ -230,7 +45,7 @@ const findEntry = (canvasElement: HTMLElement): HTMLElement =>
  * fields; type to narrow them, and Enter or a click to start a clause.
  */
 export const Default: Story = {
-  render: renderWith(),
+  render: renderBarWith(),
   play: async ({ canvasElement }) => {
     await waitFor(() => expect(countRows(canvasElement)).toBe(50));
     await expect(findEntry(canvasElement)).toHaveValue("");
@@ -242,7 +57,7 @@ export const Default: Story = {
  * offered on.
  */
 export const SuggestionsOpen: Story = {
-  render: renderWith({ query: "status=deployed" }),
+  render: renderBarWith({ query: "status=deployed" }),
   play: async ({ canvasElement }) => {
     await userEvent.click(findEntry(canvasElement));
     await expect(findEntry(canvasElement)).toHaveAttribute(
@@ -257,7 +72,7 @@ export const SuggestionsOpen: Story = {
  * value and Enter again. The rows narrow, and focus is back in the entry.
  */
 export const BuildAChip: Story = {
-  render: renderWith(),
+  render: renderBarWith(),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(countRows(canvasElement)).toBe(50));
@@ -288,7 +103,7 @@ export const BuildAChip: Story = {
  * display unit, presence, text and a date.
  */
 export const EachFieldKind: Story = {
-  render: renderWith({
+  render: renderBarWith({
     query:
       "status=deployed&tags=ex-gpu&memory__gte=65536&owner__isSet=true&hostname__contains=node-1&deployed__lte=2026-06-30",
   }),
@@ -305,7 +120,7 @@ export const EachFieldKind: Story = {
 
 /** Several values: one chip holding any of three statuses, in canonical order. */
 export const SeveralValues: Story = {
-  render: renderWith({
+  render: renderBarWith({
     query: "status=deployed&status=ready&status=allocated",
   }),
   play: async ({ canvasElement }) => {
@@ -322,7 +137,7 @@ export const SeveralValues: Story = {
  * chip holding either.
  */
 export const SameFieldAnd: Story = {
-  render: renderWith({
+  render: renderBarWith({
     query: "tags=ex-gpu&tags__isAny__1=ex-nvme&status=deployed&status=ready",
   }),
   play: async ({ canvasElement }) => {
@@ -341,7 +156,7 @@ export const SameFieldAnd: Story = {
  * being edited: the edit keeps its Entry, its text and focus.
  */
 export const OutsideChange: Story = {
-  render: renderWith({ query: "status=deployed", withOutsideChange: true }),
+  render: renderBarWith({ query: "status=deployed", withOutsideChange: true }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -371,7 +186,7 @@ export const OutsideChange: Story = {
  * focusing it wraps them.
  */
 export const Overflow: Story = {
-  render: renderWith({
+  render: renderBarWith({
     inlineSize: "38rem",
     query:
       "status=deployed&tags=ex-gpu&tags__isAny__1=ex-nvme&memory__gte=8192&memory__lte=65536&owner__isSet=true&hostname__contains=node&deployed__gte=2026-01-01",
@@ -411,7 +226,10 @@ const instanceColumns: readonly DataTableColumn[] = [
 ];
 
 /** The bar over four instances, filtered by status. */
-function StatusAliasInstances({ messages, ...args }: StoryArgs): ReactElement {
+function StatusAliasInstances({
+  messages,
+  ...args
+}: BarStoryArgs): ReactElement {
   const words = pickStoryWords({ messages });
   const [provider] = useState(() =>
     createDataViewsProvider({
@@ -458,7 +276,7 @@ export const StatusAlias: Story = {
  * history, so Back after the clear control brings the clauses back.
  */
 export const WithHistory: Story = {
-  render: renderWith({
+  render: renderBarWith({
     query: "status=deployed&status=ready",
     withHistory: true,
   }),
@@ -470,7 +288,7 @@ export const WithHistory: Story = {
  * Back brings back, the query being kept in the frame's address.
  */
 export const Range: Story = {
-  render: renderWith({
+  render: renderBarWith({
     query: "memory__gte=8192&memory__lte=65536",
     withHistory: true,
   }),
@@ -489,7 +307,7 @@ export const Range: Story = {
  * warns that nothing matches, and Merge swaps the bounds into one range.
  */
 export const Contradiction: Story = {
-  render: renderWith({ query: "memory__gte=131072&memory__lte=65536" }),
+  render: renderBarWith({ query: "memory__gte=131072&memory__lte=65536" }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -509,7 +327,7 @@ export const Contradiction: Story = {
  * still does.
  */
 export const InvalidInput: Story = {
-  render: renderWith({ query: "memory__gte=65536" }),
+  render: renderBarWith({ query: "memory__gte=65536" }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: /^64.GiB$/ }));
@@ -528,7 +346,7 @@ export const InvalidInput: Story = {
  * clause shows as a refused chip, its reason described; Clear removes it.
  */
 export const RefusedLink: Story = {
-  render: renderWith({ href: "/machines?status=melted&tags=ex-gpu" }),
+  render: renderBarWith({ href: "/machines?status=melted&tags=ex-gpu" }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -567,7 +385,7 @@ export const Presets: Story = {
       ],
     },
   },
-  render: renderWith(),
+  render: renderBarWith(),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(findEntry(canvasElement));
@@ -585,157 +403,6 @@ export const Presets: Story = {
       ).toHaveTextContent("Deployed this year"),
     );
   },
-};
-
-/** The query the narrow stories start on: two filter chips, a range once. */
-const NARROW_QUERY = "status=deployed&memory__gte=8192&memory__lte=65536";
-
-/** A phone's width, or the frame's where it is narrower still. */
-const PHONE_SIZE = "min(22.5rem, 100%)";
-
-/**
- * Mobile: below a container width of 37.5rem the chips give way to the
- * search-only entry and a summary button, "Filters, 2 applied", which
- * opens the sheet: the applied chips, "Add filter" and the filters form,
- * every change applying at once, behind which the rows update. The bar
- * stands at a phone's width.
- */
-export const Mobile: Story = {
-  render: renderWith({ query: NARROW_QUERY, inlineSize: PHONE_SIZE }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const summary = await canvas.findByRole("button", {
-      name: "Filters, 2 applied",
-    });
-    await expect(summary).toBeVisible();
-    await expect(summary).toHaveAttribute("command", "show-modal");
-  },
-};
-
-/**
- * Mobile, the sheet open: the summary button pressed, then "Add filter",
- * and a field chosen, so the sheet shows its operator step.
- */
-export const MobileSheetOpen: Story = {
-  name: "Mobile: the sheet open",
-  render: renderWith({ query: NARROW_QUERY, inlineSize: PHONE_SIZE }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const summary = await canvas.findByRole("button", {
-      name: "Filters, 2 applied",
-    });
-    await expect(summary).toBeVisible();
-    await userEvent.click(summary);
-    const sheet = within(
-      await waitFor(() =>
-        within(canvasElement.ownerDocument.body).getByRole("dialog", {
-          name: "Filter records",
-        }),
-      ),
-    );
-    await userEvent.click(sheet.getByRole("button", { name: "Add filter" }));
-    await userEvent.click(sheet.getByRole("option", { name: "status" }));
-    await expect(
-      sheet.getByRole("listbox", { name: "Choose an operator for status" }),
-    ).toBeVisible();
-  },
-};
-
-/**
- * Mobile, rows selected: the action bar over the selection stands above
- * the narrow bar, and neither pushes the page wider than the frame.
- */
-export const MobileRowsSelected: Story = {
-  name: "Mobile, rows selected",
-  render: renderWith({
-    query: NARROW_QUERY,
-    inlineSize: PHONE_SIZE,
-    selected: ["bm-01", "bm-02"],
-  }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByText("2 selected")).toBeVisible();
-    await expect(
-      await canvas.findByRole("button", { name: "Filters, 2 applied" }),
-    ).toBeVisible();
-  },
-};
-
-/** The address a no-scripts story renders, from the frame's own `query`. */
-const readFrameQuery = (fallback: string): string =>
-  new URLSearchParams(window.location.search).get("query") ?? fallback;
-
-/**
- * The bar's server markup over the machines, at an address or in memory, in
- * the story's words.
- */
-function ServerRenderedBar({
-  href,
-  inlineSize,
-  messages,
-  ...args
-}: StoryArgs & {
-  readonly href?: string;
-  readonly inlineSize?: string;
-}): ReactElement {
-  const words = pickStoryWords({ messages });
-  const [markup] = useState(() => {
-    const provider = createDataViewsProvider({
-      collection: barMachineCollection,
-      source: createArraySource<BarMachine>({
-        rows: barMachines,
-        collection: barMachineCollection,
-        searchFields: ["hostname"],
-      }),
-      ...(href === undefined
-        ? { snapshot: { query: "status=deployed&q=web", presentation: {} } }
-        : { location: createMemoryLocation({ href }) }),
-    });
-    return renderToString(
-      <DataViews provider={provider} {...words}>
-        <Component {...args} />
-      </DataViews>,
-    );
-  });
-  return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: the frame only re-addresses the server markup's own links and forms, which keep their roles
-    // biome-ignore lint/a11y/useKeyWithClickEvents: a link followed by keys fires the same click
-    <div
-      className="no-scripts"
-      style={inlineSize === undefined ? undefined : { inlineSize }}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: the story shows the server's own markup, before any script takes it over
-      dangerouslySetInnerHTML={{ __html: markup }}
-      onClick={(event) => {
-        const link = (event.target as Element).closest<HTMLAnchorElement>(
-          "a[href]",
-        );
-        if (link === null) return;
-        event.preventDefault();
-        followInFrame(new URL(link.href).search);
-      }}
-      onSubmit={(event) => {
-        event.preventDefault();
-        const data = new FormData(event.target as HTMLFormElement);
-        const params = new URLSearchParams();
-        for (const [key, value] of data) params.append(key, String(value));
-        followInFrame(`?${params.toString()}`);
-      }}
-    />
-  );
-}
-
-/**
- * Follow an address the server's markup spells within the frame: as the
- * story's `query`, the frame's own parameters kept, so the story renders
- * the page that address leads to. Story-only.
- */
-const followInFrame = (search: string): void => {
-  const url = new URL(window.location.href);
-  for (const key of [...url.searchParams.keys()]) {
-    if (!FRAME_KEYS.includes(key)) url.searchParams.delete(key);
-  }
-  url.searchParams.set("query", search.replace(/^\?/, ""));
-  window.location.assign(url);
 };
 
 /**
@@ -775,122 +442,5 @@ export const NoJavaScriptMemory: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.queryByRole("search")).toBeNull();
     await expect(canvas.queryAllByRole("link")).toHaveLength(0);
-  },
-};
-
-/**
- * No JavaScript, with an address, narrow: the server's markup at 22.5rem.
- * The summary button opens the sheet through its invoker command, with no
- * script; inside, each chip's remove control and Clear all are links, and
- * Apply submits the filters' GET form, which keeps the search.
- */
-export const NoJavaScriptNarrow: Story = {
-  name: "No JavaScript, with an address, narrow",
-  render: (args) => (
-    <ServerRenderedBar
-      {...args}
-      inlineSize="22.5rem"
-      href={`/machines?${readFrameQuery(`${NARROW_QUERY}&q=web`)}`}
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("button", { name: "Filters, 2 applied" }),
-    ).toHaveAttribute("command", "show-modal");
-  },
-};
-
-/**
- * Quick filters beside the field: the status as words, one at a time after
- * "All"; the tags as words too, several at once; the pool, the memory and
- * the owner each as a filter button opening its panel. Each word and each
- * tick commits at once, a step of the frame's history; the chips and the
- * quick filters show one query. The pool's panel narrows its twelve pools
- * with a search.
- */
-export const QuickFilters: Story = {
-  args: {
-    quickFilters: [
-      "status",
-      { field: "tags", arrangement: "words" },
-      "pool",
-      "memory",
-      "owner",
-    ],
-  },
-  render: renderWith({ withPools: true, withHistory: true }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await waitFor(() => expect(countRows(canvasElement)).toBe(50));
-    await expect(canvas.getByRole("button", { name: "All" })).toHaveAttribute(
-      "aria-current",
-      "true",
-    );
-    await expect(canvas.getByRole("button", { name: "pool" })).toHaveAttribute(
-      "aria-haspopup",
-      "dialog",
-    );
-  },
-};
-
-/**
- * A quick filter whose clause excludes: the trigger shows the Exclusion
- * mark before its count, and its name says "none of 2".
- */
-export const QuickFilterExclusion: Story = {
-  args: { quickFilters: [{ field: "status", arrangement: "button" }] },
-  render: renderWith({ query: "status__isNone=broken&status__isNone=ready" }),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = await canvas.findByRole("button", {
-      name: "status, none of 2",
-    });
-    await userEvent.click(trigger);
-    await expect(trigger).toHaveAttribute("aria-expanded", "true");
-  },
-};
-
-/**
- * No JavaScript, with an address: the quick filters in the server's markup.
- * Each status word is a link to the query with its condition set or
- * removed; the tags' and the owner's panels are GET forms whose Apply keeps
- * the search and every other clause. The frame's `query` parameter sets the address.
- */
-export const NoJavaScriptHrefQuickFilters: Story = {
-  name: "No JavaScript, with an address: quick filters",
-  args: { quickFilters: ["status", "tags", "owner"] },
-  render: (args) => (
-    <ServerRenderedBar
-      {...args}
-      href={`/machines?${readFrameQuery("status=deployed&memory__gte=8192&q=web")}`}
-    />
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("link", { name: "ready" }),
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByRole("link", { name: "deployed" }),
-    ).toHaveAttribute("aria-current", "true");
-  },
-};
-
-/**
- * No JavaScript, memory: quick filters. Nothing to lead to: the words are
- * text, the current one still marked; the tags' popover still opens, and
- * its controls, with no name, work once scripts run.
- */
-export const NoJavaScriptMemoryQuickFilters: Story = {
-  name: "No JavaScript, memory: quick filters",
-  args: { quickFilters: ["status", "tags"] },
-  render: (args) => <ServerRenderedBar {...args} />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryAllByRole("link")).toHaveLength(0);
-    await expect(
-      canvasElement.querySelector('.ds.filter-options [aria-current="true"]'),
-    ).toHaveTextContent("deployed");
   },
 };
