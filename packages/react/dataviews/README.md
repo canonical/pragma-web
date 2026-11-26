@@ -164,6 +164,7 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **A table over a provider** — build the provider once, over the collection and its source, and mount: the table observes it.
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.
 - **Sorting** — `sortable` takes effect where the source's declaration, read by the provider, names the field sortable; on any other field the heading is plain, and nothing throws.
+- **A footer** — `footer={<PaginationBar provider={provider} />}`.
 - **Selection** — the design system's checkboxes in a 32px column, named by `getRowLabel`; select-all acts on the displayed rows.
 - **Resizing and its limits** — held to the declared bounds; no control on the last column; two tables with one id on one provider agree on every width, and nothing is passed between them.
 - **A cell handed its record** — a module-scope renderer handed its typed value and record, reading the row's selection through `useDataViewsCell(collection)`.

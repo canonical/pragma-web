@@ -4,7 +4,10 @@ import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import {
   withAppScope,
+  withFlexColumn,
   withFrame,
+  withGridTrack,
+  withScrollingFrame,
 } from "../../../../../../storybook/decorators/index.js";
 import type {
   Machine,
@@ -26,11 +29,13 @@ import {
   showConsumerCode,
   useMachineProvider,
 } from "../../../../../../storybook/machines/index.js";
+import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import {
   useDataViewsCell,
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
+import { PaginationBar } from "../../../../../subcomponent/PaginationBar/index.js";
 import { virtualizeRows } from "../../../../../virtualization/index.js";
 import Component from "./DataTable.js";
 import {
@@ -55,6 +60,7 @@ const meta = {
     getRowLabel: { control: false },
     renderStatus: { control: false },
     virtualization: { control: false },
+    footer: { control: false },
   },
 } satisfies Meta<typeof Component>;
 
@@ -300,6 +306,438 @@ export const Default: Story = {
     render: tableCode,
   }),
   render: renderMachines(plainColumns),
+};
+
+/** The table with the pagination bar in its footer, five rows a page. */
+function MachinesWithFooter({
+  query = "page=1&size=5",
+  options,
+  ...args
+}: StoryTableProps & {
+  readonly query?: string;
+  readonly options?: MachineProviderConfig;
+}): ReactElement {
+  const provider = useMachineProvider(options ?? { query });
+  return (
+    <Component
+      {...args}
+      provider={provider}
+      columns={plainColumns}
+      getRowLabel={readHostName}
+      footer={
+        <PaginationBar
+          provider={provider}
+          sizes={[5, 10, 25]}
+          {...pickStoryWords(args)}
+        />
+      }
+    />
+  );
+}
+
+/** A box's edges and the widths of its block borders, in pixels. */
+const measureBox = (element: Element) => {
+  const { top, bottom } = element.getBoundingClientRect();
+  const style = getComputedStyle(element);
+  return {
+    top,
+    bottom,
+    borderTop: Number.parseFloat(style.borderTopWidth),
+    borderBottom: Number.parseFloat(style.borderBottomWidth),
+  };
+};
+
+/** With a pagination footer: the bar passed as `footer`. */
+export const WithPaginationFooter: Story = {
+  parameters: showConsumerCode({
+    parts: ["DataTable", "PaginationBar", "createColumns"],
+    declarations: plainColumnsCode,
+    query: "page=1&size=5",
+    render: `<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+/>`,
+  }),
+  render: (args) => <MachinesWithFooter {...args} />,
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    const bar = canvas.getByRole("navigation", { name: "Pagination" });
+    await expect(within(table).queryByRole("navigation")).toBeNull();
+    const frameElement = table.parentElement;
+    const footerElement = bar.parentElement;
+    if (frameElement === null || footerElement === null) {
+      throw new Error("expected the frame and its footer");
+    }
+    const frame = measureBox(frameElement);
+    const rows = measureBox(table);
+    const footer = measureBox(footerElement);
+    // No gap: the footer starts where the table ends.
+    await expect(Math.abs(footer.top - rows.bottom)).toBeLessThanOrEqual(1);
+    // One border: the frame's, with one rule between rows and footer.
+    await expect(frame.borderTop).toBeGreaterThan(0);
+    await expect(rows.borderTop + rows.borderBottom).toBe(0);
+    await expect(footer.borderTop).toBeGreaterThan(0);
+    await expect(measureBox(bar).borderTop).toBe(0);
+  },
+};
+
+/** Renders nothing, as a footer part with nothing to show. */
+function Nothing(): null {
+  return null;
+}
+
+/** The table with a footer whose content renders nothing. */
+function MachinesWithEmptyFooter(args: StoryTableProps): ReactElement {
+  const provider = useMachineProvider({ query: "page=1&size=5" });
+  return (
+    <Component
+      {...args}
+      provider={provider}
+      columns={plainColumns}
+      getRowLabel={readHostName}
+      footer={<Nothing />}
+    />
+  );
+}
+
+/** With an empty footer: content that renders nothing draws no rule. */
+export const WithEmptyFooter: Story = {
+  tags: ["!dev", "!autodocs"],
+  render: (args) => <MachinesWithEmptyFooter {...args} />,
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    const frameElement = table.parentElement;
+    if (frameElement === null) {
+      throw new Error("expected the frame");
+    }
+    await expect(
+      frameElement.querySelector(":scope > .footer"),
+    ).not.toBeVisible();
+    // The frame ends where the rows do, with its own border the only rule.
+    const frame = measureBox(frameElement);
+    const rows = measureBox(table);
+    await expect(
+      Math.abs(frame.bottom - frame.borderBottom - rows.bottom),
+    ).toBeLessThan(0.5);
+    // An empty footer covers nothing, so focus keeps no margin for it.
+    const cell = table.querySelector("td");
+    if (cell === null) {
+      throw new Error("expected a cell");
+    }
+    await expect(getComputedStyle(cell).scrollMarginBlockEnd).toBe("0px");
+  },
+};
+
+/** Footer in a scrolling frame: the footer holds to the frame's bottom. */
+export const FooterInAScrollingFrame: Story = {
+  tags: ["!dev", "!autodocs"],
+  decorators: [withScrollingFrame("16rem")],
+  render: (args) => <MachinesWithFooter {...args} query="page=1&size=25" />,
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    // Every machine on one page: twelve rows under the header.
+    await waitFor(() =>
+      expect(within(table).getAllByRole("row")).toHaveLength(13),
+    );
+    const footer = table.nextElementSibling;
+    const scroller = table.parentElement?.parentElement;
+    if (
+      !(footer instanceof HTMLElement) ||
+      !(scroller instanceof HTMLElement)
+    ) {
+      throw new Error("expected the footer and the scrolling frame");
+    }
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    await expect(
+      Math.abs(
+        footer.getBoundingClientRect().bottom -
+          scroller.getBoundingClientRect().bottom,
+      ),
+    ).toBeLessThanOrEqual(1);
+    // The table itself, a tab stop when nothing inside takes focus, keeps
+    // the footer's reserve as its own scroll margin.
+    await waitFor(() =>
+      expect(getComputedStyle(table).scrollMarginBlockEnd).toBe(
+        `${footer.getBoundingClientRect().height}px`,
+      ),
+    );
+  },
+};
+
+/** A grid track narrower than the columns: the table, not the page, scrolls. */
+export const InANarrowGrid: Story = {
+  tags: ["!dev", "!autodocs"],
+  decorators: [withGridTrack("20rem")],
+  render: renderMachines(sizedColumns),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    const frame = table.parentElement;
+    const track = frame?.parentElement;
+    if (!(frame instanceof HTMLElement) || !(track instanceof HTMLElement)) {
+      throw new Error("expected the frame in its grid");
+    }
+    await expect(
+      Math.abs(
+        frame.getBoundingClientRect().width -
+          track.getBoundingClientRect().width,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await expect(table.scrollWidth).toBeGreaterThan(table.clientWidth);
+  },
+};
+
+/** A column flex box shorter than the rows: the table, not the page, scrolls. */
+export const InAShortFlexColumn: Story = {
+  tags: ["!dev", "!autodocs"],
+  decorators: [withFlexColumn("16rem")],
+  render: renderMachines(plainColumns, { query: "page=1&size=25" }),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    // Every machine on one page: twelve rows under the header.
+    await waitFor(() =>
+      expect(within(table).getAllByRole("row")).toHaveLength(13),
+    );
+    const frame = table.parentElement;
+    const column = frame?.parentElement;
+    if (!(frame instanceof HTMLElement) || !(column instanceof HTMLElement)) {
+      throw new Error("expected the frame in its column");
+    }
+    await expect(
+      Math.abs(
+        frame.getBoundingClientRect().height -
+          column.getBoundingClientRect().height,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await expect(table.scrollHeight).toBeGreaterThan(table.clientHeight);
+  },
+};
+
+/** A table in a tall grid track: the footer keeps to the frame's bottom. */
+export const FooterInATallGrid: Story = {
+  tags: ["!dev", "!autodocs"],
+  decorators: [withGridTrack("40rem", "40rem")],
+  render: (args) => <MachinesWithFooter {...args} />,
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    const frameElement = table.parentElement;
+    const footerElement = table.nextElementSibling;
+    if (frameElement === null || footerElement === null) {
+      throw new Error("expected the frame and its footer");
+    }
+    const frame = measureBox(frameElement);
+    await expect(
+      Math.abs(
+        footerElement.getBoundingClientRect().bottom -
+          (frame.bottom - frame.borderBottom),
+      ),
+    ).toBeLessThanOrEqual(1);
+  },
+};
+
+/** A bounded table with a footer: the two fit in the viewport together. */
+export const BoundedWithFooter: Story = {
+  tags: ["!dev", "!autodocs"],
+  render: (args) => (
+    <MachinesWithFooter
+      {...args}
+      options={tenThousand}
+      virtualization={virtualization}
+    />
+  ),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    await waitFor(() =>
+      expect(table).toHaveAttribute("aria-rowcount", "10001"),
+    );
+    const frame = table.parentElement;
+    const footer = table.nextElementSibling;
+    if (frame === null || footer === null) {
+      throw new Error("expected the frame and its footer");
+    }
+    // Once the footer is measured, the cap takes it and the frame's
+    // borders off: the whole frame fits the viewport.
+    await waitFor(() =>
+      expect(frame.getBoundingClientRect().height).toBeLessThanOrEqual(
+        window.innerHeight + 0.5,
+      ),
+    );
+    frame.scrollIntoView({ block: "start" });
+    await expect(footer.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      window.innerHeight + 1,
+    );
+    // The footer starts where the rows end: it covers none of them.
+    await expect(
+      Math.abs(
+        table.getBoundingClientRect().bottom -
+          footer.getBoundingClientRect().top,
+      ),
+    ).toBeLessThanOrEqual(1);
+  },
+};
+
+/**
+ * A row control under the stuck footer takes focus, and must end above
+ * the footer, however tall the footer has grown.
+ */
+const playFocusClearsTheFooter: NonNullable<Story["play"]> = async ({
+  canvas,
+}) => {
+  const table = await canvas.findByRole("table", { name: "Machines" });
+  await waitFor(() =>
+    expect(within(table).getAllByRole("row")).toHaveLength(13),
+  );
+  const footer = table.nextElementSibling;
+  const scroller = table.parentElement?.parentElement;
+  if (!(footer instanceof HTMLElement) || !(scroller instanceof HTMLElement)) {
+    throw new Error("expected the footer and the scrolling frame");
+  }
+  // The first row the stuck footer covers or hides below it.
+  const footerTop = footer.getBoundingClientRect().top;
+  const target = within(table)
+    .getAllByRole("checkbox")
+    .find((box) => box.getBoundingClientRect().bottom > footerTop);
+  if (target === undefined) {
+    throw new Error("expected a row beneath the footer");
+  }
+  // Scroll so the target sits inside the scroller but under the footer.
+  scroller.scrollTop +=
+    target.getBoundingClientRect().bottom -
+    (scroller.getBoundingClientRect().bottom - 4);
+  await expect(target.getBoundingClientRect().bottom).toBeGreaterThan(
+    footer.getBoundingClientRect().top,
+  );
+  // Focus once the frame carries the footer's measured height.
+  const frame = table.parentElement;
+  await waitFor(() =>
+    expect(
+      frame?.style.getPropertyValue("--data-table-frame-footer-reserve"),
+    ).toBe(`${footer.getBoundingClientRect().height}px`),
+  );
+  target.focus();
+  await waitFor(() =>
+    expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      footer.getBoundingClientRect().top,
+    ),
+  );
+};
+
+/**
+ * A row control under the footer takes focus: it scrolls clear of the
+ * footer instead of staying covered.
+ */
+export const FocusClearsTheFooter: Story = {
+  tags: ["!dev", "!autodocs"],
+  args: { selectable: true },
+  decorators: [withScrollingFrame("16rem")],
+  render: (args) => <MachinesWithFooter {...args} query="page=1&size=25" />,
+  play: playFocusClearsTheFooter,
+};
+
+/**
+ * The same in a narrow frame, where the bar wraps onto more lines than the
+ * stylesheet's own reserve: the measured height is what focus clears.
+ */
+export const FocusClearsAWrappedFooter: Story = {
+  tags: ["!dev", "!autodocs"],
+  args: { selectable: true },
+  decorators: [withScrollingFrame("16rem"), withFrame("16rem")],
+  render: (args) => <MachinesWithFooter {...args} query="page=1&size=25" />,
+  play: async (context) => {
+    const table = await context.canvas.findByRole("table", {
+      name: "Machines",
+    });
+    const footer = table.nextElementSibling;
+    if (footer === null) {
+      throw new Error("expected the footer");
+    }
+    // Wrapped: taller than the 3rem reserved before scripts measure it.
+    const rem = Number.parseFloat(
+      getComputedStyle(document.documentElement).fontSize,
+    );
+    await expect(footer.getBoundingClientRect().height).toBeGreaterThan(
+      3 * rem,
+    );
+    await playFocusClearsTheFooter(context);
+  },
+};
+
+/** A bounded table whose caller asks for more than the screen: it gets it. */
+export const CallerMaximumWins: Story = {
+  tags: ["!dev", "!autodocs"],
+  args: { style: { maxBlockSize: "150svh" } },
+  render: (args) => (
+    <MachinesWithFooter
+      {...args}
+      options={tenThousand}
+      virtualization={virtualization}
+    />
+  ),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    await waitFor(() =>
+      expect(table).toHaveAttribute("aria-rowcount", "10001"),
+    );
+    await expect(
+      Math.abs(table.getBoundingClientRect().height - 1.5 * window.innerHeight),
+    ).toBeLessThanOrEqual(2);
+  },
+};
+
+/**
+ * A row control under the stuck footer, in a bounded table taller than the
+ * screen, takes focus: the page scrolls it clear of the footer.
+ */
+export const FocusClearsAFooterUnderATallTable: Story = {
+  tags: ["!dev", "!autodocs"],
+  args: { selectable: true, style: { maxBlockSize: "150svh" } },
+  render: (args) => (
+    <MachinesWithFooter
+      {...args}
+      options={tenThousand}
+      virtualization={virtualization}
+    />
+  ),
+  play: async ({ canvas }) => {
+    const table = await canvas.findByRole("table", { name: "Machines" });
+    await waitFor(() =>
+      expect(table).toHaveAttribute("aria-rowcount", "10001"),
+    );
+    const frame = table.parentElement;
+    const footer = table.nextElementSibling;
+    if (frame === null || footer === null) {
+      throw new Error("expected the frame and its footer");
+    }
+    await waitFor(() =>
+      expect(
+        frame.style.getPropertyValue("--data-table-frame-footer-reserve"),
+      ).toBe(`${footer.getBoundingClientRect().height}px`),
+    );
+    window.scrollTo(0, 0);
+    // The first row control the stuck footer covers or hides below it.
+    const footerTop = footer.getBoundingClientRect().top;
+    const target = within(table)
+      .getAllByRole("checkbox")
+      .find((box) => box.getBoundingClientRect().bottom > footerTop);
+    if (target === undefined) {
+      throw new Error("expected a row beneath the footer");
+    }
+    // Scroll the page so it sits in the viewport, under the footer.
+    window.scrollBy(
+      0,
+      target.getBoundingClientRect().bottom - (window.innerHeight - 4),
+    );
+    await expect(target.getBoundingClientRect().bottom).toBeGreaterThan(
+      footer.getBoundingClientRect().top,
+    );
+    target.focus();
+    await waitFor(() =>
+      expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+        footer.getBoundingClientRect().top,
+      ),
+    );
+  },
 };
 
 /**
