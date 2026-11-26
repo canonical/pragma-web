@@ -27,7 +27,7 @@ node:
             # groups MUST be the mandatory collapsible "Help" item (an
             # ItemExpandable containing at least one external link).
             - node:
-                uri: apps.subcomponent.side_navigation-group
+                uri: apps.subcomponent.side_navigation-item_group
                 edges:
                   - node:
                       uri: apps.subcomponent.side_navigation-group_header

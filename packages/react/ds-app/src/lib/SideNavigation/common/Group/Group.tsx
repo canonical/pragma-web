@@ -10,7 +10,7 @@ const componentCssClassName = "ds side-navigation-group";
  * optional SideNavigation.GroupHeader. One of NavTree's direct content
  * entries.
  *
- * @implements ds:apps.subcomponent.side_navigation-group
+ * @implements ds:apps.subcomponent.side_navigation-item_group
  */
 const Group = ({
   label,

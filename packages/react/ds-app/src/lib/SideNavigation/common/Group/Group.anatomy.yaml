@@ -5,7 +5,7 @@
 # but ItemExpandable's OWN children may not (enforced by the LeafNavItem /
 # ExpandableNavItem type split, not the anatomy DSL).
 node:
-  uri: apps.subcomponent.side_navigation-group
+  uri: apps.subcomponent.side_navigation-item_group
   styles:
     layout.type: stack
     layout.direction: column
