@@ -1,0 +1,83 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix ds: <https://ds.canonical.com/>.
+
+ds:implementation.library.react-ds-app ds:hasImplementation ds:implementation.react-ds-app.apps.component.side_navigation, ds:implementation.react-ds-app.apps.layout.application_layout, ds:implementation.react-ds-app.apps.layout.content_layout, ds:implementation.react-ds-app.apps.layout.view_layout, ds:implementation.react-ds-app.apps.pattern.side_panel, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-collapse_toggle, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-content, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-context_switcher, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-footer, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-group_header, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-header, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_button, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_expandable, ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_group, ds:implementation.react-ds-app.apps.subcomponent.side_panel-content, ds:implementation.react-ds-app.apps.subcomponent.side_panel-footer, ds:implementation.react-ds-app.apps.subcomponent.side_panel-header.
+ds:implementation.react-ds-app.apps.component.side_navigation a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.component.side_navigation;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/SideNavigation.tsx";
+    ds:importStatement "import { SideNavigation } from \"@canonical/react-ds-app\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/SideNavigation.tsx".
+ds:implementation.react-ds-app.apps.layout.application_layout a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.layout.application_layout;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/ApplicationLayout/ApplicationLayout.tsx";
+    ds:importStatement "import { ApplicationLayout } from \"@canonical/react-ds-app\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/ApplicationLayout/ApplicationLayout.tsx".
+ds:implementation.react-ds-app.apps.layout.content_layout a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.layout.content_layout;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/ContentLayout/ContentLayout.tsx";
+    ds:importStatement "import { ContentLayout } from \"@canonical/react-ds-app\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/ContentLayout/ContentLayout.tsx".
+ds:implementation.react-ds-app.apps.layout.view_layout a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.layout.view_layout;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/ViewLayout/ViewLayout.tsx";
+    ds:importStatement "import { ViewLayout } from \"@canonical/react-ds-app\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/ViewLayout/ViewLayout.tsx".
+ds:implementation.react-ds-app.apps.pattern.side_panel a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.pattern.side_panel;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SidePanel/Provider.tsx";
+    ds:importStatement "import { SidePanel } from \"@canonical/react-ds-app\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SidePanel/Provider.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-collapse_toggle a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-collapse_toggle;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/CollapseToggle/CollapseToggle.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/CollapseToggle/CollapseToggle.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-content a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-content;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/Content/Content.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/Content/Content.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-context_switcher a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-context_switcher;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/ContextSwitcher/ContextSwitcher.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/ContextSwitcher/ContextSwitcher.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-footer a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-footer;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/Footer/Footer.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/Footer/Footer.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-group_header a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-group_header;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/GroupHeader/GroupHeader.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/GroupHeader/GroupHeader.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-header a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-header;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/Header/Header.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/Header/Header.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-item;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/Item/Item.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/Item/Item.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_button a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-item_button;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/ItemButton/ItemButton.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/ItemButton/ItemButton.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_expandable a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-item_expandable;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/ItemExpandable/ItemExpandable.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/ItemExpandable/ItemExpandable.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_navigation-item_group a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_navigation-item_group;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SideNavigation/common/Group/Group.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SideNavigation/common/Group/Group.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_panel-content a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_panel-content;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SidePanel/common/Content/Content.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SidePanel/common/Content/Content.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_panel-footer a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_panel-footer;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SidePanel/common/Footer/Footer.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SidePanel/common/Footer/Footer.tsx".
+ds:implementation.react-ds-app.apps.subcomponent.side_panel-header a ds:ImplementationObject;
+    ds:implementsBlock ds:apps.subcomponent.side_panel-header;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-app/src/lib/SidePanel/common/Header/Header.tsx";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/react/ds-app/src/lib/SidePanel/common/Header/Header.tsx".

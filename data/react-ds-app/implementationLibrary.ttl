@@ -1,0 +1,12 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix ds: <https://ds.canonical.com/>.
+
+ds:implementation.library.react-ds-app a ds:ImplementationLibrary;
+    ds:libraryName "@canonical/react-ds-app";
+    ds:platform "react";
+    ds:link "https://github.com/canonical/pragma-web/tree/main/packages/react/ds-app";
+    ds:documentation "https://pragma.canonical.com/react";
+    ds:libraryTier ds:apps;
+    ds:version "0.47.0".
