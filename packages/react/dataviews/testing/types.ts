@@ -15,9 +15,9 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
-import type { BoundFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/BoundFilter/types.js";
-import type { PresenceFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/PresenceFilter/types.js";
-import type { TextFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/TextFilter/types.js";
+import type { BoundFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/BoundFilter/types.js";
+import type { PresenceFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/PresenceFilter/types.js";
+import type { TextFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/TextFilter/types.js";
 import type { HeaderCellProps } from "../src/lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/types.js";
 import type { Machine } from "../src/storybook/machines/index.js";
 import type { machines } from "./machines.js";

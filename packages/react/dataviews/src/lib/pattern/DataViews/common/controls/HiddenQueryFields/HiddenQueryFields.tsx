@@ -1,0 +1,41 @@
+import { type ReactElement, useMemo } from "react";
+import { useDestination } from "../../../../../_work_in_progress/DataViews/hooks/index.js";
+import { listHiddenFields } from "../../../../../utils/index.js";
+import type { HiddenQueryFieldsProps } from "./types.js";
+
+/**
+ * The hidden controls of one of the composition's GET forms: every
+ * parameter of the destination a submission reaches, less the names the
+ * form's own controls submit. A leaf of its own, so the form around it —
+ * with every control in it — does not redraw each time the destination
+ * moves: only this list does.
+ *
+ * @implements ds:apps.subcomponent.data_views-hidden_query_fields
+ */
+export default function HiddenQueryFields({
+  provider,
+  readDestination,
+  omit,
+}: HiddenQueryFieldsProps): ReactElement {
+  const spelled = useDestination({ provider, readDestination });
+  const fields = useMemo(
+    () =>
+      listHiddenFields(
+        spelled === null ? null : new URLSearchParams(spelled),
+        omit,
+      ),
+    [spelled, omit],
+  );
+  return (
+    <>
+      {fields.map((field) => (
+        <input
+          key={field.key}
+          type="hidden"
+          name={field.name}
+          value={field.value}
+        />
+      ))}
+    </>
+  );
+}

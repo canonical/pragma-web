@@ -16,7 +16,7 @@ import {
 } from "../../../testing/index.js";
 import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
 import * as restStories from "../../docs/data-sources/Rest.stories.js";
-import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
+import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
