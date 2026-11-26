@@ -208,6 +208,7 @@ import { Field, SelectInput } from "@canonical/react-ds-global-form";
 </Field.Description>
 <SelectInput
   id="language"
+  required
   aria-describedby="language-description"
   value={locale}
   onChange={(event) => setLocale(event.target.value)}
@@ -215,9 +216,9 @@ import { Field, SelectInput } from "@canonical/react-ds-global-form";
 />
 ```
 
-Show `Field.Error` instead when the value is rejected, and point `aria-errormessage` (or `aria-describedby`) at it; it carries `role="alert"`, so the message is announced when it appears.
+When the value is rejected, render `Field.Error` with an `id`, set `aria-invalid="true"` on the input, and point `aria-errormessage` (or `aria-describedby`) at that `id`. `Field.Error` carries `role="alert"`, so the message is announced when it appears.
 
-These pieces are presentational: they hold no spacing of their own. The `Field` wrapper draws the gap between fields from `--form-field-block-gap` and the gap between a label and its control from `--form-field-label-gap`; a layout built from the standalone pieces supplies those gaps itself, for example with the same tokens.
+These pieces are presentational: they hold no spacing of their own. `Form` uses `--form-field-block-gap` between fields, and the `Field` wrapper uses `--form-field-label-gap` between a label and its control. A layout built from the standalone pieces supplies those gaps itself, for example with the same tokens.
 
 ## Middleware Pattern
 

@@ -73,9 +73,9 @@ export const SemanticLabel: Story = {
  * The chrome can label a presentational input directly, without a form: wire
  * `Field.Label` to the control with `htmlFor`/`id` and point the control's
  * `aria-describedby` at `Field.Description`. The pieces carry no spacing of
- * their own — the `Field` wrapper gets the gap between fields from
- * `--form-field-block-gap` and the gap between label and control from
- * `--form-field-label-gap` — so lay them out yourself.
+ * their own: `Form` uses `--form-field-block-gap` between fields, and the
+ * `Field` wrapper uses `--form-field-label-gap` between label and control.
+ * Supply gaps yourself when composing the standalone pieces.
  */
 export const WithStandaloneInput: Story = {
   args: {
@@ -90,6 +90,7 @@ export const WithStandaloneInput: Story = {
       </Field.Description>
       <SelectInput
         id="standalone-language"
+        required
         aria-describedby="standalone-language-description"
         options={[
           { value: "en", label: "English" },
