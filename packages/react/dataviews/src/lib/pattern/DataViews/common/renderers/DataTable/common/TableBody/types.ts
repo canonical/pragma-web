@@ -1,4 +1,4 @@
-import type { BodyProps } from "../../../../../../../common/index.js";
+import type { BodyProps } from "../../../../../../../virtualization/types.js";
 
 /**
  * Props of the table's body row group: the entries, and the table's own

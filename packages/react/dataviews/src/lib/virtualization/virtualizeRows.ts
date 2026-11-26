@@ -1,6 +1,6 @@
-import { type DataTableVirtualization, VIRTUALIZED } from "../common/index.js";
 import { VirtualBody } from "./common/index.js";
-import type { VirtualRowsConfig } from "./types.js";
+import { VIRTUALIZED } from "./constants.js";
+import type { DataTableVirtualization, VirtualRowsConfig } from "./types.js";
 
 /**
  * Mount only the rows near a DataTable's viewport, however many rows its

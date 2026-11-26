@@ -24,13 +24,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import {
-  type DataTableVirtualization,
-  type EntryRenderer,
-  MessagesContext,
-  VIRTUALIZED,
-  type VirtualizedBodyProps,
-} from "../../../../../common/index.js";
+import { MessagesContext } from "../../../../../common/index.js";
 import {
   useDataViewsValue,
   useIsHydrated,
@@ -40,6 +34,12 @@ import {
   useStableValue,
 } from "../../../../../hooks/index.js";
 import { describeStatus, readFieldName } from "../../../../../utils/index.js";
+import { VIRTUALIZED } from "../../../../../virtualization/constants.js";
+import type {
+  DataTableVirtualization,
+  EntryRenderer,
+  VirtualizedBodyProps,
+} from "../../../../../virtualization/types.js";
 import {
   HeaderCell,
   Row,

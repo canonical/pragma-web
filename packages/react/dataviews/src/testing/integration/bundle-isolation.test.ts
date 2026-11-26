@@ -86,7 +86,7 @@ describe("bundle isolation", () => {
       modules.filter(
         (id) =>
           id.includes("/virtualization/") &&
-          !id.endsWith("/common/virtualization/constants.ts"),
+          !id.endsWith("/lib/virtualization/constants.ts"),
       ),
     ).toEqual([]);
     // The standalone table is an adoption boundary of its own: a consumer

@@ -44,11 +44,7 @@ export {
   useDataViews,
   useDataViewsFilter,
 } from "./_work_in_progress/index.js";
-export type {
-  DataTableVirtualization,
-  DisplayField,
-  DisplayFieldCellProps,
-} from "./common/index.js";
+export type { DisplayField, DisplayFieldCellProps } from "./common/index.js";
 export type {
   UseDataViewsCellProps,
   UseDataViewsCellResult,
@@ -56,3 +52,4 @@ export type {
   UseDataViewsValueResult,
 } from "./hooks/index.js";
 export { useDataViewsCell, useDataViewsValue } from "./hooks/index.js";
+export type { DataTableVirtualization } from "./virtualization/types.js";

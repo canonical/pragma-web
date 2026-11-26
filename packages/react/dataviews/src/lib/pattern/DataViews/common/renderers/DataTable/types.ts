@@ -6,10 +6,8 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
-import type {
-  AnnouncerTopic,
-  DataTableVirtualization,
-} from "../../../../../common/index.js";
+import type { AnnouncerTopic } from "../../../../../common/index.js";
+import type { DataTableVirtualization } from "../../../../../virtualization/types.js";
 import type { DataTableColumn } from "./common/index.js";
 
 type OwnProps<
