@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FileUploadInput } from "./FileUploadInput.js";
 
 // These tests render the presentational input with NO FormProvider, proving it
@@ -54,6 +54,67 @@ describe("FileUploadInput (presentational)", () => {
     expect(
       screen.getByRole("button", { name: "Remove report.pdf" }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps the file input outside the drop-zone button", () => {
+    const { container } = render(<FileUploadInput />);
+    const button = screen
+      .getByText("Drop files here or click to browse")
+      .closest("button");
+    const fileInput = container.querySelector('input[type="file"]');
+    expect(button).not.toContainElement(fileInput as HTMLElement);
+    expect(fileInput?.parentElement).toHaveClass("file-upload");
+  });
+
+  it("puts the id, name and required on the file input, not the button", () => {
+    const { container } = render(
+      <>
+        <label htmlFor="docs">Documents</label>
+        <FileUploadInput id="docs" name="docs" required />
+      </>,
+    );
+    const fileInput = container.querySelector('input[type="file"]');
+    expect(fileInput).toHaveAttribute("id", "docs");
+    expect(fileInput).toHaveAttribute("name", "docs");
+    expect(fileInput).toBeRequired();
+    const button = screen
+      .getByText("Drop files here or click to browse")
+      .closest("button");
+    expect(button).not.toHaveAttribute("required");
+    expect(button).not.toHaveAttribute("name");
+    expect(fileInput?.parentElement).not.toHaveAttribute("id");
+  });
+
+  describe("mirroring the value into the file input", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it("sets the native input's files to the controlled value", () => {
+      class FakeDataTransfer {
+        readonly files: File[] = [];
+        readonly items = { add: (file: File) => this.files.push(file) };
+      }
+      vi.stubGlobal("DataTransfer", FakeDataTransfer);
+      const setFiles = vi
+        .spyOn(HTMLInputElement.prototype, "files", "set")
+        .mockImplementation(() => {});
+      const file = new File(["hello"], "report.pdf");
+
+      render(<FileUploadInput name="docs" value={[file]} />);
+
+      expect(setFiles).toHaveBeenLastCalledWith([file]);
+    });
+
+    it("leaves the native input alone where DataTransfer is unavailable", () => {
+      vi.stubGlobal("DataTransfer", undefined);
+      const setFiles = vi.spyOn(HTMLInputElement.prototype, "files", "set");
+
+      render(<FileUploadInput name="docs" value={[]} />);
+
+      expect(setFiles).not.toHaveBeenCalled();
+    });
   });
 
   it("supports the disabled state", () => {

@@ -24,6 +24,22 @@ describe("FileUploadField", () => {
     expect(screen.getByText("Upload")).toBeInTheDocument();
   });
 
+  it("names the file input and points the label at it", () => {
+    const { container } = renderWithForm(
+      <FileUploadField name="doc" label="Upload" />,
+    );
+    const fileInput = container.querySelector('input[type="file"]');
+    expect(fileInput).toHaveAttribute("name", "doc");
+    expect(fileInput).toBeRequired();
+    expect(screen.getByText("Upload").closest("label")).toHaveAttribute(
+      "for",
+      fileInput?.id,
+    );
+    expect(screen.getByRole("button", { name: "Upload" })).not.toHaveAttribute(
+      "required",
+    );
+  });
+
   it("errors when more than maxFiles are selected", async () => {
     renderWithForm(
       <FileUploadField name="docs" label="Upload" multiple maxFiles={2} />,

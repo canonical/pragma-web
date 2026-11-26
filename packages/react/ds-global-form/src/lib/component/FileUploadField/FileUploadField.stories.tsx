@@ -13,6 +13,11 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+/**
+ * The native file input carries the field `name`, so the selected files post
+ * in a plain HTML submission too. A form that posts without scripting needs
+ * `enctype="multipart/form-data"`, or the browser sends file names only.
+ */
 export const Default: Story = {
   args: {
     name: "document",
