@@ -1,9 +1,9 @@
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import Component from "./Label.js";
+import Component from "./Tag.js";
 
 const meta = {
-  title: "_work_in_progress/other/Label",
+  title: "_work_in_progress/other/Tag",
   component: Component,
   argTypes: {
     anticipation: {
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: "Label",
+    children: "Tag",
   },
 };
 

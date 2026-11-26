@@ -1,5 +1,5 @@
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
-import { Badge, Button, Label } from "@canonical/react-ds-global";
+import { Badge, Button, Tag } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta = {
@@ -36,14 +36,14 @@ export const CriticalityOnBadge: Story = {
   ),
 };
 
-export const LifecycleOnLabel: Story = {
+export const LifecycleOnTag: Story = {
   name: "Lifecycle",
   render: () => (
     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
       {MODIFIER_FAMILIES.lifecycle.map((value) => (
-        <Label key={value} lifecycle={value}>
+        <Tag key={value} lifecycle={value}>
           {value}
-        </Label>
+        </Tag>
       ))}
     </div>
   ),
@@ -54,7 +54,7 @@ export const NestingOverride: Story = {
   render: () => (
     <div className="error" style={{ padding: "1rem" }}>
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-        <Label criticality="error">Error context</Label>
+        <Tag criticality="error">Error context</Tag>
         <div className="success">
           <Badge value={1} criticality="success" />
         </div>

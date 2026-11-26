@@ -1,18 +1,18 @@
 import type React from "react";
-import type { LabelProps } from "./types.js";
+import type { TagProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds label";
+const componentCssClassName = "ds tag";
 
 /**
- * The label component is a compact, non-interactive visual element used to
+ * The tag component is a compact, non-interactive visual element used to
  * categorize content or indicate a status. Its primary role is metadata
  * visualization. While it has similar visual properties to the Chip, it is
  * purely informational and does not trigger actions or allow for removal.
  *
- * @implements ds:global.component.label
+ * @implements ds:global.component.tag
  */
-const Label = ({
+const Tag = ({
   children,
   anticipation,
   importance,
@@ -20,7 +20,7 @@ const Label = ({
   lifecycle,
   className,
   ...props
-}: LabelProps): React.ReactElement => (
+}: TagProps): React.ReactElement => (
   <span
     className={[
       componentCssClassName,
@@ -38,4 +38,4 @@ const Label = ({
   </span>
 );
 
-export default Label;
+export default Tag;
