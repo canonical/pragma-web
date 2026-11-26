@@ -484,8 +484,9 @@ Disabled.play = async ({ canvasElement }) => {
 export const HiddenChips: StoryFn = () => (
   <div>
     <QueryBuilder
-      inlineSize="24rem"
-      initial="status=deployed&pool=gpu&owner=alice&status__isNone=broken"
+      // Just wider than the query bar's narrow form, which hides the chips.
+      inlineSize="38rem"
+      initial="status=deployed&status=ready&status=commissioning&pool=gpu&pool=storage&owner=alice&owner=bob&status__isNone=broken&pool__isNone=default"
     />
     <p>Content after the field, which the focused field overlays.</p>
   </div>

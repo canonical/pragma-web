@@ -221,7 +221,9 @@ export default function useSuggestions({
         onKeyDown?.(event);
       },
     } as Parameters<typeof combobox.getInputProps>[0];
-    return combobox.getInputProps(inputOptions);
+    const inputProps = combobox.getInputProps(inputOptions);
+    // The list is controlled only while it shows, as before focus.
+    return isOpen ? inputProps : { ...inputProps, "aria-controls": undefined };
   };
 
   return {

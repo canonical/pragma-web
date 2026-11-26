@@ -275,6 +275,32 @@ const fr: DataViewsMessages = {
   clauseInvalid: (reason) => `Non valide : ${trimClause(reason)}`,
   decimalSeparator: ",",
 
+  filtersApplied: ({ applied }) =>
+    `${count(applied)} ${choosePlural(applied, "appliqué", "appliqués")}`,
+  searchEntry: ({ noun }) => `Rechercher des ${noun.plural}`,
+  searchEntryPlaceholder: "Rechercher",
+  filterSheet: ({ noun }) => `Filtrer les ${noun.plural}`,
+  closeFilters: "Fermer les filtres",
+  addFilter: "Ajouter un filtre",
+  chooseField: "Choisir un champ",
+  chooseOperator: ({ label }) => `Choisir un opérateur pour ${label}`,
+  chooseValue: ({ label }) => `Choisir une valeur pour ${label}`,
+  addClause: "Ajouter",
+  goBack: "Retour",
+  clearAllFilters: "Tout effacer",
+  filtersCleared: ({ count: counted, noun }) =>
+    outcome("Filtres effacés.", counted, noun),
+  resultsUpdated: ({ count: counted, noun }) =>
+    outcome("Résultats mis à jour.", counted, noun),
+  showResults: ({ count: counted }) => {
+    if (counted.kind === "unknown") return "Afficher les résultats";
+    if (counted.kind === "at-least") {
+      return `Afficher ${count(counted.value)}+ résultats`;
+    }
+    return `Afficher ${count(counted.value)} ${choosePlural(counted.value, "résultat", "résultats")}`;
+  },
+  filterStepChosen: ({ chosen, step }) => `${chosen} choisi. ${step}.`,
+
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",
   submitPageSize: "Appliquer la taille de page",

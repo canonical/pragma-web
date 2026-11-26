@@ -4,8 +4,10 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { Dispatch, RefObject } from "react";
+import type { Dispatch, RefCallback, RefObject } from "react";
+import type { AnnouncerHandle } from "../../../../../common/index.js";
 import type { UseFacetsResult } from "../../../../../hooks/index.js";
+import type { FilterButtonPanelHandle } from "../../../../FilterButton/index.js";
 import type { ContextOptions } from "../../../types.js";
 import type {
   QueryBarSession,
@@ -73,4 +75,52 @@ export type UseFieldOverflowProps = {
 export type UseLinkFocusHandoffProps = {
   readonly rootRef: RefObject<HTMLElement | null>;
   readonly hydrated: boolean;
+};
+
+/** What the live count reads: the root's provider. */
+export type UseAnswerCountStandInProps = {
+  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
+};
+
+/** The count answering the applied query; unknown while none does. */
+export type UseAnswerCountStandInResult = Count;
+
+/** What narrow mode follows: the bar's root and entry, and the stop's move. */
+export type UseNarrowModeProps = {
+  /** The bar's root, whose inline size is observed. */
+  readonly rootRef: RefObject<HTMLElement | null>;
+  /** The free-text entry, which takes focus that was in a hidden chip. */
+  readonly entryRef: RefObject<HTMLInputElement | null>;
+  /** Called as the bar narrows, to move the stop off the hidden chips. */
+  readonly onNarrow: () => void;
+  /** Called as the bar widens again, the chips shown once more. */
+  readonly onWide: () => void;
+};
+
+/** Whether the bar is narrow. */
+export type UseNarrowModeResult = boolean;
+
+/** What the sheet's announcer redirects: the root's announcer. */
+export type UseSheetAnnouncerProps = {
+  readonly announce: ContextOptions["announce"];
+};
+
+/** The ref the sheet's status region takes, and the announcer over both. */
+export type UseSheetAnnouncerResult = {
+  readonly regionRef: RefObject<AnnouncerHandle | null>;
+  readonly announce: ContextOptions["announce"];
+};
+
+/**
+ * The quick filters' panels, as the bar holds them: a ref for each field's
+ * filter button, and one call that closes every open panel, for a part
+ * that takes the quick filters over.
+ */
+export type UseQuickFilterPanelsResult = {
+  /** The ref one field's filter button hands its panel to; one per field. */
+  readonly collectPanel: (
+    field: string,
+  ) => RefCallback<FilterButtonPanelHandle>;
+  /** Close every quick filter's open panel. */
+  readonly hidePanels: () => void;
 };

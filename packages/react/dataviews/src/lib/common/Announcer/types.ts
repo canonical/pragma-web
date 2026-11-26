@@ -34,15 +34,26 @@ export type AnnouncerHandle = {
 type OwnProps = {
   /** Receives the handle the root announces through, in place of the node. */
   readonly ref: Ref<AnnouncerHandle>;
+  /**
+   * An atomic status region in place of a region of additions: it holds
+   * only the latest announcement, read whole each time it changes, as a
+   * modal dialog's own region does.
+   */
+  readonly atomic?: boolean;
 };
 
 /**
  * Props of the announcer. Its root is the live region's `div`, so it extends
  * native div props, less those the region owns: `children`, what it says,
- * and `aria-live` and `aria-relevant`, how it is read.
+ * and `aria-live`, `aria-relevant`, `aria-atomic` and `role`, how it is read.
  */
 export type AnnouncerProps = OwnProps &
   Omit<
     ComponentProps<"div">,
-    keyof OwnProps | "children" | "aria-live" | "aria-relevant"
+    | keyof OwnProps
+    | "children"
+    | "aria-live"
+    | "aria-relevant"
+    | "aria-atomic"
+    | "role"
   >;

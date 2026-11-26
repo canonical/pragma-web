@@ -44,6 +44,10 @@ type Waiting = {
  * them. Each node leaves the region a while after it was spoken, which a
  * reader does not hear.
  *
+ * Atomic, it is a status region that holds only the latest announcement,
+ * read whole each time it changes, for a modal dialog, where the page's
+ * region behind it is inert.
+ *
  * It holds what it says itself, so speaking renders the region and nothing of
  * the root. Unmounting drops what is waiting and what is shown.
  *
@@ -53,6 +57,7 @@ type Waiting = {
  */
 const Announcer = ({
   ref,
+  atomic = false,
   className,
   ...rest
 }: AnnouncerProps): ReactElement => {
@@ -93,11 +98,14 @@ const Announcer = ({
     waiting.current = [];
     const key = nextKey.current;
     nextKey.current += 1;
-    setSaid((previous) => [...previous, { key, messages }]);
+    // An atomic region holds only the latest, which it reads whole.
+    setSaid((previous) =>
+      atomic ? [{ key, messages }] : [...previous, { key, messages }],
+    );
     schedule(() => {
       setSaid((previous) => previous.filter((shown) => shown.key !== key));
     }, CLEAR_DELAY_MS);
-  }, [schedule]);
+  }, [schedule, atomic]);
 
   const announce = useCallback(
     (message: ReactNode, topic?: AnnouncerTopic): void => {
@@ -126,8 +134,9 @@ const Announcer = ({
     <div
       {...rest}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      aria-live="polite"
-      aria-relevant="additions"
+      {...(atomic
+        ? { role: "status", "aria-atomic": "true" }
+        : { "aria-live": "polite", "aria-relevant": "additions" })}
     >
       {said.map(({ key, messages }) => (
         <p key={key}>

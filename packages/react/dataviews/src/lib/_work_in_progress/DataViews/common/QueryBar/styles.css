@@ -1,11 +1,36 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The query bar lays out its field; the field draws itself. */
+  /* The query bar lays out its field; the field draws itself. Its width
+     is the container the narrow form is queried against. The field takes
+     the first column; the summary button, shown only while narrow, the
+     second; every row below the field spans both. */
   .ds.data-views-query-bar {
-    display: block;
+    container: data-views-query-bar / inline-size;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
     inline-size: 100%;
     min-inline-size: 0;
+
+    & > .search,
+    & > .ds.query-input {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    & > .messages,
+    & > .filters {
+      grid-column: 1 / -1;
+    }
+
+    /* The summary button shows only while narrow. */
+    & > .summary {
+      display: none;
+      grid-column: 2;
+      grid-row: 1;
+      margin-inline-start: var(--dimension-100);
+    }
   }
 
   /* Focused, the field wraps over what follows it, sticky table headers
@@ -40,5 +65,25 @@
     position: relative;
     translate: 0 var(--data-views-query-bar-field-overflow, 0px);
     background-color: var(--surface-color-background, var(--color-background));
+  }
+
+  /* The narrow form, below the width NARROW_WIDTH_REM holds: the chips give
+     way to the search-only entry, and the disclosure before scripts to the
+     summary button, which opens the sheet. */
+  @container data-views-query-bar (width < 37.5rem) {
+    .ds.data-views-query-bar .ds.query-input .ds.query-chips,
+    .ds.data-views-query-bar .ds.query-input .hidden-count,
+    .ds.data-views-query-bar > .filters {
+      display: none;
+    }
+
+    .ds.data-views-query-bar > .summary {
+      display: inline-flex;
+    }
+
+    /* The entry shrinks to leave the summary button its room. */
+    .ds.data-views-query-bar .ds.query-input {
+      min-inline-size: 0;
+    }
   }
 }

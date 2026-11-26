@@ -10,33 +10,7 @@
  */
 
 import { expect, type Locator, type Page, test } from "playwright/test";
-
-/** The render phases after which a story is drawn and its play done. */
-const SETTLED_PHASES: readonly string[] = ["completed", "finished"];
-
-/**
- * Open one QueryBar story alone, and wait until its play has finished and
- * its table holds rows.
- *
- * @note Impure: navigates the page.
- */
-const openStory = async (page: Page, name: string): Promise<void> => {
-  await page.goto(
-    `/iframe.html?id=work-in-progress-dataviews-querybar--${name}&viewMode=story`,
-  );
-  await page.waitForFunction((phases) => {
-    const preview = (
-      window as {
-        readonly __STORYBOOK_PREVIEW__?: {
-          readonly currentRender?: { readonly phase?: string };
-        };
-      }
-    ).__STORYBOOK_PREVIEW__;
-    const phase = preview?.currentRender?.phase;
-    return phase !== undefined && phases.includes(phase);
-  }, SETTLED_PHASES);
-  await expect(page.locator("#storybook-root [role=row]").nth(1)).toBeVisible();
-};
+import openStory from "./openQueryBarStory.js";
 
 /** The bar's own entry. */
 const findEntry = (page: Page): Locator =>
@@ -616,8 +590,13 @@ test.describe("QueryBar, in Chromium", () => {
   test("F18b: Merge pressed by pointer while the chips wrap still merges", async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 360, height: 720 });
+    // Wider than the narrow form, which hides the chips; each chip is made
+    // wide, so the two wrap once the field takes focus.
+    await page.setViewportSize({ width: 640, height: 720 });
     await openStory(page, "contradiction");
+    await page.addStyleTag({
+      content: "#storybook-root .ds.query-chip { min-inline-size: 16rem; }",
+    });
     const field = page.locator("#storybook-root .ds.query-input .field");
     const resting = (await field.boundingBox())?.height ?? 0;
     await findEntry(page).focus();

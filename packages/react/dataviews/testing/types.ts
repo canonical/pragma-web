@@ -264,3 +264,13 @@ export type PlacedRecord = { readonly id: string; readonly region?: string };
 
 /** A record placed in a region. */
 export type RegionRecord = { readonly id: string; readonly region: string };
+
+/** What the stand-in hands a test: a way to resize, and to remove it. */
+export type ResizeObserverStandIn = {
+  /** Report a new content inline size for an element to its observers. */
+  readonly resize: (element: Element, inlineSize: number) => void;
+  /** How many observers observe an element. */
+  readonly observing: (element: Element) => number;
+  /** Remove the stand-in and restore the observer it replaced. */
+  readonly uninstall: () => void;
+};

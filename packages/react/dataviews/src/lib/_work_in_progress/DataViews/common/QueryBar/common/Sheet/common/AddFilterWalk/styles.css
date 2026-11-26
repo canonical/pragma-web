@@ -1,0 +1,79 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* "Add filter": the button, or, once open, Back and the step's name
+     above the step's list or input, then Add. */
+  .ds.data-views-query-bar-add-filter-walk {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--dimension-100);
+
+    &.open {
+      align-items: stretch;
+      padding-block: var(--dimension-100);
+      border-block: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+
+    & .bar {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+    }
+
+    & .step {
+      font-weight: var(--typography-weight-bold);
+    }
+
+    & .typed {
+      display: flex;
+      flex-direction: column;
+      gap: var(--dimension-050);
+    }
+
+    & .input {
+      box-sizing: border-box;
+      min-block-size: var(--dimension-400);
+      padding-inline: var(--dimension-100);
+      border: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+      border-radius: var(--dimension-radius-small);
+      font: inherit;
+      color: inherit;
+      background-color: var(
+        --surface-color-background,
+        var(--color-background)
+      );
+
+      &:focus-visible {
+        outline: var(--dimension-stroke-thickness-large) solid
+          var(--color-focus-ring);
+      }
+
+      &[aria-invalid="true"] {
+        border-color: var(--color-border-error);
+      }
+    }
+
+    & .format {
+      color: var(--color-text-muted);
+      font-size: var(--typography-text-tertiary-font-size);
+      line-height: var(--typography-text-tertiary-line-height);
+    }
+
+    & .invalid {
+      color: var(--color-text-error);
+    }
+
+    & .back,
+    & .add,
+    & .commit {
+      min-block-size: var(--dimension-300);
+    }
+
+    & .commit {
+      align-self: flex-end;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import type { PredicateOperator } from "@canonical/dataviews-core";
+import type { Count, PredicateOperator } from "@canonical/dataviews-core";
 import type { TypedSymbol } from "./types.js";
 
 /** Make a symbol read exactly as it says. */
@@ -46,3 +46,13 @@ export const OPERATOR_SYMBOLS: Readonly<
 
 /** The roving id of the chip a clause is built in, before it applies. */
 export const DRAFT_ID = "draft";
+
+/**
+ * The container inline size below which the bar takes its narrow form,
+ * in rem: the chips give way to a summary button that opens the sheet.
+ * The stylesheet's container query holds the same width.
+ */
+export const NARROW_WIDTH_REM = 37.5;
+
+/** What nobody has counted. */
+export const UNCOUNTED: Count = Object.freeze({ kind: "unknown" });
