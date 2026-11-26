@@ -14,6 +14,11 @@ import type { Plugin, ResolvedConfig } from "vite";
  * They live in `@canonical/ds-assets`; this plugin serves them from there
  * rather than copying them into the repository, so they can never drift
  * from the installed package version.
+ *
+ * The application's own icons (`CustomIcons` in `@canonical/ds-assets`) live
+ * in `public/icons/`, which Vite serves and copies as usual: in development
+ * this plugin hands any name it does not ship on to Vite, and in the build
+ * the two directories merge into one.
  */
 const iconsDir = () =>
   join(
@@ -48,8 +53,17 @@ export function dsIcons(): Plugin {
         }
         const file = join(iconsDir(), name);
         if (!existsSync(file)) {
-          // A real 404, not the SPA fallback: a missing icon should be
-          // visible in the network tab, not silently resolve to HTML.
+          // Not a built-in icon: an application icon in `public/icons/` is
+          // handed on for Vite to serve. Anything else is a real 404, not the
+          // SPA fallback: a missing icon should be visible in the network
+          // tab, not silently resolve to HTML.
+          if (
+            config.publicDir &&
+            existsSync(join(config.publicDir, "icons", name))
+          ) {
+            next();
+            return;
+          }
           response.statusCode = 404;
           response.end();
           return;
