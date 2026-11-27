@@ -12,6 +12,7 @@ import { useWindowDimensions } from "../useWindowDimensions/index.js";
 import type {
   ArrowOffset,
   BestPosition,
+  PhysicalPlacement,
   RelativePosition,
   UseWindowFitmentProps,
   UseWindowFitmentResult,
@@ -20,70 +21,11 @@ import type {
   WindowFitmentPlacement,
   WindowFitmentSide,
 } from "./types.js";
-
-/** A resolved PHYSICAL placement — what the fitment core consumes internally. */
-type PhysicalPlacement = {
-  direction: WindowFitmentDirection;
-  align: WindowFitmentAlign;
-};
-
-/** Coerce a bare logical side or a placement into a full logical placement. */
-export const toPlacement = (
-  entry: WindowFitmentSide | WindowFitmentPlacement,
-): WindowFitmentPlacement =>
-  typeof entry === "string" ? { side: entry, align: "center" } : entry;
-
-/**
- * Map a LOGICAL placement to a PHYSICAL one for a writing direction. The inline
- * axis follows `dir` (mirrors in RTL); the block axis is dir-invariant.
- *
- * `align` positions the popup along its side's CROSS axis, so whether it is
- * dir-dependent follows from the side:
- *
- * - An `inline-*` side has a block (vertical) cross-axis. `start` is the top
- *   edge in every writing direction, so align passes through UNMODIFIED.
- * - A `block-*` side has an INLINE (horizontal) cross-axis — the reading axis.
- *   There `start` means the LEADING edge: the left edge in LTR, the RIGHT edge
- *   in RTL. So `start`/`end` are mirrored here for RTL, which is what makes a
- *   leading-aligned dropdown (`MENU_ROOT_PLACEMENT`) open from the trigger's
- *   right edge in RTL instead of its left. `center` is its own mirror.
- */
-export const resolveLogicalPlacement = (
-  placement: WindowFitmentPlacement,
-  dir: "ltr" | "rtl",
-): PhysicalPlacement => {
-  let direction: WindowFitmentDirection;
-  // Whether this side's cross-axis is the inline (reading) axis, making its
-  // `start`/`end` alignment dir-dependent.
-  let crossAxisIsInline: boolean;
-  switch (placement.side) {
-    case "inline-start":
-      direction = dir === "rtl" ? "right" : "left";
-      crossAxisIsInline = false;
-      break;
-    case "inline-end":
-      direction = dir === "rtl" ? "left" : "right";
-      crossAxisIsInline = false;
-      break;
-    case "block-start":
-      direction = "top";
-      crossAxisIsInline = true;
-      break;
-    default:
-      direction = "bottom";
-      crossAxisIsInline = true;
-      break;
-  }
-
-  const mirrorAlign = dir === "rtl" && crossAxisIsInline;
-  let align: WindowFitmentAlign = placement.align;
-  if (mirrorAlign) {
-    if (align === "start") align = "end";
-    else if (align === "end") align = "start";
-  }
-
-  return { direction, align };
-};
+import {
+  coercePlacement,
+  computeArrowOffset,
+  resolveLogicalPlacement,
+} from "./utils/index.js";
 
 /**
  * Read the document's writing direction from the root `<html>` element — the
@@ -97,54 +39,6 @@ const readHtmlDirection = (): "ltr" | "rtl" => {
   return document.documentElement.dir === "rtl" ? "rtl" : "ltr";
 };
 
-/**
- * Compute the cross-axis displacement needed to keep an arrow pointing at the
- * target's centre for a given placement. The arrow sits at the popup edge
- * centre by default; this returns how far to shift it so it aligns with the
- * target centre, clamped to the popup's half-extent so it never leaves the edge.
- * @param direction The side of the target the popup is placed on.
- * @param targetRect The bounding client rect of the target element.
- * @param popupRect The bounding client rect of the popup element.
- * @returns The arrow axis and offset in pixels.
- */
-export const computeArrowOffset = (
-  direction: WindowFitmentDirection,
-  targetRect: DOMRect,
-  popupRect: DOMRect,
-  /**
-   * The authoritative popup position (top-left, viewport coordinates) as just
-   * computed by fitment. The popup's live `getBoundingClientRect()` lags one
-   * frame behind `bestPosition` (it still reflects the previous placement while
-   * the new `left`/`top` are applied), so measuring the centre from the live
-   * rect yields a stale offset and the arrow drifts off the anchor. Passing the
-   * authoritative position removes that lag; the rect is still used for the
-   * popup's stable width/height. Defaults to the rect's own top-left.
-   */
-  popupPosition: { top: number; left: number } = {
-    top: popupRect.top,
-    left: popupRect.left,
-  },
-): ArrowOffset => {
-  const isVerticalPlacement = direction === "top" || direction === "bottom";
-  const axis = isVerticalPlacement ? "x" : "y";
-
-  const targetCentre = isVerticalPlacement
-    ? targetRect.left + targetRect.width / 2
-    : targetRect.top + targetRect.height / 2;
-  const popupCentre = isVerticalPlacement
-    ? popupPosition.left + popupRect.width / 2
-    : popupPosition.top + popupRect.height / 2;
-
-  const halfExtent = isVerticalPlacement
-    ? popupRect.width / 2
-    : popupRect.height / 2;
-
-  const rawOffset = targetCentre - popupCentre;
-  const clampedOffset = Math.max(-halfExtent, Math.min(halfExtent, rawOffset));
-
-  return { axis, offset: clampedOffset };
-};
-
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -153,21 +47,33 @@ const DEFAULT_PREFERRED_DIRECTIONS: readonly (
   | WindowFitmentPlacement
 )[] = ["block-start", "block-end", "inline-start", "inline-end"];
 
-const useWindowFitment = <
+/**
+ * Places a popup beside its target, in the first preferred direction that
+ * fits the viewport.
+ *
+ * @param options The fitment options.
+ * @returns The refs to attach, the best position, the popup's style, its
+ *   arrow offset and the resolved direction.
+ * @note Impure: measures the DOM and observes `<html dir>`.
+ */
+export default function useWindowFitment<
   TTarget extends HTMLElement = HTMLElement,
   TPopup extends HTMLElement = HTMLDivElement,
->({
-  preferredDirections = DEFAULT_PREFERRED_DIRECTIONS,
-  distance = "0px",
-  gutter = "0px",
-  maxWidth = "350px",
-  resizeDelay = 150,
-  scrollDelay = 150,
-  isOpen,
-  onBestPositionChange,
-  autoFit = false,
-  direction: directionProp,
-}: UseWindowFitmentProps): UseWindowFitmentResult<TTarget, TPopup> => {
+>(
+  ...[options = {}]: UseWindowFitmentProps
+): UseWindowFitmentResult<TTarget, TPopup> {
+  const {
+    preferredDirections = DEFAULT_PREFERRED_DIRECTIONS,
+    distance = "0px",
+    gutter = "0px",
+    maxWidth = "350px",
+    resizeDelay = 150,
+    scrollDelay = 150,
+    isOpen,
+    onBestPositionChange,
+    autoFit = false,
+    direction: directionProp,
+  } = options;
   const isServer = typeof window === "undefined";
   // Refs are created as the concrete `TTarget`/`TPopup` the caller asks for
   // (default `HTMLElement`/`HTMLDivElement`); internally they are only read via
@@ -205,7 +111,6 @@ const useWindowFitment = <
 
   /** The bounds of the window, accounting for the `gutter` prop. */
   const bounds = useMemo(() => {
-    if (isServer) return;
     const gutterValues = gutter
       .split(" ")
       .map((val) => Number.parseInt(val, 10));
@@ -221,7 +126,7 @@ const useWindowFitment = <
       right: windowDimensions.windowWidth - rightGutter,
       bottom: windowDimensions.windowHeight - bottomGutter,
     };
-  }, [gutter, windowDimensions, isServer]);
+  }, [gutter, windowDimensions]);
 
   /**
    * Calculate the relative position of the popup when oriented in a given direction.
@@ -239,12 +144,6 @@ const useWindowFitment = <
     ): RelativePosition => {
       let left = 0;
       let top = 0;
-      if (isServer) {
-        return {
-          left,
-          top,
-        };
-      }
 
       /*
         We use left and top offsets to position the popup relative to the target element.
@@ -303,7 +202,7 @@ const useWindowFitment = <
 
       return { left, top };
     },
-    [distanceAsPixelsNumber, isServer],
+    [distanceAsPixelsNumber],
   );
 
   /**
@@ -314,8 +213,6 @@ const useWindowFitment = <
    */
   const fitsInWindow = useCallback(
     (candidatePosition: RelativePosition, popupRect: DOMRect): boolean => {
-      if (isServer || !bounds) return false;
-
       // Absolute position of the popup's vertices, relative to the viewport
       const vertices = {
         top: candidatePosition.top,
@@ -331,7 +228,7 @@ const useWindowFitment = <
         vertices.left >= bounds.left
       );
     },
-    [bounds, isServer],
+    [bounds],
   );
 
   /**
@@ -346,7 +243,6 @@ const useWindowFitment = <
       popupRect: DOMRect,
       placements: PhysicalPlacement[],
     ): BestPosition | undefined => {
-      if (isServer) return;
       let fallbackPosition: BestPosition | undefined;
       let fallbackScore = Number.POSITIVE_INFINITY;
 
@@ -378,7 +274,7 @@ const useWindowFitment = <
         // only as the fallback when no side fits naturally.
         const absolutePosition = { ...naturalPosition };
         const autoFitOffset = { top: 0, left: 0 };
-        if (autoFit && bounds) {
+        if (autoFit) {
           if (absolutePosition.top < bounds.top) {
             autoFitOffset.top = bounds.top - absolutePosition.top;
             absolutePosition.top = bounds.top;
@@ -434,12 +330,12 @@ const useWindowFitment = <
 
       return fallbackPosition as BestPosition;
     },
-    [calculateRelativePosition, fitsInWindow, isServer, autoFit, bounds],
+    [calculateRelativePosition, fitsInWindow, autoFit, bounds],
   );
 
   /** Normalise the mixed side/placement list once (bare side → centred). */
   const placements = useMemo(
-    () => preferredDirections.map(toPlacement),
+    () => preferredDirections.map(coercePlacement),
     [preferredDirections],
   );
 
@@ -484,14 +380,15 @@ const useWindowFitment = <
   // Re-resolve when the document's <html dir> flips (a language toggle) with no
   // size/scroll change. A single observer on the root — the one source of truth.
   useEffect(() => {
-    if (isServer || directionProp) return;
+    // Effects never run on the server.
+    if (directionProp) return;
     const observer = new MutationObserver(() => setDirVersion((v) => v + 1));
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["dir"],
     });
     return () => observer.disconnect();
-  }, [isServer, directionProp]);
+  }, [directionProp]);
 
   /**
    * The arrow offset that keeps an arrow pointing at the target centre, computed
@@ -592,6 +489,4 @@ const useWindowFitment = <
     arrowOffset,
     direction,
   };
-};
-
-export default useWindowFitment;
+}

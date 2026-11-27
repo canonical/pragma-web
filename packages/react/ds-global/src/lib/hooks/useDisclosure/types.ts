@@ -7,7 +7,7 @@ import type {
 } from "react";
 import type { UseDelayedToggleProps } from "../useDelayedToggle/index.js";
 import type {
-  UseWindowFitmentProps,
+  UseWindowFitmentOptions,
   UseWindowFitmentResult,
 } from "../useWindowFitment/index.js";
 
@@ -25,7 +25,7 @@ import type {
 export type DisclosureMode = "hover" | "click";
 
 export interface UseDisclosureProps
-  extends UseWindowFitmentProps,
+  extends UseWindowFitmentOptions,
     UseDelayedToggleProps {
   /** How the disclosure opens and closes. Defaults to `hover`. */
   mode?: DisclosureMode;

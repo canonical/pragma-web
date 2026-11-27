@@ -4,97 +4,15 @@ import {
   MENU_ROOT_PLACEMENT,
   OVERLAY_PLACEMENT,
 } from "./readingDirection.js";
-import { resolveLogicalPlacement, toPlacement } from "./useWindowFitment.js";
-
-describe("toPlacement", () => {
-  it("coerces a bare logical side to a centred placement", () => {
-    expect(toPlacement("inline-end")).toEqual({
-      side: "inline-end",
-      align: "center",
-    });
-    expect(toPlacement("block-start")).toEqual({
-      side: "block-start",
-      align: "center",
-    });
-  });
-
-  it("passes a placement object through unchanged", () => {
-    const placement = { side: "inline-end", align: "start" } as const;
-    expect(toPlacement(placement)).toBe(placement);
-  });
-});
-
-describe("resolveLogicalPlacement", () => {
-  it("maps the inline axis by reading direction, block axis dir-invariant (LTR)", () => {
-    const ltr = (side: Parameters<typeof toPlacement>[0]) =>
-      resolveLogicalPlacement(toPlacement(side), "ltr").direction;
-    expect(ltr("inline-start")).toBe("left");
-    expect(ltr("inline-end")).toBe("right");
-    expect(ltr("block-start")).toBe("top");
-    expect(ltr("block-end")).toBe("bottom");
-  });
-
-  it("mirrors the inline axis in RTL, leaves the block axis untouched", () => {
-    const rtl = (side: Parameters<typeof toPlacement>[0]) =>
-      resolveLogicalPlacement(toPlacement(side), "rtl").direction;
-    expect(rtl("inline-start")).toBe("right");
-    expect(rtl("inline-end")).toBe("left");
-    expect(rtl("block-start")).toBe("top");
-    expect(rtl("block-end")).toBe("bottom");
-  });
-
-  it("passes the alignment through unmodified on an inline side", () => {
-    expect(
-      resolveLogicalPlacement({ side: "inline-end", align: "end" }, "ltr"),
-    ).toEqual({ direction: "right", align: "end" });
-    // An inline side's cross-axis is vertical, so alignment is dir-blind.
-    expect(
-      resolveLogicalPlacement({ side: "inline-end", align: "end" }, "rtl"),
-    ).toEqual({ direction: "left", align: "end" });
-  });
-
-  it("mirrors start/end alignment on a block side in RTL", () => {
-    // A block side's cross-axis is the READING axis, so `start` is the leading
-    // edge: left in LTR, right in RTL. `end` is its counterpart.
-    expect(
-      resolveLogicalPlacement({ side: "block-end", align: "start" }, "ltr"),
-    ).toEqual({ direction: "bottom", align: "start" });
-    expect(
-      resolveLogicalPlacement({ side: "block-end", align: "start" }, "rtl"),
-    ).toEqual({ direction: "bottom", align: "end" });
-    expect(
-      resolveLogicalPlacement({ side: "block-start", align: "end" }, "rtl"),
-    ).toEqual({ direction: "top", align: "start" });
-  });
-
-  it("leaves centre alignment alone on a block side in RTL", () => {
-    // `center` is its own mirror.
-    expect(
-      resolveLogicalPlacement({ side: "block-end", align: "center" }, "rtl"),
-    ).toEqual({ direction: "bottom", align: "center" });
-  });
-
-  it("headline: a leading-edge, top-aligned placement mirrors for free", () => {
-    const placement = { side: "inline-end", align: "start" } as const;
-    // LTR leading edge is the right; RTL leading edge is the left.
-    expect(resolveLogicalPlacement(placement, "ltr")).toEqual({
-      direction: "right",
-      align: "start",
-    });
-    expect(resolveLogicalPlacement(placement, "rtl")).toEqual({
-      direction: "left",
-      align: "start",
-    });
-  });
-});
+import { coercePlacement, resolveLogicalPlacement } from "./utils/index.js";
 
 describe("preset placements", () => {
   const resolve = (
     placements:
-      | readonly Parameters<typeof toPlacement>[0][]
+      | readonly Parameters<typeof coercePlacement>[0][]
       | typeof MENU_PLACEMENT,
     dir: "ltr" | "rtl",
-  ) => placements.map((p) => resolveLogicalPlacement(toPlacement(p), dir));
+  ) => placements.map((p) => resolveLogicalPlacement(coercePlacement(p), dir));
 
   it("MENU_ROOT_PLACEMENT opens below, aligned to the trigger's LEADING edge", () => {
     // LTR: the leading edge is the left one, so the popup's left edge meets the

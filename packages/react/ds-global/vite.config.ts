@@ -11,7 +11,11 @@ const unitTest = reactTestConfig({
   ssr: true,
   // 100% over the parts that gate it; the rest of the package is unmeasured.
   coverage: {
-    include: ["testing/**/*.ts"],
+    include: [
+      "src/lib/hooks/useWindowFitment/useWindowFitment.tsx",
+      "src/lib/hooks/useWindowFitment/utils/**/*.ts",
+      "testing/**/*.ts",
+    ],
     exclude: ["**/*.stories.tsx", "**/index.ts", "**/types.ts"],
   },
   setupFiles: ["./vitest.setup.ts"],
