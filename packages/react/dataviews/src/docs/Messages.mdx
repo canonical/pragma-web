@@ -35,8 +35,11 @@ export function Machines({ provider }: { readonly provider: MachineProvider }) {
   return (
     <DataViews provider={provider} messages={OWN_WORDS}>
       <DataViews.Search />
-      <DataViews.DataTable columns={columns} label="Machines" />
-      <DataViews.Pagination sizes={[5, 10]} />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
+      />
     </DataViews>
   );
 }
@@ -68,8 +71,13 @@ Three rules about the record you pass:
 A standalone part is its own root, so it takes `messages` itself. `DataTable` and `PaginationBar` do, and so do the work-in-progress `DataCards` and `DataChart`:
 
 ```tsx
-<DataTable provider={provider} columns={columns} label="Machines" messages={FRENCH} />
-<PaginationBar provider={provider} messages={FRENCH} />
+<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  messages={FRENCH}
+  footer={<PaginationBar provider={provider} messages={FRENCH} />}
+/>
 ```
 
 <Canvas of={Stories.StandaloneParts} sourceState="none" />
@@ -169,9 +177,13 @@ Mark the language of the region where the record speaks, with `lang`. The packag
   <DataViews provider={provider} messages={FRENCH}>
     <DataViews.Search />
     <DataViews.Filters labels={{ status: "État", cores: "Cœurs" }} />
-    <DataViews.DataTable columns={frenchColumns} label="Machines" selectable />
+    <DataViews.DataTable
+      columns={frenchColumns}
+      label="Machines"
+      selectable
+      footer={<DataViews.Pagination sizes={[5, 10]} />}
+    />
     <DataViews.ActionBar />
-    <DataViews.Pagination sizes={[5, 10]} />
   </DataViews>
 </div>
 ```

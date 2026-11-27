@@ -57,16 +57,20 @@ export const Default: Story = {
     declarations: columnsCode,
     query: "page=1&size=5",
     render: `<DataViews provider={provider}>
-  <DataViews.DataTable columns={columns} label="Machines" />
-  <DataViews.Pagination label="Machines pagination" />
+  <DataViews.DataTable
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination label="Machines pagination" />}
+  />
 </DataViews>`,
   }),
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: () => (
-    <>
-      <Component.DataTable columns={columns} label="Machines" />
-      <Component.Pagination label="Machines pagination" />
-    </>
+    <Component.DataTable
+      columns={columns}
+      label="Machines"
+      footer={<Component.Pagination label="Machines pagination" />}
+    />
   ),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole("table", { name: "Machines" });

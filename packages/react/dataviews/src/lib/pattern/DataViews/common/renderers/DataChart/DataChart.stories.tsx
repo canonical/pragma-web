@@ -180,8 +180,8 @@ function CountsBesideFiltersMachines({
         columns={columns}
         label="Machines"
         getRowLabel={(row) => row.name}
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
       />
-      <DataViews.Pagination sizes={[5, 10]} />
     </>
   );
 }
@@ -214,8 +214,11 @@ export const CountsBesideFilters: Story = {
     render: `<DataViews provider={provider}>
   <DataViews.Filters />
   <DataChart type="bar" field="status" label="Machines by status" />
-  <DataViews.DataTable columns={columns} label="Machines" />
-  <DataViews.Pagination sizes={[5, 10]} />
+  <DataViews.DataTable
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
+  />
 </DataViews>`,
   }),
   play: async ({ canvas }) => {

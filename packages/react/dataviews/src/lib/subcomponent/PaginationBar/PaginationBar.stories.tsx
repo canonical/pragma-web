@@ -64,41 +64,56 @@ const columnsCode = `const columns = createColumns({
   ],
 });`;
 
-const pageCode = `<>
-  <DataTable provider={provider} columns={columns} label="Machines" />
-  <PaginationBar provider={provider} sizes={[5, 10, 25]} />
-</>`;
+const pageCode = `<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+/>`;
 
 /**
  * The machines five to a page, the table and its bar over one provider,
- * both speaking the story's messages.
+ * both speaking the story's messages. The bar is the table's footer, or
+ * beside the table when `beside` is set.
  */
 function MachinesPage({
   options,
+  beside = false,
   ...args
 }: Omit<PaginationBarProps<MachineFields, Machine>, "provider"> & {
   readonly options?: MachineProviderConfig | undefined;
+  readonly beside?: boolean;
 }): ReactElement {
   const provider = useMachineProvider({
     query: "page=1&size=5",
     ...options,
   });
-  return (
+  const bar = <Component {...args} provider={provider} />;
+  const table = (
+    <DataTable
+      provider={provider}
+      columns={columns}
+      label="Machines"
+      {...pickStoryWords(args)}
+      footer={beside ? undefined : bar}
+    />
+  );
+  return beside ? (
     <>
-      <DataTable
-        provider={provider}
-        columns={columns}
-        label="Machines"
-        {...pickStoryWords(args)}
-      />
-      <Component {...args} provider={provider} />
+      {table}
+      {bar}
     </>
+  ) : (
+    table
   );
 }
 
 const renderWith =
-  (options?: MachineProviderConfig): NonNullable<Story["render"]> =>
-  (args) => <MachinesPage {...args} options={options} />;
+  (
+    options?: MachineProviderConfig,
+    beside = false,
+  ): NonNullable<Story["render"]> =>
+  (args) => <MachinesPage {...args} options={options} beside={beside} />;
 
 const goTo =
   (page: number) =>
@@ -321,7 +336,7 @@ export const StickyInAScrollingFrame: Story = {
 </div>`,
   }),
   decorators: [withScrollingFrame("16rem")],
-  render: renderWith({ query: "page=1&size=25" }),
+  render: renderWith({ query: "page=1&size=25" }, true),
   play: async ({ canvas }) => {
     await waitFor(() =>
       expect(canvas.getByRole("status")).toHaveTextContent(

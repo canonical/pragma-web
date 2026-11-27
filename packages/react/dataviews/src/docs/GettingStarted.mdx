@@ -64,8 +64,11 @@ export function MachinesPage({ machines }: { readonly machines: readonly Machine
   return (
     <DataViews provider={provider}>
       <DataViews.QueryBar />
-      <DataViews.DataTable columns={columns} label="Machines" />
-      <DataViews.Pagination label="Machines pagination" />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination label="Machines pagination" />}
+      />
     </DataViews>
   );
 }

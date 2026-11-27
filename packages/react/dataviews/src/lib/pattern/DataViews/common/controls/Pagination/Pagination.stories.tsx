@@ -46,17 +46,21 @@ const columnsCode = `const columns = createColumns({
 });`;
 
 const composition = `<DataViews provider={provider}>
-  <DataTable provider={provider} columns={columns} label="Machines" />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
+  <DataViews.DataTable
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+  />
 </DataViews>`;
 
 /** A composed collection inside the story's root: its table and its pagination part. */
 function ComposedMachines(args: DataViewsPaginationProps): ReactElement {
   return (
-    <>
-      <DataViews.DataTable columns={columns} label="Machines" />
-      <Component {...args} />
-    </>
+    <DataViews.DataTable
+      columns={columns}
+      label="Machines"
+      footer={<Component {...args} />}
+    />
   );
 }
 
@@ -71,7 +75,7 @@ const onlyFailed = "status=failed&page=1&size=5";
 export const InAComposition: Story = {
   name: "In a composition",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "createColumns"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     query: "page=1&size=5",
     render: composition,
@@ -96,7 +100,7 @@ export const InAComposition: Story = {
 export const AFilteredTotal: Story = {
   name: "A filtered total",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "createColumns"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     query: onlyFailed,
     render: composition,

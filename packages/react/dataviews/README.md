@@ -105,9 +105,9 @@ export function MachinesPage({ rows }: { rows: readonly Machine[] }) {
         label="Machines"
         selectable
         getRowLabel={nameMachine}
+        footer={<DataViews.Pagination label="Machines pagination" />}
       />
       <ExportNames />
-      <DataViews.Pagination label="Machines pagination" />
     </DataViews>
   );
 }

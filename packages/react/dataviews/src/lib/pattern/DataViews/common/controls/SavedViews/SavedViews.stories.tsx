@@ -60,8 +60,13 @@ const columnsCode = `const columns = createColumns({
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <DataTable id="machines" provider={provider} columns={columns} label="Machines" />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
+  <DataTable
+    id="machines"
+    provider={provider}
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+  />
 </DataViews>`;
 
 const failedMachines: ViewDraft = {
@@ -111,8 +116,8 @@ function Collection({
         columns={columns}
         label="Machines"
         {...words}
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
       />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );
 }

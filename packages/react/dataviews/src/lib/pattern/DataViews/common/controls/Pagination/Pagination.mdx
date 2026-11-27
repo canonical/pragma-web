@@ -18,11 +18,7 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import {
-  createColumns,
-  DataTable,
-  DataViews,
-} from "@canonical/dataviews-react";
+import { createColumns, DataViews } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 
@@ -50,8 +46,16 @@ export function Machines() {
   );
   return (
     <DataViews provider={provider}>
-      <DataTable provider={provider} columns={columns} label="Machines" />
-      <DataViews.Pagination label="Machines pagination" sizes={[5, 10, 25]} />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        footer={
+          <DataViews.Pagination
+            label="Machines pagination"
+            sizes={[5, 10, 25]}
+          />
+        }
+      />
     </DataViews>
   );
 }

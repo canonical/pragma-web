@@ -68,8 +68,11 @@ export const PartialOverride: Story = {
     return (
       <Component provider={provider} messages={OWN_WORDS}>
         <Component.Search />
-        <Component.DataTable columns={columns} label="Machines" />
-        <Component.Pagination sizes={[5, 10]} />
+        <Component.DataTable
+          columns={columns}
+          label="Machines"
+          footer={<Component.Pagination sizes={[5, 10]} />}
+        />
       </Component>
     );
   },
@@ -103,9 +106,9 @@ export const FrenchLocale: Story = {
             label="Machines"
             selectable
             getRowLabel={readHostName}
+            footer={<Component.Pagination sizes={[5, 10]} />}
           />
           <Component.ActionBar />
-          <Component.Pagination sizes={[5, 10]} />
         </Component>
       </div>
     );
@@ -135,8 +138,10 @@ export const StandaloneParts: Story = {
           columns={frenchColumns}
           label="Machines"
           messages={fr}
+          footer={
+            <PaginationBar provider={provider} sizes={[5, 10]} messages={fr} />
+          }
         />
-        <PaginationBar provider={provider} sizes={[5, 10]} messages={fr} />
       </div>
     );
   },

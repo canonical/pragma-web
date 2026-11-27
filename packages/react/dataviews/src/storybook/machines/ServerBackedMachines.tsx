@@ -40,8 +40,8 @@ export default function ServerBackedMachines({
       <DataViews.DataTable
         columns={SERVER_BACKED_COLUMNS}
         label={SERVER_BACKED_PARTS.tableLabel}
+        footer={<DataViews.Pagination sizes={SERVER_BACKED_PARTS.sizes} />}
       />
-      <DataViews.Pagination sizes={SERVER_BACKED_PARTS.sizes} />
     </DataViews>
   );
 }

@@ -7,7 +7,7 @@ import * as Stories from "./ActionBar.stories";
 
 `DataViews.ActionBar` is the action bar: how much is selected, the actions that apply to it, and a button that clears it. It reads the enclosing root's selection and takes no copy of it, and it is absent while nothing is selected.
 
-It renders on the design system's contrasted surface — its root carries `.contrasted`, from `@canonical/styles` — so it paints no colour of its own. Place it in the collection's footer beside the pagination bar.
+It renders on the design system's contrasted surface — its root carries `.contrasted`, from `@canonical/styles` — so it paints no colour of its own. Place it after the table.
 
 ## Actions over the selection
 
@@ -94,6 +94,7 @@ export function Machines() {
         label="Machines"
         selectable
         getRowLabel={nameMachine}
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
       />
       <DataViews.ActionBar>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -101,7 +102,6 @@ export function Machines() {
           Delete
         </SelectionAction>
       </DataViews.ActionBar>
-      <DataViews.Pagination sizes={[5, 10]} />
     </DataViews>
   );
 }
