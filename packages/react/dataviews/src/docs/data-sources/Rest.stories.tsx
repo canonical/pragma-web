@@ -44,9 +44,12 @@ const code = showConsumerCode({
     "declareCapabilities",
     "encodeQuery",
   ],
+  coreTypes: ["RowRecord"],
   imports: `import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import { machineCollection } from "./machines.js";`,
   declarations: `${SERVER_BACKED_COLUMNS_CODE}
+
+const nameMachine = (row: RowRecord) => String(row["name"]);
 
 const queryClient = new QueryClient();
 // Mounted, so its queries refetch when the window regains focus or the
@@ -218,7 +221,7 @@ export const Failed: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByText(
-        "These rows could not be loaded: the machine inventory is unavailable",
+        "These rows could not be loaded: the machine inventory is unavailable.",
       ),
     ).toBeVisible();
   },

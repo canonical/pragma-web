@@ -4,9 +4,13 @@
  */
 
 import type { DataViewsMessages } from "@canonical/dataviews-core";
-import { renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, renderHook } from "@testing-library/react";
+import { createElement, memo } from "react";
+import { describe, expect, it, vi } from "vitest";
 import useMessages from "./useMessages.js";
+
+/** A worded message defined once, at module scope. */
+const selectInFrench = (name: string): string => `Choisir ${name}`;
 
 /** The hook mounted over the messages a render hands it. */
 const mount = (messages?: Partial<DataViewsMessages>) =>
@@ -45,6 +49,31 @@ describe("useMessages", () => {
     rerender({ given: { selectRow: (name: string) => `Choisir ${name}` } });
     expect(result.current).not.toBe(first);
     expect(result.current.selectRow("alder")).toBe("Choisir alder");
+  });
+
+  it("renders a reader once for an inline record of the same members", () => {
+    const reads = vi.fn();
+    const Reader = memo(function Reader({
+      words,
+    }: {
+      readonly words: DataViewsMessages;
+    }) {
+      reads(words.selectRow("alder"));
+      return null;
+    });
+    const Root = ({ given }: { readonly given: Partial<DataViewsMessages> }) =>
+      createElement(Reader, { words: useMessages(given) });
+    const { rerender } = render(
+      createElement(Root, {
+        given: { search: "Trouver", selectRow: selectInFrench },
+      }),
+    );
+    rerender(
+      createElement(Root, {
+        given: { search: "Trouver", selectRow: selectInFrench },
+      }),
+    );
+    expect(reads.mock.calls).toEqual([["Choisir alder"]]);
   });
 
   it("resolves again once a message changes, is added or is taken away", () => {

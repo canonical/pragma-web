@@ -63,7 +63,7 @@ describe("StatusList", () => {
       source.readLatest().deliver(failure);
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be loaded: offline",
+      "These rows could not be loaded: offline.",
     );
     expect(readNames()).toEqual([]);
   });
@@ -83,7 +83,7 @@ describe("StatusList", () => {
       source.readLatest().deliver(failure);
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be refreshed: offline",
+      "These rows could not be refreshed: offline.",
     );
     expect(readNames()).toEqual(["alpha"]);
   });

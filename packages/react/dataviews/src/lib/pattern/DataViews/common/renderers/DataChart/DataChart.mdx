@@ -63,11 +63,13 @@ A range is not lifted the same way: keeping only the failed machines narrows the
 
 <Canvas of={Stories.RangeBesideFilters} sourceState="none" />
 
-## While no result answers
+## The chart's status
 
-While no result answers the query — before the first, while another is pending, after one failed — the core's status is shown in place of the drawing, never one made for another query.
+The chart's status is its own facet's, never the rows'. While a new filter or search loads it says "Loading…" above the previous drawing, kept mounted and hidden from assistive technology so the figure keeps its height. A failure (`statusFailed`) stands in place of the drawing; a failed refresh (`statusRefreshFailed`) stands above the drawing it keeps, as does a failed re-sort or a refused link over the same counts.
 
 <Canvas of={Stories.Loading} sourceState="none" />
+
+<Canvas of={Stories.Refreshing} sourceState="none" />
 
 ## Without scripting
 
@@ -98,4 +100,4 @@ These notes are provisional, recorded for a prototype.
 |---|---|---|
 | Bar chart | 1.1.1, 1.3.1, 1.4.1, 4.1.2 | A figure captioned by its label; the drawing an image named with what it shows; every value and count in a native table with column and row headings; no value carried by colour alone; counts from the source over the matching set, a lower bound said as "at least", an uncounted value said as such |
 | Range chart | 1.1.1, 1.3.1, 1.4.1, 4.1.2 | A figure captioned by its label; the drawing an image named with its range; the lowest and highest values in a native table with row headings; the range from the source over the matching set; "no matching record holds a value" said, not drawn as an empty axis |
-| Chart status | 1.3.1, 4.1.3 | The core's status in place of the drawing while no result answers the query, a settled outcome announced once, politely; never a drawing made for another query |
+| Chart status | 1.3.1, 4.1.3 | The facet's own status, a settled outcome announced once, politely; a drawing kept while loading is hidden from assistive technology; never a drawing made for another query |

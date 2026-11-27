@@ -28,13 +28,20 @@ import {
 } from "@canonical/dataviews-react";
 import { Button, type ButtonProps } from "@canonical/react-ds-global";
 import { useState } from "react";
-import { archiveMachines, machineCollection, machines } from "./machines.js";
+import {
+  archiveMachines,
+  type Machine,
+  machineCollection,
+  machines,
+} from "./machines.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
   { id: "status", header: "Status" },
   { id: "owner", header: "Owner" },
 ];
+
+const nameMachine = (machine: Machine) => machine.name;
 
 // Pressed, it runs through the provider, which captures the selection as
 // its targets, runs the source's action and removes the ones that succeed.
@@ -83,7 +90,7 @@ export function Machines() {
         columns={columns}
         label="Machines"
         selectable
-        getRowLabel={(row) => row.name}
+        getRowLabel={nameMachine}
       />
       <DataViews.ActionBar>
         <SelectionAction action="archive">Archive</SelectionAction>

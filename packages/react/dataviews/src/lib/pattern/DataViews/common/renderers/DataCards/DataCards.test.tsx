@@ -193,6 +193,24 @@ describe("DataCards", () => {
     ).toBeInTheDocument();
   });
 
+  it("names a card anew once handed a new getRowLabel", () => {
+    const { provider, view } = renderLoadedCards(rows, {
+      getRowLabel: (row) => `machine ${row.name}`,
+    });
+    view.rerender(
+      <DataCards
+        provider={provider}
+        fields={fields}
+        title="name"
+        label="Machines"
+        getRowLabel={(row) => `machine ${row.name} (fr)`}
+      />,
+    );
+    expect(
+      within(readList()).getByRole("listitem", { name: "machine alpha (fr)" }),
+    ).toBeInTheDocument();
+  });
+
   it("names a card's checkbox by a title that is not a string, spelled", () => {
     const Blank = () => null;
     renderLoadedCards(rows, {
@@ -309,7 +327,7 @@ describe("DataCards", () => {
       source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be loaded: the inventory is unreachable",
+      "These rows could not be loaded: the inventory is unreachable.",
     );
     expect(within(readList()).queryAllByRole("listitem")).toEqual([]);
     expect(screen.getByRole("region", { name: "Machines" })).toHaveAttribute(
@@ -340,7 +358,7 @@ describe("DataCards", () => {
       source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows do not match the current query: the inventory is unreachable",
+      "These rows do not match the current query: the inventory is unreachable.",
     );
     expect(
       within(readList())
@@ -399,7 +417,7 @@ describe("DataCards", () => {
     });
     // The cards still answer the query the reader asked, so they stay.
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be refreshed: the inventory is unreachable",
+      "These rows could not be refreshed: the inventory is unreachable.",
     );
     expect(
       within(readList())

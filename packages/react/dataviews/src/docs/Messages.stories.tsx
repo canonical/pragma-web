@@ -1,4 +1,4 @@
-import type { DataViewsMessages } from "@canonical/dataviews-core";
+import type { DataViewsMessages, RowRecord } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
@@ -42,6 +42,8 @@ const columns: readonly DataTableColumn[] = [
   { id: "status", header: "Status" },
   { id: "cores", header: "Cores" },
 ];
+
+const nameMachine = (row: RowRecord) => String(row["name"]);
 
 /** The same columns, headed in French: headings are the application's data. */
 const frenchColumns: readonly DataTableColumn[] = [
@@ -92,7 +94,7 @@ export const FrenchLocale: Story = {
             columns={frenchColumns}
             label="Machines"
             selectable
-            getRowLabel={(row) => String(row["name"])}
+            getRowLabel={nameMachine}
           />
           <Component.ActionBar />
           <Component.Pagination sizes={[5, 10]} />

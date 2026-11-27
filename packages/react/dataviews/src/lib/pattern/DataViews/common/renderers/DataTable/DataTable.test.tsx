@@ -1224,6 +1224,170 @@ describe("DataTable", () => {
     ).toHaveClass("disabled");
   });
 
+  /** Columns that offer no control of their own, and alone no header menu. */
+  const plainName: DataTableColumn = { id: "name", header: "Name" };
+  const plainStatus: DataTableColumn = { id: "status", header: "Status" };
+
+  it("is a tab stop where no control inside takes focus", () => {
+    renderOrderingTable(3, [], [plainName]);
+    const table = screen.getByRole("table", { name: "Machines" });
+    expect(table.querySelector("button, input, a[href]")).toBeNull();
+    expect(table.tabIndex).toBe(0);
+  });
+
+  it.each<
+    [
+      string,
+      {
+        readonly columns?: readonly DataTableColumn[];
+        readonly selectable?: boolean;
+        readonly settings?: ReactElement;
+      },
+    ]
+  >([
+    ["a sortable column", { columns: [{ ...plainName, sortable: true }] }],
+    ["a resizable column", { columns: [{ ...plainName, resizable: true }] }],
+    ["selection", { selectable: true }],
+    ["settings and header menus", { settings: <DataViews.Settings /> }],
+  ])("is no tab stop with %s", (_, props) => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      capabilities: declareMachineOrdering(3, []),
+    });
+    render(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        {...props}
+        columns={[...(props.columns ?? [plainName]), plainStatus]}
+      />,
+    );
+    expect(screen.getByRole("table", { name: "Machines" })).toHaveAttribute(
+      "tabindex",
+      "-1",
+    );
+  });
+
+  it("is no tab stop where a column's own content holds a link", async () => {
+    const Link = ({ value, rowId }: DisplayFieldCellProps) => (
+      <a href={`/machines/${rowId}`}>{String(value)}</a>
+    );
+    renderOrderingTable(3, [], [{ ...plainName, cell: Link }]);
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table.querySelector("a[href]")).not.toBeNull());
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
+  });
+
+  it("is a tab stop where a column's own link is hidden", async () => {
+    const HiddenLink = ({ value, rowId }: DisplayFieldCellProps) => (
+      <span hidden>
+        <a href={`/machines/${rowId}`}>{String(value)}</a>
+      </span>
+    );
+    renderOrderingTable(3, [], [{ ...plainName, cell: HiddenLink }]);
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table.querySelector("a[href]")).not.toBeNull());
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+  });
+
+  it("flips the tab stop as selection comes and goes", async () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const renderTable = (selectable: boolean) => (
+      <DataTable
+        provider={provider}
+        label="Machines"
+        selectable={selectable}
+        columns={[plainName]}
+      />
+    );
+    const view = render(renderTable(false));
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+    view.rerender(renderTable(true));
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
+    view.rerender(renderTable(false));
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+  });
+
+  it("flips the tab stop as a refreshed row draws a link or none", async () => {
+    // A status cell that links only a running machine.
+    const LinkRunning = ({ value, rowId }: DisplayFieldCellProps) =>
+      value === "running" ? (
+        <a href={`/machines/${rowId}`}>{String(value)}</a>
+      ) : (
+        String(value)
+      );
+    const { provider, source } = renderDeliveredTable(
+      [buildMachine("m-1", "alpha", "failed")],
+      { columns: [{ ...plainStatus, cell: LinkRunning }] },
+    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+    act(() => {
+      provider.refresh();
+    });
+    deliver(source, [buildMachine("m-1", "alpha")]);
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
+    act(() => {
+      provider.refresh();
+    });
+    deliver(source, [buildMachine("m-1", "alpha", "failed")]);
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+  });
+
+  it("flips the tab stop as a control inside is disabled or not", async () => {
+    // A status cell whose one button is enabled only on a running machine.
+    const ActRunning = ({ value }: DisplayFieldCellProps) => (
+      <button type="button" disabled={value !== "running"}>
+        {String(value)}
+      </button>
+    );
+    const { provider, source } = renderDeliveredTable(
+      [buildMachine("m-1", "alpha", "failed")],
+      { columns: [{ ...plainStatus, cell: ActRunning }] },
+    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+    const button = within(table).getByRole("button");
+    act(() => {
+      provider.refresh();
+    });
+    deliver(source, [buildMachine("m-1", "alpha")]);
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
+    act(() => {
+      provider.refresh();
+    });
+    deliver(source, [buildMachine("m-1", "alpha", "failed")]);
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+    // The same button throughout: only its attribute changed.
+    expect(within(table).getByRole("button")).toBe(button);
+  });
+
+  it("keeps focus on a focused table as it comes to hold a control", async () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const renderTable = (selectable: boolean) => (
+      <DataTable
+        provider={provider}
+        label="Machines"
+        selectable={selectable}
+        columns={[plainName]}
+      />
+    );
+    const view = render(renderTable(false));
+    const table = screen.getByRole("table", { name: "Machines" });
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "0"));
+    act(() => {
+      table.focus();
+    });
+    view.rerender(renderTable(true));
+    await waitFor(() => expect(table).toHaveAttribute("tabindex", "-1"));
+    await waitForFocus(table);
+  });
+
   it("offers no header menu on a column that can be neither sorted, hidden nor moved", async () => {
     renderOrderingTable(
       3,
@@ -1522,7 +1686,7 @@ describe("DataTable", () => {
     expect(
       expectAnnouncedStatusRow(
         "failed",
-        "These rows could not be loaded: the inventory is unreachable",
+        "These rows could not be loaded: the inventory is unreachable.",
       ),
     ).toEqual([]);
     expect(screen.getByRole("table")).toHaveAttribute("aria-busy", "false");
@@ -1560,7 +1724,7 @@ describe("DataTable", () => {
     // The status row leads, and the retained rows follow it unblanked.
     const rows = expectAnnouncedStatusRow(
       "stale",
-      "These rows do not match the current query: the inventory is unreachable",
+      "These rows do not match the current query: the inventory is unreachable.",
     );
     expect(rows.map((row) => row.textContent)).toEqual([
       "alpharunning",
@@ -1585,7 +1749,7 @@ describe("DataTable", () => {
     // failure is said above them rather than shown nowhere at all.
     const rows = expectAnnouncedStatusRow(
       "refresh-failed",
-      "These rows could not be refreshed: the inventory is unreachable",
+      "These rows could not be refreshed: the inventory is unreachable.",
     );
     expect(rows.map((row) => row.textContent)).toEqual([
       "alpharunning",
@@ -2773,7 +2937,7 @@ describe("DataTable", () => {
     });
     expect(screen.getByRole("status")).toBe(statusMessage);
     expect(statusMessage).toHaveTextContent(
-      "These rows do not match the current query: offline",
+      "These rows do not match the current query: offline.",
     );
   });
 
@@ -2817,7 +2981,7 @@ describe("DataTable", () => {
       source.readLatest().deliver(buildFailure("timed out"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows do not match the current query: timed out",
+      "These rows do not match the current query: timed out.",
     );
   });
 

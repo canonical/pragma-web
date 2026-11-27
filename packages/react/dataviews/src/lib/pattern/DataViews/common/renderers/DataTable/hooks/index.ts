@@ -3,3 +3,4 @@ export { default as useColumnArrangement } from "./useColumnArrangement.js";
 export { default as useColumnManagement } from "./useColumnManagement.js";
 export { default as useHeaderSort } from "./useHeaderSort.js";
 export { default as useTableGeometry } from "./useTableGeometry.js";
+export { default as useTabStop } from "./useTabStop.js";

@@ -1,23 +1,39 @@
+import type {
+  DataViewsProvider,
+  SchemaFieldDefinition,
+} from "@canonical/dataviews-core";
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  createWorkloadProvider,
   silenceRenderErrors,
 } from "../../../../../../../../../testing/index.js";
 import CardItem from "./CardItem.js";
 
+/** A provider answered with one machine, m-1. */
+const createAlpha = () =>
+  createMachineProvider({
+    rows: [buildMachine("m-1", "alpha", "failed", 8)],
+  }).provider;
+
 /**
- * A provider answered with one machine, and the channels of its row over
- * the observed fields, released when the test finishes.
+ * The provider and the channels of its row over the observed fields,
+ * released when the test finishes.
  *
  * @note Impure: observes the provider and its row scopes.
  */
-const observeRow = (fields: readonly string[]) => {
-  const { provider } = createMachineProvider({
-    rows: [buildMachine("m-1", "alpha", "failed", 8)],
-  });
+const observeRow = <TRow extends object>({
+  fields,
+  provider,
+  rowId = "m-1",
+}: {
+  readonly fields: readonly string[];
+  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  readonly rowId?: string;
+}) => {
   const releaseProvider = provider.observe();
   const scopes = createRowScopes({
     rows: provider.rows,
@@ -29,12 +45,15 @@ const observeRow = (fields: readonly string[]) => {
     releaseScopes();
     releaseProvider();
   });
-  return { provider, channels: scopes.readRow("m-1") };
+  return { provider, channels: scopes.readRow(rowId) };
 };
 
 describe("CardItem", () => {
   it("is a list item named by its title, holding its title and its details", () => {
-    const { provider, channels } = observeRow(["name", "status"]);
+    const { provider, channels } = observeRow({
+      fields: ["name", "status"],
+      provider: createAlpha(),
+    });
     render(
       <ul>
         <CardItem
@@ -55,7 +74,10 @@ describe("CardItem", () => {
   });
 
   it("toggles its record's selection from its checkbox, named by the caller's label", () => {
-    const { provider, channels } = observeRow(["name"]);
+    const { provider, channels } = observeRow({
+      fields: ["name"],
+      provider: createAlpha(),
+    });
     render(
       <ul>
         <CardItem
@@ -80,9 +102,55 @@ describe("CardItem", () => {
     expect(checkbox).not.toBeChecked();
   });
 
+  it("names a card by its identity where the caller's label is blank", () => {
+    const { provider, channels } = observeRow({
+      fields: ["name"],
+      provider: createAlpha(),
+    });
+    render(
+      <ul>
+        <CardItem
+          provider={provider}
+          channels={channels}
+          title={{ id: "name", header: "Name" }}
+          details={[]}
+          selectable={false}
+          nameRecord={() => " "}
+        />
+      </ul>,
+    );
+    expect(screen.getByRole("listitem", { name: "m-1" })).toBeInTheDocument();
+  });
+
+  it("names a card by its identity where its title does not apply", () => {
+    const { provider, channels } = observeRow({
+      fields: ["host"],
+      provider: createWorkloadProvider([
+        { id: "w-1", type: "vm", host: "kept" },
+      ]),
+      rowId: "w-1",
+    });
+    render(
+      <ul>
+        <CardItem
+          provider={provider}
+          channels={channels}
+          title={{ id: "host", header: "Host" }}
+          details={[]}
+          selectable={false}
+          nameRecord={() => null}
+        />
+      </ul>,
+    );
+    expect(screen.getByRole("listitem", { name: "w-1" })).toBeInTheDocument();
+  });
+
   it("throws when its title's field is not observed", () => {
     silenceRenderErrors();
-    const { provider, channels } = observeRow(["status"]);
+    const { provider, channels } = observeRow({
+      fields: ["status"],
+      provider: createAlpha(),
+    });
     expect(() =>
       render(
         <CardItem
@@ -98,7 +166,10 @@ describe("CardItem", () => {
   });
 
   it("passes native props to its card", () => {
-    const { provider, channels } = observeRow(["name"]);
+    const { provider, channels } = observeRow({
+      fields: ["name"],
+      provider: createAlpha(),
+    });
     render(
       <ul>
         <CardItem

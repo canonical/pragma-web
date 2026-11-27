@@ -12,6 +12,7 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createStandInPresentationStore } from "@canonical/dataviews-core/testing";
+import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -21,6 +22,8 @@ import {
   deliverRows,
   machines,
 } from "../../../../../../../testing/index.js";
+import type { DisplayFieldCellProps } from "../../../../../common/index.js";
+import { DataViews } from "../../../index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -69,7 +72,7 @@ describe("DataTable SSR", () => {
     expect(readPresentation).not.toHaveBeenCalled();
     expect(heard).not.toHaveBeenCalled();
     expect(html).toContain('class="ds data-table dense"');
-    expect(html).toContain('<table class="ds data-table dense"');
+    expect(html).toMatch(/<table[^>]* class="ds data-table dense"/);
     expect(html).toContain('aria-label="Machines"');
     // A resize handle's keys work only once scripts run, so none is sent.
     expect(html).not.toContain('role="separator"');
@@ -94,6 +97,73 @@ describe("DataTable SSR", () => {
     expect(
       html.match(/<input[^>]*type="checkbox"[^>]*disabled=""/g),
     ).toHaveLength(2);
+  });
+
+  it("is a tab stop before scripts run where no control takes focus", () => {
+    // No location: the checkboxes are disabled and no handle is sent.
+    const { provider } = createMachineProvider();
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        selectable
+        columns={columns}
+      />,
+    );
+    expect(html).toMatch(/<table[^>]* tabindex="0"/);
+  });
+
+  /** The table's server markup, standing on a location. */
+  const renderLocated = (props: {
+    readonly columns?: readonly DataTableColumn[];
+    readonly settings?: ReactElement;
+  }): string => {
+    const { provider } = createMachineProvider({
+      capabilities: declareMachineOrdering(3, []),
+      location: createMemoryLocation({ href: "/machines" }),
+    });
+    return renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        columns={columns}
+        {...props}
+      />,
+    );
+  };
+
+  it.each([
+    [
+      "a sortable column",
+      { columns: [{ id: "name", header: "Name", sortable: true }] },
+    ],
+    ["settings", { settings: <DataViews.Settings /> }],
+  ])("is no tab stop before scripts run with a location and %s", (_, props) => {
+    expect(renderLocated(props)).toMatch(/<table[^>]* tabindex="-1"/);
+  });
+
+  it("is a tab stop before scripts run with a location and no link", () => {
+    expect(renderLocated({})).toMatch(/<table[^>]* tabindex="0"/);
+  });
+
+  it("is a tab stop before scripts run even where a row's cell holds a link", () => {
+    const Link = ({ value, rowId }: DisplayFieldCellProps) => (
+      <a href={`/machines/${rowId}`}>{String(value)}</a>
+    );
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    provider.refresh();
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        columns={[{ id: "name", header: "Name", cell: Link }]}
+      />,
+    );
+    expect(html).toContain('<a href="/machines/m-1">alpha</a>');
+    // A column's own content is not guessed: at worst one stop too many.
+    expect(html).toMatch(/<table[^>]* tabindex="0"/);
   });
 
   it("observes nothing on the server: the provider stays idle and the source is never asked", () => {

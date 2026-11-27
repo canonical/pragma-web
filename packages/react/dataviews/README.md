@@ -96,7 +96,7 @@ Each part renders a baseline before scripts run, and works once they do.
 The recipes, with consumer code and the live stories beside them, are the Storybook page **Documentation / Guides / Recipes** — source in [`src/docs/guides/Recipes.mdx`](src/docs/guides/Recipes.mdx):
 
 - **The connected parts** — one root, every part reading its provider; place them in any order and any wrapper.
-- **Your own words** — `<DataViews provider={provider} messages={{ search: "Rechercher", shownRows: ({ first, shown, total }) => … }}>`: the parts left out keep English, and a record typed `DataViewsMessages` replaces them all. Keep the record at module scope, or its functions stable: the root holds its words while their members stay the same.
+- **Your own words** — `<DataViews provider={provider} messages={{ search: "Rechercher", rowsShown: (first, shown, total) => … }}>`: the parts left out keep English, and a record typed `DataViewsMessages` replaces them all. Keep the record at module scope, or its functions stable: the root holds its words while their members stay the same.
 - **Keeping the query in the URL** — hand the provider a location and the URL is the query's other home, adopted before the first page is asked for; a refused link reports its reasons on `provider.issues`.
 
 The parts have recipe pages of their own: [`Filters.mdx`](src/lib/pattern/DataViews/common/controls/Filters/Filters.mdx), [`ActionBar.mdx`](src/lib/pattern/DataViews/common/controls/ActionBar/ActionBar.mdx), [`Pagination.mdx`](src/lib/pattern/DataViews/common/controls/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/subcomponent/PaginationBar/PaginationBar.mdx).

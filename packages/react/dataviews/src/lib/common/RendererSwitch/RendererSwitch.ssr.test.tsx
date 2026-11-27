@@ -94,7 +94,7 @@ describe("RendererSwitch SSR", () => {
       expect(regions).toHaveLength(1);
       const [table = ""] = regions;
       expect(table).toContain('aria-label="Table"');
-      expect(table).toContain('<table class="ds data-table dense"');
+      expect(table).toMatch(/<table[^>]* class="ds data-table dense"/);
       expect(markup).not.toContain('aria-label="Machines as cards"');
       // It draws the query: every third machine of nine failed.
       expect(table).toContain("host-003");

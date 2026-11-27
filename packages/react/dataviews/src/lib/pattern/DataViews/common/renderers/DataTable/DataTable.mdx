@@ -64,7 +64,7 @@ Every column shows the record field its id names; `field` names a different one.
 
 The recipes from here on keep the provider built above and change only the columns.
 
-A column is `fixed` — it keeps exactly its width — or `flex`: it takes at least its `minPx`, at most its `maxPx`, and a share of whatever is left by `weight`. The solver reserves every fixed width and every minimum first, then shares the rest; a column that reaches its maximum hands its excess back to the others. When even the reservations do not fit, nothing is squeezed: the table scrolls. A flexible last column takes whatever width the columns before it leave, up to its own maximum; the space past a capped or fixed last column is the table's, and stays empty rather than stretching a column past what it declares.
+A column is `fixed` — it keeps exactly its width — or `flex`: it takes at least its `minPx`, at most its `maxPx`, and a share of whatever is left by `weight`. The solver reserves every fixed width and every minimum first, then shares the rest; a column that reaches its maximum hands its excess back to the others. When even the reservations do not fit, nothing is squeezed: the table scrolls, and with nothing tabbable inside it is itself a Tab stop, so a keyboard scrolls it. A flexible last column takes whatever width the columns before it leave, up to its own maximum; the space past a capped or fixed last column is the table's, and stays empty rather than stretching a column past what it declares.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
@@ -116,6 +116,7 @@ To open on an order, issue it once the provider is built, before anything observ
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import type { Machine } from "./machines.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -123,12 +124,14 @@ const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];
 
+const nameMachine = (machine: Machine) => machine.name;
+
 <DataTable
   provider={provider}
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
 />;
 ```
 
@@ -169,7 +172,7 @@ import {
   useDataViewsCell,
   useDataViewsValue,
 } from "@canonical/dataviews-react";
-import { machineCollection } from "./machines.js";
+import { type Machine, machineCollection } from "./machines.js";
 
 function HostCell({ value }: DisplayFieldCellProps) {
   // The collection is the witness: the record is typed as a machine.
@@ -195,12 +198,14 @@ const columns: readonly DataTableColumn[] = [
   { id: "status", header: "Status" },
 ];
 
+const nameMachine = (machine: Machine) => machine.name;
+
 <DataTable
   provider={provider}
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
 />;
 ```
 
