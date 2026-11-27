@@ -49,6 +49,10 @@ export default defineConfig({
         extends: true,
         test: {
           name: "client",
+          // Test files share one page, so a file that moves focus would blur
+          // a control another file is driving (Firefox shows it): run the
+          // browser files one at a time.
+          fileParallelism: false,
           browser: {
             enabled: true,
             headless: true,
