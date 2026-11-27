@@ -67,6 +67,26 @@
       flex-direction: column;
       gap: 0;
       min-width: 0;
+
+      /* The content column is not a criticality surface: only the block's own
+         background, side bar and icon take the criticality colour. Unsetting
+         the criticality channels here means a control nested in the copy (a
+         Button, for example) reads its own neutral fallbacks for text, border,
+         focus ring, fills and icon instead of the criticality's. */
+      --modifier-color-border: initial;
+      --modifier-color-focus-ring: initial;
+      --modifier-color-foreground-checkbox-unselected: initial;
+      --modifier-color-foreground-input: initial;
+      --modifier-color-foreground-primary: initial;
+      --modifier-color-foreground-primary-disabled: initial;
+      --modifier-color-foreground-radio-unselected: initial;
+      --modifier-color-foreground-secondary: initial;
+      --modifier-color-icon: initial;
+      --modifier-color-icon-on-foreground-secondary: initial;
+      --modifier-color-text: initial;
+      --modifier-color-text-on-foreground-secondary: initial;
+      --modifier-color-text-onForegroundSecondary: initial;
+      --modifier-icon: initial;
     }
 
     & .heading {
