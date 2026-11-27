@@ -20,7 +20,7 @@ import "@canonical/styles";
 
 Or, from a stylesheet: `@import url("@canonical/styles");`.
 
-Each component brings its own stylesheet when you import it. The package stylesheet (field layout, input chrome, form tokens) is not imported by any component, so import it right after the styles:
+Each component brings its own stylesheet when you import it. The package stylesheet (field layout, input chrome, form tokens) also imports every component's own stylesheet, so import it right after the styles to get every component rule from the first paint:
 
 ```ts
 import "@canonical/react-ds-global-form/dist/esm/index.css";
@@ -30,9 +30,9 @@ Testing with Jest? `@canonical/react-ds-global`'s [Testing with Jest](../ds-glob
 
 ### How component CSS reaches the page
 
-This package puts CSS on the page two ways. `dist/esm/index.css` — the file the snippet above imports — is the package-level stylesheet: the `--form-*` token block, the field grid, the shared input chrome, and `density.css`, which sizes every control to the context and density cell on the root. Each component module then imports its own stylesheet (`import "./styles.css"`), so importing a component is what puts that component's CSS on the page; a bundler collects those imports into the application's CSS. Nothing here is injected at runtime, and a component you never import ships no CSS.
+This package puts CSS on the page two ways. `dist/esm/index.css` — the file the snippet above imports — is the package-level stylesheet: the `--form-*` token block, the field grid, the shared input chrome, and `density.css`, which sizes every control to the context and density cell on the root. It also imports every component's own stylesheet, so linking it gives every component rule from the first paint, before any JavaScript renders. Each component module also imports its own stylesheet (`import "./styles.css"`), so a component's CSS still reaches the page when the module does; a bundler collects those imports into the application's CSS. Nothing here is injected at runtime.
 
-The consequence is that the order a bundler happens to emit these sheets in is not something you can rely on, which is what the cascade layer below is for.
+The duplicate copies are harmless: both reach the build, and a minifier removes them. The order a bundler happens to emit these sheets in is not something you can rely on, which is what the cascade layer below is for.
 
 ### Every stylesheet is in `ds.components.global`
 
