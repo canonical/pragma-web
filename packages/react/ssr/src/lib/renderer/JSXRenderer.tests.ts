@@ -28,6 +28,21 @@ const asInternals = (
   >,
 ): JSXRendererInternals => renderer as unknown as JSXRendererInternals;
 
+/**
+ * Narrow `scriptElements` to the array the fixture guarantees. Every test that
+ * exercises `getScriptSourcesByType` constructs the renderer with an HTML
+ * shell, so the extractor always produces one; the guard turns that assumption
+ * into a crash rather than a silent `unknown`-typed access.
+ */
+function requireScriptElements(
+  props: ServerEntrypointProps<Record<string, unknown>>,
+): React.ReactElement[] {
+  if (!props.scriptElements) {
+    throw new Error("expected scriptElements for the HTML shell fixture");
+  }
+  return props.scriptElements;
+}
+
 const TestComponent: React.FC<
   ServerEntrypointProps<Record<string, unknown>>
 > = (props) => React.createElement("html", { lang: props.lang }, "Hello");
@@ -124,8 +139,9 @@ describe("JSXRenderer", () => {
         { htmlString: SAMPLE_HTML },
       );
       const props = asInternals(renderer).getComponentProps();
+      const scriptElements = requireScriptElements(props);
       const modules = asInternals(renderer).getScriptSourcesByType(
-        props.scriptElements,
+        scriptElements,
         "module",
       );
       expect(modules).toEqual(["/main.js"]);
@@ -139,7 +155,7 @@ describe("JSXRenderer", () => {
       );
       const props = asInternals(renderer).getComponentProps();
       const classic = asInternals(renderer).getScriptSourcesByType(
-        props.scriptElements,
+        requireScriptElements(props),
         "classic",
       );
       expect(classic).toEqual(["/legacy.js"]);
@@ -151,7 +167,7 @@ describe("JSXRenderer", () => {
       const renderer = new JSXRenderer(TestComponent, {}, { htmlString: html });
       const props = asInternals(renderer).getComponentProps();
       const classic = asInternals(renderer).getScriptSourcesByType(
-        props.scriptElements,
+        requireScriptElements(props),
         "classic",
       );
       expect(classic).toEqual(["/real.js"]);

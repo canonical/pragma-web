@@ -167,7 +167,7 @@ export default class Extractor {
   protected convertToReactElement(
     element: CollectedElement,
     index: number,
-  ): React.ReactElement {
+  ): React.ReactElement<Record<string, string>> {
     const props: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(element.attribs)) {
@@ -184,7 +184,7 @@ export default class Extractor {
    * Typically used to inject stylesheet and preload links into the
    * server-rendered `<head>`.
    */
-  public getLinkElements(): React.ReactElement[] {
+  public getLinkElements(): React.ReactElement<Record<string, string>>[] {
     return this.parsed.links.map((el, i) => this.convertToReactElement(el, i));
   }
 
@@ -194,7 +194,7 @@ export default class Extractor {
    * Preserving order is important: Vite dev mode emits module scripts
    * that depend on being evaluated in sequence.
    */
-  public getScriptElements(): React.ReactElement[] {
+  public getScriptElements(): React.ReactElement<Record<string, string>>[] {
     return this.parsed.scripts.map((el, i) =>
       this.convertToReactElement(el, i),
     );
@@ -207,7 +207,7 @@ export default class Extractor {
    * in the order they appeared in the HTML, preserving inter-type ordering (a `<meta>`
    * between two `<style>` tags stays between them).
    */
-  public getOtherHeadElements(): React.ReactElement[] {
+  public getOtherHeadElements(): React.ReactElement<Record<string, string>>[] {
     return this.parsed.others.map((el, i) => this.convertToReactElement(el, i));
   }
 }

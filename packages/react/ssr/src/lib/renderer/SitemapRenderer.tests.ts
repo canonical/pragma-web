@@ -17,6 +17,21 @@ interface SitemapRendererInternals {
 const asInternals = (renderer: SitemapRenderer): SitemapRendererInternals =>
   renderer as unknown as SitemapRendererInternals;
 
+/**
+ * Republishes the protected static helpers these tests exercise directly. A
+ * subclass may widen a member's visibility, so the helpers keep their real
+ * signatures without a cast.
+ */
+class ExposedSitemapRenderer extends SitemapRenderer {
+  static override escapeXml(value: string): string {
+    return SitemapRenderer.escapeXml(value);
+  }
+
+  static override formatDate(date: Date | string): string {
+    return SitemapRenderer.formatDate(date);
+  }
+}
+
 const BASE_CONFIG: SitemapConfig = {
   baseUrl: "https://example.com",
 };
@@ -150,27 +165,27 @@ describe("SitemapRenderer", () => {
 
   describe("escapeXml", () => {
     it("escapes ampersand", () => {
-      expect(SitemapRenderer.escapeXml("foo&bar")).toBe("foo&amp;bar");
+      expect(ExposedSitemapRenderer.escapeXml("foo&bar")).toBe("foo&amp;bar");
     });
 
     it("escapes less than", () => {
-      expect(SitemapRenderer.escapeXml("a<b")).toBe("a&lt;b");
+      expect(ExposedSitemapRenderer.escapeXml("a<b")).toBe("a&lt;b");
     });
 
     it("escapes greater than", () => {
-      expect(SitemapRenderer.escapeXml("a>b")).toBe("a&gt;b");
+      expect(ExposedSitemapRenderer.escapeXml("a>b")).toBe("a&gt;b");
     });
 
     it("escapes double quote", () => {
-      expect(SitemapRenderer.escapeXml('a"b')).toBe("a&quot;b");
+      expect(ExposedSitemapRenderer.escapeXml('a"b')).toBe("a&quot;b");
     });
 
     it("escapes single quote", () => {
-      expect(SitemapRenderer.escapeXml("a'b")).toBe("a&apos;b");
+      expect(ExposedSitemapRenderer.escapeXml("a'b")).toBe("a&apos;b");
     });
 
     it("escapes all special characters in a URL", () => {
-      expect(SitemapRenderer.escapeXml("/search?q=a&b=<c>")).toBe(
+      expect(ExposedSitemapRenderer.escapeXml("/search?q=a&b=<c>")).toBe(
         "/search?q=a&amp;b=&lt;c&gt;",
       );
     });
@@ -178,13 +193,13 @@ describe("SitemapRenderer", () => {
 
   describe("formatDate", () => {
     it("formats a Date object to YYYY-MM-DD", () => {
-      expect(SitemapRenderer.formatDate(new Date("2024-12-25T10:00:00Z"))).toBe(
-        "2024-12-25",
-      );
+      expect(
+        ExposedSitemapRenderer.formatDate(new Date("2024-12-25T10:00:00Z")),
+      ).toBe("2024-12-25");
     });
 
     it("formats an ISO string to YYYY-MM-DD", () => {
-      expect(SitemapRenderer.formatDate("2024-01-15T08:30:00Z")).toBe(
+      expect(ExposedSitemapRenderer.formatDate("2024-01-15T08:30:00Z")).toBe(
         "2024-01-15",
       );
     });

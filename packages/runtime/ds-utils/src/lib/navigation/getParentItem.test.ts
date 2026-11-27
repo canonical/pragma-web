@@ -1,9 +1,10 @@
+import type { Item } from "@canonical/ds-types";
 import { describe, expect, it } from "vitest";
 import { annotateTree } from "./annotateTree.js";
 import getParentItem from "./getParentItem.js";
 import { prepareIndex } from "./prepareIndex.js";
 
-const tree = {
+const tree: Item = {
   key: "root",
   label: "Root",
   items: [{ url: "/a", label: "A", items: [{ url: "/a/1", label: "A1" }] }],
