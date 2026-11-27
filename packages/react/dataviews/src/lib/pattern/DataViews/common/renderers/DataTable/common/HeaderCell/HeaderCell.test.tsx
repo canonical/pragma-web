@@ -7,6 +7,7 @@ import {
   createColumnLayout,
   createGridInteraction,
 } from "@canonical/dataviews-core/bindings";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import {
@@ -21,7 +22,6 @@ import {
 import {
   type HeaderCellCaseProps as CaseProps,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../../../../../../../testing/index.js";
 import HeaderCell from "./HeaderCell.js";
@@ -329,11 +329,10 @@ describe("HeaderCell", () => {
       });
       await openMenuFrom(trigger);
       // The stylesheet hides the reason while this button's menu is open.
-      expect(
-        getHeader().querySelector(
-          ':scope > .ds.data-table-header-menu[aria-expanded="true"]',
-        ),
-      ).toBe(trigger);
+      expect(trigger.parentElement).toBe(getHeader());
+      expect(trigger).toHaveClass("ds", "data-table-header-menu");
+      expect(trigger.nextElementSibling).toHaveClass("ds", "contextual-menu");
+      expect(trigger.nextElementSibling?.matches(":popover-open")).toBe(true);
       expect(getHeader().querySelector(":scope > .sort-reason")).not.toBeNull();
     });
   });

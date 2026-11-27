@@ -16,6 +16,7 @@ import {
   buildPage,
   createManualSource,
 } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import {
   act,
   fireEvent,
@@ -28,7 +29,6 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   createQuickFilterProvider,
   expectNoAxeViolations,
-  installPopoverStandIn,
   type QuickHost,
   quickHostCollection,
   quickHosts,

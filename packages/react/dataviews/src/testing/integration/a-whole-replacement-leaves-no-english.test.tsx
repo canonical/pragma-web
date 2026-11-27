@@ -8,6 +8,7 @@
 
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import {
   act,
   fireEvent,
@@ -33,7 +34,6 @@ import {
   createTokenMessages,
   declareMachineOrdering,
   findEnglish,
-  installPopoverStandIn,
   type MachineProvider,
   openMenuFrom,
 } from "../../../testing/index.js";

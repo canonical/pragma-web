@@ -1,1 +1,2 @@
-export { default } from "./SubMenu.js";
+export { default as SubMenu } from "./SubMenu.js";
+export type * from "./types.js";

@@ -7,6 +7,7 @@
  */
 
 import { createPage, DEFAULT_WINDOW } from "@canonical/dataviews-core";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -15,7 +16,6 @@ import {
   createMachineProvider,
   createMemoryViewStore,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   type Machine,
   type MachineProvider,
   openMenuFrom,

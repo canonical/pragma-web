@@ -8,12 +8,12 @@
  * was unmounted and mounted again. Every item now renders one shared label.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { act, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";

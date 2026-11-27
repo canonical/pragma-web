@@ -28,6 +28,7 @@ import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "@canonical/dataviews-core/testing";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import {
   act,
   cleanup,
@@ -57,7 +58,6 @@ import {
   elementAt,
   expectNoAxeViolations,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   MACHINE_CAPABILITIES,
   type Machine,
   type MachineFields,
@@ -1221,7 +1221,7 @@ describe("DataTable", () => {
     ).toEqual(["Move column left", "Move column right"]);
     expect(
       screen.getByRole("menuitem", { name: "Move column right" }),
-    ).toHaveClass("disabled");
+    ).toHaveAttribute("aria-disabled", "true");
   });
 
   it("offers no header menu on a column that can be neither sorted, hidden nor moved", async () => {
@@ -1252,7 +1252,7 @@ describe("DataTable", () => {
     await openMenuOf("Name");
     expect(
       screen.getByRole("menuitem", { name: "Move column left" }),
-    ).toHaveClass("disabled");
+    ).toHaveAttribute("aria-disabled", "true");
   });
 
   it("hides a column from its header menu, announces it, and hands focus to the heading now in its place", async () => {
@@ -1298,7 +1298,7 @@ describe("DataTable", () => {
     });
     await openMenuOf("Name");
     const hide = screen.getByRole("menuitem", { name: "Hide column" });
-    expect(hide).toHaveClass("disabled");
+    expect(hide).toHaveAttribute("aria-disabled", "true");
     fireEvent.click(hide);
     expect(provider.presentation.state.get().presentation).toEqual({
       "table.hidden": ["status"],
@@ -1321,7 +1321,7 @@ describe("DataTable", () => {
     await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     expect(
       screen.getByRole("menuitem", { name: "Reset table settings" }),
-    ).toHaveClass("disabled");
+    ).toHaveAttribute("aria-disabled", "true");
   });
 
   it("moves a column from its header menu, announcing where it stands, focus kept on its trigger, asking the source for nothing", async () => {

@@ -1,4 +1,3 @@
-export * from "./useContextualMenu/index.js";
 export * from "./useDelayedToggle/index.js";
 export * from "./useDisclosure/index.js";
 export * from "./useIsMounted/index.js";

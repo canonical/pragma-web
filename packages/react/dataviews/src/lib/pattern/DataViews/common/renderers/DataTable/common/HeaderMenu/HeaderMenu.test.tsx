@@ -1,10 +1,8 @@
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import {
-  installPopoverStandIn,
-  openMenuFrom,
-} from "../../../../../../../../../testing/index.js";
+import { openMenuFrom } from "../../../../../../../../../testing/index.js";
 import HeaderMenu from "./HeaderMenu.js";
 import type { HeaderMenuProps } from "./types.js";
 
@@ -69,7 +67,6 @@ describe("HeaderMenu", () => {
   it("holds a closed menu behind its button, named for the column", () => {
     mount();
     expect(findTrigger()).toHaveAttribute("aria-haspopup", "menu");
-    expect(findTrigger()).toHaveAttribute("aria-expanded", "false");
     expect(
       screen.queryByRole("menu", { hidden: true }),
     ).not.toBeInTheDocument();
@@ -121,7 +118,6 @@ describe("HeaderMenu", () => {
       "Move column left",
       "Move column right",
     ]);
-    expect(findTrigger()).toHaveAttribute("aria-expanded", "true");
   });
 
   it("offers remove only while the reader's ordering names the column", async () => {
@@ -150,7 +146,7 @@ describe("HeaderMenu", () => {
     await openMenu();
     const disabled = screen
       .getAllByRole("menuitem")
-      .filter((item) => item.classList.contains("disabled"))
+      .filter((item) => item.getAttribute("aria-disabled") === "true")
       .map((item) => item.textContent);
     expect(disabled).toEqual(["Hide column", "Move column left"]);
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));

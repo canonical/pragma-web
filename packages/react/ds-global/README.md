@@ -44,7 +44,7 @@ Components accept standard HTML attributes for their underlying elements. A `But
 ## Testing with Jest
 
 The packages are ES modules only, and each component imports its own stylesheet, which a Jest 29 + jsdom
-project does not follow without help. Four things are needed:
+project does not follow without help. Five things are needed:
 
 - **Transform the packages.** `transformIgnorePatterns` excludes `node_modules` from the transformer by
   default, and `@canonical` has to be let back through so that `ts-jest` (with `allowJs`) or `babel-jest`
@@ -58,8 +58,11 @@ project does not follow without help. Four things are needed:
   other `@canonical` package that fails the same way.
 - **Give jsdom a dialog.** jsdom implements `HTMLDialogElement` but not `showModal()` or `close()`, and
   `Modal` opens through `showModal()`, so the two methods are stubbed.
+- **Stand in for popovers.** Menus open as native popovers, which jsdom lacks: call
+  `installPopoverStandIn()` from `@canonical/react-ds-global/testing`, which also stubs `scrollIntoView`.
 
-With the stub in `tests/style-stub.js` and the dialog stub in `tests/setup.ts`, the configuration is:
+With the stub in `tests/style-stub.js`, and the dialog stub and the popover stand-in in `tests/setup.ts`, the
+configuration is:
 
 ```js
 /** @type {import('jest').Config} */
@@ -90,6 +93,10 @@ module.exports = {
 
 ```ts
 // tests/setup.ts
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
+
+installPopoverStandIn();
+
 if (typeof HTMLDialogElement !== "undefined") {
   const proto = HTMLDialogElement.prototype as any;
   if (!proto.showModal) {
@@ -116,8 +123,8 @@ module.exports = {};
 Vitest needs none of those pieces — no transform list, no stylesheet stub and no mapper — but two settings of
 its own. `test.server.deps.inline` keeps `@canonical` out of the externalised `node_modules` that Node loads
 directly and that cannot read a `.css` import, and `resolve.mainFields` adds `module`, the only entry field
-`@canonical/react-ds-app` publishes. The dialog stub is the same one, and in this repository's own suites it
-is declared in the test files that open a modal.
+`@canonical/react-ds-app` publishes. The dialog stub and the popover stand-in are the same, and in this
+repository's own suites each is set up in the test files that open a modal or a menu.
 
 ## Modifier Families
 
@@ -172,6 +179,7 @@ The manifest now carries an `exports` map, which is the list of paths this packa
 | `@canonical/react-ds-global/index.css` | the aggregate stylesheet above |
 | `@canonical/react-ds-global/dist/…` | any published file, by its exact path |
 | `@canonical/react-ds-global/package.json` | the manifest |
+| `@canonical/react-ds-global/testing` | test helpers, such as `installPopoverStandIn` |
 
 **This is a breaking change for anyone importing by a path the map does not answer.** Before, a package with no `exports` map let a resolver reach any file in the directory and, in most bundlers, guess at the rest — the extension you left off, or the `index.js` inside a folder you named. Two things stop working:
 

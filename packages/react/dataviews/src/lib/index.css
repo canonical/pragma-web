@@ -54,7 +54,4 @@
 @import url("./common/Announcer/styles.css");
 @import url("./common/AssistiveText/styles.css");
 @import url("./common/ConditionMark/styles.css");
-@import url("./common/DropdownButtonStandIn/common/Menu/styles.css");
-@import url("./common/DropdownButtonStandIn/common/MenuItem/styles.css");
-@import url("./common/DropdownButtonStandIn/common/Panel/styles.css");
 @import url("./common/IconButtonStandIn/styles.css");

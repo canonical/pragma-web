@@ -12,6 +12,7 @@
  * read otherwise, as regression 0014 found.
  */
 
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
   afterAll,
@@ -26,7 +27,6 @@ import {
   buildMachine,
   createMachineProvider,
   fakeAnnouncerClock,
-  installPopoverStandIn,
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";

@@ -398,7 +398,7 @@
   .ds.data-table-header-cell:where(
       :has(
         > .ds.data-table-resize-handle[data-mode="placing"],
-        > .ds.data-table-header-menu[aria-expanded="true"]
+        > .ds.data-table-header-menu + .ds.contextual-menu:popover-open
       )
     )
     > .sort-reason {

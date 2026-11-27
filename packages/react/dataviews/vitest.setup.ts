@@ -11,9 +11,3 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 }
 
 standInDialogs();
-
-// jsdom lays nothing out, so it has no scrollIntoView for a menu's focus move
-// to call. A suite on the node environment has no Element.
-if (typeof Element !== "undefined") {
-  Element.prototype.scrollIntoView = () => {};
-}

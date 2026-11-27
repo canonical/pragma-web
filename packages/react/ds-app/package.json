@@ -35,6 +35,7 @@
     "check:ts": "tsc --noEmit",
     "storybook": "storybook dev -p 6008 --no-open --host 0.0.0.0",
     "test": "bun run test:vitest",
+    "test:coverage": "vitest run --coverage",
     "test:vitest": "vitest run",
     "test:vitest:watch": "vitest"
   },

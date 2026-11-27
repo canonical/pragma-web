@@ -2,13 +2,12 @@
  * The chip a clause is shown, built or edited in: its Segments in order,
  * the Entry where the part being typed stands, and its words.
  */
+
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  installPopoverStandIn,
-} from "../../../../../../../../../testing/index.js";
+import { createMachineProvider } from "../../../../../../../../../testing/index.js";
 import { QueryInput } from "../../../../../../../component/QueryInput/index.js";
 import { QueryChips } from "../../../../../../../group/QueryChips/index.js";
 import DataViews from "../../../../../Provider.js";

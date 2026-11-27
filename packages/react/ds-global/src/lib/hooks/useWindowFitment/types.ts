@@ -1,6 +1,6 @@
 import type { CSSProperties, RefObject } from "react";
 
-export interface UseWindowFitmentProps {
+export interface UseWindowFitmentOptions {
   /**
    * Whether the popup should automatically fit into the viewport.
    * If true, the hook will try to fit the popup into the viewport if it doesn't fit in the preferred directions.
@@ -176,3 +176,12 @@ export interface BestPosition {
   fits: boolean;
   autoFitOffset: RelativePosition;
 }
+
+/** A physical placement: what the fitment core consumes. */
+export type PhysicalPlacement = {
+  direction: WindowFitmentDirection;
+  align: WindowFitmentAlign;
+};
+
+/** The hook's arguments: its options, all optional. */
+export type UseWindowFitmentProps = [options?: UseWindowFitmentOptions];

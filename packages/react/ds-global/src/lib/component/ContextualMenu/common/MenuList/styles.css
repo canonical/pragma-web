@@ -1,0 +1,22 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+@layer ds.components.global {
+  /* A separator entry draws the muted divider between sections (Figma:
+     color-border-muted, stroke-thickness-medium): a coloured border, with
+     the UA's <hr> margin reset. */
+  .ds.contextual-menu-list > .separator {
+    margin: 0;
+    border: none;
+    border-block-start: var(--contextual-menu-divider-width) solid
+      var(--contextual-menu-color-divider);
+  }
+
+  /* A separator beside a group of script-only items is shown with them,
+     once scripts run. */
+  .ds.contextual-menu-list > .separator.script-only {
+    display: none;
+
+    @media (scripting: enabled) {
+      display: block;
+    }
+  }
+}
