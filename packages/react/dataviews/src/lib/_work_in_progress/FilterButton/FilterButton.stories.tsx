@@ -303,11 +303,14 @@ export const OnToggle: StoryFn = () => {
 };
 OnToggle.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  await userEvent.click(canvas.getByRole("button", { name: "Status" }));
+  const trigger = canvas.getByRole("button", { name: "Status" });
+  await userEvent.click(trigger);
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("open"),
   );
-  await userEvent.keyboard("{Escape}");
+  // A browser light-dismisses a popover only on a trusted Escape, so the
+  // trigger closes it here.
+  await userEvent.click(trigger);
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("closed"),
   );
