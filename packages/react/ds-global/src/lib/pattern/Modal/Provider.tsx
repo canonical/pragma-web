@@ -18,14 +18,15 @@ const componentCssClassName = "ds modal";
  * instance, sending a delete request.
  *
  * It renders a native `<dialog>` opened with `showModal()`, so the backdrop,
- * focus trap, page inertness and Escape handling come from the platform rather
- * than from JavaScript. The modal is self-contained: the open state lives in
- * the `<dialog>` element, not in a prop, so the header's close button and
- * Escape close it — and a backdrop click too, once `closeOnBackdropClick` opts
- * in — without the consumer wiring anything. Opening always goes through the
- * `ref` — which is required, since `showModal()` is the only way in:
- * `ref.current?.showModal()` opens the modal and `ref.current?.close()`
- * closes it.
+ * page inertness and Escape handling come from the platform rather than from
+ * JavaScript. Focus moves into the dialog when it opens and cannot reach the
+ * page content behind it, though users can still tab out of the document. The
+ * modal is self-contained: the open state lives in the `<dialog>` element, not
+ * in a prop, so the header's close button and Escape close it — and a backdrop
+ * click too, once `closeOnBackdropClick` opts in — without the consumer wiring
+ * anything. Opening always goes through the `ref` — which is required, since
+ * `showModal()` is the only way in: `ref.current?.showModal()` opens the modal
+ * and `ref.current?.close()` closes it.
  *
  * A native dialog opened with `showModal()` renders in the browser's top
  * layer, so even under an ancestor with `overflow: hidden` the modal is not
