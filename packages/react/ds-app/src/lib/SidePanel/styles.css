@@ -131,11 +131,11 @@
       Two consequences worth knowing: the content pane is a scroll container,
       so it clips its descendants, and the `transform` below makes the panel the
       containing block for any `position: fixed` descendant. So an overlay that
-      escapes its box — ds-global's Popover and ContextualMenu position their
-      content with `position: fixed` — is both clipped and anchored to the
-      panel instead of the viewport. Documented in Provider.tsx; the fix belongs
-      upstream, in overlays that use the top layer rather than fixed
-      positioning.
+      escapes its box — ds-global's Popover positions its content with
+      `position: fixed` — is both clipped and anchored to the panel instead of
+      the viewport; ContextualMenu opens in the top layer and is not.
+      Documented in Provider.tsx; the fix belongs upstream, in overlays that
+      use the top layer rather than fixed positioning.
     */
 
     /*

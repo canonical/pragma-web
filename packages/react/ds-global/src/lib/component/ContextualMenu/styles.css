@@ -10,78 +10,88 @@
     --contextual-menu-divider-width: var(--dimension-stroke-thickness-medium);
     --contextual-menu-min-width: 12rem;
     --contextual-menu-max-width: 20rem;
+    /* A menu taller than the viewport scrolls inside itself. */
+    --contextual-menu-max-block-size: calc(100dvh - 2 * var(--space-200));
+    /* The gap between the trigger and the menu. */
+    --contextual-menu-offset: var(--space-050);
     /* Three-layer drop shadow from the Figma effect. */
     --contextual-menu-shadow:
       0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.15),
       0 0 3px 0 rgba(0, 0, 0, 0.2);
-    --contextual-menu-motion-duration: 0.12s;
+    --contextual-menu-motion-duration: var(--motion-duration-fast);
+    --contextual-menu-motion-easing: var(--motion-easing-standard);
+  }
+
+  /* The menu's popover: the browser draws it in the top layer, so it needs
+     no z-index and no ancestor clips it. It keeps the browser's margin,
+     which centres it where anchor positioning is missing. */
+  .ds.contextual-menu {
+    min-inline-size: var(--contextual-menu-min-width);
+    max-inline-size: var(--contextual-menu-max-width);
+    /* A menu taller than the viewport scrolls inside itself, and
+       the highlighted item scrolls into view on keyboard navigation. */
+    max-block-size: var(--contextual-menu-max-block-size);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0;
+    border: none;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    box-shadow: var(--contextual-menu-shadow);
   }
 
   .ds.contextual-menu {
-    display: inline-block;
-
-    > .trigger {
-      cursor: pointer;
-    }
-  }
-
-  .ds.contextual-menu__surface {
-    position: fixed;
-    z-index: var(--z-index-overlay, 100);
-    min-width: var(--contextual-menu-min-width);
-    max-width: var(--contextual-menu-max-width);
-    inline-size: 100%;
-    /* A menu (or submenu) taller than the viewport scrolls INSIDE itself instead
-       of overflowing off-screen — otherwise keyboard-navigating to an item below
-       the fold would move the highlight to an item that is not visible. The
-       highlighted item is scrolled into view on keyboard nav (see Item). */
-    max-block-size: calc(100dvh - 2 * var(--dimension-200, 16px));
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background-color: var(--color-background);
-    box-shadow: var(--contextual-menu-shadow);
-
-    /* CSS-only enter/exit animation. */
+    /* The fade in and out. display and overlay are discrete, so the menu
+       stays in the top layer until the fade out ends. */
     opacity: 0;
-    visibility: hidden;
     transition:
-      opacity var(--contextual-menu-motion-duration) ease-in-out,
-      visibility var(--contextual-menu-motion-duration) allow-discrete;
+      opacity var(--contextual-menu-motion-duration)
+      var(--contextual-menu-motion-easing),
+      display var(--contextual-menu-motion-duration) allow-discrete,
+      overlay var(--contextual-menu-motion-duration) allow-discrete;
 
-    &[aria-hidden="false"] {
+    &:popover-open {
       opacity: 1;
-      visibility: visible;
 
       @starting-style {
         opacity: 0;
       }
     }
 
-    /* A submenu mounts on open but is positioned a frame later; keep it hidden
-       until `data-positioned` so it never paints at the fallback top:0/left:0. */
-    &.submenu[aria-hidden="false"]:not([data-positioned="true"]) {
-      opacity: 0;
-      visibility: hidden;
-    }
-
     @media (prefers-reduced-motion: reduce) {
       transition: none;
     }
+  }
 
-    /* A separator entry draws the muted divider between sections (Figma:
-       color-border-muted, stroke-thickness-medium). Reset the UA's <hr> box —
-       the divider is a coloured border, not a margin-bearing rule. */
-    .separator {
-      margin: 0;
-      border: none;
-      border-block-start: var(--contextual-menu-divider-width, 1px) solid
-        var(--contextual-menu-color-divider);
+  /* Tethered under its trigger where the browser has anchor positioning;
+     the logical position-area mirrors in right-to-left text. Elsewhere the
+     menu keeps the browser's centred placement. */
+  @supports (anchor-name: --a) {
+    /* It opens on the roomier side and scrolls within the space its
+       position-area leaves (100%, less its block margins). */
+    .ds.contextual-menu {
+      inset: auto;
+      margin: var(--contextual-menu-offset) 0;
+      position-area: block-end span-inline-end;
+      position-try-fallbacks:
+        flip-block,
+        flip-inline,
+        flip-block flip-inline;
+      position-try-order: most-block-size;
+      max-block-size: min(
+        var(--contextual-menu-max-block-size),
+        100% -
+        2 *
+        var(--contextual-menu-offset)
+      );
     }
+  }
 
-    /* The submenu-anchor wraps a submenu-parent item for hover detection; it must
-       not disturb the vertical item flow, so it lays out like the item it wraps. */
-    .submenu-anchor {
-      display: block;
+  /* Before scripts run, hides a trigger whose menu holds only actions. It
+     hides rather than reveals: the trigger's display is its own. */
+  @media (scripting: none) {
+    .ds.contextual-menu-trigger.script-only:has(+ .ds.contextual-menu) {
+      display: none;
     }
   }
 }

@@ -4,91 +4,22 @@
   .ds.side-navigation-context-switcher {
     display: block;
 
-    /* ContextualMenu's own root — the dropdown field fills the wrapper
-       (its inline-block default is for inline placements; the rail is a
-       block column). */
-    & > .ds.contextual-menu {
-      display: block;
-      height: var(--dimension-400);
-
-      & > .trigger {
-        height: 100%;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        align-items: center;
-        width: 100%;
-        padding-block: var(--sidenav-icon-gap);
-        padding-inline: var(--sidenav-icon-gap);
-        box-sizing: border-box;
-        color: var(--color-text);
-        background: var(--color-foreground-input);
-        border: none;
-        border-block-end: var(--dimension-stroke-thickness-medium) solid
-          var(--color-border);
-        cursor: pointer;
-
-        &:hover {
-          background: var(--color-foreground-input-hover);
-        }
-
-        & > .row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: var(--sidenav-icon-gap);
-          width: 100%;
-        }
-      }
-    }
-
-    & .label {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    & .end.caret {
-      display: flex;
-      align-items: center;
-      color: var(--color-icon);
-      flex-shrink: 0;
-    }
+    /* The menu is no wider than the rail's content. */
+    --contextual-menu-max-width: calc(
+      var(--sidenav-rail-inline-size) -
+      2 *
+      var(--sidenav-inset-inline)
+    );
   }
 
-  .ds.contextual-menu-item {
-    /* The portaled menu items are styled structurally — this sheet's layer
-       (ds.components.apps) outranks the item's own (ds.components.global)
-       at equal specificity. Both classes are emitted only by this
-       component's renderer, so no other ContextualMenu on the page is
-       affected. */
-    /* A context: name + optional description + optional badge. */
-    & .content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 100%;
-      gap: var(--dimension-025);
+  /* Before scripts run the menu holds only actions. The trigger still
+     states the current context, as its own sheet keeps it shown; the
+     empty popover shows once scripts run, with the menu's own display. */
+  .ds.side-navigation-context-switcher > .ds.contextual-menu {
+    display: none;
 
-      & .description {
-        color: var(--color-text-muted);
-        font-size: var(--typography-text-secondary-font-size);
-      }
-
-      & > .badge {
-        position: absolute;
-        align-self: flex-end;
-      }
-      &.current .name {
-        font-weight: var(--typography-weight-medium);
-      }
-    }
-
-    /* The "create context" action: an icon + label row. */
-    & .create-context {
-      display: flex;
-      align-items: center;
-      gap: var(--dimension-100);
+    @media (scripting: enabled) {
+      display: revert-layer;
     }
   }
 }

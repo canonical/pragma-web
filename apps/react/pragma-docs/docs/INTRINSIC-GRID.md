@@ -93,8 +93,9 @@ toggle. Measured consequence: the five lens frames are byte-identical
 container-driven intrinsics) — and size containment of any axis establishes
 LAYOUT containment, so the canvas becomes the containing block for
 `position: fixed` and `position: absolute` descendants. Today's overlays
-(Tooltip, Popover, ContextualMenu) survive only because they portal to
-`document.body`, outside the canvas subtree; `TooltipArea` portals to
+(Tooltip, Popover) survive only because they portal to `document.body`,
+outside the canvas subtree, and ContextualMenu because it opens in the top
+layer; `TooltipArea` portals to
 `parentElement || document.body`, so a consumer passing an in-canvas
 `parentElement` gets canvas-relative fixed math. Any future bare in-canvas
 `position: fixed` element — a FAB, a floating inspector — silently anchors

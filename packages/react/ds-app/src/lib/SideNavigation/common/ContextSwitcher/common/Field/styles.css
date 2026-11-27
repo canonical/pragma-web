@@ -1,0 +1,47 @@
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+@layer ds.components.apps {
+  /* The dropdown field fills the switcher. This layer sits above the
+     menu's, so the field stays shown before scripts run. */
+  .ds.side-navigation-context-switcher-field {
+    height: var(--dimension-400);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    width: 100%;
+    padding-block: var(--sidenav-icon-gap);
+    padding-inline: var(--sidenav-icon-gap);
+    box-sizing: border-box;
+    color: var(--color-text);
+    background: var(--color-foreground-input);
+    border: none;
+    border-block-end: var(--dimension-stroke-thickness-medium) solid
+      var(--color-border);
+    cursor: pointer;
+  }
+
+  .ds.side-navigation-context-switcher-field:hover {
+    background: var(--color-foreground-input-hover);
+  }
+
+  .ds.side-navigation-context-switcher-field > .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sidenav-icon-gap);
+    width: 100%;
+  }
+
+  .ds.side-navigation-context-switcher-field > .row > .label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ds.side-navigation-context-switcher-field > .row > .end.caret {
+    display: flex;
+    align-items: center;
+    color: var(--color-icon);
+    flex-shrink: 0;
+  }
+}

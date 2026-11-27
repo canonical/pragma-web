@@ -17,10 +17,10 @@
     --contextual-menu-item-color-background-active: var(
       --color-foreground-ghost-active
     );
-    --contextual-menu-item-padding-block: var(--dimension-050);
-    --contextual-menu-item-padding-inline: var(--dimension-200);
+    --contextual-menu-item-padding-block: var(--space-050);
+    --contextual-menu-item-padding-inline: var(--space-200);
     /* 4px gap: icon<->text and text<->caret (per the spec). */
-    --contextual-menu-item-gap: var(--dimension-050);
+    --contextual-menu-item-gap: var(--space-050);
     /* De-emphasised slot text (badge / shortcut) — muted, matching
        KeyboardKey / Tabs. */
     --contextual-menu-item-slot-color: var(--color-text-muted);
@@ -50,6 +50,7 @@
       --typography-text-primary-line-height,
       var(--dimension-300)
     );
+    text-decoration: none;
     cursor: pointer;
     user-select: none;
 
@@ -108,11 +109,10 @@
       }
     }
 
-    &.disabled {
+    &[aria-disabled="true"] {
       color: var(--contextual-menu-item-color-text-disabled);
       background-color: var(--contextual-menu-item-color-background);
       cursor: not-allowed;
-      pointer-events: none;
 
       /* The slot follows the disabled text colour instead of staying muted. */
       > .slot {
@@ -121,10 +121,17 @@
     }
   }
 
-  /* Mirror the `›` caret glyph to `‹` for right-to-left reading. Keyed on any
-     `[dir="rtl"]` ANCESTOR of the item — which, because the menu is portalled to
-     the body, must be `<html>` or `<body>` (a wrapper `<div dir>` is escaped by
-     the portal). Set `dir="rtl"` on `<html>` (or `<body>`) and it mirrors. */
+  /* An item that acts only through a script is shown once scripts run. */
+  .ds.contextual-menu-item.script-only {
+    display: none;
+
+    @media (scripting: enabled) {
+      display: flex;
+    }
+  }
+
+  /* Mirror the `›` caret glyph to `‹` for right-to-left reading, keyed on any
+     `[dir="rtl"]` ancestor of the item. */
   [dir="rtl"] .ds.contextual-menu-item > .caret {
     transform: scaleX(-1);
   }

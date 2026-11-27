@@ -1,0 +1,38 @@
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+@layer ds.components.apps {
+  /* A context: its name, an optional description and an optional badge. */
+  .ds.side-navigation-context-switcher-item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: var(--dimension-025);
+
+    & > .description {
+      color: var(--color-text-muted);
+      font-size: var(--typography-text-secondary-font-size);
+    }
+
+    & > .badge {
+      position: absolute;
+      align-self: flex-end;
+    }
+  }
+
+  /* The current context's name is weighted. */
+  .ds.side-navigation-context-switcher-item-content.current > .name {
+    font-weight: var(--typography-weight-medium);
+  }
+
+  /* The "create context" action: an icon and its label in a row. A long
+     label wraps; the icon keeps its size. */
+  .ds.side-navigation-context-switcher-item-content.create {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--dimension-100);
+
+    & > .ds.icon {
+      flex-shrink: 0;
+    }
+  }
+}

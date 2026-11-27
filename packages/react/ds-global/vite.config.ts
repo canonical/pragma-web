@@ -12,6 +12,8 @@ const unitTest = reactTestConfig({
   // 100% over the parts that gate it; the rest of the package is unmeasured.
   coverage: {
     include: [
+      "src/lib/component/ContextualMenu/**/*.{ts,tsx}",
+      "src/lib/hooks/useWindowFitment/constants.ts",
       "src/lib/hooks/useWindowFitment/useWindowFitment.tsx",
       "src/lib/hooks/useWindowFitment/utils/**/*.ts",
       "testing/**/*.ts",

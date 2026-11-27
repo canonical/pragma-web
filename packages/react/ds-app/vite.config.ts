@@ -14,7 +14,13 @@ export default defineConfig({
     sourcemap: true,
   },
   test: reactTestConfig({
-    glob: "tests",
+    glob: ["test", "tests"],
+    ssr: true,
+    // 100% over the context switcher; the rest of the package is unmeasured.
+    coverage: {
+      include: ["src/lib/SideNavigation/common/ContextSwitcher/**/*.{ts,tsx}"],
+      exclude: ["**/*.stories.tsx", "**/index.ts", "**/types.ts"],
+    },
     setupFiles: ["./vitest.setup.ts"],
   }),
 });

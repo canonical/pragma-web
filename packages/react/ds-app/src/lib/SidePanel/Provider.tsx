@@ -65,9 +65,8 @@ const componentCssClassName = "ds side-panel";
  * `Popover` currently follows that pattern, so keep it within the content
  * pane's bounds.
  *
- * `ContextualMenu` instead portals its surface to `document.body`, escaping
- * this clipping. When it must overlap the panel, give its overlay layer a
- * z-index higher than `--side-panel-z-index`.
+ * `ContextualMenu` instead opens in the top layer, as a native popover,
+ * escaping this clipping and drawn above the panel.
  *
  * The panel's width comes from the `--side-panel-inline-size` custom
  * property, 465px by default.

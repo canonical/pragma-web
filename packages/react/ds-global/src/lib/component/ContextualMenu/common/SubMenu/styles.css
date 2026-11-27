@@ -1,0 +1,42 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+@layer ds.components.global {
+  /* A submenu shares its menu's top layer and surface. It is fixed, so the
+     menu's scrolling never clips it, and scrolls inside itself when tall. */
+  .ds.contextual-menu-submenu > .submenu {
+    position: fixed;
+    min-inline-size: var(--contextual-menu-min-width);
+    max-inline-size: var(--contextual-menu-max-width);
+    max-block-size: var(--contextual-menu-max-block-size);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    box-shadow: var(--contextual-menu-shadow);
+  }
+
+  /* A separator draws the menu's muted divider. */
+  .ds.contextual-menu-submenu > .submenu > .separator {
+    margin: 0;
+    border: none;
+    border-block-start: var(--contextual-menu-divider-width) solid
+      var(--contextual-menu-color-divider);
+  }
+
+  /* Beside its parent item where the browser has anchor positioning, on
+     the roomier side; the logical position-area mirrors in right-to-left
+     text. */
+  @supports (anchor-name: --a) {
+    .ds.contextual-menu-submenu > .submenu {
+      position-area: inline-end span-block-end;
+      position-try-fallbacks:
+        flip-inline,
+        flip-block,
+        flip-inline flip-block;
+      position-try-order: most-block-size;
+      max-block-size: min(var(--contextual-menu-max-block-size), 100%);
+    }
+  }
+}
