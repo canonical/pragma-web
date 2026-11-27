@@ -668,6 +668,7 @@ function createNavigationHarness(initialPath: string): AdapterHarness {
     destination: { url: string };
     canIntercept: boolean;
     hashChange: boolean;
+    downloadRequest: string | null;
     intercept(): void;
   }) => void;
   let navigateListener: NavigateListener | null = null;
@@ -677,6 +678,7 @@ function createNavigationHarness(initialPath: string): AdapterHarness {
       destination: { url },
       canIntercept: true,
       hashChange: false,
+      downloadRequest: null,
       intercept() {},
     });
   };

@@ -14,6 +14,7 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
         destination: { url: string };
         canIntercept: boolean;
         hashChange: boolean;
+        downloadRequest: string | null;
         intercept: (options?: FakeInterceptOptions) => void;
       }) => void)
     | null = null;
@@ -37,6 +38,7 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
           destination: { url: destination },
           canIntercept: true,
           hashChange: false,
+          downloadRequest: null,
           intercept: (interceptOptions?: FakeInterceptOptions) => {
             navigationWindow.lastInterceptOptions = interceptOptions;
           },
@@ -59,16 +61,18 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
     },
     lastInterceptOptions: undefined as FakeInterceptOptions | undefined,
     dispatchNavigate(nextHref: string, navigationType: string = "traverse") {
-      navigationWindow.location.href = nextHref;
+      // As in the browser, the navigate event fires before the URL changes.
       navigateListener?.({
         navigationType,
         destination: { url: nextHref },
         canIntercept: true,
         hashChange: false,
+        downloadRequest: null,
         intercept: (options?: FakeInterceptOptions) => {
           navigationWindow.lastInterceptOptions = options;
         },
       });
+      navigationWindow.location.href = nextHref;
     },
     dispatchNavigateRaw(
       event: Parameters<NonNullable<typeof navigateListener>>[0],
@@ -133,7 +137,7 @@ describe("createNavigationAdapter (Navigation API)", () => {
     );
   });
 
-  it("intercepts push and replace events without notifying subscribers", () => {
+  it("intercepts push and replace events the router did not start", () => {
     const navigationWindow = createFakeNavigationWindow();
     const adapter = createNavigationAdapter(navigationWindow);
     const listener = vi.fn<(location: string | URL) => void>();
@@ -142,9 +146,38 @@ describe("createNavigationAdapter (Navigation API)", () => {
     navigationWindow.dispatchNavigate("https://example.com/push", "push");
     navigationWindow.dispatchNavigate("https://example.com/replace", "replace");
 
-    // Push/replace events are intercepted (preventing full reload) but don't
-    // notify subscribers — the router's navigate() method handles notification.
-    expect(listener).toHaveBeenCalledTimes(0);
+    // A plain link's push or replace is intercepted so the browser does not
+    // reload, and the router follows the destination the event names.
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ pathname: "/push" }),
+    );
+    expect(listener).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ pathname: "/replace" }),
+    );
+  });
+
+  it("leaves download navigations to the browser", () => {
+    const navigationWindow = createFakeNavigationWindow();
+    const adapter = createNavigationAdapter(navigationWindow);
+    const listener = vi.fn<(location: string | URL) => void>();
+    const intercept = vi.fn();
+
+    adapter.subscribe(listener);
+
+    navigationWindow.dispatchNavigateRaw({
+      navigationType: "push",
+      destination: { url: "https://example.com/api/finance/export.zip" },
+      canIntercept: true,
+      hashChange: false,
+      downloadRequest: "export.zip",
+      intercept,
+    });
+
+    expect(intercept).not.toHaveBeenCalled();
+    expect(listener).not.toHaveBeenCalled();
   });
 
   it("ignores hash-change navigate events", () => {
@@ -159,6 +192,7 @@ describe("createNavigationAdapter (Navigation API)", () => {
       destination: { url: "https://example.com/#section" },
       canIntercept: true,
       hashChange: true,
+      downloadRequest: null,
       intercept: vi.fn(),
     });
 
