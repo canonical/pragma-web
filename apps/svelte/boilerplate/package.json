@@ -1,0 +1,49 @@
+{
+  "name": "@canonical/svelte-boilerplate",
+  "private": true,
+  "version": "0.47.0",
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "build:all": "bun run build",
+    "build:spa": "APP_SPA=1 vite build && node scripts/copy-spa-assets.js",
+    "build:storybook": "storybook build",
+    "storybook": "storybook dev -p 6009 --no-open",
+    "preview": "node build/index.js",
+    "check": "APP_SPA=1 svelte-kit sync && APP_SPA=1 svelte-check --tsconfig ./tsconfig.spa.json && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:fix": "bun run check",
+    "test": "bun run build:spa && bun run build:storybook && node --test test/spa.test.js && bun run build && node --test test/app.test.js"
+  },
+  "dependencies": {
+    "@canonical/ds-assets": "^0.47.0",
+    "@canonical/i18n-core": "^0.47.0",
+    "@canonical/styles": "^0.47.0",
+    "@canonical/svelte-ds-app": "^0.47.0",
+    "@canonical/svelte-ds-global-form": "^0.47.0",
+    "@canonical/svelte-ds-global": "^0.47.0"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "5.5.4",
+    "@sveltejs/adapter-static": "3.0.10",
+    "@sveltejs/kit": "2.70.3",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@canonical/storybook-config": "^0.47.0",
+    "@storybook/addon-svelte-csf": "^5.1.3",
+    "@storybook/sveltekit": "^10.6.0",
+    "@types/node": "^26.0.0",
+    "playwright": "^1.61.1",
+    "svelte": "5.57.3",
+    "svelte-check": "^4.4.5",
+    "storybook": "^10.6.0",
+    "typescript": "~6.0.3",
+    "vite": "8.3.5"
+  },
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
+  },
+  "nx": {
+    "tags": ["playwright"]
+  }
+}
