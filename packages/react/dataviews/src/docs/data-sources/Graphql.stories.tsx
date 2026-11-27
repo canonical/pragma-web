@@ -180,6 +180,7 @@ export const Failed: Story = {
  * answering the query, under the reason the endpoint gives.
  */
 export const FailedOverKeptRows: Story = {
+  name: "Failed over kept rows",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -215,6 +216,7 @@ export const FailedOverKeptRows: Story = {
  * before sending it and says why, rather than answering another page.
  */
 export const UnreachablePage: Story = {
+  name: "Unreachable page",
   parameters: code,
   render: function RenderUnreachablePage(args) {
     const [location] = useState(() =>
@@ -244,6 +246,7 @@ export const UnreachablePage: Story = {
  * control named `name__contains`, and a submission reaches the same query.
  */
 export const TextApplied: Story = {
+  name: "Text applied",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -281,6 +284,7 @@ export const TextApplied: Story = {
  * machine that is not failed.
  */
 export const CountsAndNoneOf: Story = {
+  name: "Counts and none of",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -326,6 +330,7 @@ export const CountsAndNoneOf: Story = {
  * contains and nothing else. `EX:I` keeps the machine owned by `ex:ivy`.
  */
 export const StartsWithApplied: Story = {
+  name: "Starts with applied",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines

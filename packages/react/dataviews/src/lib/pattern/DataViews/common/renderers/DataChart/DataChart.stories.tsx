@@ -96,6 +96,7 @@ function MachineChart({
  * are in the table that follows the drawing.
  */
 export const StatusCounts: Story = {
+  name: "Status counts",
   render: ({ type, field, label, messages }) => (
     <MachineChart
       type={type}
@@ -126,6 +127,7 @@ export const StatusCounts: Story = {
  * the field's declared minimum. Both values are in the table that follows.
  */
 export const CoresRange: Story = {
+  name: "Cores range",
   args: { type: "range", field: "cores", label: "Cores" },
   render: ({ type, field, label, messages }) => (
     <MachineChart
@@ -177,6 +179,7 @@ function CountsBesideFiltersMachines({
  * screen.
  */
 export const CountsBesideFilters: Story = {
+  name: "Counts beside filters",
   decorators: [
     withMachineRoot({ query: "page=1&size=5", facets: ["status", "cores"] }),
   ],
@@ -240,6 +243,7 @@ function RangeBesideFiltersMachines({
  * every machine the query matches.
  */
 export const RangeBesideFilters: Story = {
+  name: "Range beside filters",
   args: { type: "range", field: "cores", label: "Cores" },
   decorators: [withMachineRoot({ facets: ["status", "cores"] })],
   render: ({ label }) => <RangeBesideFiltersMachines label={label} />,
@@ -298,6 +302,7 @@ const withRestBackedRoot = (query?: string): Decorator =>
  * matches, and the chart draws what it answers.
  */
 export const CountsRestBacked: Story = {
+  name: "Counts REST backed",
   decorators: [withRestBackedRoot("page=1&size=5")],
   render: ({ label }) => (
     <ConnectedChart type="bar" field="status" label={label} />
@@ -321,6 +326,7 @@ export const CountsRestBacked: Story = {
  * matches, and the chart draws the range it answers.
  */
 export const RangeRestBacked: Story = {
+  name: "Range REST backed",
   args: { type: "range", field: "cores", label: "Cores" },
   decorators: [withRestBackedRoot()],
   render: ({ label }) => (

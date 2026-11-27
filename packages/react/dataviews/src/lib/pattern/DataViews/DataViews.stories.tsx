@@ -85,6 +85,7 @@ function MachineCount(): ReactElement {
  * table that shows them.
  */
 export const OwnChild: Story = {
+  name: "Own child",
   parameters: showConsumerCode({
     parts: [
       "DataViews",

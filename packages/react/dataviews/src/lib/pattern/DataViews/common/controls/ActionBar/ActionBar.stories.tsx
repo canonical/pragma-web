@@ -220,6 +220,7 @@ const selectTwo = `provider.selection.add(["m-02", "m-06"]);`;
  * appears with the first selection.
  */
 export const NothingSelected: Story = {
+  name: "Nothing selected",
   parameters: spellActionsCode(),
   decorators: [withManagedMachines()],
   render: () => <ManagedMachines />,
@@ -239,6 +240,7 @@ export const NothingSelected: Story = {
  * with what it clears. It renders on the design system's contrasted surface.
  */
 export const TwoSelected: Story = {
+  name: "Two selected",
   parameters: spellActionsCode({ prepare: selectTwo }),
   decorators: [withManagedMachines(["m-02", "m-06"])],
   render: () => <ManagedMachines />,
@@ -257,6 +259,7 @@ export const TwoSelected: Story = {
  * The count is the whole selection, not the rows on screen.
  */
 export const SelectedAcrossPages: Story = {
+  name: "Selected across pages",
   parameters: spellActionsCode({
     prepare: `provider.selection.add(["m-02", "m-09"]);`,
   }),
@@ -302,6 +305,7 @@ function MachinesSelected() {
  * persistent selection panel ships, its trigger takes this place.
  */
 export const CustomIndicator: Story = {
+  name: "Custom indicator",
   parameters: spellActionsCode({
     prepare: selectTwo,
     indicator: " indicator={<MachinesSelected />}",

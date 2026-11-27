@@ -69,6 +69,7 @@ export const Wrapping: Story = {
 
 /** Named by a visible heading through `aria-labelledby`. */
 export const NamedByHeading: Story = {
+  name: "Named by heading",
   render: () => (
     <section>
       <h2 id="applied-filters">Applied filters</h2>
@@ -79,6 +80,7 @@ export const NamedByHeading: Story = {
 
 /** The markup a server sends before any script runs. */
 export const WithoutScripts: Story = {
+  name: "Without scripts",
   decorators: [withServerMarkup],
   render: (args) => <Component {...args} />,
 };

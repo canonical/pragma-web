@@ -133,6 +133,7 @@ export const Default: Story = {
  * not a draft of it — there is no second query to apply or keep in step.
  */
 export const ChoiceApplied: Story = {
+  name: "Choice applied",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -150,6 +151,7 @@ export const ChoiceApplied: Story = {
 
 /** A bound applied: machines with at least sixteen cores. */
 export const BoundApplied: Story = {
+  name: "Bound applied",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -180,6 +182,7 @@ const twoLowerBounds = "cores__gte=16&cores__gte__1=4";
  * carries the restriction through the form.
  */
 export const FurtherConjunctsApplied: Story = {
+  name: "Further conjuncts applied",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -208,6 +211,7 @@ export const FurtherConjunctsApplied: Story = {
  * filtering the rows.
  */
 export const InvalidEditKeepsTheRestriction: Story = {
+  name: "Invalid edit keeps the restriction",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -236,6 +240,7 @@ export const InvalidEditKeepsTheRestriction: Story = {
  * does nothing.
  */
 export const UndeclaredField: Story = {
+  name: "Undeclared field",
   parameters: showConsumerCode({
     parts,
     coreTypes: ["Source"],
@@ -285,6 +290,7 @@ const facets = ["status", "cores"] as const;
  * and each end of the range its bound.
  */
 export const CountsBesideOptions: Story = {
+  name: "Counts beside options",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -315,6 +321,7 @@ const noneFailed = "status__isNone=failed";
  * not failed, shown as the none-of set. It moves back to any-of in one step.
  */
 export const NoneOfApplied: Story = {
+  name: "None of applied",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -350,6 +357,7 @@ const primaryComposition = `<DataViews provider={provider}>
  * rather than hiding what filters the rows.
  */
 export const PrimaryFilters: Story = {
+  name: "Primary filters",
   args: { primary: ["status"] },
   parameters: showConsumerCode({
     parts,
@@ -423,6 +431,7 @@ const newOperators =
  * both. Presence is filtered either way: Has a value, or Has no value.
  */
 export const NewOperators: Story = {
+  name: "New operators",
   args: {
     labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
   },
@@ -477,6 +486,7 @@ export const NewOperators: Story = {
  * it, and moves under More filters once focus leaves.
  */
 export const PresenceOutsideThePrimaryFilters: Story = {
+  name: "Presence outside the primary filters",
   args: {
     primary: ["name"],
     labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
@@ -544,7 +554,7 @@ const newOperatorsWithoutScripts =
  * as one with scripting disabled shows it.
  */
 export const NoJavaScriptMemoryFilters: Story = {
-  name: "No JavaScript, memory: Filters",
+  name: "No JavaScript, memory",
   args: {
     labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
   },

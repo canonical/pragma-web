@@ -120,4 +120,5 @@ export const RightToLeft: StoryFn = () => (
     <TagWords />
   </Component.Grid>
 );
+RightToLeft.storyName = "Right to left";
 RightToLeft.decorators = [withRightToLeft];

@@ -147,6 +147,7 @@ export const Conditions: StoryFn = () => (
 
 /** The panel stays open while its checkboxes change. */
 export const CheckboxList: StoryFn = () => <StatusFilter />;
+CheckboxList.storyName = "Checkbox list";
 CheckboxList.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const trigger = canvas.getByRole("button", { name: "Status" });
@@ -199,6 +200,7 @@ export const LongList: StoryFn = () => {
     </Component>
   );
 };
+LongList.storyName = "Long list";
 LongList.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "Pool" }));
@@ -256,6 +258,7 @@ Density.parameters = { baseline: true };
 export const RightToLeft: StoryFn = () => (
   <StatusFilter condition="exclusion" initial={["deployed", "ready"]} />
 );
+RightToLeft.storyName = "Right to left";
 RightToLeft.decorators = [withRightToLeft];
 
 /**
@@ -283,6 +286,7 @@ export const WithoutScripts: StoryFn = () => (
     </form>
   </Component>
 );
+WithoutScripts.storyName = "Without scripts";
 WithoutScripts.decorators = [withServerMarkup];
 
 /** `onToggle` hears the panel open and close, however it happens. */
@@ -302,6 +306,7 @@ export const OnToggle: StoryFn = () => {
     </div>
   );
 };
+OnToggle.storyName = "On toggle";
 OnToggle.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const trigger = canvas.getByRole("button", { name: "Status" });
@@ -331,6 +336,7 @@ export const PanelRef: StoryFn = () => {
     </div>
   );
 };
+PanelRef.storyName = "Panel ref";
 PanelRef.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(

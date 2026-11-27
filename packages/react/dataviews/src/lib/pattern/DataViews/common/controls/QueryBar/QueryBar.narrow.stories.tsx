@@ -27,7 +27,7 @@ export default meta;
 type Story = StoryObj<BarStoryArgs>;
 
 /**
- * Mobile: below a container width of 37.5rem the chips give way to the
+ * Narrow: below a container width of 37.5rem the chips give way to the
  * search-only entry and a summary button, "Filters, 2 applied", which
  * opens the sheet: the applied chips, "Add filter" and the filters form,
  * every change applying at once, behind which the rows update. The bar
@@ -46,11 +46,11 @@ export const Narrow: Story = {
 };
 
 /**
- * Mobile, the sheet open: the summary button pressed, then "Add filter",
+ * The sheet open: the summary button pressed, then "Add filter",
  * and a field chosen, so the sheet shows its operator step.
  */
 export const SheetOpen: Story = {
-  name: "Mobile: the sheet open",
+  name: "The sheet open",
   render: renderBarWith({ query: NARROW_QUERY, inlineSize: PHONE_SIZE }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -75,11 +75,11 @@ export const SheetOpen: Story = {
 };
 
 /**
- * Mobile, rows selected: the action bar over the selection stands above
+ * Rows selected: the action bar over the selection stands above
  * the narrow bar, and neither pushes the page wider than the frame.
  */
 export const RowsSelected: Story = {
-  name: "Mobile, rows selected",
+  name: "Rows selected",
   render: renderBarWith({
     query: NARROW_QUERY,
     inlineSize: PHONE_SIZE,
@@ -95,13 +95,13 @@ export const RowsSelected: Story = {
 };
 
 /**
- * No JavaScript, with an address, narrow: the server's markup at 22.5rem.
+ * No JavaScript, with an address: the server's markup at 22.5rem.
  * The summary button opens the sheet through its invoker command, with no
  * script; inside, each chip's remove control and Clear all are links, and
  * Apply submits the filters' GET form, which keeps the search.
  */
 export const NoJavaScriptHref: Story = {
-  name: "No JavaScript, with an address, narrow",
+  name: "No JavaScript, with an address",
   render: (args) => (
     <ServerRenderedBar
       {...args}

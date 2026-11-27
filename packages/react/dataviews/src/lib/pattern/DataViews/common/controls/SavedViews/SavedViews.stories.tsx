@@ -160,6 +160,7 @@ const open = async (canvas: Canvas, name: string): Promise<void> => {
  * and the pagination bar all follow it.
  */
 export const SavedViews: Story = {
+  name: "Saved views",
   parameters,
   render: (args) => (
     <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
@@ -181,6 +182,7 @@ export const SavedViews: Story = {
  * query under it and opens the new view.
  */
 export const SaveAsANewView: Story = {
+  name: "Save as a new view",
   parameters,
   render: (args) => (
     <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
@@ -241,6 +243,7 @@ function AnotherTab({
  * the stored query.
  */
 export const AConflictBetweenTabs: Story = {
+  name: "A conflict between tabs",
   parameters,
   render: function RenderAConflictBetweenTabs(args) {
     const { store, openAnotherTab } = useStoryViewStore({
@@ -285,6 +288,7 @@ export const AConflictBetweenTabs: Story = {
  * Enter deletes nothing. Once deleted, the view goes and its query stays.
  */
 export const DeletingAView: Story = {
+  name: "Deleting a view",
   parameters,
   render: (args) => (
     <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
@@ -321,6 +325,7 @@ const wideHosts: ViewDraft = {
  * sets that arrangement over the one the columns declare.
  */
 export const AViewsArrangement: Story = {
+  name: "A view's arrangement",
   parameters,
   render: (args) => (
     <SavedMachines {...pickStoryWords(args)} seed={[wideHosts]} />
@@ -361,6 +366,7 @@ const refusedStorage: IndexedDBFactory = {
  * before; nothing is kept in memory and passed off as saved.
  */
 export const StorageUnavailable: Story = {
+  name: "Storage unavailable",
   parameters,
   render: (args) => (
     <SavedMachines {...pickStoryWords(args)} indexedDB={refusedStorage} />
@@ -384,6 +390,7 @@ export const StorageUnavailable: Story = {
  * in the link; the view itself stays in this browser.
  */
 export const WithTheQueryInTheUrl: Story = {
+  name: "With the query in the URL",
   parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],

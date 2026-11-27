@@ -142,6 +142,7 @@ export const Default: Story = {
 
 /** A number field's range in place of the counts, with the same table. */
 export const RangeOrTable: Story = {
+  name: "Range or table",
   render: (args) => (
     <MachineChartWithTable
       {...pickStoryWords(args)}
@@ -192,6 +193,7 @@ function BesideFiltersMachines(): ReactElement {
  * lifts its own field's filter.
  */
 export const BesideFilters: Story = {
+  name: "Beside filters",
   decorators: [
     withMachineRoot({
       query: "page=1&size=5",

@@ -75,6 +75,7 @@ Default.play = async ({ canvasElement }) => {
 
 /** Choose a field, an operator and a value, and the chip is complete. */
 export const BuildAChip: StoryFn = () => <QueryBuilder />;
+BuildAChip.storyName = "Build a chip";
 BuildAChip.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.type(findEntry(canvasElement), "status");
@@ -97,6 +98,7 @@ BuildAChip.play = async ({ canvasElement }) => {
  * replaces it, and Enter applies it.
  */
 export const EditAChip: StoryFn = () => <QueryBuilder initial={DEPLOYED} />;
+EditAChip.storyName = "Edit a chip";
 EditAChip.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "deployed" }));
@@ -125,6 +127,7 @@ EditAChip.play = async ({ canvasElement }) => {
 export const RemoveAChip: StoryFn = () => (
   <QueryBuilder initial={DEPLOYED_AND_GPU} />
 );
+RemoveAChip.storyName = "Remove a chip";
 RemoveAChip.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(
@@ -154,6 +157,7 @@ RemoveAChip.play = async ({ canvasElement }) => {
 export const RemoveAnotherChipMidEdit: StoryFn = () => (
   <QueryBuilder initial={DEPLOYED_AND_GPU} />
 );
+RemoveAnotherChipMidEdit.storyName = "Remove another chip mid-edit";
 RemoveAnotherChipMidEdit.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "deployed" }));
@@ -189,6 +193,7 @@ Clear.play = async ({ canvasElement }) => {
  * Tab, and remove it with Delete.
  */
 export const KeyboardOnly: StoryFn = () => <QueryBuilder />;
+KeyboardOnly.storyName = "Keyboard only";
 KeyboardOnly.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const entry = findEntry(canvasElement);
@@ -244,6 +249,7 @@ KeyboardOnly.play = async ({ canvasElement }) => {
 
 /** Escape, once the list is closed, drops a draft, and focus returns to the entry. */
 export const AbandonADraft: StoryFn = () => <QueryBuilder />;
+AbandonADraft.storyName = "Abandon a draft";
 AbandonADraft.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.type(findEntry(canvasElement), "sta");
@@ -259,6 +265,7 @@ AbandonADraft.play = async ({ canvasElement }) => {
  * back, and focus returns to the part the Entry was on.
  */
 export const CancelAnEdit: StoryFn = () => <QueryBuilder initial={DEPLOYED} />;
+CancelAnEdit.storyName = "Cancel an edit";
 CancelAnEdit.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "status" }));
@@ -283,6 +290,7 @@ CancelAnEdit.play = async ({ canvasElement }) => {
  * offers fields again.
  */
 export const LeaveADraft: StoryFn = () => <QueryBuilder />;
+LeaveADraft.storyName = "Leave a draft";
 LeaveADraft.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const entry = findEntry(canvasElement);
@@ -301,6 +309,7 @@ LeaveADraft.play = async ({ canvasElement }) => {
  * as text: a chip keeps one Segment.
  */
 export const TabOutOfADraft: StoryFn = () => <QueryBuilder />;
+TabOutOfADraft.storyName = "Tab out of a draft";
 TabOutOfADraft.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.type(findEntry(canvasElement), "status");
@@ -344,6 +353,7 @@ export const EndEditOnBlur: StoryFn = () => (
     <button type="button">Elsewhere</button>
   </div>
 );
+EndEditOnBlur.storyName = "End edit on blur";
 EndEditOnBlur.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "deployed" }));
@@ -373,6 +383,7 @@ EndEditOnBlur.play = async ({ canvasElement }) => {
 export const LeaveToThePage: StoryFn = () => (
   <QueryBuilder initial={DEPLOYED} />
 );
+LeaveToThePage.storyName = "Leave to the page";
 LeaveToThePage.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   const leaveToThePage = async () => {
@@ -492,6 +503,7 @@ export const HiddenChips: StoryFn = () => (
     <p>Content after the field, which the focused field overlays.</p>
   </div>
 );
+HiddenChips.storyName = "Hidden chips";
 HiddenChips.play = async ({ canvasElement }) => {
   const field = canvasElement.querySelector(".field") as HTMLElement;
   const row = field.getBoundingClientRect();
@@ -518,6 +530,7 @@ export const AtTheBottom: StoryFn = () => (
     <QueryBuilder />
   </div>
 );
+AtTheBottom.storyName = "At the bottom";
 AtTheBottom.play = async ({ canvasElement }) => {
   const entry = findEntry(canvasElement);
   await userEvent.click(entry);
@@ -544,6 +557,7 @@ export const OnASurface: StoryFn = () => (
     <QueryBuilder />
   </div>
 );
+OnASurface.storyName = "On a surface";
 
 /** Density comes from the scope. */
 export const Density: StoryFn = () => (
@@ -565,6 +579,7 @@ export const WithoutScripts: StoryFn = () => (
     <TextHost name="q" clearHref="?" clearLabel="Clear filters and search" />
   </form>
 );
+WithoutScripts.storyName = "Without scripts";
 WithoutScripts.decorators = [withServerMarkup];
 
 /**
@@ -575,4 +590,5 @@ WithoutScripts.decorators = [withServerMarkup];
 export const WithoutAddresses: StoryFn = () => (
   <TextHost onClear={() => {}} clearLabel="Clear filters and search" />
 );
+WithoutAddresses.storyName = "Without addresses";
 WithoutAddresses.decorators = [withServerMarkup];

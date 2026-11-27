@@ -409,6 +409,7 @@ export const Removable: Story = {
  * chip's first Segment, or onto its Entry while it holds one.
  */
 export const InRovingContext: Story = {
+  name: "In roving context",
   render: () => (
     <Toolbar initial="status">
       <Component
@@ -455,6 +456,7 @@ export const InRovingContext: Story = {
 
 /** In a right-to-left context, the parts and the remove control mirror. */
 export const RTL: Story = {
+  name: "Right to left",
   decorators: [withRightToLeft],
   args: {
     children: (
@@ -475,6 +477,7 @@ export const RTL: Story = {
  * button where it does not.
  */
 export const WithoutScripts: Story = {
+  name: "Without scripts",
   decorators: [withServerMarkup],
   render: () => (
     <div style={column}>

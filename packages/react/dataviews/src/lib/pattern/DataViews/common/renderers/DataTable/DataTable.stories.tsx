@@ -314,6 +314,7 @@ export const Sortable: Story = {
  * machines of one status keep the source's order among themselves.
  */
 export const SortedAscending: Story = {
+  name: "Sorted ascending",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
@@ -367,6 +368,7 @@ export const SortedAscending: Story = {
  * at ascending.
  */
 export const SortedDescending: Story = {
+  name: "Sorted descending",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
@@ -399,6 +401,7 @@ export const SortedDescending: Story = {
  * Shift still sorts by that column alone.
  */
 export const SortLimitedToOneTerm: Story = {
+  name: "Sort limited to one term",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: oneTermColumnsCode,
@@ -448,6 +451,7 @@ const sortByStatusThenCores = (provider: MachineProvider): void => {
  * one heading ever claims it.
  */
 export const SortedByTwoTerms: Story = {
+  name: "Sorted by two terms",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
@@ -481,6 +485,7 @@ export const SortedByTwoTerms: Story = {
  * own; clearing it returns to this.
  */
 export const DefaultOrdering: Story = {
+  name: "Default ordering",
   parameters: showConsumerCode({
     parts: [...tableParts, "createArraySource"],
     declarations: `const source = createArraySource({
@@ -556,6 +561,7 @@ export const Selectable: Story = {
  * alone. It never reaches a row the reader cannot see.
  */
 export const SelectAllActsOnDisplayedRows: Story = {
+  name: "Select all acts on displayed rows",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
@@ -590,6 +596,7 @@ export const SelectAllActsOnDisplayedRows: Story = {
  * column is ever squeezed below its minimum to make room.
  */
 export const FixedAndFlexibleColumns: Story = {
+  name: "Fixed and flexible columns",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
@@ -607,6 +614,7 @@ export const FixedAndFlexibleColumns: Story = {
  * column when scrolled.
  */
 export const HorizontalScroll: Story = {
+  name: "Horizontal scroll",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
@@ -670,6 +678,7 @@ export const Resizable: Story = {
  * control appears exactly where a column may be resized, and nowhere else.
  */
 export const MixedResizableColumns: Story = {
+  name: "Mixed resizable columns",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -703,6 +712,7 @@ export const MixedResizableColumns: Story = {
  * Host has been pressed once, then pressed again where it should end.
  */
 export const ResizeWithoutDragging: Story = {
+  name: "Resize without dragging",
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
   render: renderMachines(resizableColumns),
@@ -801,6 +811,7 @@ const boundedColumns: readonly DataTableColumn[] = [
  * width is left.
  */
 export const ResizeWithinBounds: Story = {
+  name: "Resize within bounds",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -836,6 +847,7 @@ export const ResizeWithinBounds: Story = {
  * scrolls.
  */
 export const ResizePastTheContainer: Story = {
+  name: "Resize past the container",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -896,6 +908,7 @@ const fixedColumns: readonly DataTableColumn[] = [
  * take it, up to its own maximum.
  */
 export const SpaceAfterFixedColumns: Story = {
+  name: "Space after fixed columns",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -963,6 +976,7 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
  * caller authoring any other header, row or cell.
  */
 export const CustomCellRenderer: Story = {
+  name: "Custom cell renderer",
   parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
     imports: `import type { IconName } from "@canonical/ds-assets";
@@ -1041,6 +1055,7 @@ const scopedColumns: readonly DataTableColumn[] = [
  * cells, and every other row, stay as they are.
  */
 export const CellReadingItsScope: Story = {
+  name: "Cell reading its scope",
   parameters: showConsumerCode({
     parts: [
       "DataTable",
@@ -1139,6 +1154,7 @@ export const Failed: Story = {
  * malfunctioned. A change of filter or search asks again.
  */
 export const NoAccess: Story = {
+  name: "No access",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
@@ -1164,6 +1180,7 @@ export const NoAccess: Story = {
  * matched nothing — there is nothing here to find.
  */
 export const EmptyCollection: Story = {
+  name: "Empty collection",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
@@ -1186,6 +1203,7 @@ export const EmptyCollection: Story = {
  * collection is empty.
  */
 export const NoMatch: Story = {
+  name: "No match",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
@@ -1207,6 +1225,7 @@ export const NoMatch: Story = {
  * technology reads and what a copy selects.
  */
 export const LongValues: Story = {
+  name: "Long values",
   parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -1332,6 +1351,7 @@ function WrappingNote({ value }: DisplayFieldCellProps): ReactElement {
  * its estimate, the view stays on the rows being read rather than jumping.
  */
 export const VirtualizedVariableHeights: Story = {
+  name: "Virtualized variable heights",
   parameters: showVirtualizedCode(
     `function WrappingNote({ value }: DisplayFieldCellProps) {
   return <span style={{ whiteSpace: "normal" }}>{String(value)}</span>;
@@ -1413,6 +1433,7 @@ const columns: readonly DataTableColumn[] = [
  * the row is let go.
  */
 export const VirtualizedKeepsFocus: Story = {
+  name: "Virtualized keeps focus",
   parameters: showVirtualizedCode(`const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
   { id: "status", header: "Status" },

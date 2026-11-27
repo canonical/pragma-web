@@ -34,6 +34,7 @@ type Story = StoryObj<BarStoryArgs>;
  * with a search.
  */
 export const QuickFilters: Story = {
+  name: "Quick filters",
   args: {
     quickFilters: [
       "status",
@@ -84,7 +85,7 @@ export const Exclusion: Story = {
  * the search and every other clause. The frame's `query` parameter sets the address.
  */
 export const NoJavaScriptHref: Story = {
-  name: "No JavaScript, with an address: quick filters",
+  name: "No JavaScript, with an address",
   args: { quickFilters: ["status", "tags", "owner"] },
   render: (args) => (
     <ServerRenderedBar
@@ -109,7 +110,7 @@ export const NoJavaScriptHref: Story = {
  * its controls, with no name, work once scripts run.
  */
 export const NoJavaScriptMemory: Story = {
-  name: "No JavaScript, memory: quick filters",
+  name: "No JavaScript, memory",
   args: { quickFilters: ["status", "tags"] },
   render: (args) => <ServerRenderedBar {...args} />,
   play: async ({ canvasElement }) => {

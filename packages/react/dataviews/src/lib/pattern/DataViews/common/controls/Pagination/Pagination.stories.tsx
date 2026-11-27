@@ -60,6 +60,7 @@ const onlyFailed = "status=failed&page=1&size=5";
  * provider.
  */
 export const InAComposition: Story = {
+  name: "In a composition",
   parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
@@ -84,6 +85,7 @@ export const InAComposition: Story = {
  * fill. The total it shows is always the current query's.
  */
 export const AFilteredTotal: Story = {
+  name: "A filtered total",
   parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,

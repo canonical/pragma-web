@@ -114,6 +114,7 @@ export const Default: Story = {
  * Nothing is asked of the source: the rows are the same rows.
  */
 export const HideAColumn: Story = {
+  name: "Hide a column",
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
@@ -145,6 +146,7 @@ export const HideAColumn: Story = {
  * Hide; Reset table settings returns the declared arrangement.
  */
 export const ArrangedByTheViewer: Story = {
+  name: "Arranged by the viewer",
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,

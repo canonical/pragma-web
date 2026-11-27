@@ -58,6 +58,7 @@ function PlainMachines(): ReactElement {
 
 /** Step 1: one list item per row on the page, and nothing else. */
 export const APlainList: Story = {
+  name: "A plain list",
   render: () => <PlainMachines />,
 };
 
@@ -82,6 +83,7 @@ function StatusMachines({
 
 /** Step 2: the source has not answered yet, so the list says it is loading. */
 export const StatusLoading: Story = {
+  name: "Status loading",
   render: (args) => (
     <StatusMachines {...pickStoryWords(args)} source={createPendingSource} />
   ),
@@ -89,6 +91,7 @@ export const StatusLoading: Story = {
 
 /** Step 2: the source failed, and its reason stands in place of the rows. */
 export const StatusFailed: Story = {
+  name: "Status failed",
   render: (args) => (
     <StatusMachines {...pickStoryWords(args)} source={createFailingSource} />
   ),
@@ -96,6 +99,7 @@ export const StatusFailed: Story = {
 
 /** Step 2: the collection holds nothing yet. */
 export const StatusNoData: Story = {
+  name: "Status no data",
   render: (args) => (
     <StatusMachines {...pickStoryWords(args)} source={createEmptySource} />
   ),
@@ -103,6 +107,7 @@ export const StatusNoData: Story = {
 
 /** Step 2: the search matches no machine. */
 export const StatusNoMatch: Story = {
+  name: "Status no match",
   render: (args) => (
     <StatusMachines
       {...pickStoryWords(args)}
@@ -133,6 +138,7 @@ function SelectableMachines({
 
 /** Step 3: a checkbox per record, and a sort the source can run. */
 export const SelectionAndSort: Story = {
+  name: "Selection and sort",
   render: (args) => <SelectableMachines {...pickStoryWords(args)} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -147,6 +153,7 @@ export const SelectionAndSort: Story = {
 
 /** Step 3: the source refuses the sort, and the list says why. */
 export const SortRefused: Story = {
+  name: "Sort refused",
   render: (args) => (
     <SelectableMachines
       {...pickStoryWords(args)}
@@ -200,6 +207,7 @@ function ConnectedMachines(words: StoryWords): ReactElement {
  * selected in the other.
  */
 export const ConnectedTwin: Story = {
+  name: "Connected twin",
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: (args) => <ConnectedMachines {...pickStoryWords(args)} />,
   play: async ({ canvasElement }) => {

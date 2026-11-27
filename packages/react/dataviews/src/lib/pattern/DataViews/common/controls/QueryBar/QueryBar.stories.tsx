@@ -58,6 +58,7 @@ export const Default: Story = {
  * offered on.
  */
 export const SuggestionsOpen: Story = {
+  name: "Suggestions open",
   render: renderBarWith({ query: "status=deployed" }),
   play: async ({ canvasElement }) => {
     await userEvent.click(findEntry(canvasElement));
@@ -73,6 +74,7 @@ export const SuggestionsOpen: Story = {
  * value and Enter again. The rows narrow, and focus is back in the entry.
  */
 export const BuildAChip: Story = {
+  name: "Build a chip",
   render: renderBarWith(),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -104,6 +106,7 @@ export const BuildAChip: Story = {
  * display unit, presence, text and a date.
  */
 export const EachFieldKind: Story = {
+  name: "Each field kind",
   render: renderBarWith({
     query:
       "status=deployed&tags=ex-gpu&memory__gte=65536&owner__isSet=true&hostname__contains=node-1&deployed__lte=2026-06-30",
@@ -121,6 +124,7 @@ export const EachFieldKind: Story = {
 
 /** Several values: one chip holding any of three statuses, in canonical order. */
 export const SeveralValues: Story = {
+  name: "Several values",
   render: renderBarWith({
     query: "status=deployed&status=ready&status=allocated",
   }),
@@ -138,6 +142,7 @@ export const SeveralValues: Story = {
  * chip holding either.
  */
 export const SameFieldAnd: Story = {
+  name: "Two clauses on one field",
   render: renderBarWith({
     query: "tags=ex-gpu&tags__isAny__1=ex-nvme&status=deployed&status=ready",
   }),
@@ -157,6 +162,7 @@ export const SameFieldAnd: Story = {
  * being edited: the edit keeps its Entry, its text and focus.
  */
 export const OutsideChange: Story = {
+  name: "Outside change",
   render: renderBarWith({ query: "status=deployed", withOutsideChange: true }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -261,6 +267,7 @@ function StatusAliasInstances({
  * stays in the result with its own phase beside it.
  */
 export const StatusAlias: Story = {
+  name: "Status alias",
   render: (args) => <StatusAliasInstances {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -277,6 +284,7 @@ export const StatusAlias: Story = {
  * history, so Back after the clear control brings the clauses back.
  */
 export const WithHistory: Story = {
+  name: "With history",
   render: renderBarWith({
     query: "status=deployed&status=ready",
     withHistory: true,
@@ -328,6 +336,7 @@ export const Contradiction: Story = {
  * still does.
  */
 export const InvalidInput: Story = {
+  name: "Invalid input",
   render: renderBarWith({ query: "memory__gte=65536" }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -347,6 +356,7 @@ export const InvalidInput: Story = {
  * clause shows as a refused chip, its reason described; Clear removes it.
  */
 export const RefusedLink: Story = {
+  name: "Refused link",
   render: renderBarWith({ href: "/machines?status=melted&tags=ex-gpu" }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

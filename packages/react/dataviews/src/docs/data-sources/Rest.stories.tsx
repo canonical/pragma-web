@@ -229,6 +229,7 @@ export const Failed: Story = {
  * answering the query, under the reason the endpoint gives.
  */
 export const FailedOverKeptRows: Story = {
+  name: "Failed over kept rows",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -263,6 +264,7 @@ export const FailedOverKeptRows: Story = {
  * is refused before any request is sent, and that header says why.
  */
 export const SortLimitedToOneTerm: Story = {
+  name: "Sort limited to one term",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -303,6 +305,7 @@ export const SortLimitedToOneTerm: Story = {
  * submission reaches the same query.
  */
 export const TextApplied: Story = {
+  name: "Text applied",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -343,6 +346,7 @@ export const TextApplied: Story = {
  * the set to none-of keeps every machine that is not failed instead.
  */
 export const CountsAndNoneOf: Story = {
+  name: "Counts and none of",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines
@@ -397,6 +401,7 @@ export const CountsAndNoneOf: Story = {
  * `name__startsWith`.
  */
 export const StartsWithApplied: Story = {
+  name: "Starts with applied",
   parameters: code,
   render: (args) => (
     <ServerBackedMachines

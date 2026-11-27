@@ -52,6 +52,7 @@ const frenchColumns: readonly DataTableColumn[] = [
 
 /** A partial set: three messages reworded, every other one in English. */
 export const PartialOverride: Story = {
+  name: "Partial override",
   render: function RenderPartialOverride(): ReactElement {
     const provider = useMachineProvider({ query: "q=nothing&page=1&size=5" });
     return (
@@ -79,6 +80,7 @@ export const PartialOverride: Story = {
  * the parts say comes from the record.
  */
 export const FrenchLocale: Story = {
+  name: "French locale",
   render: function RenderFrenchLocale(): ReactElement {
     const provider = useMachineProvider({ query: "page=1&size=5" });
     return (
@@ -113,6 +115,7 @@ export const FrenchLocale: Story = {
 
 /** Standalone parts are their own root, so each takes `messages` itself. */
 export const StandaloneParts: Story = {
+  name: "Standalone parts",
   render: function RenderStandaloneParts(): ReactElement {
     const provider = useMachineProvider({ query: "page=1&size=5" });
     return (

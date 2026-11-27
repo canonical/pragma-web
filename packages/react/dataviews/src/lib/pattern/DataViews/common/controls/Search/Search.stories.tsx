@@ -141,6 +141,7 @@ export const Default: Story = {
  * it — there is no second query to apply or keep in step.
  */
 export const SearchApplied: Story = {
+  name: "Search applied",
   parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
@@ -165,6 +166,7 @@ export const SearchApplied: Story = {
  * and nothing else.
  */
 export const SearchInTheUrl: Story = {
+  name: "Search in the URL",
   parameters: showConsumerCode({
     parts,
     core: ["createPlatformLocation"],

@@ -110,6 +110,7 @@ const failedMachines: ViewDraft = {
  * the store follow the provider, which owns both loops.
  */
 export const ConnectedParts: Story = {
+  name: "Connected parts",
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
@@ -197,6 +198,7 @@ import { platform } from "./router.js";`,
  * and the filters list it with its reasons.
  */
 export const QueryInTheUrl: Story = {
+  name: "Query in the URL",
   parameters: queryInTheUrlCode,
   render: function RenderQueryInTheUrl(args) {
     // A memory location stands in for the browser's here, so the story
@@ -245,6 +247,7 @@ export const QueryInTheUrl: Story = {
  * twelve machines.
  */
 export const LinkWithARefusedFilter: Story = {
+  name: "Link with a refused filter",
   parameters: queryInTheUrlCode,
   render: function RenderLinkWithARefusedFilter(args) {
     const [location] = useState(() =>
@@ -282,6 +285,7 @@ export const LinkWithARefusedFilter: Story = {
  * own order and the filters list the refused sort, with nothing to clear.
  */
 export const LinkWithARefusedSort: Story = {
+  name: "Link with a refused sort",
   parameters: queryInTheUrlCode,
   render: function RenderLinkWithARefusedSort(args) {
     const [location] = useState(() =>

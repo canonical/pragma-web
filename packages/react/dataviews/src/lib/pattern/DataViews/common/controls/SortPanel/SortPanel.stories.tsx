@@ -112,6 +112,7 @@ export const Default: Story = {
  * rather than showing an empty list.
  */
 export const NothingStated: Story = {
+  name: "Nothing stated",
   parameters: showConsumerCode({
     parts: ["DataViews"],
     render: `<DataViews provider={provider}>

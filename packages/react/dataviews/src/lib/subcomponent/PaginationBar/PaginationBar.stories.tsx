@@ -120,6 +120,7 @@ const expectAvailable = async (
  * that total makes, and there is nothing before the first page to go to.
  */
 export const FirstPage: Story = {
+  name: "First page",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
@@ -140,6 +141,7 @@ export const FirstPage: Story = {
 
 /** A middle page: every destination is open. */
 export const MiddlePage: Story = {
+  name: "Middle page",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
@@ -163,6 +165,7 @@ export const MiddlePage: Story = {
  * beyond the last page, so Next and Last are unavailable.
  */
 export const LastPage: Story = {
+  name: "Last page",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
@@ -191,6 +194,7 @@ export const LastPage: Story = {
  * browser's here, so the story never rewrites this page's own address.
  */
 export const RealDestinations: Story = {
+  name: "Real destinations",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     core: ["createPlatformLocation"],
@@ -240,6 +244,7 @@ import { platform } from "./router.js";`,
  * is full, which is the only evidence there may be another.
  */
 export const WithoutACount: Story = {
+  name: "Without a count",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     imports: `import { machineCollection, machinesApi } from "./machines.js";`,
@@ -297,6 +302,7 @@ export const Loading: Story = {
  * passing beneath it.
  */
 export const StickyInAScrollingFrame: Story = {
+  name: "Sticky in a scrolling frame",
   parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,

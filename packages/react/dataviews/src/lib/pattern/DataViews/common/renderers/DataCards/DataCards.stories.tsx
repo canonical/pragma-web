@@ -175,6 +175,7 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement {
  * in a table and on a card.
  */
 export const CustomCell: Story = {
+  name: "Custom cell",
   render: (args) => (
     <MachineCards
       {...args}
@@ -237,6 +238,7 @@ export const Failed: Story = {
 
 /** No data: the collection is empty, which the cards say rather than draw nothing. */
 export const NoData: Story = {
+  name: "No data",
   render: (args) => (
     <MachineCards {...args} options={{ source: createEmptySource }} />
   ),
@@ -274,6 +276,7 @@ function SortedAndPagedMachines({
  * both placed beside the cards in one root, as they are beside a table.
  */
 export const SortedAndPaged: Story = {
+  name: "Sorted and paged",
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label }) => <SortedAndPagedMachines label={label} />,
   parameters: showConsumerCode({
@@ -354,6 +357,7 @@ function TableOrCardsMachines({
  * drawn alone.
  */
 export const TableOrCards: Story = {
+  name: "Table or cards",
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label, messages }) => (
     <TableOrCardsMachines label={label} {...pickStoryWords({ messages })} />
@@ -430,6 +434,7 @@ function RestBackedMachines({
  * and say they are loading until it does.
  */
 export const RestBacked: Story = {
+  name: "REST backed",
   decorators: [
     withMachineRoot({
       source: () => createRestMachineSource("live"),
