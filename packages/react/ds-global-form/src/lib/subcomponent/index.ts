@@ -23,7 +23,15 @@ export type { DateTimeInputProps } from "./DateTimeInput/index.js";
 export { DateTimeInput } from "./DateTimeInput/index.js";
 // Field chrome subcomponents (Field.Label / Field.Description / Field.Error)
 export * from "./Field/index.js";
-export type { FileUploadInputProps } from "./FileUploadInput/index.js";
+export type {
+  FileMessage,
+  FileMessageLevel,
+  FileUploadInputProps,
+  FileUploadMessages,
+  UploadFunction,
+  UploadOptions,
+  UploadSummary,
+} from "./FileUploadInput/index.js";
 export { FileUploadInput } from "./FileUploadInput/index.js";
 export type { HiddenInputProps } from "./HiddenInput/index.js";
 export { HiddenInput } from "./HiddenInput/index.js";

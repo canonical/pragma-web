@@ -38,8 +38,11 @@
    * Controls no longer carry `.p` — the density system supplies the body font tier
    * (font-size / weight / family) here. */
   /* NB `.ds.input.textarea` is EXCLUDED: the textarea seats intrinsically (its own
-   * rule below) and must keep its multi-row min-height. */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input:not(.textarea) {
+   * rule below) and must keep its multi-row min-height. `.ds.input.file-upload`
+   * is EXCLUDED too: it is a stack of a drop area and a file list, not one
+   * control box, so it takes no density cell. */
+  :is(.comfortable, .dense, .app, .site, .docs)
+    .ds.input:not(.textarea, .file-upload) {
     box-sizing: border-box;
     /* Same effective line-height the target-baseline uses (single source of the
        fallback chain), so a bare context class keeps a valid box height too. */
@@ -58,7 +61,7 @@
    * child, top-reference it so the input's own space-before governs. Needs to beat
    * the TextInput's `.ds.input.text { align-items: stretch }` (0,3,0). */
   :is(.comfortable, .dense, .app, .site, .docs) .ds.input.text,
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input {
+  :is(.comfortable, .dense, .app, .site, .docs) .ds.input:not(.file-upload) {
     align-items: flex-start;
   }
 
