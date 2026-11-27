@@ -145,6 +145,13 @@ describe("DataTable SSR", () => {
     expect(renderLocated({})).toMatch(/<table[^>]* tabindex="0"/);
   });
 
+  it.fails("is a tab stop before scripts run with settings of its own", () => {
+    // Only the settings menu draws links; another element draws none.
+    expect(renderLocated({ settings: <span>Mine</span> })).toMatch(
+      /<table[^>]* tabindex="0"/,
+    );
+  });
+
   it("is a tab stop before scripts run even where a row's cell holds a link", () => {
     const Link = ({ value, rowId }: DisplayFieldCellProps) => (
       <a href={`/machines/${rowId}`}>{String(value)}</a>
