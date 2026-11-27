@@ -232,17 +232,18 @@
   }
 
   /* ── .ds.input.chrome — shared input chrome ─────────────────────────
-   * Applied on native <textarea>/<select> directly, and on the
-   * composite .ds.input.text wrapper for <input> + prefix/suffix.
+   * Applied on native <textarea> directly, and on the composite wrappers
+   * (.ds.input.text, .ds.input.select, …) that hold an <input>/<select>
+   * leaf plus optional siblings (prefix/suffix, chevron overlay).
    *
    * Inline padding is deliberately NOT set here. On composite wrappers the
-   * text-bearing leaf is the inner <input>, which carries its own
+   * text-bearing leaf is the inner form element, which carries its own
    * `padding-inline`; if the wrapper ALSO had it the text would be inset twice
    * (and prefix/suffix would sit off the edge). So the inline padding lives on
-   * the leaf in every case: the inner <input> for composite inputs (text,
-   * number, password, phone …), and the element itself for the direct-chrome
-   * inputs (date, time, datetime, select, textarea), which set it locally.
-   * Only the block padding (baseline-grid height) is shared here.
+   * the leaf in every case: the inner <input>/<select> for composite inputs
+   * (text, number, password, phone, select …), and the element itself for the
+   * direct-chrome inputs (date, time, datetime, textarea), which set it
+   * locally. Only the block padding (baseline-grid height) is shared here.
    */
   .ds.input.chrome {
     display: block;
@@ -306,7 +307,7 @@
       border-color var(--motion-duration-fast) ease,
       box-shadow var(--motion-duration-fast) ease;
 
-    &:hover:not(:disabled, :has(input:disabled)) {
+    &:hover:not(:disabled, :has(input:disabled), :has(select:disabled)) {
       background-color: var(
         --hover--color-foreground-input,
         var(--color-foreground-input-hover)
@@ -331,7 +332,8 @@
      * :root) but stays a themeable override point. The background + muted text
      * carry the disabled affordance instead. */
     &:disabled,
-    &:has(input:disabled) {
+    &:has(input:disabled),
+    &:has(select:disabled) {
       border-bottom-color: var(--form-input-border-color-disabled);
       background-color: var(--form-input-background-disabled);
       color: var(--form-input-color-disabled);

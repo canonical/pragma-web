@@ -17,14 +17,31 @@ describe("SelectInput (presentational)", () => {
     expect(screen.getByRole("combobox")).toBeInTheDocument();
   });
 
-  it("applies the input chrome on the select element", () => {
+  it("applies the input chrome on the wrapping element", () => {
     render(<SelectInput name="color" options={options} />);
-    expect(screen.getByRole("combobox")).toHaveClass(
+    expect(screen.getByRole("combobox").parentElement).toHaveClass(
       "ds",
       "input",
       "select",
       "chrome",
     );
+  });
+
+  it("overlays the chevron icon on a single select", () => {
+    const { container } = render(
+      <SelectInput name="color" options={options} />,
+    );
+    const chevron = container.querySelector("svg.chevron");
+    expect(chevron).toBeInTheDocument();
+    // Decorative: the select's accessible name comes from the Field label.
+    expect(chevron).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("omits the chevron on a multiple select", () => {
+    const { container } = render(
+      <SelectInput name="colors" options={options} multiple />,
+    );
+    expect(container.querySelector("svg.chevron")).not.toBeInTheDocument();
   });
 
   it("renders all options", () => {

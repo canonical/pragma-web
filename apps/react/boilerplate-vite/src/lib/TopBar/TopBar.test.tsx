@@ -39,16 +39,13 @@ describe("TopBar", () => {
   it("holds the theme and language selectors, with the input chrome", () => {
     renderWithProviders(<TopBar />);
 
-    expect(screen.getByRole("combobox", { name: "Color theme" })).toHaveClass(
-      "ds",
-      "input",
-      "select",
-    );
-    expect(screen.getByRole("combobox", { name: "Language" })).toHaveClass(
-      "ds",
-      "input",
-      "select",
-    );
+    // The input chrome sits on the select's wrapping element.
+    expect(
+      screen.getByRole("combobox", { name: "Color theme" }).parentElement,
+    ).toHaveClass("ds", "input", "select");
+    expect(
+      screen.getByRole("combobox", { name: "Language" }).parentElement,
+    ).toHaveClass("ds", "input", "select");
   });
 
   it("labels each language in its own language", () => {

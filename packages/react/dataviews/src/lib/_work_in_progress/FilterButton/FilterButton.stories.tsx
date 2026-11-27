@@ -307,7 +307,11 @@ OnToggle.play = async ({ canvasElement }) => {
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("open"),
   );
-  await userEvent.keyboard("{Escape}");
+  // A play's keyboard events are synthetic, and the platform only answers its
+  // own Escape with the popover's light dismissal — so this closes the panel
+  // the way a reader who clicks the trigger again does. The component tests
+  // cover the Escape path through the popover stand-in.
+  await userEvent.click(canvas.getByRole("button", { name: "Status" }));
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("closed"),
   );

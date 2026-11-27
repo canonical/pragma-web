@@ -2,7 +2,7 @@
 import type React from "react";
 import type { ResetButtonProps } from "./types.js";
 import "./styles.css";
-import { Button } from "@canonical/react-ds-global";
+import { Button, Icon } from "@canonical/react-ds-global";
 import defaultMessages from "../../messages.js";
 
 const componentCssClassName = "ds combobox-reset-button";
@@ -29,7 +29,8 @@ const ResetButton = ({
       type="button"
       onClick={onClick}
     >
-      x
+      {/* Decorative: the button is named by aria-label. */}
+      <Icon icon="close" />
     </Button>
   );
 };

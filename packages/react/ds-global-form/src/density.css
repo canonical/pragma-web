@@ -145,13 +145,15 @@
    * block-size) yet lands exactly on the density cell, both edges on the grid.
    *
    * Placed AFTER the fixed-height box rule above so this (equal-specificity)
-   * rule wins for the text family. Direct chromes (select/date/time) and the
-   * textarea keep the previous model until their own cutover pass. */
+   * rule wins for the composite family. Direct chromes (date/time/datetime)
+   * and the textarea keep the previous model until their own cutover pass —
+   * their multi-part UA internals need their own measurement. */
   :is(.comfortable, .dense, .app, .site, .docs)
-    .ds.input:is(.text, .number, .password, .phone) {
-    /* The COMPOSITE chrome family — every wrapper with an inner <input> leaf
-       (text, number, password, phone). One selector, one seat: the wrapper is
-       the box, the leaf carries the line. */
+    .ds.input:is(.text, .number, .password, .phone, .select) {
+    /* The COMPOSITE chrome family — every wrapper with an inner form-element
+       leaf (text, number, password, phone hold an <input>; select holds a
+       <select>). One selector, one seat: the wrapper is the box, the leaf
+       carries the line. */
 
     /* NO drift term here — deliberately. The old ~2px "native input renders low"
        compensation was an artifact of the line-height:1 crush structure: give the
@@ -220,6 +222,16 @@
     padding-block-end: 0;
   }
 
+  /* The select leaf seats exactly like the input leaf. A rule of its own
+     because the leaf tag differs — folding it into the input rule above (via
+     `> :is(input, select)`) would also seat the phone wrapper's inner country
+     <select>, which is a separate leaf of that composite. */
+  :is(.comfortable, .dense, .app, .site, .docs) .ds.input.select > select {
+    line-height: var(--seat-line-floored);
+    padding-block-start: var(--seat-before);
+    padding-block-end: 0;
+  }
+
   /* ── Textarea: many rows of the SAME intrinsic seat ──────────────────────────
    * The textarea is a single element (it carries the chrome itself), so it seats
    * like the button: the interior line box is `--control-seat-line` — which is a
@@ -275,52 +287,6 @@
       var(--control-seat-line) +
       var(--density-line-height-effective)
     );
-  }
-
-  /* ── Select: a single-element direct chrome on the intrinsic seat ────────────
-   * The <select> IS the chrome (border and text on one element), so it seats
-   * like the button: interior line box + seat pads, height emerging as exactly
-   * the density cell. Replaces the old fixed-height + 8px-block-padding path,
-   * which never seated the option text at all and CLIPPED it in apps/dense
-   * (24px fixed box − 8px pad left too little room for the line).
-   * The line is floored like the single-line input's: a <select> shows one line,
-   * so if the UA imposes a `normal` floor the formula already matches it, and if
-   * it does not the specified floor is simply what renders — correct either way
-   * (unlike the textarea, where flooring would break the multi-row rhythm).
-   * Remaining direct chromes (date/time/datetime) stay on the previous model
-   * until their own pass — their multi-part UA internals need their own
-   * measurement. */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input.select {
-    --seat-line-floored: max(var(--control-seat-line), 1.2em);
-    line-height: var(--seat-line-floored);
-
-    --seat-before: round(
-      nearest,
-      max(
-        0px,
-        calc(
-          var(--density-target-baseline-px, 0px) -
-          (var(--seat-line-floored) + 1cap) /
-          2 -
-          var(--form-input-border-width, 0px)
-        )
-      ),
-      0.25px
-    );
-    --seat-after: max(
-      0px,
-      calc(
-        var(--density-line-height-effective) -
-        var(--seat-line-floored) -
-        var(--seat-before) -
-        2 *
-        var(--form-input-border-width, 0px)
-      )
-    );
-
-    block-size: auto;
-    min-block-size: 0;
-    padding-block: var(--seat-before) var(--seat-after);
   }
 
   /* ── Bottom rhythm: density-seated flow text only (NOT prose) ─────────────────
