@@ -42,6 +42,8 @@
     "build": "bun run build:client",
     "build:all": "bun run build:client && bun run build:server && bun run build:storybook",
     "build:client": "vite build --ssrManifest --outDir dist/client",
+    "build:client:release": "vite build --mode release --ssrManifest --outDir dist/client",
+    "build:release": "bun run build:client:release && bun run build:server && bun run build:storybook",
     "build:server": "vite build --mode server",
     "build:storybook": "storybook build",
     "check": "bun run check:biome && bun run check:ts && bun run relay:check",

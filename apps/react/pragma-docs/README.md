@@ -139,6 +139,13 @@ that variable also tells the launcher an endpoint already exists, so it starts
 no graph of its own — which is how you point the app at a shared or remote
 one.
 
+**Release builds require the endpoint.** The loopback default is for development
+only: in a visitor's browser, `127.0.0.1` is the visitor's own machine. A client
+build that will be deployed must set `VITE_GRAPHQL_URL` to a publicly reachable
+address; `bun run build:client:release` (or `build:release`) refuses to compile
+without it. The ordinary `build:client` and `build:all` paths used by CI and
+local previews keep the loopback default.
+
 **Prerequisite:** the *default* provider compiles from the pragma CLI's refs
 cache, so `~/.cache/pragma/refs/@canonical` must be populated (`pragma sources
 update`, or point `PRAGMA_REFS_DIR` at a cache) before any server script serves
