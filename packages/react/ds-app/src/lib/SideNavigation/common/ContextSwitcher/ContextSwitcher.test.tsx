@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { installPopoverStandIn } from "@canonical/react-ds-global/testing";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import ContextSwitcher from "./ContextSwitcher.js";
 import type { ContextSwitcherItem } from "./types.js";
 
@@ -8,9 +9,17 @@ const contexts: ContextSwitcherItem[] = [
   { key: "globex", name: "Globex", description: "Secondary account" },
 ];
 
-/** Opens the menu (portaled to document.body, so its content leaves the aria-hidden subtree). */
-const open = (): void => {
+// jsdom has no Popover API, which the menu opens through.
+let uninstall: () => void;
+beforeAll(() => {
+  uninstall = installPopoverStandIn();
+});
+afterAll(() => uninstall());
+
+/** Opens the menu and waits for it. */
+const open = async (): Promise<void> => {
   fireEvent.click(screen.getByRole("button", { name: /Acme Corp/ }));
+  await waitFor(() => expect(screen.getByRole("menu")).toBeInTheDocument());
 };
 
 describe("ContextSwitcher", () => {
@@ -20,28 +29,27 @@ describe("ContextSwitcher", () => {
     );
     const trigger = screen.getByRole("button", { name: /Acme Corp/ });
     expect(trigger).toHaveAttribute("aria-haspopup", "menu");
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).toHaveAttribute("popovertarget");
   });
 
-  it("lists every context, including description, once open", () => {
+  it("lists every context, including description, once open", async () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
     );
-    open();
-    expect(screen.getByRole("menu")).toHaveAttribute("aria-hidden", "false");
+    await open();
     expect(screen.getByText("Globex")).toBeInTheDocument();
     expect(screen.getByText("Secondary account")).toBeInTheDocument();
   });
 
-  it("renders each context as a menuitem", () => {
+  it("renders each context as a menuitem", async () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
     );
-    open();
-    expect(screen.getAllByRole("menuitem", { hidden: true })).toHaveLength(2);
+    await open();
+    expect(screen.getAllByRole("menuitem")).toHaveLength(2);
   });
 
-  it("calls onContextChange and closes when a context is selected", () => {
+  it("calls onContextChange and closes when a context is selected", async () => {
     const onContextChange = vi.fn();
     render(
       <ContextSwitcher
@@ -50,7 +58,7 @@ describe("ContextSwitcher", () => {
         onContextChange={onContextChange}
       />,
     );
-    open();
+    await open();
     // The menuitem's accessible name includes its description text (both
     // are content of the same role="menuitem" element), so match on the
     // item's own identifying text rather than an exact accessible name.
@@ -58,26 +66,27 @@ describe("ContextSwitcher", () => {
       screen.getByText("Globex").closest('[role="menuitem"]') as HTMLElement,
     );
     expect(onContextChange).toHaveBeenCalledWith(contexts[1]);
-    expect(screen.getByRole("menu", { hidden: true })).toHaveAttribute(
-      "aria-hidden",
-      "true",
-    );
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
   });
 
-  it("marks the current context item for styling", () => {
+  it("marks the current context item for styling", async () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
     );
-    open();
+    await open();
     expect(
-      screen.getByText("Acme Corp", { selector: ".name" }).closest(".content"),
+      screen
+        .getByText("Acme Corp", { selector: ".name" })
+        .closest(".side-navigation-context-switcher-item-content"),
     ).toHaveClass("current");
     expect(
-      screen.getByText("Globex", { selector: ".name" }).closest(".content"),
+      screen
+        .getByText("Globex", { selector: ".name" })
+        .closest(".side-navigation-context-switcher-item-content"),
     ).not.toHaveClass("current");
   });
 
-  it("renders a create-context action and calls onCreateContext", () => {
+  it("renders a create-context action and calls onCreateContext", async () => {
     const onCreateContext = vi.fn();
     render(
       <ContextSwitcher
@@ -86,7 +95,7 @@ describe("ContextSwitcher", () => {
         onCreateContext={onCreateContext}
       />,
     );
-    open();
+    await open();
     fireEvent.click(
       screen
         .getByText("Create context")
@@ -95,7 +104,7 @@ describe("ContextSwitcher", () => {
     expect(onCreateContext).toHaveBeenCalledOnce();
   });
 
-  it("renders the create-context label as a rich node, not just a plain string", () => {
+  it("renders the create-context label as a rich node, not just a plain string", async () => {
     render(
       <ContextSwitcher
         currentContext={contexts[0]}
@@ -104,20 +113,20 @@ describe("ContextSwitcher", () => {
         createContextLabel={<strong>New workspace</strong>}
       />,
     );
-    open();
+    await open();
     const label = screen.getByText("New workspace");
     expect(label.tagName).toBe("STRONG");
   });
 
-  it("omits the create-context action when onCreateContext is not given", () => {
+  it("omits the create-context action when onCreateContext is not given", async () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
     );
-    open();
+    await open();
     expect(screen.queryByText("Create context")).not.toBeInTheDocument();
   });
 
-  it("renders a badge when a context has one", () => {
+  it("renders a badge when a context has one", async () => {
     const withBadge: ContextSwitcherItem[] = [
       ...contexts,
       { key: "beta", name: "Beta", badge: <span>2</span> },
@@ -125,7 +134,7 @@ describe("ContextSwitcher", () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={withBadge} />,
     );
-    open();
+    await open();
     expect(screen.getByText("2")).toBeInTheDocument();
   });
 
@@ -149,15 +158,18 @@ describe("ContextSwitcher", () => {
     const caption = screen.getByText("Context");
     expect(caption).toHaveClass("ds", "side-navigation-group-header");
     // Both are children of the component's own wrapper element — the
-    // caption a sibling of the menu, not nested inside it.
+    // caption a sibling of the trigger, not nested inside it.
     expect(caption.parentElement).toHaveClass(
       "ds",
       "side-navigation-context-switcher",
     );
-    expect(caption.nextElementSibling).toHaveClass("ds", "contextual-menu");
+    expect(caption.nextElementSibling).toHaveClass(
+      "ds",
+      "side-navigation-context-switcher-field",
+    );
   });
 
-  it("navigates contexts with arrow keys and selects with Enter", () => {
+  it("navigates contexts with arrow keys and selects with Enter", async () => {
     const onContextChange = vi.fn();
     render(
       <ContextSwitcher
@@ -166,19 +178,23 @@ describe("ContextSwitcher", () => {
         onContextChange={onContextChange}
       />,
     );
-    open();
-    // The roving tab stop, not necessarily real DOM focus — jsdom doesn't
-    // run the requestAnimationFrame-deferred focus-into-menu effect
-    // synchronously, but the keyboard handler is on the element regardless
-    // of which one the browser has actually focused.
-    const rovingItem = document.querySelector(
-      '[role="menuitem"][tabindex="0"]',
-    ) as HTMLElement;
-    fireEvent.keyDown(rovingItem, { key: "ArrowDown" });
-    const nextRovingItem = document.querySelector(
-      '[role="menuitem"][tabindex="0"]',
-    ) as HTMLElement;
-    fireEvent.keyDown(nextRovingItem, { key: "Enter" });
+    await open();
+    await waitFor(() =>
+      expect(
+        screen
+          .getByText("Acme Corp", { selector: ".name" })
+          .closest('[role="menuitem"]'),
+      ).toHaveFocus(),
+    );
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "ArrowDown",
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText("Globex").closest('[role="menuitem"]'),
+      ).toHaveFocus(),
+    );
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Enter" });
     expect(onContextChange).toHaveBeenCalledWith(contexts[1]);
   });
 });

@@ -1,190 +1,261 @@
-import type { _Item } from "@canonical/ds-types";
-import { getItemId } from "@canonical/ds-utils";
-import type React from "react";
-import { useMemo } from "react";
-import { createPortal } from "react-dom";
+import type { ReactElement, ToggleEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Item, type MenuFocusIntent, MenuList } from "./common/index.js";
+import { LIST_CLASS_NAME, MENU_ITEM, TOP_LEVEL_ITEM } from "./constants.js";
+import type { ContextualMenuProps, MenuEntry } from "./types.js";
 import {
-  MENU_ROOT_PLACEMENT,
-  useContextualMenu,
-  useIsMounted,
-} from "../../hooks/index.js";
-import MenuContext from "./common/MenuContext.js";
-import SubMenu from "./common/SubMenu/index.js";
-import type { ContextualMenuProps, MenuItem } from "./types.js";
+  assertDefined,
+  findActiveElement,
+  findTrigger,
+  formatIdent,
+  isMenuLink,
+  isMenuSeparator,
+} from "./utils/index.js";
 import "./styles.css";
 
 const componentCssClassName = "ds contextual-menu";
 
 /**
- * A contextual menu presents a flat list of actions — optionally partitioned
- * by separators — anchored to a trigger. It opens on click, positions itself
- * with viewport-fitment, and supports full keyboard navigation.
+ * Finds the separators that only make sense once scripts run: those with no
+ * link in the group before or after them. With scripting off the action
+ * items are hidden, so such a separator would dangle or double up.
+ *
+ * @param items The menu's entries, in order.
+ * @returns The keys of the separators that need a script.
+ */
+function findScriptOnlySeparators(items: MenuEntry[]): Set<string> {
+  const keys = new Set<string>();
+  // The open group, the separator that opened it, and whether the group
+  // before it held a link.
+  let separator: string | undefined;
+  let beforeHasLink = false;
+  let hasLink = false;
+  // Hides the open separator when a group beside it has no link, and says
+  // whether it did.
+  const close = (): boolean => {
+    if (separator === undefined || (beforeHasLink && hasLink)) return false;
+    keys.add(separator);
+    return true;
+  };
+  for (const entry of items) {
+    if (isMenuSeparator(entry)) {
+      // A hidden separator merges its two groups, so the earlier group's
+      // link carries forward.
+      const hidden = close();
+      separator = entry.key;
+      beforeHasLink = hasLink || (hidden && beforeHasLink);
+      hasLink = false;
+    } else if (isMenuLink(entry)) {
+      hasLink = true;
+    }
+  }
+  close();
+  return keys;
+}
+
+/**
+ * A contextual menu provides secondary actions and options that can be
+ * attached to various interface controls, including Buttons, command Links,
+ * and right-click interactions. It displays relevant actions based on the
+ * context of the element or area it's associated with, helping to keep the
+ * interface clean while making additional functionality easily accessible
+ * when needed.
  *
  * `import { ContextualMenu } from "@canonical/react-ds-global";`
  *
  * @implements ds:global.component.contextual_menu
  */
-const ContextualMenu = ({
-  children,
+export default function ContextualMenu({
+  id,
   items,
-  label,
-  className,
-  preferredDirections,
-  distance,
-  gutter,
-  maxWidth,
-  autoFit,
-  wrap,
   onSelect,
-  open,
-  onOpenChange,
+  label,
+  labelledBy,
+  wrap = true,
+  className,
+  style,
+  onBeforeToggle,
+  onToggle,
   ...props
-}: ContextualMenuProps): React.ReactElement => {
-  // A synthetic root holds the entries so the tree is menu -> item.
-  // MUST be stable across renders: the hook annotates it (memoised on `root`),
-  // so a fresh object each render would re-annotate the tree every render.
-  const root = useMemo(() => ({ key: "contextual-menu-root", items }), [items]);
-  // Portal only after mount so the server and first client render agree —
-  // `typeof window` is already truthy on the first client render, which would
-  // portal the menu on render 0 and mismatch the inline server output.
-  const mounted = useIsMounted();
-  const menu = useContextualMenu({
-    root,
-    isOpen: open,
-    // Open BELOW the trigger, leading-aligned, flipping above then to the side
-    // as space runs out (design review). MENU_ROOT_PLACEMENT is logical, so the
-    // hook mirrors alignment in RTL automatically — no direction read here.
-    // (Submenus keep the side-opening MENU_PLACEMENT — see SubMenu.)
-    preferredDirections: preferredDirections ?? MENU_ROOT_PLACEMENT,
-    distance,
-    gutter,
-    maxWidth,
-    autoFit: autoFit ?? true,
-    // Menus conventionally wrap: ArrowDown on the last item loops to the
-    // first (APG menu pattern). Opt out with `wrap={false}`.
-    wrap: wrap ?? true,
-    onShow: () => onOpenChange?.(true),
-    onHide: () => onOpenChange?.(false),
-  });
+}: ContextualMenuProps): ReactElement {
+  const generatedId = formatIdent(useId());
+  const menuId = id ?? generatedId;
+  // The effects read the element from state, so they run once it exists.
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const [isOpen, setOpen] = useState(false);
+  const [triggerId, setTriggerId] = useState<string>();
+  // Where focus goes as the menu opens: the first item, the last after
+  // ArrowUp on the trigger, or where it was in a menu opened before
+  // hydration.
+  const [focusIntent, setFocusIntent] = useState<MenuFocusIntent>("first");
+  // Each opening mounts a fresh list, even one that follows a close the
+  // menu has not yet heard of.
+  const [openings, setOpenings] = useState(0);
+  const hadFocusRef = useRef(false);
 
-  const {
-    isOpen,
-    close,
-    targetRef,
-    popupRef,
-    popupPositionStyle,
-    popupId,
-    bestPosition,
-    annotatedRoot,
-    getNodeStatus,
-    highlightItem,
-    getTriggerProps,
-    getMenuProps,
-    getItemProps,
-  } = menu;
+  // A popover opened before hydration fired its toggle before React
+  // listened. Focus is read as the element attaches, since the re-render
+  // that follows may replace the focused item.
+  // @note Impure: reads the popover's state and focus from the DOM.
+  const attachElement = useCallback((node: HTMLDivElement | null) => {
+    setElement(node);
+    if (!node?.matches(":popover-open")) return;
+    const entries = [...node.querySelectorAll(MENU_ITEM)];
+    const active = findActiveElement(node);
+    const index = entries.findIndex((entry) => entry === active);
+    setFocusIntent(index >= 0 ? index : "none");
+  }, []);
 
-  const triggerProps = getTriggerProps();
-  const annotatedEntries = annotatedRoot.items ?? [];
+  // @note Impure: reads the popover's state and its trigger from the DOM.
+  const readState = useCallback((popover: HTMLDivElement) => {
+    const open = popover.matches(":popover-open");
+    setOpen(open);
+    if (open) setTriggerId(findTrigger(popover)?.id);
+  }, []);
 
-  // The shared menu API threaded to every (nested) level. One state, one
-  // highlight path, one keyboard handler — submenus are render-only. Memoised so
-  // the context value is stable across renders; an unstable value would re-render
-  // every SubMenu (and re-run their positioning) on every commit.
-  const menuContextValue = useMemo(
-    () => ({
-      getItemProps,
-      getMenuProps,
-      getNodeStatus,
-      highlightItem,
-      close,
-      // Submenus gate their own visibility on the ROOT open state: their
-      // hover state is local, so without this a mouse-selected nested leaf
-      // would close the root surface while the hovered submenu stayed up.
-      isOpen,
-      onSelectItem: (item: _Item<MenuItem>) => {
-        onSelect?.(item);
-        close();
-      },
-    }),
-    [
-      getItemProps,
-      getMenuProps,
-      getNodeStatus,
-      highlightItem,
-      close,
-      isOpen,
-      onSelect,
-    ],
+  useEffect(() => {
+    if (element) readState(element);
+  }, [element, readState]);
+
+  // A page restored from the back-forward cache comes back as it was left,
+  // with no toggle event: an open menu re-reads its state then.
+  // @note Impure: listens to the window's pageshow event.
+  useEffect(() => {
+    if (!element || !isOpen) return;
+    const handlePageShow = (): void => readState(element);
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, [element, isOpen, readState]);
+
+  // ArrowDown and ArrowUp on the trigger open the menu on its first or last
+  // item, or move focus there in an open one. Listening on the root runs
+  // after React, so a trigger's own preventDefault skips them.
+  // @note Impure: listens to keydown, opens the popover, moves focus.
+  useEffect(() => {
+    if (!element) return;
+    const root = element.getRootNode();
+    if (!(root instanceof Document || root instanceof ShadowRoot)) return;
+    const handleKeyDown = (event: Event): void => {
+      const { key, target, defaultPrevented } = event as KeyboardEvent;
+      if (defaultPrevented || (key !== "ArrowDown" && key !== "ArrowUp")) {
+        return;
+      }
+      if (target !== findTrigger(element)) return;
+      event.preventDefault();
+      const last = key === "ArrowUp";
+      if (!element.matches(":popover-open")) {
+        setFocusIntent(last ? "last" : "first");
+        element.showPopover();
+        return;
+      }
+      const topLevel = element.querySelectorAll<HTMLElement>(TOP_LEVEL_ITEM);
+      topLevel.item(last ? topLevel.length - 1 : 0)?.focus();
+    };
+    root.addEventListener("keydown", handleKeyDown);
+    return () => root.removeEventListener("keydown", handleKeyDown);
+  }, [element]);
+
+  // Only an open menu, whose element is attached, hides itself; hiding a
+  // closed popover does nothing.
+  // @note Impure: closes the popover element.
+  const hide = useCallback(
+    () =>
+      assertDefined(
+        element,
+        "an open menu's popover is attached",
+      ).hidePopover(),
+    [element],
   );
 
-  // With no explicit `label`, the menu is named by its trigger — so the trigger
-  // needs a stable id the menu can point `aria-labelledby` at (pointing at the
-  // menu's own id would leave it unnamed).
-  const triggerId = `${popupId}-trigger`;
+  const leavesFocusRef = useRef(false);
+  // Tab's close leaves focus to the browser, which moves it on.
+  // @note Impure: closes the popover.
+  const hideLeavingFocus = useCallback(() => {
+    leavesFocusRef.current = true;
+    hide();
+    leavesFocusRef.current = false;
+  }, [hide]);
 
-  // getMenuProps returns a generic prop bag from the headless navigation hook
-  // (loose event-handler and ref types); it is spread onto the menu container.
-  const menuProps = getMenuProps({
-    label,
-    labelledBy: label ? undefined : triggerId,
-    // Compose the positioning ref with the menu's keyboard ref.
-    ref: popupRef,
-  }) as React.HTMLAttributes<HTMLDivElement> & {
-    ref?: React.Ref<HTMLDivElement>;
+  // Safari does not focus a button on click, so the browser's own focus
+  // return can land on <body>: record whether focus was inside.
+  // @note Impure: records whether focus was inside.
+  const handleBeforeToggle = (event: ToggleEvent<HTMLDivElement>): void => {
+    if (event.newState === "closed") {
+      hadFocusRef.current =
+        !leavesFocusRef.current &&
+        event.currentTarget.contains(findActiveElement(event.currentTarget));
+    }
+    onBeforeToggle?.(event);
   };
 
-  const menuElement = (
+  // @note Impure: returns focus to the trigger when the menu closes with
+  // focus inside.
+  const handleToggle = (event: ToggleEvent<HTMLDivElement>): void => {
+    const popover = event.currentTarget;
+    readState(popover);
+    if (event.newState === "open") setOpenings((count) => count + 1);
+    // A close the menu has since reopened from leaves focus to the new list.
+    if (event.newState === "closed" && !popover.matches(":popover-open")) {
+      setFocusIntent("first");
+      if (hadFocusRef.current) {
+        hadFocusRef.current = false;
+        findTrigger(popover)?.focus();
+      }
+    }
+    onToggle?.(event);
+  };
+
+  const scriptOnlySeparators = findScriptOnlySeparators(items);
+
+  // tabIndex -1: a click on the popover outside an item keeps focus inside
+  // it, so closing then returns focus to the trigger.
+  return (
     <div
-      className={[
-        // Spelled out rather than interpolated from componentCssClassName: the
-        // portal target sits outside the caller's subtree, so this root marks
-        // its own pragma territory, and that must not depend on another
-        // constant keeping its "ds " prefix. SubMenu.tsx does the same.
-        "ds",
-        "contextual-menu__surface",
-        bestPosition?.positionName,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      id={popupId}
-      aria-hidden={!isOpen}
-      style={popupPositionStyle}
-      {...menuProps}
+      {...props}
+      ref={attachElement}
+      id={menuId}
+      popover="auto"
+      tabIndex={-1}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      style={{ ...style, positionAnchor: `--${menuId}` }}
+      onBeforeToggle={handleBeforeToggle}
+      onToggle={handleToggle}
     >
-      {annotatedEntries.map((entry) => (
-        // SubMenu renders a separator as a divider, a submenu parent as the
-        // item plus its nested popup (recursively), and a leaf as a plain item.
-        <SubMenu key={getItemId(entry)} item={entry} />
-      ))}
+      {isOpen ? (
+        <MenuList
+          key={openings}
+          items={items}
+          onSelect={onSelect}
+          // The ids win over the string, as aria-labelledby wins over
+          // aria-label, and the trigger names the menu when neither is given.
+          label={labelledBy === undefined ? label : undefined}
+          labelledBy={
+            labelledBy ?? (label === undefined ? triggerId : undefined)
+          }
+          wrap={wrap}
+          focusIntent={focusIntent}
+          hide={hide}
+          hideLeavingFocus={hideLeavingFocus}
+        />
+      ) : (
+        // Closed, and before hydration: a static list with no listener.
+        <div className={LIST_CLASS_NAME}>
+          {items.map((entry) =>
+            isMenuSeparator(entry) ? (
+              <hr
+                key={entry.key}
+                className={
+                  scriptOnlySeparators.has(entry.key)
+                    ? "separator script-only"
+                    : "separator"
+                }
+              />
+            ) : (
+              <Item key={entry.key ?? entry.url} item={entry} />
+            ),
+          )}
+        </div>
+      )}
     </div>
   );
-
-  return (
-    <MenuContext.Provider value={menuContextValue}>
-      <div
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
-        {...props}
-      >
-        {/* getTriggerProps drives the disclosure (the source of truth for open)
-            and carries the menu ARIA wiring. The disclosure's target ref sits on
-            the BUTTON, not the wrapper: closing returns focus via
-            `targetRef.current?.focus()`, and `focus()` on a non-focusable div is
-            a no-op — focus would silently fall to <body> (WCAG 2.4.3). The
-            fitment hook types its anchor as a div; the button anchors the same
-            rect, so cast (Popover precedent). */}
-        <button
-          type="button"
-          id={triggerId}
-          className="trigger"
-          ref={targetRef as React.Ref<HTMLButtonElement>}
-          {...triggerProps}
-        >
-          {children}
-        </button>
-        {mounted ? createPortal(menuElement, document.body) : menuElement}
-      </div>
-    </MenuContext.Provider>
-  );
-};
-
-export default ContextualMenu;
+}
