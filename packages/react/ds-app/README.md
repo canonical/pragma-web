@@ -20,6 +20,8 @@ import "@canonical/styles";
 
 Each component brings its own stylesheet when you import it.
 
+Testing with Jest? `@canonical/react-ds-global`'s [Testing with Jest](../ds-global/README.md#testing-with-jest) section covers the ESM transform, the stylesheet stub, the mapper entry this package needs and the jsdom dialog stub.
+
 ## Usage
 
 ```tsx

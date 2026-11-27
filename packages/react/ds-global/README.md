@@ -41,6 +41,84 @@ function Example() {
 
 Components accept standard HTML attributes for their underlying elements. A `Button` accepts all `ButtonHTMLAttributes`, a `Link` accepts all `AnchorHTMLAttributes`, and so on.
 
+## Testing with Jest
+
+The packages are ES modules only, and each component imports its own stylesheet, which a Jest 29 + jsdom
+project does not follow without help. Four things are needed:
+
+- **Transform the packages.** `transformIgnorePatterns` excludes `node_modules` from the transformer by
+  default, and `@canonical` has to be let back through so that `ts-jest` (with `allowJs`) or `babel-jest`
+  reads the ES modules instead of failing on their `export` statements.
+- **Stub the stylesheets.** A component imports `./styles.css`; map `\.css$` to an empty module.
+- **Map the packages a CommonJS resolver cannot find.** Two packaging shapes break the resolver.
+  `@canonical/react-hooks` and `@canonical/ds-types` publish an export map whose only runtime condition is
+  `import`, and `@canonical/react-ds-app` publishes no `main` and no `exports` map, only a `module` field.
+  Until each is mapped to its `dist/esm` entry, importing it stops the suite with `Cannot find module` —
+  `@canonical/react-hooks`, `@canonical/ds-types` or `@canonical/react-ds-app`. Extend the group with any
+  other `@canonical` package that fails the same way.
+- **Give jsdom a dialog.** jsdom implements `HTMLDialogElement` but not `showModal()` or `close()`, and
+  `Modal` opens through `showModal()`, so the two methods are stubbed.
+
+With the stub in `tests/style-stub.js` and the dialog stub in `tests/setup.ts`, the configuration is:
+
+```js
+/** @type {import('jest').Config} */
+module.exports = {
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\.(ts|tsx|js|mjs)$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          jsx: "react-jsx",
+          module: "esnext",
+          moduleResolution: "bundler",
+          allowJs: true,
+        },
+      },
+    ],
+  },
+  transformIgnorePatterns: ["/node_modules/(?!@canonical/)"],
+  moduleNameMapper: {
+    "^@canonical/(react-hooks|ds-types|react-ds-app)$":
+      "<rootDir>/node_modules/@canonical/$1/dist/esm/index.js",
+    "\\.css$": "<rootDir>/tests/style-stub.js",
+  },
+  setupFiles: ["<rootDir>/tests/setup.ts"],
+};
+```
+
+```ts
+// tests/setup.ts
+if (typeof HTMLDialogElement !== "undefined") {
+  const proto = HTMLDialogElement.prototype as any;
+  if (!proto.showModal) {
+    proto.showModal = function (this: HTMLDialogElement) {
+      this.setAttribute("open", "");
+    };
+  }
+  if (!proto.close) {
+    proto.close = function (this: HTMLDialogElement, value?: string) {
+      if (!this.hasAttribute("open")) return;
+      this.removeAttribute("open");
+      if (value !== undefined) (this as any).returnValue = value;
+      this.dispatchEvent(new Event("close"));
+    };
+  }
+}
+```
+
+```js
+// tests/style-stub.js
+module.exports = {};
+```
+
+Vitest needs none of those pieces — no transform list, no stylesheet stub and no mapper — but two settings of
+its own. `test.server.deps.inline` keeps `@canonical` out of the externalised `node_modules` that Node loads
+directly and that cannot read a `.css` import, and `resolve.mainFields` adds `module`, the only entry field
+`@canonical/react-ds-app` publishes. The dialog stub is the same one, and in this repository's own suites it
+is declared in the test files that open a modal.
+
 ## Modifier Families
 
 Several components accept appearance props that correspond to modifier families from `@canonical/ds-types`:
