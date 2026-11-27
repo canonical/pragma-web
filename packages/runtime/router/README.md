@@ -331,6 +331,18 @@ const testRouter = createRouter(routes, {
 });
 ```
 
+### Server-owned links
+
+With the Navigation API adapter, plain links to matching application routes stay in the router. Plain links outside the client route map go to the server, even when the router has a not-found fallback. This lets server-only pages, redirect endpoints and `Content-Disposition: attachment` responses work normally.
+
+If a server endpoint also matches a client route (including a catch-all), mark a plain anchor with `data-router-native` to bypass interception:
+
+```html
+<a href="/api/auth/login" data-router-native>Sign in</a>
+```
+
+Links with a `download` attribute do not need this marker. Use a plain anchor for server-owned URLs; `router.navigate()` is for client navigation.
+
 ### Externally owned location
 
 By default `createMemoryAdapter()` owns its location: it keeps an internal entries array and index that `navigate`, `back`, and `forward` mutate. Some hosts already own navigation state and need the router as a pure resolver rather than a second state owner — an application store that decides what is shown, a replay harness driving location from a recorded sequence, a state machine where "where we are" is derived state. For those, pass a `history` delegate and the adapter keeps no entries array and no index of its own:

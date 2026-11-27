@@ -690,10 +690,18 @@ export interface PlatformNavigateOptions {
   readonly state?: unknown;
 }
 
+export interface PlatformSubscribeOptions {
+  /** Whether a destination belongs to the client router, excluding its 404 fallback. */
+  readonly matchesRoute?: (location: URL) => boolean;
+}
+
 export interface PlatformAdapter {
   getLocation(): string | URL;
   navigate(url: string, options?: PlatformNavigateOptions): void;
-  subscribe(callback: (location: string | URL) => void): () => void;
+  subscribe(
+    callback: (location: string | URL) => void,
+    options?: PlatformSubscribeOptions,
+  ): () => void;
   /**
    * Optional: receive the in-flight load the router scheduled for the most
    * recent adapter-visible navigation, so platform loading UI can await it

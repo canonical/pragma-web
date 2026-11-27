@@ -1,4 +1,8 @@
-import type { PlatformAdapter, PlatformNavigateOptions } from "./types.js";
+import type {
+  PlatformAdapter,
+  PlatformNavigateOptions,
+  PlatformSubscribeOptions,
+} from "./types.js";
 
 interface NavigationResultLike {
   readonly committed?: Promise<unknown>;
@@ -23,10 +27,14 @@ interface NavigationLike {
 
 interface NavigateEventLike {
   readonly navigationType: string;
-  readonly destination: { readonly url: string };
+  readonly destination: {
+    readonly url: string;
+    readonly sameDocument?: boolean;
+  };
   readonly canIntercept: boolean;
   readonly hashChange: boolean;
   readonly downloadRequest: string | null;
+  readonly sourceElement?: { closest(selector: string): unknown } | null;
   intercept(options?: NavigationInterceptOptionsLike): void;
 }
 
@@ -70,7 +78,10 @@ function getDefaultNavigationWindow(): NavigationWindowLike {
 export default function createNavigationAdapter(
   navigationWindow: NavigationWindowLike = getDefaultNavigationWindow(),
 ): PlatformAdapter {
-  const subscribers = new Set<(location: string | URL) => void>();
+  const subscribers = new Map<
+    (location: string | URL) => void,
+    PlatformSubscribeOptions | undefined
+  >();
   const navigation = navigationWindow.navigation;
   let trackedLoad: Promise<void> | null = null;
   /** True while this adapter's own `navigate()` is calling the Navigation
@@ -82,7 +93,7 @@ export default function createNavigationAdapter(
   }
 
   function notify(location: URL = getLocation()): void {
-    for (const subscriber of subscribers) {
+    for (const subscriber of subscribers.keys()) {
       subscriber(new URL(location.href));
     }
   }
@@ -96,7 +107,41 @@ export default function createNavigationAdapter(
       return;
     }
 
-    // Intercept all same-origin navigations to prevent full page reloads.
+    const destination = new URL(event.destination.url);
+
+    // Leave new document requests outside the client route map to the server.
+    // A 404 fallback is not a route. An explicit opt-out also covers endpoints
+    // whose paths overlap a client route (for example because of a catch-all).
+    if (
+      !navigatingForRouter &&
+      (event.navigationType === "push" || event.navigationType === "replace")
+    ) {
+      if (event.sourceElement?.closest("a[data-router-native]")) {
+        return;
+      }
+
+      if (!event.destination.sameDocument) {
+        let hasRouteMatcher = false;
+        let matched = false;
+
+        for (const options of subscribers.values()) {
+          if (options?.matchesRoute) {
+            hasRouteMatcher = true;
+
+            if (options.matchesRoute(destination)) {
+              matched = true;
+              break;
+            }
+          }
+        }
+
+        if (hasRouteMatcher && !matched) {
+          return;
+        }
+      }
+    }
+
+    // Intercept router-owned navigations to prevent full page reloads.
     // The router handles the URL update and re-render internally.  The
     // handler hands the browser the router's in-flight load (tracked via
     // trackLoad below), so native loading UI reflects the navigation.  It
@@ -134,7 +179,7 @@ export default function createNavigationAdapter(
     // asked for is notified by navigate() after navigation.navigate()
     // returns, when location.href already names the destination.
     if (!navigatingForRouter) {
-      notify(new URL(event.destination.url));
+      notify(destination);
     }
   }
 
@@ -163,10 +208,10 @@ export default function createNavigationAdapter(
     trackLoad(load) {
       trackedLoad = load;
     },
-    subscribe(callback) {
+    subscribe(callback, options) {
       const shouldAttachListener = subscribers.size === 0;
 
-      subscribers.add(callback);
+      subscribers.set(callback, options);
 
       if (shouldAttachListener) {
         navigation.addEventListener("navigate", handleNavigate);
