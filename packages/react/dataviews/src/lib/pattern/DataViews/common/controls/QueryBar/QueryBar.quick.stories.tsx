@@ -11,7 +11,8 @@ import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import Component from "./QueryBar.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/QueryBar/Quick filters",
+  title: "patterns/DataViews/Controls/QueryBar/Quick filters",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   // The suggestions are a popover in the top layer, which escapes every

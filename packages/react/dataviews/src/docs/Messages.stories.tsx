@@ -13,11 +13,11 @@ import fr from "../storybook/locales/fr.js";
 import useMachineProvider from "../storybook/machines/useMachineProvider.js";
 
 const meta = {
-  title: "_work_in_progress/Messages and internationalization",
+  title: "Documentation/Messages and internationalization",
   component: Component,
   decorators: [withAppScope],
   // The page on messages is this entry's documentation.
-  tags: ["!autodocs"],
+  tags: ["!autodocs", "experimental"],
   argTypes: {
     provider: { control: false },
     messages: { control: false },

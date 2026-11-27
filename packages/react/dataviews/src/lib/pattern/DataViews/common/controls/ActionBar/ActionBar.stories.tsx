@@ -25,7 +25,8 @@ import Pagination from "../Pagination/Pagination.js";
 import Component from "./ActionBar.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/ActionBar",
+  title: "patterns/DataViews/Controls/ActionBar",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   // The deselect's Tooltip portals to the page, so docs preview each story

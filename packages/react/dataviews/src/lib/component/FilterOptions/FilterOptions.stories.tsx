@@ -13,7 +13,8 @@ import {
 import Component from "./FilterOptions.js";
 
 const meta = {
-  title: "_work_in_progress/FilterOptions",
+  title: "components/FilterOptions",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;

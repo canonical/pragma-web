@@ -10,7 +10,8 @@ import Component from "./QueryInput.js";
 import type { QueryInputOption, QueryInputProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/QueryInput",
+  title: "components/QueryInput",
+  tags: ["experimental"],
   component: Component,
   // The suggestions are a popover in the top layer, which escapes every
   // container, so each docs preview gets its own iframe.

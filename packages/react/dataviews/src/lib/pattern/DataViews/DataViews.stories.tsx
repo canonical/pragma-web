@@ -13,7 +13,8 @@ import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/DataViews",
+  title: "patterns/DataViews",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   argTypes: {

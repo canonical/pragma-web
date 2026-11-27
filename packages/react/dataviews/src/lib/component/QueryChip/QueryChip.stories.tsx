@@ -110,7 +110,8 @@ const clause = (
 );
 
 const meta = {
-  title: "_work_in_progress/QueryChip",
+  title: "components/QueryChip",
+  tags: ["experimental"],
   component: Component,
   argTypes: {
     criticality: {

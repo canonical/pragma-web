@@ -12,7 +12,8 @@ import Component from "./FilterButton.js";
 import type { FilterButtonPanelHandle } from "./index.js";
 
 const meta = {
-  title: "_work_in_progress/FilterButton",
+  title: "components/FilterButton",
+  tags: ["experimental"],
   component: Component,
   // The panel is a popover in the top layer, which escapes every container,
   // so each docs preview gets its own iframe.

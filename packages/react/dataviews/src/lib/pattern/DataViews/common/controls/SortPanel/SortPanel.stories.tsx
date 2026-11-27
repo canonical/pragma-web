@@ -12,7 +12,8 @@ import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 import Component from "./SortPanel.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/SortPanel",
+  title: "patterns/DataViews/Controls/SortPanel",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;

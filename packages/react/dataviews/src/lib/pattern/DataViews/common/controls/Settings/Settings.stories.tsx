@@ -15,7 +15,8 @@ import Component from "./Settings.js";
 type StoryArgs = ComponentProps<typeof Component> & StoryWords;
 
 const meta = {
-  title: "_work_in_progress/DataViews/Settings",
+  title: "patterns/DataViews/Controls/Settings",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<StoryArgs>;

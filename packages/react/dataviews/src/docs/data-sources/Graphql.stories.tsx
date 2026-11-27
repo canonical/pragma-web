@@ -20,7 +20,8 @@ import { createGraphQLMachineSource } from "../../storybook/machines/sources/ind
 import pickStoryWords from "../../storybook/pickStoryWords.js";
 
 const meta = {
-  title: "_work_in_progress/GraphQL API",
+  title: "Documentation/Data sources/GraphQL API",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   argTypes: {

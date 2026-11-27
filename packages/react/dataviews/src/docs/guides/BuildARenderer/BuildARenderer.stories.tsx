@@ -21,11 +21,11 @@ import { ConnectedRecordList, PlainList, StatusList } from "./common/index.js";
 import Component from "./common/RecordList/RecordList.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Renderers/Build your own renderer",
+  title: "Documentation/Guides/Build your own renderer",
   component: Component,
   decorators: [withAppScope],
   // The tutorial page is this folder's documentation.
-  tags: ["!autodocs"],
+  tags: ["!autodocs", "experimental"],
 } satisfies Meta<typeof Component>;
 
 export default meta;

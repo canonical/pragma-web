@@ -17,7 +17,8 @@ import pickStoryWords from "../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../storybook/types.js";
 
 const meta = {
-  title: "_work_in_progress/Composition",
+  title: "Documentation/Guides/Composition",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   argTypes: {

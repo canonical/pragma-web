@@ -20,7 +20,8 @@ import Component from "./DataChartWithTable.js";
 import { ConnectedDataChartWithTable as ConnectedChartWithTable } from "./index.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Renderers/DataChartWithTable",
+  title: "patterns/DataViews/Renderers/DataChartWithTable",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   argTypes: {

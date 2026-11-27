@@ -31,7 +31,8 @@ import type { DataViewsFiltersProps } from "./types.js";
 type StoryArgs = DataViewsFiltersProps & StoryWords;
 
 const meta = {
-  title: "_work_in_progress/DataViews/Filters",
+  title: "patterns/DataViews/Controls/Filters",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   args: {

@@ -37,7 +37,8 @@ import { ConnectedDataCards as ConnectedCards } from "./index.js";
 import type { DataCardsProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Renderers/DataCards",
+  title: "patterns/DataViews/Renderers/DataCards",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   args: {

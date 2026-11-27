@@ -28,7 +28,8 @@ import type { DataViewsSavedViewsProps } from "./types.js";
 type StoryArgs = DataViewsSavedViewsProps & StoryWords;
 
 const meta = {
-  title: "_work_in_progress/DataViews/SavedViews",
+  title: "patterns/DataViews/Controls/SavedViews",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<StoryArgs>;

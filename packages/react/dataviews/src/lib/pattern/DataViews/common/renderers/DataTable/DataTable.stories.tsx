@@ -34,7 +34,8 @@ import Component from "./DataTable.js";
 import type { DataTableColumn, DataTableProps } from "./index.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Renderers/DataTable",
+  title: "patterns/DataViews/Renderers/DataTable",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   args: {

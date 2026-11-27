@@ -24,7 +24,8 @@ import type { DataViewsSearchProps } from "./types.js";
 type StoryArgs = DataViewsSearchProps & StoryWords;
 
 const meta = {
-  title: "_work_in_progress/DataViews/Search",
+  title: "patterns/DataViews/Controls/Search",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   args: {

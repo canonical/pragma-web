@@ -31,7 +31,8 @@ const chips = [
 ];
 
 const meta = {
-  title: "_work_in_progress/QueryChips",
+  title: "groups/QueryChips",
+  tags: ["experimental"],
   component: Component,
   args: {
     label: "Filters",

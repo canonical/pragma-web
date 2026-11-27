@@ -5,7 +5,8 @@ import FilterOptions from "../../FilterOptions.js";
 import Component from "./Grid.js";
 
 const meta = {
-  title: "_work_in_progress/FilterOptions/Grid",
+  title: "components/FilterOptions/Grid",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;

@@ -18,7 +18,8 @@ import { createRestMachineSource } from "../../storybook/machines/sources/index.
 import pickStoryWords from "../../storybook/pickStoryWords.js";
 
 const meta = {
-  title: "_work_in_progress/REST API",
+  title: "Documentation/Data sources/REST API",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   argTypes: {

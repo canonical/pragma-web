@@ -22,7 +22,8 @@ import { ConnectedDataChart as ConnectedChart } from "./index.js";
 import type { DataChartType } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Renderers/DataChart",
+  title: "patterns/DataViews/Renderers/DataChart",
+  tags: ["experimental"],
   component: Component,
   decorators: [withAppScope],
   args: {

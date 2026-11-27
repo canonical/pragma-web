@@ -13,7 +13,7 @@ import scopedTypes from "./common/ScopedRecordList/types.ts?raw";
 import statusListSource from "./common/StatusList/StatusList.tsx?raw";
 import useIsScriptedSource from "./hooks/useIsScripted.ts?raw";
 
-<Meta title="_work_in_progress/DataViews/Renderers/Build your own renderer" />
+<Meta title="Documentation/Guides/Build your own renderer" tags={["experimental"]} />
 
 # Build your own renderer
 
@@ -75,7 +75,7 @@ The smallest renderer observes the provider and lists its rows.
 
 <Canvas of={Stories.APlainList} sourceState="none" />
 
-On a server, build the provider over the request's URL and call `provider.refresh()` before rendering. A source that answers within the call, such as `createArraySource`, has published its rows by then, so the server's markup lists them. The recipe is on the **_work_in_progress / Recipes** page, under "Before any script runs".
+On a server, build the provider over the request's URL and call `provider.refresh()` before rendering. A source that answers within the call, such as `createArraySource`, has published its rows by then, so the server's markup lists them. The recipe is on the **Documentation / Guides / Recipes** page, under "Before any script runs".
 
 ## Step 2: the status
 
@@ -100,7 +100,7 @@ The phase says what to announce. A terminal status is a settled outcome, so the 
 
 <Source code={spellPublicImports(statusListSource)} language="tsx" />
 
-Every word comes from `messages`: `resolveMessages` puts the application's messages over English, so a list given none speaks English. `resolveMessages` returns a new object on each call, so the list holds its result in a memo. The **_work_in_progress / Messages and internationalization** page covers the messages.
+Every word comes from `messages`: `resolveMessages` puts the application's messages over English, so a list given none speaks English. `resolveMessages` returns a new object on each call, so the list holds its result in a memo. The **Documentation / Messages and internationalization** page covers the messages.
 
 <Canvas of={Stories.StatusLoading} sourceState="none" />
 
