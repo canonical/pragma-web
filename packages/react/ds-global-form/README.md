@@ -32,7 +32,7 @@ Testing with Jest? `@canonical/react-ds-global`'s [Testing with Jest](../ds-glob
 
 This package puts CSS on the page two ways. `dist/esm/index.css` — the file the snippet above imports — is the package-level stylesheet: the `--form-*` token block, the field grid, the shared input chrome, and `density.css`, which sizes every control to the context and density cell on the root. It also imports every component's own stylesheet, so linking it gives every component rule from the first paint, before any JavaScript renders. Each component module also imports its own stylesheet (`import "./styles.css"`), so a component's CSS still reaches the page when the module does; a bundler collects those imports into the application's CSS. Nothing here is injected at runtime.
 
-The duplicate copies are harmless: both reach the build, and a minifier removes them. The order a bundler happens to emit these sheets in is not something you can rely on, which is what the cascade layer below is for.
+A bundler may deduplicate the component imports. Shared chrome's default text color has lower specificity than the component's own rules, so date and datetime inputs can override it even when a bundler changes stylesheet order.
 
 ### Every stylesheet is in `ds.components.global`
 
