@@ -8,11 +8,22 @@
   let {
     url,
     options = {},
-  }: { url: string; options?: Omit<OptionsFetchOptions<unknown>, "signal"> } =
-    $props();
+    version = 1,
+  }: {
+    url: string;
+    options?: Omit<OptionsFetchOptions<unknown>, "signal">;
+    version?: number;
+  } = $props();
 
   // svelte-ignore state_referenced_locally
-  const remote = createRemoteOptions(() => url, options);
+  // The headers read `version`, so a test can check that a change to the
+  // options alone starts no request.
+  const remote = createRemoteOptions(() => url, {
+    ...options,
+    get headers() {
+      return { "X-Version": String(version) };
+    },
+  });
 </script>
 
 <Field inputType="select" name="fruit" label="Fruit" {...remote.fieldProps} />

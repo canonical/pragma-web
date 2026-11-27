@@ -1,3 +1,4 @@
+import { untrack } from "svelte";
 import type { Option } from "../../subcomponent/types.js";
 import fetchOptions from "./fetchOptions.js";
 import type { OptionsFetchOptions, RemoteOptions } from "./types.js";
@@ -46,13 +47,21 @@ export default function createRemoteOptions<Data = Option[]>(
   let status = $state<Status>("loading");
   let error = $state<string>();
 
+  // A derived URL, so the effect re-runs only for a different string, not
+  // whenever something `readUrl` reads is updated.
+  const currentUrl = $derived(readUrl());
+
   $effect(() => {
-    const url = readUrl();
+    const url = currentUrl;
     const controller = new AbortController();
     fetched = NO_OPTIONS;
     status = "loading";
     error = undefined;
-    fetchOptions(url, { ...options, signal: controller.signal }).then(
+    // Only the URL starts a request: the options, and anything the request
+    // reads before its first await, are not tracked.
+    untrack(() =>
+      fetchOptions(url, { ...options, signal: controller.signal }),
+    ).then(
       (result) => {
         if (controller.signal.aborted) return;
         fetched = result;

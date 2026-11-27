@@ -102,4 +102,21 @@ describe("createRemoteOptions", () => {
     await expect.poll(() => readState().options).toEqual(["pear"]);
     expect(readError()).toBeNull();
   });
+
+  it("fetches again only when the URL changes", async () => {
+    const fetch = vi.fn(async () => Response.json(fruits));
+    const { page, readState } = await renderOptions({
+      url: "/api/fruits",
+      options: { fetch },
+    });
+    await expect.poll(() => readState().isLoading).toBe(false);
+    expect(fetch).toHaveBeenCalledOnce();
+    await page.rerender({ version: 2 });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(fetch.mock.calls[0]).toEqual([
+      "/api/fruits",
+      expect.objectContaining({ headers: { "X-Version": "1" } }),
+    ]);
+  });
 });
