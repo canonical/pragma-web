@@ -30,6 +30,20 @@ attachments are spread onto the real control.
 </Form>
 ```
 
+## Styles
+
+Import the global Pragma styles once, then either every form stylesheet:
+
+```css
+@import url("@canonical/styles");
+@import url("@canonical/svelte-ds-global-form/index.css");
+```
+
+or nothing more: each component imports its own stylesheet, so a bundler that
+handles CSS imports (Vite, SvelteKit) loads only the styles of the components
+you use. The package marks `**/*.css` as side effects so they are not
+tree-shaken.
+
 ## Fields
 
 - `Field` routes on `inputType` (`text`, `email`, `tel`, `url`, `password`,
@@ -112,6 +126,82 @@ type FormOwner<Values> = {
 - Outside a `Form` with an owner, bind a field yourself:
   `bind:value={() => owner.values.email, (v) => owner.setValue("email", v)}`
   and spread `{...bindField(owner, "email")}` for `error` and `onblur`.
+
+## Remote validation and options
+
+Middleware that changes the control is a Svelte attachment. `{@attach}` on a
+`Field` or field component is forwarded to its control, as native attributes
+and handlers are.
+
+`validateRemotely(target, options)` checks the value once the user stops
+typing and sets the answer as the control's custom validity, so the browser
+blocks the submit and the field shows the message:
+
+```svelte
+<Field
+  inputType="text"
+  name="username"
+  label="Username"
+  {@attach validateRemotely("/api/validate-username", {
+    errorExtractor: async (response) => (await response.json()).error,
+  })}
+/>
+```
+
+- `target` is a REST endpoint (`POST { value }` by default; `method`, `headers`,
+  `bodyFormatter`, `errorExtractor`), or your own check:
+  `(value, signal) => Promise<string | undefined>`, resolving to a message or
+  `undefined` when valid.
+- `minLength` (3), `debounceWait` (300 ms) and `timeout` (10000 ms) set when it
+  checks and how long it waits. Each change cancels the pending check, so only
+  the answer for the latest value counts.
+- A check that fails to complete, or times out, keeps the previous message.
+  A value shorter than `minLength` clears it. Each attachment clears only the
+  message it set.
+- A submit of a value not yet answered waits for its check, then submits again
+  when the value passed. In a `novalidate` form a rejected value still blocks
+  the submit.
+- Only string values typed or picked by the user are followed; a value written
+  by code is checked on submit. Without JavaScript nothing is checked, so
+  validate on the server too.
+
+Options are data. Fetch them in a SvelteKit `load` for server rendering, with
+`fetchOptions(url, { fetch, transformData })`, and pass them as `options`. To
+fetch them in the browser, and again when the URL changes, use
+`createRemoteOptions`:
+
+```svelte
+<script>
+  const fruits = createRemoteOptions(() => `/api/fruits?season=${season}`);
+</script>
+
+<Field inputType="select" name="fruit" label="Fruit" {...fruits.fieldProps} />
+```
+
+While loading the field is disabled, `aria-busy` and empty; a failed request
+becomes its `error` and leaves it enabled; a new URL clears the options and
+error while the new ones load. Spread `fieldProps` before your own props.
+
+## Native validity
+
+A field given no `error` (by you or by the owner) shows its control's native
+`validationMessage`, from the control's first `invalid` event: a failed
+submit, `checkValidity()`, `reportValidity()` or a `validateRemotely`
+rejection. From then on it reads the message again on `input`, `change`,
+`focusout` and the `ds:validity` event (`VALIDITY_EVENT`), so a fixed value
+clears it. A form reset, or hiding the field, stops it until the next
+`invalid`. If you call `setCustomValidity("")` yourself, dispatch
+`new Event("ds:validity", { bubbles: true })` on the control afterwards, since
+the browser fires no event. A custom `component` renders its own error.
+
+## Without JavaScript
+
+Fields render their values on the server, carry native `name`, `required` and
+constraint attributes, and post with the form, so a `Form` without an owner
+works with SvelteKit actions and with JavaScript disabled. Pass the action's
+messages back as `error`. Owners, `condition`, `validateRemotely` and
+`createRemoteOptions` need JavaScript; fetch options in `load` to have them on
+the server.
 
 `file` fields post their files without JavaScript: the named file input mirrors
 the bound files, including dropped ones. A plain form needs
