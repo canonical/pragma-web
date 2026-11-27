@@ -74,6 +74,10 @@ export const storyFilePairs: ReadonlyArray<readonly [string, string]> = [
     "lib/pattern/Field/Field.stories.svelte",
   ],
   ["lib/pattern/Form/Form.stories.tsx", "lib/pattern/Form/Form.stories.svelte"],
+  [
+    "lib/utils/middleware/middleware.stories.tsx",
+    "lib/utils/middleware/middleware.stories.svelte",
+  ],
   ...["ColorField", "ComboboxField", "RatingField"].map(
     (name) =>
       [

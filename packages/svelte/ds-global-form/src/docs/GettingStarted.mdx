@@ -295,14 +295,23 @@ control, so behaviour that changes the element is a Svelte attachment passed wit
 SvelteKit `load` for server rendering, an `$effect` to refetch) and pass it in.
 
 ```svelte
+<script>
+  const fruits = createRemoteOptions(() => "/api/fruits");
+</script>
+
+<Field name="fruit" inputType="select" label="Fruit" {...fruits.fieldProps} />
 <Field
-  name="country"
-  inputType="select"
-  label="Country"
-  options={data.countries}
-  {@attach trackChanges}
+  name="username"
+  inputType="text"
+  label="Username"
+  {@attach validateRemotely("/api/validate-username")}
 />
 ```
+
+`validateRemotely` sets the control's custom validity, so the browser blocks
+the submit and the field shows the message. `createRemoteOptions` keeps the
+field disabled and busy while loading and shows a failed request as its error.
+For server rendering, fetch the options in `load` with `fetchOptions`.
 
 ## Conditional fields
 

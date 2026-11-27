@@ -74,14 +74,15 @@ Every field and input takes a `$bindable` value: `value` for text-like, select,
 date, color, rating and combobox inputs, `checked` for the checkbox, switch and
 radio inputs (the boolean `value` on their fields), and `files` for the file
 upload input. Fields are required unless `isOptional` is set, and validation
-rules are native attributes (`minlength`, `pattern`, `min`, `max`, …). There is
-no form owner yet: the application owns form state, validation and submission,
-and passes a validation message to a field through its `error` prop. Error states
-apply a `.danger` CSS class that shifts the input border to the error colour.
+rules are native attributes (`minlength`, `pattern`, `min`, `max`, …). A field
+shows the message passed as `error` (for example a SvelteKit action result), the
+owner's message inside a `Form` with an owner, or else the control's native
+validation message once the control was invalid. Error states apply a `.danger`
+CSS class that shifts the input border to the error colour.
 
 ## Middleware
 
-Middleware wraps input components to add cross-cutting behaviour — fetching options from an API, server-side validation, conditional display. It is not part of the Svelte package yet; conditional display is available today through each field's `condition` prop.
+Cross-cutting behaviour that changes the control is a Svelte attachment, forwarded from a field to its control: `validateRemotely` checks the value against an endpoint and sets the control's custom validity. Options are data: `fetchOptions` for a SvelteKit `load`, `createRemoteOptions` to fetch them in the browser. Conditional display is each field's `condition` prop. See `utils/middleware`.
 
 ## Installation
 

@@ -1,8 +1,8 @@
 /**
  * Public package surface: the Field and Form patterns with their types, the
  * presentational inputs (with bindable values, usable outside a form), the
- * form owner helpers, and the phone helpers for decoding a form posted
- * without JavaScript. The field
+ * form owner helpers, the remote validation and options helpers, and the
+ * phone helpers for decoding a form posted without JavaScript. The field
  * components and the Field chrome are reached through the Field pattern.
  *
  * @module
@@ -19,6 +19,7 @@ export {
   ComboboxInput,
   RatingInput,
 } from "./_work_in_progress/index.js";
+export { VALIDITY_EVENT } from "./common/constants.js";
 export * from "./pattern/index.js";
 export type {
   CheckboxInputProps,
@@ -67,7 +68,14 @@ export type {
   FormStateOptions,
   FormValues,
   LatestOutcome,
+  OptionsFetchOptions,
+  RESTValidationOptions,
+  RemoteCheck,
+  RemoteOptions,
+  RemoteOptionsFieldProps,
+  RemoteValidationOptions,
   ResettableOwner,
+  ValidatedControl,
   ValidatedOwner,
   ValidationMode,
 } from "./utils/index.js";
@@ -75,9 +83,12 @@ export {
   bindField,
   createBinding,
   createFormState,
+  createRemoteOptions,
   createValidatedBinding,
   decodePhone,
   extractPhoneDigits,
+  fetchOptions,
   formatPhone,
   runLatest,
+  validateRemotely,
 } from "./utils/index.js";

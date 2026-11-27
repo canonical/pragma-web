@@ -18,4 +18,12 @@ describe("splitChromeProps", () => {
       control: { placeholder: "you@example.com", disabled: true },
     });
   });
+
+  it("sends attachments, keyed by symbols, to the control", () => {
+    const key = Symbol("attachment");
+    const attach = () => {};
+    const { chrome, control } = splitChromeProps({ name: "e", [key]: attach });
+    expect(chrome).toEqual({ name: "e" });
+    expect((control as Record<symbol, unknown>)[key]).toBe(attach);
+  });
 });

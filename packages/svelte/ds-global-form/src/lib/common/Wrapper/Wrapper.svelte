@@ -6,6 +6,7 @@
   } from "../../subcomponent/Field/index.js";
   import type { WrapperProps } from "../types.js";
   import useConditionalDisplay from "../useConditionalDisplay.svelte.js";
+  import useNativeValidity from "../useNativeValidity.svelte.js";
   import createControlProps from "./createControlProps.js";
   import "./styles.css";
 
@@ -30,7 +31,11 @@
 
   const uid = $props.id();
   const baseId = $derived(`${uid}-${name}`);
-  const isError = $derived(Boolean(error));
+  // Without an `error`, the field shows its control's native validation
+  // message once the control was invalid.
+  const nativeValidity = useNativeValidity();
+  const shownError = $derived(error ?? nativeValidity.message);
+  const isError = $derived(Boolean(shownError));
   const controlProps = $derived(
     createControlProps(baseId, isError, !isOptional, Boolean(description)),
   );
@@ -40,7 +45,7 @@
   );
 </script>
 
-{#if display.isVisible}<div {id} {style} class={[componentCssClassName, className, isError && "danger"]}><Label
+{#if display.isVisible}<div {id} {style} class={[componentCssClassName, className, isError && "danger"]} {@attach nativeValidity.follow}><Label
       {name}
       {isOptional}
       {requiredIndicator}
@@ -51,7 +56,7 @@
     ><div class="payload"
       >{#if descriptionPosition === "leading" && description}<Description id={`${baseId}-description`}>{description}</Description
       >{/if}{@render children(controlProps)}{#if descriptionPosition === "trailing" && description}<Description id={`${baseId}-description`}>{description}</Description
-      >{/if}{#if isError}<FieldError id={`${baseId}-error`}>{error}</FieldError
+      >{/if}{#if isError}<FieldError id={`${baseId}-error`}>{shownError}</FieldError
       >{/if}</div
   ></div
 >{/if}
