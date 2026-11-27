@@ -1567,17 +1567,20 @@ export default function createRouter<
   }
 
   if (adapter) {
-    unsubscribeFromAdapter = adapter.subscribe((location) => {
-      const href = toHref(location);
+    unsubscribeFromAdapter = adapter.subscribe(
+      (location) => {
+        const href = toHref(location);
 
-      if (ignoredAdapterHref === href) {
-        ignoredAdapterHref = null;
-        return;
-      }
+        if (ignoredAdapterHref === href) {
+          ignoredAdapterHref = null;
+          return;
+        }
 
-      saveScrollPosition();
-      scheduleAdapterLoad(location, "pop");
-    });
+        saveScrollPosition();
+        scheduleAdapterLoad(location, "pop");
+      },
+      { matchesRoute: (location) => match(location)?.name != null },
+    );
   }
 
   if (adapter) {

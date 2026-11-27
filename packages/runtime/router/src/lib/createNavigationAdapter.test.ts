@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import createNavigationAdapter from "./createNavigationAdapter.js";
+import createRouter from "./createRouter.js";
+import route from "./route.js";
 
 interface FakeInterceptOptions {
   handler?: () => void | Promise<void>;
@@ -11,10 +13,11 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
   let navigateListener:
     | ((event: {
         navigationType: string;
-        destination: { url: string };
+        destination: { url: string; sameDocument?: boolean };
         canIntercept: boolean;
         hashChange: boolean;
         downloadRequest: string | null;
+        sourceElement?: { closest: (selector: string) => unknown };
         intercept: (options?: FakeInterceptOptions) => void;
       }) => void)
     | null = null;
@@ -172,12 +175,94 @@ describe("createNavigationAdapter (Navigation API)", () => {
       destination: { url: "https://example.com/api/finance/export.zip" },
       canIntercept: true,
       hashChange: false,
-      downloadRequest: "export.zip",
+      downloadRequest: "",
       intercept,
     });
 
     expect(intercept).not.toHaveBeenCalled();
     expect(listener).not.toHaveBeenCalled();
+  });
+
+  it("follows application links but leaves server URLs alone with a 404 fallback", async () => {
+    const navigationWindow = createFakeNavigationWindow();
+    const router = createRouter(
+      {
+        home: route({ url: "/", content: () => "home" }),
+        docs: route({ url: "/docs", content: () => "docs" }),
+      },
+      {
+        adapter: createNavigationAdapter(navigationWindow),
+        notFound: route({ url: "/*", content: () => "not-found" }),
+      },
+    );
+
+    navigationWindow.dispatchNavigate("https://example.com/docs", "push");
+    await vi.waitFor(() => expect(router.getState().match?.name).toBe("docs"));
+
+    for (const path of ["/api/auth/login", "/api/export.zip"]) {
+      const intercept = vi.fn();
+      navigationWindow.dispatchNavigateRaw({
+        navigationType: "push",
+        destination: { url: `https://example.com${path}`, sameDocument: false },
+        canIntercept: true,
+        hashChange: false,
+        downloadRequest: null,
+        intercept,
+      });
+      expect(intercept).not.toHaveBeenCalled();
+    }
+
+    expect(router.getState().location.pathname).toBe("/docs");
+  });
+
+  it("leaves a marked native link alone even when the destination matches", () => {
+    const navigationWindow = createFakeNavigationWindow();
+    const adapter = createNavigationAdapter(navigationWindow);
+    const listener = vi.fn();
+    const intercept = vi.fn();
+    const closest = vi.fn((selector) =>
+      selector === "a[data-router-native]" ? {} : null,
+    );
+
+    adapter.subscribe(listener, { matchesRoute: () => true });
+    navigationWindow.dispatchNavigateRaw({
+      navigationType: "replace",
+      destination: { url: "https://example.com/api/export.zip" },
+      canIntercept: true,
+      hashChange: false,
+      downloadRequest: null,
+      sourceElement: { closest },
+      intercept,
+    });
+
+    expect(closest).toHaveBeenCalledWith("a[data-router-native]");
+    expect(intercept).not.toHaveBeenCalled();
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it("still intercepts same-document updates and traversal without a route match", () => {
+    const navigationWindow = createFakeNavigationWindow();
+    const adapter = createNavigationAdapter(navigationWindow);
+    const listener = vi.fn();
+    const intercept = vi.fn();
+
+    adapter.subscribe(listener, { matchesRoute: () => false });
+    for (const [navigationType, sameDocument] of [
+      ["push", true],
+      ["traverse", false],
+    ] as const) {
+      navigationWindow.dispatchNavigateRaw({
+        navigationType,
+        destination: { url: "https://example.com/unknown", sameDocument },
+        canIntercept: true,
+        hashChange: false,
+        downloadRequest: null,
+        intercept,
+      });
+    }
+
+    expect(intercept).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenCalledTimes(2);
   });
 
   it("ignores hash-change navigate events", () => {
