@@ -86,40 +86,6 @@ Inert.play = async ({ canvasElement }) => {
 };
 
 /**
- * Several filters, one per line: the names in a fixed column, the words of
- * each starting on one edge. Narrow the frame to stack them.
- */
-export const Grid: StoryFn = () => (
-  <Component.Grid>
-    <StatusWords initial="deployed" />
-    <TagWords />
-    <Component
-      label="Owner"
-      options={[
-        {
-          value: "Any",
-          label: "Any",
-          current: true,
-          onSelect: () => undefined,
-        },
-        {
-          value: "Has an owner",
-          label: "Has an owner",
-          current: false,
-          onSelect: () => undefined,
-        },
-        {
-          value: "No owner",
-          label: "No owner",
-          current: false,
-          onSelect: () => undefined,
-        },
-      ]}
-    />
-  </Component.Grid>
-);
-
-/**
  * While an exclusion applies, the name carries its words, "none of 1", and
  * the Exclusion mark, and the excluded value shows the mark too.
  */
