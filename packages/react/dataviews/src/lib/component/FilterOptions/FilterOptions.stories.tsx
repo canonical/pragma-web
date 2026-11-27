@@ -1,12 +1,15 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import type { ReactElement } from "react";
-import { useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import {
   withAppScope,
   withRightToLeft,
   withServerMarkup,
 } from "../../../storybook/decorators/index.js";
+import {
+  STATUSES,
+  StatusWords,
+  TagWords,
+} from "../../../storybook/words/index.js";
 import Component from "./FilterOptions.js";
 
 const meta = {
@@ -16,61 +19,6 @@ const meta = {
 } satisfies Meta<typeof Component>;
 
 export default meta;
-
-const STATUSES = [
-  { value: "deployed", count: "12" },
-  { value: "ready", count: "4" },
-  { value: "broken", count: "1" },
-];
-
-const TAGS = ["ex-gpu", "ex-nvme", "ex-ssd"];
-
-/** One status at a time, after "All", as a radio group behaves. */
-const StatusWords = ({ initial = null }: { initial?: string | null }) => {
-  const [status, setStatus] = useState<string | null>(initial);
-  return (
-    <Component
-      label="Status"
-      options={[
-        {
-          value: "",
-          label: "All",
-          current: status === null,
-          onSelect: () => setStatus(null),
-        },
-        ...STATUSES.map(({ value, count }) => ({
-          value,
-          label: value,
-          count,
-          current: status === value,
-          onSelect: () => setStatus(value),
-        })),
-      ]}
-    />
-  );
-};
-
-/** Several tags at once, as checkboxes behave. */
-const TagWords = (): ReactElement => {
-  const [tags, setTags] = useState<readonly string[]>(["ex-gpu"]);
-  return (
-    <Component
-      label="Tags"
-      multiple
-      options={TAGS.map((tag) => ({
-        value: tag,
-        label: tag,
-        current: tags.includes(tag),
-        onSelect: () =>
-          setTags(
-            tags.includes(tag)
-              ? tags.filter((held) => held !== tag)
-              : [...tags, tag],
-          ),
-      }))}
-    />
-  );
-};
 
 /**
  * One value at a time: choosing a word makes it current, and "All" clears
