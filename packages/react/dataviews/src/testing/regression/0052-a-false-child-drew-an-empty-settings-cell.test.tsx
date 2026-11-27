@@ -14,8 +14,8 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0052 — a false child drew an empty settings cell", () => {
   it("draws no settings cell for a conditional that renders nothing, typed or not", () => {

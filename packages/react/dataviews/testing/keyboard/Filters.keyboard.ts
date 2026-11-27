@@ -41,7 +41,7 @@ const findStory = (name: string): IndexedStory => {
   ) as { readonly entries: Readonly<Record<string, IndexedStory>> };
   const story = Object.values(index.entries).find(
     (entry) =>
-      entry.title === "_work_in_progress/DataViews/Filters" &&
+      entry.title === "patterns/DataViews/Controls/Filters" &&
       entry.name === name,
   );
   if (story === undefined) {
@@ -97,7 +97,7 @@ test.describe("Filters, new operators, keyboard only", () => {
   test("Tab reaches presence's checked choice, and arrow keys apply each choice they reach", async ({
     page,
   }) => {
-    await openStory(page, "New Operators");
+    await openStory(page, "New operators");
     const owner = page.getByRole("group", { name: "Owner" });
     const any = owner.getByRole("radio", { name: "Any" });
     await tabTo(page, any);
@@ -119,7 +119,7 @@ test.describe("Filters, new operators, keyboard only", () => {
   });
 
   test("typed text narrows the rows as it is typed", async ({ page }) => {
-    await openStory(page, "New Operators");
+    await openStory(page, "New operators");
     const host = page.getByRole("textbox", { name: "Host does not contain" });
     await tabTo(page, host);
     await page.keyboard.press("End");
@@ -133,7 +133,7 @@ test.describe("Filters, new operators, keyboard only", () => {
   test("focus follows text an arrow key moves past a taken operator", async ({
     page,
   }) => {
-    await openStory(page, "New Operators");
+    await openStory(page, "New operators");
     const selects = page.getByRole("combobox", { name: "How Host matches" });
     const ending = selects.nth(1);
     await expect(ending).toHaveValue("endsWith");
@@ -151,7 +151,7 @@ test.describe("Filters, new operators, keyboard only", () => {
   test("Enter on a further restriction's Clear removes that one alone", async ({
     page,
   }) => {
-    await openStory(page, "New Operators");
+    await openStory(page, "New operators");
     const clear = page.getByRole("button", {
       name: "Clear Tags is any of ex-nvme",
     });
@@ -168,7 +168,7 @@ test.describe("Filters, new operators, keyboard only", () => {
   test("arrow keys onto Any keep focus in a presence control shown for its restriction", async ({
     page,
   }) => {
-    await openStory(page, "Presence Outside The Primary Filters");
+    await openStory(page, "Presence outside the primary filters");
     const owner = page.getByRole("group", { name: "Owner" });
     const set = owner.getByRole("radio", { name: "Has a value" });
     await tabTo(page, set);

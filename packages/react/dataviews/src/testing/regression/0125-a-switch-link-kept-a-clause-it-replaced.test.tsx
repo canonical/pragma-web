@@ -25,7 +25,7 @@ import {
   type Machine,
   machines,
 } from "../../../testing/index.js";
-import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../lib/pattern/DataViews/Provider.js";
 
 describe("regression 0125 — a switch link kept a clause it replaced", () => {
   it("leads the none-of switch to the moved set alone", () => {

@@ -12,8 +12,7 @@
 import { expect, type Locator, type Page, test } from "playwright/test";
 
 /** The story id of one QueryInput story. */
-const buildStoryId = (name: string): string =>
-  `work-in-progress-queryinput--${name}`;
+const buildStoryId = (name: string): string => `components-queryinput--${name}`;
 
 /** The render phases after which a story is drawn and its play done. */
 const SETTLED_PHASES: readonly string[] = ["completed", "finished"];
@@ -341,7 +340,7 @@ test.describe("QueryInput, keyboard only", () => {
     expect(options).toContain("status, 6 values");
     expect(options).toContain("at least cpu");
     await page.goto(
-      "/iframe.html?id=work-in-progress-filterbutton--applied&viewMode=story",
+      "/iframe.html?id=components-filterbutton--applied&viewMode=story",
     );
     await expect(page.getByRole("button", { name: /Status/ })).toBeVisible();
     expect(await readTreeNames(page, "button")).toContain("Status, 2 applied");

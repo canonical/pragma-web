@@ -43,9 +43,12 @@ describe("openQueryBarStory", () => {
       ),
       locator: vi.fn(() => ({ getByRole })),
     };
-    await openQueryBarStory(page as unknown as Page, "default");
+    await openQueryBarStory(
+      page as unknown as Page,
+      "patterns-dataviews-controls-querybar--default",
+    );
     expect(page.goto).toHaveBeenCalledWith(
-      "/iframe.html?id=work-in-progress-dataviews-querybar--default&viewMode=story",
+      "/iframe.html?id=patterns-dataviews-controls-querybar--default&viewMode=story",
     );
     expect(settled).toEqual([false, false, true]);
     expect(page.locator).toHaveBeenCalledWith("#storybook-root");

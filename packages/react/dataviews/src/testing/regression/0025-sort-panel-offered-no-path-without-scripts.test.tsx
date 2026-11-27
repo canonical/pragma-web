@@ -16,7 +16,7 @@ import {
   declareMachineOrdering,
   machines,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0025 — the sort panel offered no path without scripts", () => {
   it("links a later term's move up to the ordering with it first", () => {

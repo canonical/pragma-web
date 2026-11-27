@@ -16,7 +16,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0009 — a header link's focus lost on hydration", () => {
   it("hands the link's focus to the button that replaces it", async () => {

@@ -22,7 +22,7 @@ import {
   createMachineProvider,
   createMemoryViewStore,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0005 — a refused name was not asked again", () => {
   it("clears the standing refusal as the submit begins, so the name is checked anew", async () => {

@@ -22,7 +22,7 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 beforeEach(() => {
   fakeAnnouncerClock();

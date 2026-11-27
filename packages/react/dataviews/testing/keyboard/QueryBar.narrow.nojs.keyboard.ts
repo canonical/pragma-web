@@ -7,6 +7,7 @@
  */
 
 import { expect, type Page, test } from "playwright/test";
+import { QUERY_BAR } from "./constants.js";
 import openWithoutScripts from "./openWithoutScripts.js";
 
 test.use({ viewport: { width: 360, height: 740 } });
@@ -29,7 +30,7 @@ test.describe("QueryBar's narrow form without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=deployed&q=web",
     );
     // Narrow, the disclosure gives way to the summary button.
@@ -84,7 +85,7 @@ test.describe("QueryBar's narrow form without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=deployed",
     );
     const summary = page.getByRole("button", { name: "Filters, 1 applied" });
@@ -102,7 +103,13 @@ test.describe("QueryBar's narrow form without scripts", () => {
     page,
     browser,
   }, info) => {
-    await openWithoutScripts(page, browser, info, "no-java-script-memory", "");
+    await openWithoutScripts(
+      page,
+      browser,
+      info,
+      `${QUERY_BAR}--no-java-script-memory`,
+      "",
+    );
     await page.getByRole("button", { name: "Filters, 1 applied" }).click();
     const sheet = page.getByRole("dialog", { name: "Filter records" });
     await expect(sheet).toBeVisible();

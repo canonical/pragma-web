@@ -5,8 +5,8 @@ import {
 } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { QueryBar } from "../../lib/_work_in_progress/DataViews/common/QueryBar/index.js";
-import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
+import { QueryBar } from "../../lib/pattern/DataViews/common/controls/QueryBar/index.js";
+import DataViews from "../../lib/pattern/DataViews/Provider.js";
 import type { QueryBuilderProps } from "./types.js";
 
 /** One record the builder's clauses filter. */

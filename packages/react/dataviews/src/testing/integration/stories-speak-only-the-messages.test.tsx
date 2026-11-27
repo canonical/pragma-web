@@ -17,24 +17,26 @@ import {
   type RequestsRead,
   serveMockApi,
 } from "../../../testing/index.js";
-import * as buildARendererStories from "../../lib/_work_in_progress/BuildARenderer/BuildARenderer.stories.js";
-import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
-import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
-import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
-import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
-import * as actionBarStories from "../../lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.stories.js";
-import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
-import * as paginationStories from "../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.stories.js";
-import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
-import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common/SavedViews/SavedViews.stories.js";
-import * as searchStories from "../../lib/_work_in_progress/DataViews/common/Search/Search.stories.js";
-import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
-import * as sortPanelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
-import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
-import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
-import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
-import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
+import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
+import * as restStories from "../../docs/data-sources/Rest.stories.js";
+import * as buildARendererStories from "../../docs/guides/BuildARenderer/BuildARenderer.stories.js";
+import * as compositionStories from "../../docs/guides/Composition.stories.js";
+import * as actionBarStories from "../../lib/pattern/DataViews/common/controls/ActionBar/ActionBar.stories.js";
+import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
+import * as paginationStories from "../../lib/pattern/DataViews/common/controls/Pagination/Pagination.stories.js";
+import * as queryBarNarrowStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.narrow.stories.js";
+import * as queryBarQuickStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.quick.stories.js";
+import * as queryBarStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.stories.js";
+import * as savedViewsStories from "../../lib/pattern/DataViews/common/controls/SavedViews/SavedViews.stories.js";
+import * as searchStories from "../../lib/pattern/DataViews/common/controls/Search/Search.stories.js";
+import * as settingsStories from "../../lib/pattern/DataViews/common/controls/Settings/Settings.stories.js";
+import * as sortPanelStories from "../../lib/pattern/DataViews/common/controls/SortPanel/SortPanel.stories.js";
+import * as dataCardsStories from "../../lib/pattern/DataViews/common/renderers/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
+import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
+import * as rootStories from "../../lib/pattern/DataViews/DataViews.stories.js";
+import * as barStories from "../../lib/subcomponent/PaginationBar/PaginationBar.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -58,6 +60,8 @@ const parts = {
   Filters: composeStories(filtersStories),
   Pagination: composeStories(paginationStories),
   QueryBar: composeStories(queryBarStories),
+  "QueryBar/Narrow": composeStories(queryBarNarrowStories),
+  "QueryBar/Quick filters": composeStories(queryBarQuickStories),
   SavedViews: composeStories(savedViewsStories),
   Search: composeStories(searchStories),
   Settings: composeStories(settingsStories),

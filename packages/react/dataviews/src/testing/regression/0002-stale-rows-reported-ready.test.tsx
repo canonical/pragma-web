@@ -29,7 +29,7 @@ import {
   createMachineProvider,
   machines,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 const columns = [
   { id: "name", header: "Name", sortable: true },

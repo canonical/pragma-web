@@ -1,0 +1,35 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Welcome" tags={["experimental"]} />
+
+# DataViews — React
+
+`@canonical/dataviews-react` shows a collection of records, and lets a reader search, filter, sort, select and page through it. The state lives in a provider from `@canonical/dataviews-core`. The React parts render that state and send the reader's commands back to it.
+
+> **Experimental.** Every export is pre-release, and its shape may change between minor versions.
+
+## How the parts fit
+
+```
+createDataViewsProvider   @canonical/dataviews-core: the collection, a source, and its ports
+  └─ DataViews            the root: mounts the provider for the parts inside it
+       ├─ controls        QueryBar · Search · Filters · SortPanel · Settings · SavedViews · Pagination · ActionBar
+       └─ renderers       DataTable
+```
+
+- The **root**, `DataViews`, takes the provider once. Every part inside it reads the root and takes no provider of its own.
+- The **controls** edit the query, the ordering, the arrangement and the selection, through the provider.
+- The **renderers** show the records. `DataTable` is exported. `DataCards`, `DataChart` and `DataChartWithTable` are prototypes and are not exported from the package root.
+- The **standalone blocks** work without a root: `PaginationBar` and `DataTable` take a provider, and `QueryInput`, `QueryChip`, `QueryChips`, `FilterButton` and `FilterOptions` take their values from the host.
+
+## The sidebar
+
+The sidebar follows the source folders:
+
+- **patterns / DataViews**: the root, with its controls and renderers.
+- **components**: `QueryInput`, `QueryChip`, `FilterButton` and `FilterOptions`.
+- **groups**: `QueryChips`.
+- **subcomponents**: `PaginationBar`.
+- **Documentation**: this page, a first DataViews, guides, the data sources and the messages.
+
+Each part renders a baseline before scripts run. **Guides / Without JavaScript** links the stories that show a part without scripts.

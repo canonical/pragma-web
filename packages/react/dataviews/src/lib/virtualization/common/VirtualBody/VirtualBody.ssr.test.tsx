@@ -11,7 +11,7 @@ import {
   createMachineProvider,
   deliverRows,
 } from "../../../../../testing/index.js";
-import { DataTable } from "../../../_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../../pattern/DataViews/common/renderers/DataTable/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
 
 describe("virtualized DataTable SSR", () => {

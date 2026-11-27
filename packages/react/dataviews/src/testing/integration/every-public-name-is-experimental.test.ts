@@ -11,10 +11,7 @@ const listUnmarked = (barrel: string): readonly string[] =>
 const readMembersBlock = (): string =>
   /export type DataViewsComponent = [\s\S]*?\) & \{([\s\S]*?)\n\};/
     .exec(
-      readFileSync(
-        path.resolve("src/lib/_work_in_progress/DataViews/types.ts"),
-        "utf8",
-      ),
+      readFileSync(path.resolve("src/lib/pattern/DataViews/types.ts"), "utf8"),
     )
     ?.at(1) ?? "";
 

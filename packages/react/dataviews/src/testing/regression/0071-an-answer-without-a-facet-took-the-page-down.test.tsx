@@ -10,7 +10,7 @@ import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createFacetedManual } from "../../../testing/index.js";
-import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
+import { DataChart } from "../../lib/pattern/DataViews/common/renderers/DataChart/index.js";
 
 /** Answer the source's latest request with a page carrying no facet at all. */
 const answerWithoutFacets = (

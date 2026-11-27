@@ -13,23 +13,26 @@ import {
   installPopoverStandIn,
   serveMockApi,
 } from "../../../testing/index.js";
-import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
-import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
-import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
-import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
-import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
-import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
-import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
-import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
-import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
-import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
-import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
-import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
-import * as filterOptionsStories from "../../lib/_work_in_progress/FilterOptions/FilterOptions.stories.js";
-import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
-import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
-import * as queryInputStories from "../../lib/_work_in_progress/QueryInput/QueryInput.stories.js";
+import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
+import * as restStories from "../../docs/data-sources/Rest.stories.js";
+import * as compositionStories from "../../docs/guides/Composition.stories.js";
+import * as filterButtonStories from "../../lib/component/FilterButton/FilterButton.stories.js";
+import * as filterOptionsGridStories from "../../lib/component/FilterOptions/common/Grid/Grid.stories.js";
+import * as filterOptionsStories from "../../lib/component/FilterOptions/FilterOptions.stories.js";
+import * as queryChipStories from "../../lib/component/QueryChip/QueryChip.stories.js";
+import * as queryInputStories from "../../lib/component/QueryInput/QueryInput.stories.js";
+import * as queryChipsStories from "../../lib/group/QueryChips/QueryChips.stories.js";
+import * as filtersStories from "../../lib/pattern/DataViews/common/controls/Filters/Filters.stories.js";
+import * as queryBarNarrowStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.narrow.stories.js";
+import * as queryBarQuickStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.quick.stories.js";
+import * as queryBarStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.stories.js";
+import * as settingsStories from "../../lib/pattern/DataViews/common/controls/Settings/Settings.stories.js";
+import * as panelStories from "../../lib/pattern/DataViews/common/controls/SortPanel/SortPanel.stories.js";
+import * as dataCardsStories from "../../lib/pattern/DataViews/common/renderers/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
+import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
+import * as rootStories from "../../lib/pattern/DataViews/DataViews.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -79,6 +82,7 @@ const played = {
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
   FilterOptions: composeStories(filterOptionsStories),
+  "FilterOptions Grid": composeStories(filterOptionsGridStories),
   // The links with a refused clause, on a memory location and no mock API.
   Composition: Object.fromEntries(
     Object.entries(composeStories(compositionStories)).filter(([name]) =>
@@ -140,7 +144,15 @@ describe("the query controls' played stories have no axe violations", () => {
   }
 
   // Each as first drawn, then once its play has run.
-  for (const [name, Story] of Object.entries(composeStories(queryBarStories))) {
+  for (const [name, Story] of [
+    ...Object.entries(composeStories(queryBarStories)),
+    ...Object.entries(composeStories(queryBarNarrowStories)).map(
+      ([story, composed]) => [`Narrow ${story}`, composed] as const,
+    ),
+    ...Object.entries(composeStories(queryBarQuickStories)).map(
+      ([story, composed]) => [`Quick filters ${story}`, composed] as const,
+    ),
+  ]) {
     it(`QueryBar ${name}`, async () => {
       const { container, unmount } = render(<Story />);
       await expectNoAxeViolations(container);

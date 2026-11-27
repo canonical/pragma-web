@@ -1,6 +1,6 @@
 import type { QueryLocation, Source } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 import type { StoryWords } from "../types.js";
 import {
   SERVER_BACKED_COLUMNS,

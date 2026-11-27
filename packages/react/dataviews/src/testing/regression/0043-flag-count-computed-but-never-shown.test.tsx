@@ -24,7 +24,7 @@ import {
   answerFacetValues,
   type IdentifiedRecord as Owned,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const owned = createCollection({
   identify: (row: Owned) => row.id,

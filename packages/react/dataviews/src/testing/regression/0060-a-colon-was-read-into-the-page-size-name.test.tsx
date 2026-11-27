@@ -9,7 +9,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../testing/index.js";
-import { PaginationBar } from "../../lib/_work_in_progress/PaginationBar/index.js";
+import { PaginationBar } from "../../lib/subcomponent/PaginationBar/index.js";
 
 describe("regression 0060 — a colon was read into the page size name", () => {
   it("names the page size select by its words alone", () => {

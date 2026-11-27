@@ -14,7 +14,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 
 describe("regression 0022 — a refusal was recorded over a later ordering", () => {
   it("drops the reason when the same event changes the ordering after the refusal", () => {

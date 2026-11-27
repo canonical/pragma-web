@@ -15,7 +15,7 @@ import { createStandInViewStore } from "@canonical/dataviews-core/testing";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0026 — destinations kept a view left behind", () => {
   it("drops the view from the search form and the pagination when the location leaves it", () => {

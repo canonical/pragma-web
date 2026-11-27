@@ -11,46 +11,46 @@
  * loaded route paints before its CSS arrives. Linking this file means no
  * route can ever render unstyled.
  *
- * A hand-written list of the exported parts' stylesheets. Add a component,
- * add its line, alphabetically.
+ * A hand-written list of the exported parts' stylesheets, in cascade order:
+ * add a component's line where its rules belong, and move none.
  */
 
-@import url("./_work_in_progress/common/ScopedDataTable/styles.css");
-@import url("./_work_in_progress/DataViews/common/ActionBar/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/common/BoundFilter/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/common/FurtherConjuncts/common/FurtherConjunct/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/common/LinkRefusals/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/common/PresenceFilter/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/common/TextFilter/styles.css");
-@import url("./_work_in_progress/DataViews/common/Filters/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/FiltersDisclosure/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/MessageLine/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/BoundsPanel/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/ChoicesPanel/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/PanelForm/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/PresencePanel/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/TextPanel/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/QuickFilter/common/TypedInput/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/AddFilterWalk/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/common/StepListbox/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/Sheet/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/common/SummaryButton/styles.css");
-@import url("./_work_in_progress/DataViews/common/QueryBar/styles.css");
-@import url("./_work_in_progress/DataViews/common/SavedViews/common/NameForm/styles.css");
-@import url("./_work_in_progress/DataViews/common/SavedViews/styles.css");
-@import url("./_work_in_progress/DataViews/common/Search/styles.css");
-@import url("./_work_in_progress/FilterButton/styles.css");
-@import url("./_work_in_progress/FilterOptions/common/FilterOptionsGrid/styles.css");
-@import url("./_work_in_progress/FilterOptions/styles.css");
-@import url("./_work_in_progress/PaginationBar/common/PageControl/styles.css");
-@import url("./_work_in_progress/PaginationBar/styles.css");
-@import url("./_work_in_progress/QueryChip/common/Entry/styles.css");
-@import url("./_work_in_progress/QueryChip/common/Segment/styles.css");
-@import url("./_work_in_progress/QueryChip/styles.css");
-@import url("./_work_in_progress/QueryChips/styles.css");
-@import url("./_work_in_progress/QueryInput/common/Entry/styles.css");
-@import url("./_work_in_progress/QueryInput/common/Suggestions/styles.css");
-@import url("./_work_in_progress/QueryInput/styles.css");
+@import url("./pattern/DataViews/common/renderers/DataTable/styles.css");
+@import url("./pattern/DataViews/common/controls/ActionBar/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/common/BoundFilter/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/common/FurtherConjuncts/common/FurtherConjunct/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/common/LinkRefusals/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/common/PresenceFilter/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/common/TextFilter/styles.css");
+@import url("./pattern/DataViews/common/controls/Filters/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/FiltersDisclosure/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/MessageLine/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/BoundsPanel/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/ChoicesPanel/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/PanelForm/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/PresencePanel/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/TextPanel/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/QuickFilter/common/TypedInput/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/Sheet/common/AddFilterWalk/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/Sheet/common/StepListbox/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/Sheet/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/common/SummaryButton/styles.css");
+@import url("./pattern/DataViews/common/controls/QueryBar/styles.css");
+@import url("./pattern/DataViews/common/controls/SavedViews/common/NameForm/styles.css");
+@import url("./pattern/DataViews/common/controls/SavedViews/styles.css");
+@import url("./pattern/DataViews/common/controls/Search/styles.css");
+@import url("./component/FilterButton/styles.css");
+@import url("./component/FilterOptions/common/Grid/styles.css");
+@import url("./component/FilterOptions/styles.css");
+@import url("./subcomponent/PaginationBar/common/PageControl/styles.css");
+@import url("./subcomponent/PaginationBar/styles.css");
+@import url("./component/QueryChip/common/Entry/styles.css");
+@import url("./component/QueryChip/common/Segment/styles.css");
+@import url("./component/QueryChip/styles.css");
+@import url("./group/QueryChips/styles.css");
+@import url("./component/QueryInput/common/Entry/styles.css");
+@import url("./component/QueryInput/common/Suggestions/styles.css");
+@import url("./component/QueryInput/styles.css");
 @import url("./common/Announcer/styles.css");
 @import url("./common/AssistiveText/styles.css");
 @import url("./common/ConditionMark/styles.css");

@@ -1,4 +1,4 @@
-import type { VirtualizedBodyProps } from "../../../common/index.js";
+import type { VirtualizedBodyProps } from "../../types.js";
 
 /**
  * Props of the virtualized body row group.

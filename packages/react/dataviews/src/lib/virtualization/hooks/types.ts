@@ -7,7 +7,7 @@ import type { RowModel } from "@canonical/dataviews-core";
 import type { DisplayEntry } from "@canonical/dataviews-core/bindings";
 import type { MountedRange } from "@canonical/dataviews-core/virtualization";
 import type { FocusEvent, RefObject } from "react";
-import type { EntryPlacement } from "../../common/index.js";
+import type { EntryPlacement } from "../types.js";
 
 /** One virtualized body's range, and the handles its elements attach by. */
 export type UseVirtualRowsResult = {

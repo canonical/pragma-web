@@ -14,7 +14,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import type { EntryPlacement } from "../../common/index.js";
+import type { EntryPlacement } from "../types.js";
 import type { UseVirtualRowsProps, UseVirtualRowsResult } from "./types.js";
 
 /** What the rows' heights were last measured against. */

@@ -28,7 +28,7 @@ import {
   MACHINE_CAPABILITIES,
   machines,
 } from "../../../testing/index.js";
-import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
+import DataViews from "../../lib/pattern/DataViews/Provider.js";
 
 describe("regression 0124 — a refused link drew wider rows on the server", () => {
   it("draws the refused outcome and the list, and asks the source for nothing", () => {

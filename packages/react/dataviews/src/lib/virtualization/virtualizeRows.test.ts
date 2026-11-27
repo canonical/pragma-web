@@ -3,8 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import * as root from "../../index.js";
-import { VIRTUALIZED } from "../common/index.js";
 import { VirtualBody } from "./common/index.js";
+import { VIRTUALIZED } from "./constants.js";
 import * as entry from "./index.js";
 import virtualizeRows from "./virtualizeRows.js";
 

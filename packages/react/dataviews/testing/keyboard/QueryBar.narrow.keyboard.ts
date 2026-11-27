@@ -13,6 +13,7 @@
 
 import { createRequire } from "node:module";
 import { expect, type Locator, type Page, test } from "playwright/test";
+import { QUERY_BAR, QUERY_BAR_NARROW } from "./constants.js";
 import openStory from "./openQueryBarStory.js";
 
 /** axe's browser build, injected into the page. */
@@ -134,7 +135,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
     page,
   }) => {
     // A story whose bar takes the frame's width, which the viewport sets.
-    await openStory(page, "range");
+    await openStory(page, `${QUERY_BAR}--range`);
     await expect(page.locator("#storybook-root .ds.query-chips")).toBeHidden();
     await expect(findSummary(page, 1)).toBeVisible();
     // Search-only, the entry is named and prompted for searching.
@@ -177,7 +178,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   }) => {
     // The bar about 595px wide: the story's frame pads it 16px a side.
     await page.setViewportSize({ width: 627, height: 740 });
-    await openStory(page, "range");
+    await openStory(page, `${QUERY_BAR}--range`);
     const bar = await page
       .locator("#storybook-root .ds.data-views-query-bar")
       .boundingBox();
@@ -202,7 +203,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M1b: widening with the sheet open closes it, focus on the entry", async ({
     page,
   }) => {
-    await openStory(page, "range");
+    await openStory(page, `${QUERY_BAR}--range`);
     const sheet = await openSheet(page, 1);
     await page.setViewportSize({ width: 1024, height: 740 });
     await expect(sheet).toBeHidden();
@@ -212,7 +213,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M1c: widening after the sheet closes moves focus from the summary to the entry", async ({
     page,
   }) => {
-    await openStory(page, "range");
+    await openStory(page, `${QUERY_BAR}--range`);
     const sheet = await openSheet(page, 1);
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
@@ -224,7 +225,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M2: the summary opens the sheet modally; Escape closes it, focus back on the summary, no history entry", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const history = await page.evaluate(() => window.history.length);
     const sheet = await openSheet(page, 2);
     expect(await sheet.evaluate((dialog) => dialog.matches(":modal"))).toBe(
@@ -255,7 +256,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M3: Add filter by keys: the chip applies, focus on its remove control, the region says it, the rows update", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const before = await countRows(page);
     const sheet = await openSheet(page, 2);
     await recordAnnouncements(page);
@@ -309,7 +310,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M4: Space toggles two values, and Add makes one chip", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const sheet = await openSheet(page, 2);
     await sheet.getByRole("button", { name: "Add filter" }).click();
     await sheet.getByRole("option", { name: "tags" }).click();
@@ -335,7 +336,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M5: a number with a unit; invalid text is marked, a valid Enter applies", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const sheet = await openSheet(page, 2);
     await sheet.getByRole("button", { name: "Add filter" }).click();
     await sheet.getByRole("option", { name: "memory" }).click();
@@ -359,7 +360,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M6: Escape inside the walk leaves the walk, the sheet open, focus on Add filter", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const sheet = await openSheet(page, 2);
     await sheet.getByRole("button", { name: "Add filter" }).click();
     await page.keyboard.press("Enter");
@@ -386,7 +387,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M7: removing moves focus to the next remove control, else the previous, else the first filters control", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     await findEntry(page).fill("ex-node");
     await findEntry(page).press("Enter");
     const sheet = await openSheet(page, 2);
@@ -413,7 +414,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M8: Clear all clears the filters and keeps the search, focus on the first filters control", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     await findEntry(page).fill("ex-node");
     await findEntry(page).press("Enter");
     const sheet = await openSheet(page, 2);
@@ -439,7 +440,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M9: Show N results follows the live count, closes the sheet and commits nothing", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const sheet = await openSheet(page, 2);
     const rows = await countRows(page);
     const results = sheet.getByRole("button", { name: /^Show \d+ results?$/ });
@@ -465,7 +466,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("M10: with rows selected, the action bar stands above the narrow bar, the page no wider than the phone", async ({
     page,
   }) => {
-    await openStory(page, "mobile-rows-selected");
+    await openStory(page, `${QUERY_BAR_NARROW}--rows-selected`);
     await expect(page.getByText("2 selected")).toBeVisible();
     await expect(findSummary(page, 2)).toBeVisible();
     // The action bar stands above the narrow bar.
@@ -486,7 +487,7 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
   test("targets: every control in the sheet's own parts is at least 24 × 24", async ({
     page,
   }) => {
-    await openStory(page, "mobile");
+    await openStory(page, `${QUERY_BAR_NARROW}--narrow`);
     const sheet = await openSheet(page, 2);
     await sheet.getByRole("button", { name: "Add filter" }).click();
     await sheet.getByRole("option", { name: "tags" }).click();

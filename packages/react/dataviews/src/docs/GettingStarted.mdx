@@ -1,0 +1,83 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as RootStories from "../lib/pattern/DataViews/DataViews.stories";
+
+<Meta title="Documentation/Getting started" tags={["experimental"]} />
+
+# Getting started
+
+## Installation
+
+```bash
+bun add @canonical/dataviews-react @canonical/dataviews-core
+```
+
+## Styles
+
+Each part imports its own stylesheet. To have every rule present from the first paint, link the package's entry stylesheet beside `@canonical/styles`:
+
+```css
+@import url("@canonical/styles");
+@import url("@canonical/dataviews-react/index.css");
+```
+
+The table expects the `.app` context of `@canonical/styles`: render it inside an element with the `.app` class.
+
+## A first DataViews
+
+Declare the collection once, at module scope. Build the provider once, in state, over the collection and a source. Mount it with `DataViews`, and place the parts inside.
+
+```tsx
+import {
+  createArraySource,
+  createCollection,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+import { type DataTableColumn, DataViews } from "@canonical/dataviews-react";
+import { useState } from "react";
+
+type Machine = { readonly id: string; readonly hostname: string; readonly status: string };
+
+export const machineCollection = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [
+    { field: "hostname", kind: "text" },
+    { field: "status", kind: "choices", options: ["deployed", "ready", "broken"] },
+  ],
+});
+
+const columns: readonly DataTableColumn[] = [
+  { id: "hostname", header: "Host" },
+  { id: "status", header: "Status" },
+];
+
+export function MachinesPage({ machines }: { readonly machines: readonly Machine[] }) {
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: machineCollection,
+      source: createArraySource({
+        rows: machines,
+        collection: machineCollection,
+        searchFields: ["hostname"],
+      }),
+    }),
+  );
+  return (
+    <DataViews provider={provider}>
+      <DataViews.QueryBar />
+      <DataViews.DataTable columns={columns} label="Machines" />
+      <DataViews.Pagination label="Machines pagination" />
+    </DataViews>
+  );
+}
+```
+
+The table and its pagination, under one root:
+
+<Canvas of={RootStories.Default} />
+
+## Next
+
+- **Guides / Composition** shows the connected parts in one root.
+- **Guides / Recipes** covers a whole screen, the query in the URL, and the page before any script runs.
+- **Data sources** covers a REST API and a GraphQL API.
+- **Messages and internationalization** covers the words the parts speak.

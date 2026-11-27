@@ -13,7 +13,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
 } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0017 — the sort panel sent dead buttons before hydration", () => {
   it("lists the terms without their buttons on the server", () => {

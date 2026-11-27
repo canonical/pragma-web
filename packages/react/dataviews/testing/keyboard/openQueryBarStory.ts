@@ -9,18 +9,16 @@ import { expect, type Page } from "playwright/test";
 const SETTLED_PHASES: readonly string[] = ["completed", "finished"];
 
 /**
- * Open one QueryBar story alone, and wait until its play has finished and
+ * Open one QueryBar story alone, by its id, and wait until its play has finished and
  * its table holds rows.
  *
  * @note Impure: navigates the page.
  */
 export default async function openQueryBarStory(
   page: Page,
-  name: string,
+  id: string,
 ): Promise<void> {
-  await page.goto(
-    `/iframe.html?id=work-in-progress-dataviews-querybar--${name}&viewMode=story`,
-  );
+  await page.goto(`/iframe.html?id=${id}&viewMode=story`);
   await page.waitForFunction((phases) => {
     const preview = (
       window as {

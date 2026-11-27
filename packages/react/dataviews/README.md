@@ -12,7 +12,7 @@ bun add @canonical/dataviews-react @canonical/dataviews-core
 
 ## Status
 
-Under active development; the public surface grows change by change. Prototype renderers not exported from the root — DataCards, DataChart and DataChartWithTable — have their recipes under _work_in_progress / DataViews / Renderers. The current exports:
+Under active development; the public surface grows change by change. Prototype renderers not exported from the root — DataCards, DataChart and DataChartWithTable — have their recipes under patterns / DataViews / Renderers. The current exports:
 
 - **`DataViews`** — the root component: mounts a provider created by `createDataViewsProvider` (from `@canonical/dataviews-core`) as the collection's context, observes it for as long as it is mounted — which starts the provider's source, location, presentation and saved views, ref-counted, so a table inside the root observing too costs nothing and a StrictMode rehearsal leaves a working provider — and owns the root's filter records. Throws unless the provider is one `createDataViewsProvider` built. Nothing is wired in an effect by the application: it builds the provider once, in state, and mounts.
 - **Messages and announcements** — every word a part renders or announces comes from one messages record, `DataViewsMessages` (from `@canonical/dataviews-core`), in English unless the application says otherwise. The root takes `messages`: any of them, merged over English, or all of them — annotate a whole replacement as `DataViewsMessages` and a missing message fails to compile. A message stating a fact is a function of it — a count, a position, a name, a reason — and words its own plurals and ordinals. Field and option labels are not messages. A standalone `DataTable` or `PaginationBar` is its own root and takes `messages` itself; the connected parts take their root's. What a command did that has no place on screen — a sort's new order, why it changed nothing, a column hidden, shown or moved — is said through one polite live region per root, rendered after its children: what is said in one moment is spoken as one announcement — words repeated in that moment said once, and an outcome with one latest answer, such as what the rows are ordered by, standing where the last one stood — the same words said again in a later moment are spoken again, and a second root over the same provider says nothing of the first root's commands. While the query bar's sheet is open, the page behind the modal dialog is inert, so the bar and every part inside the sheet speak through the sheet's own atomic status region instead. Status regions that belong to a place — the pagination summary, the table's status row, a filter's feedback, the saved views' status — speak for themselves and are never repeated.
@@ -93,17 +93,17 @@ Each part renders a baseline before scripts run, and works once they do.
 
 ## Composition recipes
 
-The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / Recipes** — source in [`src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx`](src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx):
+The recipes, with consumer code and the live stories beside them, are the Storybook page **Documentation / Guides / Recipes** — source in [`src/docs/guides/Recipes.mdx`](src/docs/guides/Recipes.mdx):
 
 - **The connected parts** — one root, every part reading its provider; place them in any order and any wrapper.
 - **Your own words** — `<DataViews provider={provider} messages={{ search: "Rechercher", shownRows: ({ first, shown, total }) => … }}>`: the parts left out keep English, and a record typed `DataViewsMessages` replaces them all. Keep the record at module scope, or its functions stable: the root holds its words while their members stay the same.
 - **Keeping the query in the URL** — hand the provider a location and the URL is the query's other home, adopted before the first page is asked for; a refused link reports its reasons on `provider.issues`.
 
-The parts have recipe pages of their own: [`Filters.mdx`](src/lib/_work_in_progress/DataViews/common/Filters/Filters.mdx), [`ActionBar.mdx`](src/lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.mdx), [`Pagination.mdx`](src/lib/_work_in_progress/DataViews/common/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/_work_in_progress/PaginationBar/PaginationBar.mdx).
+The parts have recipe pages of their own: [`Filters.mdx`](src/lib/pattern/DataViews/common/controls/Filters/Filters.mdx), [`ActionBar.mdx`](src/lib/pattern/DataViews/common/controls/ActionBar/ActionBar.mdx), [`Pagination.mdx`](src/lib/pattern/DataViews/common/controls/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/subcomponent/PaginationBar/PaginationBar.mdx).
 
 ## Messages and internationalization
 
-Every word the parts render or announce comes from one record, `DataViewsMessages`, shipped in English. The Storybook page **_work_in_progress / Messages and internationalization** covers it, with live stories — source in [`src/lib/_work_in_progress/DataViews/DataViews.messages.mdx`](src/lib/_work_in_progress/DataViews/DataViews.messages.mdx):
+Every word the parts render or announce comes from one record, `DataViewsMessages`, shipped in English. The Storybook page **Documentation / Messages and internationalization** covers it, with live stories — source in [`src/docs/Messages.mdx`](src/docs/Messages.mdx):
 
 - **The root's `messages`** — a partial set merged over English, or a whole replacement annotated `DataViewsMessages`, which fails to compile while it misses a message; standalone `DataTable` and `PaginationBar` take `messages` themselves.
 - **Messages that state a fact** — functions of the names, counts, positions and reasons they state, which word their own plurals and ordinals.
@@ -126,7 +126,7 @@ The pagination bar's selects and the controls in the query bar's quick filter pa
 
 ## DataTable recipes
 
-The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / DataViews / Renderers / DataTable / Recipes** — under **DataViews** in the Storybook hub — source in [`src/lib/_work_in_progress/DataTable/DataTable.mdx`](src/lib/_work_in_progress/DataTable/DataTable.mdx):
+The recipes, with consumer code and the live stories beside them, are the Storybook page **patterns / DataViews / Renderers / DataTable / Recipes** — under **DataViews** in the Storybook hub — source in [`src/lib/pattern/DataViews/common/renderers/DataTable/DataTable.mdx`](src/lib/pattern/DataViews/common/renderers/DataTable/DataTable.mdx):
 
 - **A table over a provider** — build the provider once, over the collection and its source, and mount: the table observes it.
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.
@@ -139,7 +139,7 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 
 ## Build your own renderer
 
-The Storybook page **_work_in_progress / DataViews / Renderers / Build your own renderer** is a tutorial for writing a renderer over a provider, as `DataTable`, `DataCards` and `DataChart` are written — source in [`src/lib/_work_in_progress/BuildARenderer/BuildARenderer.mdx`](src/lib/_work_in_progress/BuildARenderer/BuildARenderer.mdx), with the example's compiled and tested code beside it:
+The Storybook page **Documentation / Guides / Build your own renderer** is a tutorial for writing a renderer over a provider, as `DataTable`, `DataCards` and `DataChart` are written — source in [`src/docs/guides/BuildARenderer/BuildARenderer.mdx`](src/docs/guides/BuildARenderer/BuildARenderer.mdx), with the example's compiled and tested code beside it:
 
 - **A plain list** — observe the provider from an effect for as long as the list is mounted, and read its rows with `useDataViewsValue`.
 - **The status** — `resolveDisplayStatus` and `listDisplayEntries` from `@canonical/dataviews-core/bindings`: loading, failed, refresh-failed, stale, empty and no match.

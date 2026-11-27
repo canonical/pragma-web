@@ -8,10 +8,9 @@
 /** The relative imports the tutorial's files make, and how an application spells them. */
 const SPELLINGS: readonly (readonly [RegExp, string])[] = [
   [
-    /"\.\.\/\.\.\/\.\.\/\.\.\/hooks\/index\.js"/g,
+    /"(?:\.\.\/)+lib\/(?:\w+\/)*(?:hooks|DataViews)\/index\.js"/g,
     '"@canonical/dataviews-react"',
   ],
-  [/"\.\.\/\.\.\/\.\.\/DataViews\/index\.js"/g, '"@canonical/dataviews-react"'],
   [/"\.\.\/\.\.\/hooks\/index\.js"/g, '"./useIsScripted.js"'],
   [/"\.\.\/(\w+)\/index\.js"/g, '"./$1.js"'],
 ];

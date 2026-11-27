@@ -10,6 +10,7 @@
  */
 
 import { expect, type Locator, type Page, test } from "playwright/test";
+import { QUERY_BAR_QUICK } from "./constants.js";
 import openStory from "./openQueryBarStory.js";
 
 /** The table's record rows: every row but the header's. */
@@ -46,7 +47,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q1: a word commits, moves the mark and rows, as one history step; All clears", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const length = await page.evaluate(() => window.history.length);
     const ready = findWords(page, "status").getByRole("button", {
       name: "ready",
@@ -81,7 +82,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q2: two words of a list are both current, and one any-of chip", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const tags = findWords(page, "tags");
     await tags.getByRole("button", { name: "ex-gpu", exact: true }).click();
     await tags.getByRole("button", { name: "ex-ssd", exact: true }).click();
@@ -99,7 +100,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q3: each tick commits and the panel stays open; Escape and a click outside close it; leaving focus does not", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const trigger = findTrigger(page, "pool");
     await trigger.click();
     const panel = await findPanel(trigger);
@@ -130,7 +131,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q4: past ten options a search narrows them; Up, Down and Space work in the list", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const trigger = findTrigger(page, "pool");
     await trigger.click();
     const panel = await findPanel(trigger);
@@ -158,7 +159,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q5: a range typed in a unit commits a bound; an invalid value keeps it, with a message", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const trigger = findTrigger(page, "memory");
     await trigger.click();
     const panel = await findPanel(trigger);
@@ -189,7 +190,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q6: a chip added in the bar marks the quick filter; removing it clears the mark", async ({
     page,
   }) => {
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const entry = page.getByRole("combobox", { name: "Filter records" });
     await entry.click();
     await page.keyboard.type("status");
@@ -218,7 +219,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
   test("Q7: an excluding clause shows its mark, hidden, and says none of 2", async ({
     page,
   }) => {
-    await openStory(page, "quick-filter-exclusion");
+    await openStory(page, `${QUERY_BAR_QUICK}--exclusion`);
     const trigger = page.getByRole("button", {
       name: "status, none of 2",
       exact: true,
@@ -233,7 +234,7 @@ test.describe("QueryBar's quick filters, in Chromium", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 360, height: 740 });
-    await openStory(page, "quick-filters");
+    await openStory(page, `${QUERY_BAR_QUICK}--quick-filters`);
     const trigger = findTrigger(page, "pool");
     await expect(trigger).toBeVisible();
     await trigger.click();

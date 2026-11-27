@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
 const sheet = readFileSync(
   path.join(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../../lib/_work_in_progress/common/ScopedDataTable/styles.css",
+    "../../lib/pattern/DataViews/common/renderers/DataTable/styles.css",
   ),
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");

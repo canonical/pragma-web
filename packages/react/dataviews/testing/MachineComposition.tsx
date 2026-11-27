@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
-import type { DataTableColumn } from "../src/lib/_work_in_progress/DataTable/index.js";
-import { DataViews } from "../src/lib/_work_in_progress/DataViews/index.js";
+import type { DataTableColumn } from "../src/lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../src/lib/pattern/DataViews/index.js";
 import type { MachineProvider } from "./types.js";
 
 /** The table's columns: cores alone sort, so one header claims an ordering. */

@@ -86,13 +86,22 @@ describe("bundle isolation", () => {
       modules.filter(
         (id) =>
           id.includes("/virtualization/") &&
-          !id.endsWith("/common/virtualization/constants.ts"),
+          !id.endsWith("/lib/virtualization/constants.ts"),
       ),
     ).toEqual([]);
     // The standalone table is an adoption boundary of its own: a consumer
     // who never mounts a DataViews root ships no root, no connected part
     // and no context, only the table, the shared hooks and the core.
-    expect(modules.filter((id) => id.includes("/DataViews/"))).toEqual([]);
+    expect(
+      modules.filter(
+        (id) =>
+          id.includes("/DataViews/") &&
+          !id.includes("/DataViews/common/renderers/DataTable/"),
+      ),
+    ).toEqual([]);
+    expect(
+      modules.filter((id) => id.endsWith("/ConnectedDataTable.tsx")),
+    ).toEqual([]);
     expect(modules.filter((id) => id.includes("/PaginationBar/"))).toEqual([]);
     expect(css).toContain("data-table");
     expect(css).not.toContain("virtual");

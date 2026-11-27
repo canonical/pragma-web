@@ -6,8 +6,8 @@ describe("spellPublicImports", () => {
     expect(
       spellPublicImports(
         [
-          'import { useView } from "../../../../hooks/index.js";',
-          'import { DataViews } from "../../../DataViews/index.js";',
+          'import { useView } from "../../../../../lib/hooks/index.js";',
+          'import { DataViews } from "../../../../../lib/pattern/DataViews/index.js";',
         ].join("\n"),
       ),
     ).toBe(

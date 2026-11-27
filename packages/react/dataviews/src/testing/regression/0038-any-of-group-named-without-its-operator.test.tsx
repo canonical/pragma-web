@@ -18,7 +18,7 @@ import { createManualSource } from "@canonical/dataviews-core/testing";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { IdentifiedRecord as Row } from "../../../testing/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
