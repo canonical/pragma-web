@@ -10,32 +10,54 @@ const SVELTE_PROP_NAMES: Record<string, string> = {
   autoComplete: "autocomplete",
 };
 
+/**
+ * Cases captured ahead of the Svelte work that makes them pass: the combobox
+ * moves onto downshift's markup in the next steps.
+ */
+const PENDING_CASES = new Set([
+  "combobox-single-empty",
+  "combobox-single-value",
+  "combobox-disabled",
+  "combobox-placeholder",
+  "combobox-description-error",
+  "combobox-multiple-empty",
+  "combobox-multiple-chips",
+]);
+
 /** Maps a golden case to the props of the Svelte Field. */
 function createSvelteProps(key: string) {
-  const { props, error } = goldenCases[key];
+  const { props, error, value } = goldenCases[key];
   return Object.fromEntries([
     ...Object.entries(props).map(([name, value]) => [
       SVELTE_PROP_NAMES[name] ?? name,
       value,
     ]),
     ...(error ? [["error", error]] : []),
+    ...(value === undefined ? [] : [["value", value]]),
   ]);
 }
+
+const caseKeys = Object.keys(goldenCases);
 
 describe("React markup parity", () => {
   const { window } = render(Field, {
     props: { inputType: "text", name: "probe" },
   });
 
-  it.each(Object.keys(goldenCases))("renders the %s markup", (key) => {
-    const svelte = render(Field, {
-      // biome-ignore lint/suspicious/noExplicitAny: golden props are data
-      props: createSvelteProps(key) as any,
-    });
-    const react = window.document.createElement("div");
-    react.innerHTML = reactGolden[key];
-    expect(normalizeMarkup(svelte.container)).toBe(normalizeMarkup(react));
-  });
+  it.each(caseKeys.filter((key) => !PENDING_CASES.has(key)))(
+    "renders the %s markup",
+    (key) => {
+      const svelte = render(Field, {
+        // biome-ignore lint/suspicious/noExplicitAny: golden props are data
+        props: createSvelteProps(key) as any,
+      });
+      const react = window.document.createElement("div");
+      react.innerHTML = reactGolden[key];
+      expect(normalizeMarkup(svelte.container)).toBe(normalizeMarkup(react));
+    },
+  );
+
+  it.skip.each([...PENDING_CASES])("renders the %s markup", () => {});
 
   it("covers every shipped input type", () => {
     const covered = new Set(
@@ -46,6 +68,7 @@ describe("React markup parity", () => {
         "checkbox",
         "choices",
         "color",
+        "combobox",
         "date",
         "datetime",
         "email",

@@ -1,18 +1,26 @@
 /**
  * Field states whose server-rendered markup is compared between the React and
  * Svelte form packages. Each case lists the props shared by both `Field`
- * patterns, plus an optional error message: React receives it as a
- * react-hook-form error, Svelte as the `error` prop.
+ * patterns, plus an optional error message and value: React receives them as
+ * a react-hook-form error and default value, Svelte as the `error` and `value`
+ * props.
  */
 export type GoldenCase = {
   props: Record<string, unknown> & { inputType: string; name: string };
   error?: string;
+  value?: unknown;
 };
 
 const options = [
   { value: "apple", label: "Apple" },
   { value: "banana", label: "Banana" },
   { value: "cherry", label: "Cherry", disabled: true },
+];
+
+const fruits = [
+  { value: "apple", label: "Apple" },
+  { value: "banana", label: "Banana" },
+  { value: "cherry", label: "Cherry" },
 ];
 
 export const goldenCases: Record<string, GoldenCase> = {
@@ -364,5 +372,75 @@ export const goldenCases: Record<string, GoldenCase> = {
       allowHalf: true,
       count: 10,
     },
+  },
+  // The combobox cases. An open list with a highlighted item has no case:
+  // React's ComboboxInput passes no `initialIsOpen` or
+  // `initialHighlightedIndex` to downshift, and shows the list popover from an
+  // effect, so a server render is always closed.
+  "combobox-single-empty": {
+    props: {
+      inputType: "combobox",
+      name: "fruit",
+      label: "Fruit",
+      options: fruits,
+    },
+  },
+  "combobox-single-value": {
+    props: {
+      inputType: "combobox",
+      name: "fruit",
+      label: "Fruit",
+      options: fruits,
+    },
+    value: "banana",
+  },
+  "combobox-disabled": {
+    props: {
+      inputType: "combobox",
+      name: "fruit",
+      label: "Fruit",
+      options: fruits,
+      disabled: true,
+    },
+    value: "apple",
+  },
+  "combobox-placeholder": {
+    props: {
+      inputType: "combobox",
+      name: "fruit",
+      label: "Fruit",
+      options: fruits,
+      placeholder: "Pick a fruit",
+    },
+  },
+  "combobox-description-error": {
+    props: {
+      inputType: "combobox",
+      name: "fruit",
+      label: "Fruit",
+      options: fruits,
+      description: "Seasonal only",
+    },
+    error: "Pick a fruit",
+  },
+  "combobox-multiple-empty": {
+    props: {
+      inputType: "combobox",
+      name: "fruits",
+      label: "Fruits",
+      options: fruits,
+      isMultiple: true,
+    },
+    value: [],
+  },
+  "combobox-multiple-chips": {
+    props: {
+      inputType: "combobox",
+      name: "fruits",
+      label: "Fruits",
+      options: fruits,
+      isMultiple: true,
+    },
+    value: ["apple", "banana"],
   },
 };
