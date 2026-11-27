@@ -145,7 +145,7 @@ describe("DataTable SSR", () => {
     expect(renderLocated({})).toMatch(/<table[^>]* tabindex="0"/);
   });
 
-  it.fails("is a tab stop before scripts run with settings of its own", () => {
+  it("is a tab stop before scripts run with settings of its own", () => {
     // Only the settings menu draws links; another element draws none.
     expect(renderLocated({ settings: <span>Mine</span> })).toMatch(
       /<table[^>]* tabindex="0"/,

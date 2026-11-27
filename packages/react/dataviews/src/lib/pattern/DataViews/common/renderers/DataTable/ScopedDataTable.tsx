@@ -267,13 +267,14 @@ export default function ScopedDataTable<
     column.sortable === true && orderable.has(readFieldName(column));
   const isResizable = (column: DataTableColumn, position: number): boolean =>
     column.resizable === true && position < rendered.length - 1;
-  // The table is a tab stop only where nothing inside is.
+  // The table is a tab stop only where nothing inside is; only the
+  // settings menu draws links of its own.
   const tabIndex = useTabStop(
     provider,
     headerRow,
     rendered,
     isSortable,
-    hasSettings,
+    hasSettings && settings.type === settingsMenu,
   );
 
   // The tracks a row renders: selection, the columns, the settings cell.
