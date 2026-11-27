@@ -819,6 +819,20 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(checkbox).toBeFocused();
   });
 
+  test("WithPaginationFooter: Shift+Tab from the footer's first control lands in the table, Tab returns", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(TABLE, "With Pagination Footer").id);
+    const table = page.getByRole("table", { name: "Machines" });
+    const bar = page.getByRole("navigation", { name: "Pagination" });
+    const first = bar.locator("select").first();
+    await first.focus();
+    await page.keyboard.press("Shift+Tab");
+    await expect(table.locator(":focus")).toHaveCount(1);
+    await page.keyboard.press("Tab");
+    await expect(first).toBeFocused();
+  });
+
   test("DataCards Selectable: Space checks a card's checkbox, and the page's, focus stays", async ({
     page,
   }) => {

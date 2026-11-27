@@ -34,8 +34,8 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
           id="t"
           columns={[{ id: "name", header: "Name" }]}
           label="Machines"
+          footer={<DataViews.Pagination />}
         />
-        <DataViews.Pagination />
       </DataViews>,
     );
     // More rows match than one page shows, so the bar offers the next one.

@@ -72,8 +72,12 @@ describe("the announcer speaks once per root", () => {
       <>
         <DataViews provider={provider}>
           <DataViews.DataTable id="t" columns={columns} label="First" />
-          <DataViews.DataTable id="t" columns={columns} label="Second" />
-          <DataViews.Pagination />
+          <DataViews.DataTable
+            id="t"
+            columns={columns}
+            label="Second"
+            footer={<DataViews.Pagination />}
+          />
         </DataViews>
         <DataTable id="t" provider={provider} columns={columns} label="Alone" />
       </>,
