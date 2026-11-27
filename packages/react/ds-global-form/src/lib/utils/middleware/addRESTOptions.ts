@@ -92,6 +92,14 @@ const buildRESTOptions: MiddlewareBuilder<
 
     useEffect(() => {
       const controller = new AbortController();
+      /** Clears the field's error when this middleware set it. */
+      const clearOwnError = () => {
+        if (getFieldState(name).error?.type === REST_OPTIONS_ERROR_TYPE) {
+          clearErrors(name);
+        }
+      };
+      // The failure of the previous URL is part of its answer: drop it too.
+      clearOwnError();
       setStatus("loading");
       setFetchedOptions(NO_OPTIONS);
       fetchOptions(url, controller.signal)
@@ -99,9 +107,7 @@ const buildRESTOptions: MiddlewareBuilder<
           if (controller.signal.aborted) return;
           setFetchedOptions(result);
           setStatus("ready");
-          if (getFieldState(name).error?.type === REST_OPTIONS_ERROR_TYPE) {
-            clearErrors(name);
-          }
+          clearOwnError();
         })
         .catch((error: unknown) => {
           if (controller.signal.aborted) return;
@@ -136,8 +142,9 @@ const configureRESTOptions = createMiddleware(buildRESTOptions);
  * the field's error, so it shows where the field shows any other error, and
  * leaves the field enabled. The middleware can be created inline: the field
  * keeps one instance, which fetches again only when the URL changes, and
- * drops the answer for the previous URL. The request is aborted when the
- * field unmounts.
+ * drops the answer for the previous URL, its error included. The request is
+ * aborted when the field unmounts. Use one per field: an inner instance's
+ * options replace the outer one's.
  *
  * @param url - The endpoint returning the options.
  * @param options - Request and transform options.

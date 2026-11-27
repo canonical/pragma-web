@@ -59,6 +59,8 @@ This ordering is handled by `withWrapper`, which reduces the array from the righ
 middleware.reduceRight((Accumulated, hoc) => hoc(Accumulated), InputComponent);
 ```
 
+A middleware made by `createMiddleware` is built from its HOC instead, and reads its settings from the field; see [Settings that change](#settings-that-change).
+
 ## Built-in middleware
 
 The form package ships two middleware for common API integration patterns.
@@ -95,7 +97,7 @@ import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
 />
 ```
 
-The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The field stays enabled, so the user can see the error and the form stays usable. The fetch is keyed on the URL: re-rendering the field with a middleware created inline fetches nothing, and a different URL fetches the new options without remounting the field, dropping any answer still on its way for the previous URL. The request is aborted when the field unmounts. Its error type is `restOptions`, so it only ever clears its own error.
+The field keeps its normal markup while the options load: it is disabled, marked `aria-busy`, and has no options. If the request fails, the failure is set as the field's error with `setError`, so it shows where the field shows any other error. Once the data arrives, the field renders with the fetched options. The field stays enabled, so the user can see the error and the form stays usable. The fetch is keyed on the URL: re-rendering the field with a middleware created inline fetches nothing, and a different URL fetches the new options without remounting the field, dropping any answer still on its way for the previous URL, and the error that URL set. The request is aborted when the field unmounts. Use one per field: an inner instance's options replace the outer one's. Its error type is `restOptions`, so it only ever clears its own error.
 
 ### addRESTValidation
 
@@ -119,6 +121,9 @@ import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
       // Debounce wait in milliseconds (default: 300)
       debounceWait: 300,
 
+      // Milliseconds to wait for an answer before giving up (default: 10000)
+      timeout: 10000,
+
       // Format the request body (default: { value })
       bodyFormatter: (value) => ({ username: value }),
 
@@ -132,9 +137,11 @@ import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
 />
 ```
 
-The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field with the error type `restValidation`, which triggers the `.danger` error state. If the server returns OK, or the value becomes shorter than the minimum, it clears the error it set, leaving errors from the field's rules in place. A request that fails to complete says nothing about the value, so the previous message stays. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
+The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field with the error type `restValidation`, which triggers the `.danger` error state. If the server returns OK, or the value becomes shorter than the minimum, it clears the error it set, leaving errors from the field's rules in place. A request that fails to complete, or is still unanswered after `timeout`, says nothing about the value, so the previous message stays. Each change cancels the pending timer and aborts the request in flight, so only the answer for the latest value can set or clear the error; unmounting the field does the same.
 
-The check is also added to the field's `validate` rules, under the name `restValidation`, next to any `validate` rules the field already has. Submitting runs the rules again, so a value the server rejected blocks the submit instead of having its error cleared. A value submitted before its check has run waits for the answer, which the typing and the submit share, so they send one request.
+The check is also added to the field's `validate` rules, under the name `restValidation`, next to any `validate` rules the field already has. Submitting runs the rules again, so a value the server rejected blocks the submit instead of having its error cleared. A value submitted before its check has run waits for the answer, which the typing and the submit share, so they send one request. Because the request gives up after `timeout`, an endpoint that never answers cannot hold the submit.
+
+Two `addRESTValidation` middleware on one field run as one `restValidation` rule that fails with the first rejection, and each clears only the message it set.
 
 ## Writing custom middleware
 
