@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import { defineMeta } from "@storybook/addon-svelte-csf";
+  import { Button } from "../Button/index.js";
   import { Card } from "./index.js";
 
   const { Story } = defineMeta({
@@ -33,6 +34,23 @@
         footprint, is a great option to run a cluster on. Provisioning is easy
         with <a href="https://maas.io">MAAS</a>.
       </p>
+    </Card.Content>
+  </Card>
+</Story>
+
+<!--
+  A Button inside the content block. The Button keeps its intrinsic width
+  instead of stretching to the content width.
+-->
+<Story name="With Button" asChild>
+  <Card>
+    <Card.Content>
+      <h4>Build a bare-metal cloud on a Raspberry Pi cluster with MAAS</h4>
+      <p class="p">
+        The Raspberry Pi 4 is a great option to run a cluster on. Provisioning is
+        easy with <a href="https://maas.io">MAAS</a>.
+      </p>
+      <Button>Get started</Button>
     </Card.Content>
   </Card>
 </Story>

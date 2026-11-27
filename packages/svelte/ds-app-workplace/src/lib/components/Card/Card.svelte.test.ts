@@ -4,6 +4,7 @@ import { createRawSnippet } from "svelte";
 import { describe, expect, it } from "vitest";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
+import "../Button/styles.css";
 import Component from "./Card.svelte";
 import Content from "./common/Content/Content.svelte";
 import Footer from "./common/Footer/Footer.svelte";
@@ -81,6 +82,42 @@ describe("Card.Content", () => {
     await expect
       .element(page.getByTestId("content"))
       .toHaveClass("ds", "card-content");
+  });
+
+  it("keeps a Button at its intrinsic width", async () => {
+    const page = await render(Content, {
+      "data-testid": "content",
+      style: "width: 400px;",
+      children: createRawSnippet(() => ({
+        render: () => `<button class="ds button primary">Button</button>`,
+      })),
+    });
+    const content = page.getByTestId("content").element() as HTMLElement;
+    const style = getComputedStyle(content);
+    const contentBoxWidth =
+      content.clientWidth -
+      parseFloat(style.paddingLeft) -
+      parseFloat(style.paddingRight);
+    const button = page.getByRole("button").element();
+    expect(button.getBoundingClientRect().width).toBeLessThan(contentBoxWidth);
+  });
+
+  it("keeps block content full width", async () => {
+    const page = await render(Content, {
+      "data-testid": "content",
+      style: "width: 400px;",
+      children: createRawSnippet(() => ({
+        render: () => `<div data-testid="block"></div>`,
+      })),
+    });
+    const content = page.getByTestId("content").element() as HTMLElement;
+    const style = getComputedStyle(content);
+    const contentBoxWidth =
+      content.clientWidth -
+      parseFloat(style.paddingLeft) -
+      parseFloat(style.paddingRight);
+    const block = page.getByTestId("block").element();
+    expect(block.getBoundingClientRect().width).toBeCloseTo(contentBoxWidth);
   });
 });
 

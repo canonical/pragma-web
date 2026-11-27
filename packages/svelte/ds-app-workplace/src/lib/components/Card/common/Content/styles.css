@@ -19,4 +19,11 @@
     padding-block-end: var(--card-content-padding-block-end);
     padding-inline: var(--card-content-padding-inline);
   }
+
+  /* The stack stretches its children to the content width by default. A Button
+     is an inline control, so keep it at its intrinsic width; headings,
+     paragraphs and media still fill the content width. */
+  .ds.card-content > .ds.button {
+    align-self: flex-start;
+  }
 }
