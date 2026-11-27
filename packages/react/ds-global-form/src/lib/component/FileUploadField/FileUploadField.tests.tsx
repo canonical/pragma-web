@@ -79,6 +79,45 @@ describe("FileUploadField", () => {
     expect(button).toHaveAttribute("aria-errormessage", alert.id);
     // The field's ref focuses the Choose file button.
     expect(button).toHaveFocus();
+    // The drop area takes the error Criticality class; the button does not.
+    expect(container.querySelector(".drop-area")).toHaveClass("error");
+    expect(button).not.toHaveClass("error");
+  });
+
+  it("passes showDropArea and showFileList through to the input", async () => {
+    const { container } = renderWithForm(
+      <FileUploadField
+        name="docs"
+        label="Upload"
+        multiple
+        showDropArea={false}
+        validateFile={() => ({ level: "error", message: "Not allowed." })}
+      />,
+      { formProps: { defaultValues: { docs: [file("a.txt")] } } },
+    );
+    expect(container.querySelector(".drop-area")).toBeNull();
+    submit();
+    // With the drop area off, the field error hides with it, and the ref
+    // focuses the tile's action.
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Remove a.txt" }),
+      ).toHaveFocus();
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("hides the file list with showFileList off", () => {
+    const { container } = renderWithForm(
+      <FileUploadField
+        name="docs"
+        label="Upload"
+        multiple
+        showFileList={false}
+      />,
+      { formProps: { defaultValues: { docs: [file("a.txt")] } } },
+    );
+    expect(container.querySelector(".file-list")).toBeNull();
   });
 
   it("errors when more than maxFiles are selected", async () => {

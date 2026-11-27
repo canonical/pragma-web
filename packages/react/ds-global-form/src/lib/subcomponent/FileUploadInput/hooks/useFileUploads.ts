@@ -14,9 +14,7 @@ type UseFileUploadsOptions = {
 type FileUploads = {
   /** The upload state of each chosen file that has been sent. */
   states: ReadonlyMap<File, UploadState>;
-  /** Aborts a running upload; the file stays, marked as cancelled. */
-  cancel: (file: File) => void;
-  /** Sends a file again after a failed or cancelled upload. */
+  /** Sends a file again after a failed upload. */
   retry: (file: File) => void;
 };
 
@@ -28,7 +26,7 @@ const summarise = (states: ReadonlyMap<File, UploadState>): UploadSummary => {
   let failed = 0;
   for (const state of states.values()) {
     if (state.status === "uploading") uploading += 1;
-    if (state.status === "failed" || state.status === "cancelled") failed += 1;
+    if (state.status === "failed") failed += 1;
   }
   return { uploading, failed };
 };
@@ -39,9 +37,14 @@ const summarise = (states: ReadonlyMap<File, UploadState>): UploadSummary => {
  * selection has its upload aborted and its state dropped. Upload state lives
  * here, keyed by the `File` object, and never in the form value.
  *
+ * Cancelling an upload is removing its file: the consumer drops it from the
+ * value, and the upload is aborted with it. Once an upload ends, success or
+ * failure, its result shows for `RESULT_DISPLAY_DURATION`; a failed upload
+ * then stays failed until it is retried or removed.
+ *
  * Every upload promise is settled here, so neither a rejection nor an abort
  * escapes as an unhandled rejection. A result from an upload that has since
- * been cancelled, retried or removed is ignored.
+ * been retried or removed is ignored.
  */
 export default function useFileUploads(
   files: readonly File[],
@@ -79,6 +82,29 @@ export default function useFileUploads(
     timers.current.delete(file);
   }, []);
 
+  /**
+   * Records how an upload ended and shows its result, then hides the result
+   * after `RESULT_DISPLAY_DURATION`, keeping the outcome.
+   */
+  const end = useCallback(
+    (file: File, outcome: (current?: UploadState) => UploadState) => {
+      controllers.current.delete(file);
+      update(file, outcome);
+      timers.current.set(
+        file,
+        setTimeout(() => {
+          timers.current.delete(file);
+          update(file, (current) =>
+            current && current.status !== "uploading"
+              ? { ...current, showResult: false }
+              : current,
+          );
+        }, RESULT_DISPLAY_DURATION),
+      );
+    },
+    [update],
+  );
+
   const start = useCallback(
     (file: File, send: UploadFunction) => {
       stop(file);
@@ -103,24 +129,20 @@ export default function useFileUploads(
       }).then(
         () => {
           if (!isCurrent()) return;
-          controllers.current.delete(file);
-          update(file, () => ({ status: "finished" }));
-          timers.current.set(
-            file,
-            setTimeout(() => {
-              timers.current.delete(file);
-              update(file, () => ({ status: "done" }));
-            }, RESULT_DISPLAY_DURATION),
-          );
+          end(file, () => ({ status: "uploaded", showResult: true }));
         },
         (reason: unknown) => {
           if (!isCurrent()) return;
-          controllers.current.delete(file);
-          update(file, () => ({ status: "failed", reason }));
+          end(file, (current) => ({
+            status: "failed",
+            reason,
+            progress: current?.status === "uploading" ? current.progress : 0,
+            showResult: true,
+          }));
         },
       );
     },
-    [stop, update],
+    [end, stop, update],
   );
 
   const live = Boolean(upload);
@@ -165,15 +187,6 @@ export default function useFileUploads(
     latest.current.onSummaryChange?.(summary);
   }, [states]);
 
-  const cancel = useCallback(
-    (file: File) => {
-      if (!controllers.current.has(file)) return;
-      stop(file);
-      update(file, () => ({ status: "cancelled" }));
-    },
-    [stop, update],
-  );
-
   const retry = useCallback(
     (file: File) => {
       const send = latest.current.upload;
@@ -183,5 +196,5 @@ export default function useFileUploads(
     [start],
   );
 
-  return { states, cancel, retry };
+  return { states, retry };
 }
