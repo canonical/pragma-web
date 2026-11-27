@@ -1,0 +1,23 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Guides/The Wrapper Pattern" />
+
+# The Wrapper Pattern
+
+Built-in `Field` variants compose an input with field chrome. The standard wrapper (`Wrapper`) supplies labels, descriptions, errors, accessibility properties, optional marking and conditional display; the input binds its own `value`, which the field forwards as one bindable `value`. Checkbox and switch use inline toggle chrome (`ToggleWrapper`), while hidden fields render no chrome but keep the control wiring.
+
+`Wrapper` renders the control through its `children` snippet, which receives the control's identity and accessibility wiring (`id`, `aria-labelledby`, `aria-describedby`, `aria-errormessage`, `aria-invalid`, `aria-required` and `required`). Spread it onto the focusable, named element:
+
+```svelte
+<Wrapper name="email" label="Email" description="We never share it.">
+  {#snippet children(controlProps)}
+    <TextInput name="email" {...controlProps} bind:value={email} />
+  {/snippet}
+</Wrapper>
+```
+
+These wrappers are internal implementation details, not package-root exports. Use `Field` for the built-in wrapped controls. Standalone inputs such as `TextInput` and `SelectInput` are also exported from the package root: they are presentational and need a label supplied by the caller.
+
+The wrapper treats a field as required unless `isOptional` is set, and hands `required` to the control. Validation rules beyond required are native attributes on the control (`minlength`, `pattern`, …), and a validation message reaches the chrome through the field's `error` prop. Every field's `value` is `$bindable`: pass an initial value, or bind it to the application's own state. `condition` decides whether the field renders; with no form owner it receives an empty object, so it closes over the application's state.
+
+`inputType="custom"` renders the supplied `component` inside the same `Wrapper`, passing it the control wiring, its `name` and its bindable `value`. See **Creating Custom Fields** for an example using public APIs.

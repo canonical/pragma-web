@@ -1,0 +1,194 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix ds: <https://ds.canonical.com/>.
+
+ds:implementation.library.svelte-ds-global-form ds:hasImplementation ds:implementation.svelte-ds-global-form.global.component.checkbox_field, ds:implementation.svelte-ds-global-form.global.component.choices_field, ds:implementation.svelte-ds-global-form.global.component.color_field, ds:implementation.svelte-ds-global-form.global.component.combobox_field, ds:implementation.svelte-ds-global-form.global.component.date_field, ds:implementation.svelte-ds-global-form.global.component.date_time_field, ds:implementation.svelte-ds-global-form.global.component.file_upload_field, ds:implementation.svelte-ds-global-form.global.component.hidden_field, ds:implementation.svelte-ds-global-form.global.component.number_field, ds:implementation.svelte-ds-global-form.global.component.password_field, ds:implementation.svelte-ds-global-form.global.component.phone_field, ds:implementation.svelte-ds-global-form.global.component.range_field, ds:implementation.svelte-ds-global-form.global.component.rating_field, ds:implementation.svelte-ds-global-form.global.component.rich_choices_field, ds:implementation.svelte-ds-global-form.global.component.select_field, ds:implementation.svelte-ds-global-form.global.component.switch_field, ds:implementation.svelte-ds-global-form.global.component.text_field, ds:implementation.svelte-ds-global-form.global.component.textarea_field, ds:implementation.svelte-ds-global-form.global.component.time_field, ds:implementation.svelte-ds-global-form.global.pattern.field, ds:implementation.svelte-ds-global-form.global.pattern.form, ds:implementation.svelte-ds-global-form.global.subcomponent.checkbox_input, ds:implementation.svelte-ds-global-form.global.subcomponent.color_input, ds:implementation.svelte-ds-global-form.global.subcomponent.combobox_input, ds:implementation.svelte-ds-global-form.global.subcomponent.date_input, ds:implementation.svelte-ds-global-form.global.subcomponent.date_time_input, ds:implementation.svelte-ds-global-form.global.subcomponent.field-description, ds:implementation.svelte-ds-global-form.global.subcomponent.field-error, ds:implementation.svelte-ds-global-form.global.subcomponent.field-label, ds:implementation.svelte-ds-global-form.global.subcomponent.file_upload_input, ds:implementation.svelte-ds-global-form.global.subcomponent.hidden_input, ds:implementation.svelte-ds-global-form.global.subcomponent.number_input, ds:implementation.svelte-ds-global-form.global.subcomponent.password_input, ds:implementation.svelte-ds-global-form.global.subcomponent.phone_input, ds:implementation.svelte-ds-global-form.global.subcomponent.radio_input, ds:implementation.svelte-ds-global-form.global.subcomponent.range_input, ds:implementation.svelte-ds-global-form.global.subcomponent.rating_input, ds:implementation.svelte-ds-global-form.global.subcomponent.select_input, ds:implementation.svelte-ds-global-form.global.subcomponent.switch_input, ds:implementation.svelte-ds-global-form.global.subcomponent.text_input, ds:implementation.svelte-ds-global-form.global.subcomponent.textarea_input, ds:implementation.svelte-ds-global-form.global.subcomponent.time_input.
+ds:implementation.svelte-ds-global-form.global.component.checkbox_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.checkbox_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/CheckboxField/CheckboxField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/CheckboxField/CheckboxField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.choices_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.choices_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/ChoicesField/ChoicesField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/ChoicesField/ChoicesField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.color_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.color_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/ColorField/ColorField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/ColorField/ColorField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.combobox_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.combobox_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/ComboboxField/ComboboxField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/ComboboxField/ComboboxField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.date_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.date_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/DateField/DateField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/DateField/DateField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.date_time_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.date_time_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/DateTimeField/DateTimeField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/DateTimeField/DateTimeField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.file_upload_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.file_upload_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/FileUploadField/FileUploadField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/FileUploadField/FileUploadField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.hidden_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.hidden_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/HiddenField/HiddenField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/HiddenField/HiddenField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.number_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.number_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/NumberField/NumberField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/NumberField/NumberField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.password_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.password_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/PasswordField/PasswordField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/PasswordField/PasswordField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.phone_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.phone_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/PhoneField/PhoneField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/PhoneField/PhoneField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.range_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.range_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/RangeField/RangeField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/RangeField/RangeField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.rating_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.rating_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/RatingField/RatingField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/component/RatingField/RatingField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.rich_choices_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.rich_choices_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/RichChoicesField/RichChoicesField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/RichChoicesField/RichChoicesField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.select_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.select_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/SelectField/SelectField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/SelectField/SelectField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.switch_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.switch_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/SwitchField/SwitchField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/SwitchField/SwitchField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.text_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.text_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/TextField/TextField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/TextField/TextField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.textarea_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.textarea_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/TextareaField/TextareaField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/TextareaField/TextareaField.svelte".
+ds:implementation.svelte-ds-global-form.global.component.time_field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.time_field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/component/TimeField/TimeField.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/component/TimeField/TimeField.svelte".
+ds:implementation.svelte-ds-global-form.global.pattern.field a ds:ImplementationObject;
+    ds:implementsBlock ds:global.pattern.field;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/pattern/Field/Field.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/pattern/Field/Field.svelte";
+    ds:importStatement "import { Field } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.pattern.form a ds:ImplementationObject;
+    ds:implementsBlock ds:global.pattern.form;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/pattern/Form/Form.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/pattern/Form/Form.svelte";
+    ds:importStatement "import { Form } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.checkbox_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.checkbox_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/CheckboxInput/CheckboxInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/CheckboxInput/CheckboxInput.svelte";
+    ds:importStatement "import { CheckboxInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.color_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.color_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/ColorInput/ColorInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/ColorInput/ColorInput.svelte";
+    ds:importStatement "import { ColorInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.combobox_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.combobox_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/ComboboxInput/ComboboxInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/ComboboxInput/ComboboxInput.svelte";
+    ds:importStatement "import { ComboboxInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.date_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.date_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/DateInput/DateInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/DateInput/DateInput.svelte";
+    ds:importStatement "import { DateInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.date_time_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.date_time_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/DateTimeInput/DateTimeInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/DateTimeInput/DateTimeInput.svelte";
+    ds:importStatement "import { DateTimeInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.field-description a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.field-description;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Description/Description.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Description/Description.svelte".
+ds:implementation.svelte-ds-global-form.global.subcomponent.field-error a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.field-error;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Error/Error.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Error/Error.svelte".
+ds:implementation.svelte-ds-global-form.global.subcomponent.field-label a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.field-label;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Label/Label.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/Field/Label/Label.svelte".
+ds:implementation.svelte-ds-global-form.global.subcomponent.file_upload_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.file_upload_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/FileUploadInput/FileUploadInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/FileUploadInput/FileUploadInput.svelte";
+    ds:importStatement "import { FileUploadInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.hidden_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.hidden_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/HiddenInput/HiddenInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/HiddenInput/HiddenInput.svelte";
+    ds:importStatement "import { HiddenInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.number_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.number_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/NumberInput/NumberInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/NumberInput/NumberInput.svelte";
+    ds:importStatement "import { NumberInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.password_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.password_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/PasswordInput/PasswordInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/PasswordInput/PasswordInput.svelte";
+    ds:importStatement "import { PasswordInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.phone_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.phone_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/PhoneInput/PhoneInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/PhoneInput/PhoneInput.svelte";
+    ds:importStatement "import { PhoneInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.radio_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.radio_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/RadioInput/RadioInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/RadioInput/RadioInput.svelte";
+    ds:importStatement "import { RadioInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.range_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.range_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/RangeInput/RangeInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/RangeInput/RangeInput.svelte";
+    ds:importStatement "import { RangeInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.rating_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.rating_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/RatingInput/RatingInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/_work_in_progress/subcomponent/RatingInput/RatingInput.svelte";
+    ds:importStatement "import { RatingInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.select_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.select_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/SelectInput/SelectInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/SelectInput/SelectInput.svelte";
+    ds:importStatement "import { SelectInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.switch_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.switch_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/SwitchInput/SwitchInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/SwitchInput/SwitchInput.svelte";
+    ds:importStatement "import { SwitchInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.text_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.text_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/TextInput/TextInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/TextInput/TextInput.svelte";
+    ds:importStatement "import { TextInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.textarea_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.textarea_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/TextareaInput/TextareaInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/TextareaInput/TextareaInput.svelte";
+    ds:importStatement "import { TextareaInput } from \"@canonical/svelte-ds-global-form\";".
+ds:implementation.svelte-ds-global-form.global.subcomponent.time_input a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.time_input;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global-form/src/lib/subcomponent/TimeInput/TimeInput.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global-form/src/lib/subcomponent/TimeInput/TimeInput.svelte";
+    ds:importStatement "import { TimeInput } from \"@canonical/svelte-ds-global-form\";".

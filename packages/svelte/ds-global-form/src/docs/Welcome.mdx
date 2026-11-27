@@ -1,0 +1,118 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { PackageInfo } from "@canonical/storybook-helpers";
+
+<Meta title="Documentation/Introduction" />
+
+# Form Components — Svelte
+
+Forms are where users provide data — getting them right is critical for both usability and data quality. This package provides a `Form` shell, a `Field` router, the built-in input types with bindable values, and accessible form structures that work consistently across all Canonical products.
+
+## Package
+
+<PackageInfo
+  name="@canonical/svelte-ds-global-form"
+  version="0.47.0"
+  tier="global_form"
+  framework="svelte"
+  status="prerelease"
+  dependencies={["@canonical/ds-utils", "@canonical/styles"]}
+  links={{
+    source: "https://github.com/canonical/pragma-web/tree/main/packages/svelte/ds-global-form",
+    ontology: "https://github.com/canonical/pragma-core/tree/main/packages/semantics/design-system",
+  }}
+/>
+
+## Architecture
+
+The form system has four layers:
+
+```
+Form            markup-only shell + subgrid container
+  └─ Field      type-safe router — selects input by inputType prop
+       ├─ Wrapper    label, description, error, ARIA for every field
+       │    └─ Input
+       └─ Custom component    rendered inside the Wrapper, binds its own value
+```
+
+`Form` renders a native `<form>` as a CSS subgrid, inheriting columns from the parent `.grid` context; it holds no form state. `Field` is a discriminated union — the `inputType` prop selects which input component renders, and TypeScript enforces the correct props for that type. Every field composes the field chrome (`Wrapper`) around its input. A custom `component` is rendered inside the same chrome and receives the control's ID, name and accessibility attributes.
+
+## Quick example
+
+```svelte
+<script lang="ts">
+  import { Field, Form } from "@canonical/svelte-ds-global-form";
+
+  let name = $state("");
+  let email = $state("");
+  let role = $state("dev");
+</script>
+
+<div class="grid responsive">
+  <Form method="POST">
+    <Field name="name" inputType="text" label="Name" isOptional bind:value={name} />
+    <Field name="email" inputType="text" label="Email" bind:value={email} />
+    <Field
+      name="role"
+      inputType="select"
+      label="Role"
+      options={[
+        { value: "dev", label: "Developer" },
+        { value: "design", label: "Designer" },
+      ]}
+      bind:value={role}
+    />
+    <button type="submit">Submit</button>
+  </Form>
+</div>
+```
+
+Forms require a `.grid` parent — `Form` renders as a subgrid and inherits the column structure. See [Getting Started](?path=/docs/global-form-getting-started--docs) for the full walkthrough.
+
+## Bindable values, native validation
+
+Every field and input takes a `$bindable` value: `value` for text-like, select,
+date, color, rating and combobox inputs, `checked` for the checkbox, switch and
+radio inputs (the boolean `value` on their fields), and `files` for the file
+upload input. Fields are required unless `isOptional` is set, and validation
+rules are native attributes (`minlength`, `pattern`, `min`, `max`, …). There is
+no form owner yet: the application owns form state, validation and submission,
+and passes a validation message to a field through its `error` prop. Error states
+apply a `.danger` CSS class that shifts the input border to the error colour.
+
+## Middleware
+
+Middleware wraps input components to add cross-cutting behaviour — fetching options from an API, server-side validation, conditional display. It is not part of the Svelte package yet; conditional display is available today through each field's `condition` prop.
+
+## Installation
+
+```bash
+bun add @canonical/svelte-ds-global-form @canonical/styles
+```
+
+Then import **both** stylesheets in your application's root stylesheet — the
+global Pragma styles (which define the design tokens the form reads) and the form
+styles:
+
+```css
+@import url("@canonical/styles");
+@import url("@canonical/svelte-ds-global-form/index.css");
+```
+
+Without the global `@canonical/styles` import the form renders unstyled. See
+[Getting Started](?path=/docs/global-form-getting-started--docs) for the details.
+
+## Documentation
+
+<table>
+  <thead>
+    <tr>
+      <th>Page</th>
+      <th>What you'll find</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="?path=/docs/global-form-getting-started--docs">Getting Started</a></td><td>Full tutorial — Form, Field, validation, layout, conditionals</td></tr>
+    <tr><td><a href="?path=/docs/global-form-guides-creating-custom-fields--docs">Creating Custom Fields</a></td><td>How to build custom input types</td></tr>
+    <tr><td><a href="?path=/docs/global-form-guides-the-wrapper-pattern--docs">The Wrapper Pattern</a></td><td>How built-in field chrome and binding work</td></tr>
+  </tbody>
+</table>

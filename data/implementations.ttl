@@ -24,3 +24,8 @@ ds:implementation.library.svelte-ds-global
     a ds:ImplementationLibrary;
     rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/svelte-ds-global/implementationLibrary.ttl>;
     ds:implementationCount 9.
+
+ds:implementation.library.svelte-ds-global-form
+    a ds:ImplementationLibrary;
+    rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/svelte-ds-global-form/implementationLibrary.ttl>;
+    ds:implementationCount 42.
