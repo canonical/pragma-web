@@ -6,6 +6,8 @@ import {
   useRef,
 } from "react";
 import {
+  type FieldError,
+  type FieldValues,
   type RegisterOptions,
   useFormContext,
   useWatch,
@@ -30,6 +32,11 @@ interface ValidationOptions {
   minLength?: number;
   /** Milliseconds to wait after the last change before sending. Defaults to 300. */
   debounceWait?: number;
+  /**
+   * Milliseconds to wait for the endpoint's answer before giving up, so a
+   * request that never completes cannot hold a submit. Defaults to 10000.
+   */
+  timeout?: number;
 }
 
 /** The settings of one validation middleware, with its defaults applied. */
@@ -65,8 +72,15 @@ type PendingCheck = {
   cancel: () => void;
 };
 
+/** A `validate` rule, as react-hook-form runs it. */
+type Rule = Validate<unknown, FieldValues>;
+
 /** A middleware that works with any field. */
 type ValidationMiddleware = ConfiguredMiddleware<BaseInputProps>;
+
+/** Reads the message of an error set by a REST check, if it is one. */
+const readRESTMessage = (error: FieldError | undefined): string | undefined =>
+  error?.type === REST_VALIDATION_ERROR_TYPE ? error.message : undefined;
 
 /** Whether a value is long enough, and a string, to be sent. */
 const isCheckable = (value: unknown, minLength: number): value is string =>
@@ -90,7 +104,8 @@ const readErrorMessage = async (
 
 /**
  * Sends the value and reads the endpoint's answer. A request that fails to
- * complete, or is aborted, says nothing about the value.
+ * complete says nothing about the value. An aborted request's answer is never
+ * read: `startCheck` settles the check before it aborts the request.
  * @note Impure: performs a network request.
  */
 const requestAnswer = async (
@@ -106,17 +121,18 @@ const requestAnswer = async (
       body: JSON.stringify(bodyFormatter(value)),
       signal,
     });
-    if (response.ok) return signal.aborted ? NO_ANSWER : VALID;
+    if (response.ok) return VALID;
     const message = await readErrorMessage(response, errorExtractor);
-    return signal.aborted ? NO_ANSWER : { kind: "invalid", message };
+    return { kind: "invalid", message };
   } catch {
     return NO_ANSWER;
   }
 };
 
 /**
- * Starts a check that sends the value once `debounceWait` has passed.
- * @note Impure: schedules a timer and a network request.
+ * Starts a check that sends the value once `debounceWait` has passed, and
+ * gives up on the request after `timeout`.
+ * @note Impure: schedules timers and a network request.
  */
 const startCheck = (
   url: string,
@@ -124,34 +140,67 @@ const startCheck = (
   settings: ValidationSettings,
 ): PendingCheck => {
   const controller = new AbortController();
-  let cancel = () => {};
+  let settle!: (answer: Answer) => void;
   const answer = new Promise<Answer>((resolve) => {
-    const timer = setTimeout(() => {
-      requestAnswer(url, value, settings, controller.signal).then(resolve);
-    }, settings.debounceWait);
-    cancel = () => {
-      clearTimeout(timer);
-      controller.abort();
-      resolve(NO_ANSWER);
-    };
+    settle = resolve;
   });
-  return { url, value, answer, cancel: () => cancel() };
+  let requestTimer: ReturnType<typeof setTimeout> | undefined;
+  const cancel = () => {
+    clearTimeout(debounceTimer);
+    clearTimeout(requestTimer);
+    settle(NO_ANSWER);
+    controller.abort();
+  };
+  const debounceTimer = setTimeout(() => {
+    requestTimer = setTimeout(cancel, settings.timeout);
+    requestAnswer(url, value, settings, controller.signal).then((result) => {
+      clearTimeout(requestTimer);
+      settle(result);
+    });
+  }, settings.debounceWait);
+  return { url, value, answer, cancel };
 };
+
+/** Whether a `validate` rule's result lets the value through. */
+const isPassing = (result: unknown): boolean =>
+  result === true || result === undefined || result === null;
+
+/**
+ * Runs two `validate` rules together and returns the first failure, so a
+ * second REST check on the field keeps the first one under the same name.
+ */
+const combineRules =
+  (first: Rule, second: Rule): Rule =>
+  async (value, formValues) => {
+    const [firstResult, secondResult] = await Promise.all([
+      first(value, formValues),
+      second(value, formValues),
+    ]);
+    return isPassing(firstResult) ? secondResult : firstResult;
+  };
 
 /**
  * Adds a rule to the field's `validate` rules, keeping the rules it has. A
  * single `validate` function stays under the `validate` name, the error type
- * react-hook-form gives it.
+ * react-hook-form gives it. A `restValidation` rule already there, from
+ * another REST check on the field, runs together with the new one.
  */
 const addValidateRule = (
   registerProps: RegisterOptions | undefined,
-  rule: Validate<unknown, unknown>,
+  rule: Rule,
 ): RegisterOptions => {
   const validate = registerProps?.validate;
-  const rules = typeof validate === "function" ? { validate } : validate;
+  const rules: Record<string, Rule> | undefined =
+    typeof validate === "function" ? { validate } : validate;
+  const previous = rules?.[REST_VALIDATION_ERROR_TYPE];
   return {
     ...registerProps,
-    validate: { ...rules, [REST_VALIDATION_ERROR_TYPE]: rule },
+    validate: {
+      ...rules,
+      [REST_VALIDATION_ERROR_TYPE]: previous
+        ? combineRules(previous, rule)
+        : rule,
+    },
   } as RegisterOptions;
 };
 
@@ -167,12 +216,29 @@ const buildRESTValidation: MiddlewareBuilder<
     const { setError, clearErrors, getFieldState } = useFormContext();
     const value: unknown = useWatch({ name });
     const pending = useRef<PendingCheck | null>(null);
+    // The message this instance last gave, so a second REST check on the
+    // field cannot clear or keep the other one's message. A REST message left
+    // from before the field mounted is adopted, so it can still be cleared.
+    const ownMessage = useRef<string | undefined>(
+      readRESTMessage(getFieldState(name).error),
+    );
 
-    /** Clears the field's error when this middleware set it. */
+    /** Reads the field's error message when this instance set it. */
+    const readOwnMessage = () => {
+      const message = readRESTMessage(getFieldState(name).error);
+      return message === ownMessage.current ? message : undefined;
+    };
+
+    /** Clears the field's error when this instance set it. */
     const clearOwnError = () => {
-      if (getFieldState(name).error?.type === REST_VALIDATION_ERROR_TYPE) {
-        clearErrors(name);
-      }
+      if (readOwnMessage() !== undefined) clearErrors(name);
+      ownMessage.current = undefined;
+    };
+
+    /** Sets the endpoint's rejection as the field's error. */
+    const setOwnError = (message: string) => {
+      ownMessage.current = message;
+      setError(name, { type: REST_VALIDATION_ERROR_TYPE, message });
     };
 
     /** Stops the pending check, if any. */
@@ -214,12 +280,15 @@ const buildRESTValidation: MiddlewareBuilder<
     ): Promise<string | true> => {
       if (!isCheckable(fieldValue, settings.minLength)) return true;
       const answer = await check(url, fieldValue);
-      if (answer.kind === "valid") return true;
-      if (answer.kind === "invalid") return answer.message;
-      const { error } = getFieldState(name);
-      return (
-        (error?.type === REST_VALIDATION_ERROR_TYPE && error.message) || true
-      );
+      if (answer.kind === "valid") {
+        ownMessage.current = undefined;
+        return true;
+      }
+      if (answer.kind === "invalid") {
+        ownMessage.current = answer.message;
+        return answer.message;
+      }
+      return readOwnMessage() || true;
     };
 
     const followValue = useEffectEvent(
@@ -233,10 +302,7 @@ const buildRESTValidation: MiddlewareBuilder<
           if (answer.kind === "valid") {
             clearOwnError();
           } else if (answer.kind === "invalid") {
-            setError(name, {
-              type: REST_VALIDATION_ERROR_TYPE,
-              message: answer.message,
-            });
+            setOwnError(answer.message);
           }
           // A check without an answer leaves the field's error as it is.
         });
@@ -272,9 +338,11 @@ const configureRESTValidation = createMiddleware(buildRESTValidation);
  * change cancels the pending timer and aborts the request in flight, so only
  * the answer for the latest value can set or clear the error; unmounting the
  * field does the same. A request that fails to complete keeps the previous
- * message. It only clears the error it set, so an error from the field's own
- * rules or another middleware stays in place. The middleware can be created
- * inline: the field keeps one instance.
+ * message, and a request still unanswered after `timeout` is given up. It
+ * only clears the error it set, so an error from the field's own rules or
+ * another middleware stays in place. Two instances on one field each keep
+ * their own message, and submit runs both checks. The middleware can be
+ * created inline: the field keeps one instance.
  *
  * @param url - The endpoint validating the value.
  * @param options - Request, debounce and error options.
@@ -293,6 +361,7 @@ function addRESTFieldValidation(
     errorExtractor = () => DEFAULT_ERROR_MESSAGE,
     minLength = 3,
     debounceWait = 300,
+    timeout = 10000,
   } = options;
   return configureRESTValidation({
     url,
@@ -302,6 +371,7 @@ function addRESTFieldValidation(
     errorExtractor,
     minLength,
     debounceWait,
+    timeout,
   });
 }
 

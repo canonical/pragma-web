@@ -49,6 +49,8 @@ const MiddlewareSettingsContext = createContext<readonly unknown[]>([]);
  *
  * @param build - Builds the component from the wrapped one.
  * @returns A factory making a middleware from settings.
+ * @note Impure: the factory records each middleware it makes, with its builder
+ * and settings, in a module-level `WeakMap` that fields read.
  *
  * `import { createMiddleware } from "@canonical/react-ds-global-form";`
  */

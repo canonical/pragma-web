@@ -199,6 +199,38 @@ describe("addRESTFieldOptions", () => {
       await respondWith(0, fruits);
       expect(screen.getByRole("alert")).toHaveTextContent("Unreadable options");
     });
+
+    it("does not block the submit", async () => {
+      const onSubmit = vi.fn();
+      /** A form whose only field fetches its options. */
+      const SubmitForm = () => {
+        const methods = useForm();
+        return (
+          <FormProvider {...methods}>
+            <form
+              aria-label="Order"
+              onSubmit={methods.handleSubmit((values) => onSubmit(values))}
+            >
+              <SelectField
+                name="fruit"
+                label="Fruit"
+                options={[]}
+                isOptional
+                middleware={[addRESTFieldOptions("/api/fruits")]}
+              />
+            </form>
+          </FormProvider>
+        );
+      };
+      render(<SubmitForm />);
+      await respondWith(0, {}, 500);
+      await act(async () => {
+        fireEvent.submit(screen.getByRole("form", { name: "Order" }));
+      });
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
+    });
   });
 
   describe("cancellation", () => {
@@ -284,6 +316,27 @@ describe("addRESTFieldOptions", () => {
       await waitFor(() => {
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe("URL change", () => {
+    it("drops the previous URL's error while the new options load", async () => {
+      const { rerender } = renderSelect(addRESTFieldOptions("/api/a"));
+      await respondWith(0, {}, 500);
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+
+      rerender(
+        <SelectField
+          name="fruit"
+          label="Fruit"
+          options={[]}
+          middleware={[addRESTFieldOptions("/api/b")]}
+        />,
+      );
+      await waitFor(() => {
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
+      expect(screen.getByRole("combobox")).toHaveAttribute("aria-busy", "true");
     });
   });
 
