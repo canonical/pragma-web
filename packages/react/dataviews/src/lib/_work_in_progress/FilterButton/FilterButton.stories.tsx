@@ -303,11 +303,16 @@ export const OnToggle: StoryFn = () => {
 };
 OnToggle.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  await userEvent.click(canvas.getByRole("button", { name: "Status" }));
+  const trigger = canvas.getByRole("button", { name: "Status" });
+  await userEvent.click(trigger);
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("open"),
   );
-  await userEvent.keyboard("{Escape}");
+  // The trigger closes it too: a play can only dispatch a synthetic Escape,
+  // and a real browser runs a popover's close request for a key it pressed
+  // itself, so the panel would stay open and the story would read as an
+  // error on a browser runner such as Chromatic.
+  await userEvent.click(trigger);
   await waitFor(() =>
     expect(canvas.getByRole("status")).toHaveTextContent("closed"),
   );
