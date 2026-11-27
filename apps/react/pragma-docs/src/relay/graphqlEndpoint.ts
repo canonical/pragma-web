@@ -20,12 +20,9 @@
  * 1. **Vite dev (browser)** — `import.meta.env` is a live object Vite
  *    populates from `VITE_*` env vars and `.env` files.
  * 2. **Vite client build (`dist/client`)** — `import.meta.env.VITE_*` is
- *    statically replaced at build time. The repository's ordinary client build
- *    deliberately leaves `VITE_GRAPHQL_URL` unset, so this arm compiles to the
- *    empty string / `undefined` and the browser falls through to the default.
- *    That is on purpose: the built bundle must not have a machine's dev port
- *    baked in. A release build (`build:client:release`) sets the variable and
- *    compiles its value into the bundle instead.
+ *    statically replaced at build time. A deployable build requires
+ *    `VITE_GRAPHQL_URL`. The explicit local `preview` mode allows it to be
+ *    absent, so the browser can use the loopback default.
  * 3. **Vite SSR build (`dist/server/renderer.js`)** — same static
  *    replacement, same deliberate miss; the compiled renderer therefore reads
  *    `process.env.VITE_GRAPHQL_URL` at RUNTIME, which is exactly how
@@ -68,16 +65,11 @@
  * client build, and Vite statically replaces it into the browser bundle:
  *
  * ```sh
- * VITE_GRAPHQL_URL=https://graph.example.com/graphql bun run build:client:release
+ * VITE_GRAPHQL_URL=https://graph.example.com/graphql bun run build:client
  * ```
  *
- * The repository's ordinary build does not set it, which is why arm 2 below
- * compiles to nothing here — a machine's dev port must never be frozen into a
- * committed artifact. That is the default, not a limit: a deployment that
- * leaves the variable unset ships a bundle pointing at the reader's loopback,
- * and that is a deployment error rather than a thing to work around in code.
- * The release build enforces this: `build:client:release` refuses to compile
- * without the variable.
+ * `build:client` refuses to compile without the variable. Only local preview
+ * builds may leave it unset and retain the development fallback.
  */
 export const DEFAULT_GRAPHQL_URL = "http://127.0.0.1:5175/graphql";
 

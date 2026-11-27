@@ -11,16 +11,24 @@
 import { GRAPHQL_URL_ENV_VAR } from "./graphqlEndpoint.js";
 
 /**
- * Throws when a release client build has no configured GraphQL endpoint.
+ * Throws when a deployable client build has no configured GraphQL endpoint.
  *
  * An empty string counts as unset, matching the resolver's treatment of a bare
  * `VITE_GRAPHQL_URL=` line.
  */
-export const assertReleaseGraphqlUrl = (url: string | undefined): void => {
-  if (typeof url !== "string" || url.length === 0) {
+export const assertReleaseGraphqlUrl = ({
+  mode,
+  ssr,
+  url,
+}: {
+  mode: string;
+  ssr: boolean;
+  url: string | undefined;
+}): void => {
+  if (!ssr && mode !== "preview" && !url?.trim()) {
     throw new Error(
-      `${GRAPHQL_URL_ENV_VAR} must be set for a release client build. ` +
-        "The loopback default is for development only; set it to a publicly reachable GraphQL endpoint.",
+      `${GRAPHQL_URL_ENV_VAR} must be set for a production client build. ` +
+        "Set it to a publicly reachable GraphQL endpoint, or use build:client:preview for local use.",
     );
   }
 };

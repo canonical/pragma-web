@@ -36,14 +36,14 @@
     "dev": "bun src/server/withGraph.ts vite",
     "dev:express": "bun src/server/withGraph.ts node --import tsx --import ./src/server/nodeCssNoop.ts src/server/server.express.ts",
     "dev:bun": "bun src/server/withGraph.ts bun src/server/server.bun.ts",
-    "preview": "bun run build:client && bun src/server/withGraph.ts vite preview --outDir dist/client",
-    "preview:bun": "bun run build:client && bun run build:server && bun src/server/withGraph.ts bun src/server/preview.bun.ts",
-    "preview:express": "bun run build:client && bun run build:server && bun src/server/withGraph.ts node --import tsx src/server/preview.express.ts",
-    "build": "bun run build:client",
-    "build:all": "bun run build:client && bun run build:server && bun run build:storybook",
+    "preview": "bun run build:client:preview && bun src/server/withGraph.ts vite preview --outDir dist/client",
+    "preview:bun": "bun run build:client:preview && bun run build:server && bun src/server/withGraph.ts bun src/server/preview.bun.ts",
+    "preview:express": "bun run build:client:preview && bun run build:server && bun src/server/withGraph.ts node --import tsx src/server/preview.express.ts",
+    "build": "bun run build:client --mode \"${PRAGMA_DOCS_BUILD_MODE:-production}\"",
+    "build:all": "bun run build:client:preview && bun run build:server && bun run build:storybook",
     "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:client:release": "vite build --mode release --ssrManifest --outDir dist/client",
-    "build:release": "bun run build:client:release && bun run build:server && bun run build:storybook",
+    "build:client:preview": "bun run build:client --mode preview",
+    "build:release": "bun run build:client && bun run build:server && bun run build:storybook",
     "build:server": "vite build --mode server",
     "build:storybook": "storybook build",
     "check": "bun run check:biome && bun run check:ts && bun run relay:check",
@@ -59,6 +59,13 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "storybook": "storybook dev -p 6010 --no-open --host 0.0.0.0"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "cache": false
+      }
+    }
   },
   "dependencies": {
     "@canonical/prism-pragma-provider": "^0.47.0",

@@ -21,11 +21,8 @@ const PORT = Number(process.env.PORT) || undefined;
 // renderers in a single pass. Each is a separate, individually-instantiated
 // Lego brick, so they are named Rollup inputs — the build emits
 // `dist/server/renderer.js` (the JSX app) + `dist/server/sitemap.js` (the XML
-// sitemap), which the preview servers import directly. `build:client:release`
-// runs the SPA client build in `release` mode, which refuses to compile without
-// `VITE_GRAPHQL_URL`. Every other command (`dev`, `build:client`, `preview`)
-// uses the default mode and the SPA client build
-// (`--ssrManifest --outDir dist/client`).
+// sitemap), which the preview servers import directly. Client builds require an
+// explicit GraphQL endpoint unless they opt into `preview` mode for local use.
 export default defineConfig(({ mode }) => ({
   // Relay's `graphql\`...\`` tags must be rewritten into imports of the
   // compiler-generated artifacts. `@vitejs/plugin-react` v6 is OXC-based (no
@@ -40,14 +37,14 @@ export default defineConfig(({ mode }) => ({
   // `relay:watch` scripts.
   plugins: [
     {
-      // A release build must carry an explicit endpoint; the ordinary build
-      // keeps the loopback default for CI and local previews.
-      name: "pragma-docs-release-graphql-url",
+      name: "pragma-docs-client-graphql-url",
       apply: "build",
       configResolved(config) {
-        if (config.mode === "release") {
-          assertReleaseGraphqlUrl(config.env.VITE_GRAPHQL_URL);
-        }
+        assertReleaseGraphqlUrl({
+          mode: config.mode,
+          ssr: Boolean(config.build.ssr),
+          url: config.env.VITE_GRAPHQL_URL,
+        });
       },
     },
     relay({ codegen: false }),
