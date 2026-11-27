@@ -1,0 +1,30 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Guides/Without JavaScript" tags={["experimental"]} />
+
+# Without JavaScript
+
+Each part renders a baseline before scripts run, and works once they do. What a part can do before scripts depends on its location: under a location that spells addresses, its controls are links and GET forms. In memory, with no address to lead to, a control that would lead somewhere renders inert until scripts run; a form that needs no address, such as the filters' form, still submits.
+
+The stories below show that baseline.
+
+## The DataViews controls
+
+- [QueryBar, with an address](?path=/story/patterns-dataviews-controls-querybar--no-java-script-href): a GET search form around a plain input, each chip's remove control and the clear control as links, and the filters form in a disclosure.
+- [QueryBar, in memory](?path=/story/patterns-dataviews-controls-querybar--no-java-script-memory): the same controls, inert, with no form, address or name.
+- [QueryBar, narrow](?path=/story/patterns-dataviews-controls-querybar-narrow--no-java-script-href): the summary button opens the sheet through its invoker command. Inside, the remove controls and Clear all are links, and Apply submits the filters' GET form.
+- [QueryBar quick filters, with an address](?path=/story/patterns-dataviews-controls-querybar-quick-filters--no-java-script-href): each word is a link, and each panel is a GET form.
+- [QueryBar quick filters, in memory](?path=/story/patterns-dataviews-controls-querybar-quick-filters--no-java-script-memory): the words are text, with the current one still marked.
+- [Filters, in memory](?path=/story/patterns-dataviews-controls-filters--no-java-script-memory-filters): the controls show the state the provider started on, and Apply filters submits the form.
+
+## The standalone blocks
+
+- [PaginationBar](?path=/story/subcomponents-paginationbar--real-destinations): every page the bar can reach is a link, and the page size and the page select sit in GET forms.
+- [QueryInput, with an address](?path=/story/components-queryinput--without-scripts): a plain search input in its GET form.
+- [QueryInput, in memory](?path=/story/components-queryinput--without-addresses): the entry and the clear button are inert.
+- [QueryChip](?path=/story/components-querychip--without-scripts): plain-text segments, and a remove link where the host gives an address.
+- [QueryChips](?path=/story/groups-querychips--without-scripts): the chips' list as the server sends it.
+- [FilterButton](?path=/story/components-filterbutton--without-scripts): the trigger opens the native popover, and its panel's GET form submits.
+- [FilterOptions](?path=/story/components-filteroptions--inert): with no address, the words are text, the current one still marked.
+
+**Guides / Recipes** shows how to render the page on a server, under "Before any script runs".
