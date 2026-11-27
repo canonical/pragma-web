@@ -7,6 +7,7 @@
  */
 
 import { expect, type Page, test } from "playwright/test";
+import { QUERY_BAR } from "./constants.js";
 import openWithoutScripts from "./openWithoutScripts.js";
 
 /** The address's parameters, as the page now stands. */
@@ -37,7 +38,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=deployed",
     );
     const search = page.getByRole("search").getByRole("searchbox");
@@ -59,7 +60,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=deployed&memory__gte=8192&memory__lte=65536&q=web",
     );
     const remove = page.getByRole("link", {
@@ -92,7 +93,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=deployed&q=web",
     );
     const summary = page.getByText("Filters (1)");
@@ -120,7 +121,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "memory__gte=131072&memory__lte=65536",
     );
     const merge = page.getByRole("link", { name: "Merge the memory filters" });
@@ -140,7 +141,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "status=melted&tags=ex-gpu",
     );
     const clear = page.getByRole("link", { name: "Clear status" });
@@ -161,7 +162,7 @@ test.describe("QueryBar without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href",
+      `${QUERY_BAR}--no-java-script-href`,
       "memory__gte=131072&memory__lte=65536&status=deployed&tags=ex-gpu&q=web",
     );
     const remove = page.getByRole("link", {
@@ -194,7 +195,13 @@ test.describe("QueryBar without scripts", () => {
     page,
     browser,
   }, info) => {
-    await openWithoutScripts(page, browser, info, "no-java-script-memory", "");
+    await openWithoutScripts(
+      page,
+      browser,
+      info,
+      `${QUERY_BAR}--no-java-script-memory`,
+      "",
+    );
     expect(await readChips(page)).toHaveLength(2);
     await expect(page.locator(".ds.query-chip").first()).toBeVisible();
     await expect(page.locator("a[href]")).toHaveCount(0);

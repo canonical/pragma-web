@@ -23,7 +23,7 @@ const SETTLED_PHASES: readonly string[] = ["completed", "finished"];
 const renderMarkup = async (
   browser: Browser,
   info: TestInfo,
-  story: string,
+  id: string,
   query: string,
 ): Promise<{ readonly head: string; readonly body: string }> => {
   const context = await browser.newContext({
@@ -32,7 +32,7 @@ const renderMarkup = async (
   });
   const page = await context.newPage();
   await page.goto(
-    `/iframe.html?id=work-in-progress-dataviews-querybar--${story}&viewMode=story&query=${encodeURIComponent(query)}`,
+    `/iframe.html?id=${id}&viewMode=story&query=${encodeURIComponent(query)}`,
   );
   await page.waitForFunction((phases) => {
     const phase = (
@@ -72,7 +72,7 @@ export default async function openWithoutScripts(
   page: Page,
   browser: Browser,
   info: TestInfo,
-  story: string,
+  id: string,
   query: string,
 ): Promise<void> {
   await page.route(`${ORIGIN}/**`, async (route) => {
@@ -88,7 +88,7 @@ export default async function openWithoutScripts(
     const { head, body } = await renderMarkup(
       browser,
       info,
-      story,
+      id,
       url.search.replace(/^\?/, ""),
     );
     await route.fulfill({

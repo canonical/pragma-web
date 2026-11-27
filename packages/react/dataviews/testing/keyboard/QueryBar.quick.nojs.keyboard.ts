@@ -7,6 +7,7 @@
  */
 
 import { expect, type Page, test } from "playwright/test";
+import { QUERY_BAR_QUICK } from "./constants.js";
 import openWithoutScripts from "./openWithoutScripts.js";
 
 /** The address's parameters, as the page now stands. */
@@ -27,7 +28,7 @@ test.describe("QueryBar's quick filters without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href-quick-filters",
+      `${QUERY_BAR_QUICK}--no-java-script-href`,
       "status=deployed&memory__gte=8192&q=web",
     );
     const words = page.locator(".ds.filter-options");
@@ -60,7 +61,7 @@ test.describe("QueryBar's quick filters without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href-quick-filters",
+      `${QUERY_BAR_QUICK}--no-java-script-href`,
       "status=deployed&memory__gte=8192&q=web",
     );
     const trigger = page.locator(".ds.filter-button", { hasText: "tags" });
@@ -89,7 +90,7 @@ test.describe("QueryBar's quick filters without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-href-quick-filters",
+      `${QUERY_BAR_QUICK}--no-java-script-href`,
       "status=deployed&q=web",
     );
     const trigger = page.locator(".ds.filter-button", { hasText: "owner" });
@@ -116,7 +117,7 @@ test.describe("QueryBar's quick filters without scripts", () => {
       page,
       browser,
       info,
-      "no-java-script-memory-quick-filters",
+      `${QUERY_BAR_QUICK}--no-java-script-memory`,
       "",
     );
     const words = page.locator(".ds.filter-options");

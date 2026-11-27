@@ -10,6 +10,7 @@
  */
 
 import { expect, type Locator, type Page, test } from "playwright/test";
+import { QUERY_BAR } from "./constants.js";
 import openStory from "./openQueryBarStory.js";
 
 /** The bar's own entry. */
@@ -94,7 +95,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F1: a chip built by keys narrows the rows and is announced", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await recordAnnouncements(page);
     const before = page.url();
     await findEntry(page).click();
@@ -131,7 +132,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F2: a chip built by pointer commits on a click outside", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await findEntry(page).click();
     await page.getByRole("option", { name: "status" }).click();
     await expect(findPart(page, "Operator for status")).toBeFocused();
@@ -150,7 +151,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F3: a typed `>` reads as at least, said once, and a number in its unit", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await recordAnnouncements(page);
     await findEntry(page).click();
     await page.keyboard.type("memory");
@@ -186,7 +187,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F4: a space in a typed value is text; on a highlighted choice it commits", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await findEntry(page).click();
     await page.keyboard.type("hostname");
     await page.keyboard.press("Enter");
@@ -212,7 +213,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F5: several values take two Enters and make one chip", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await recordAnnouncements(page);
     await findEntry(page).click();
     await page.keyboard.type("status");
@@ -236,7 +237,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F6: a value edited by pointer: the Entry takes the Segment's place, and Enter restores it with focus", async ({
     page,
   }) => {
-    await openStory(page, "several-values");
+    await openStory(page, `${QUERY_BAR}--several-values`);
     await page
       .getByRole("button", { name: "allocated, deployed, ready", exact: true })
       .click();
@@ -265,7 +266,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F7: an edit walks its parts with Tab, and past either end focus leaves in that direction", async ({
     page,
   }) => {
-    await openStory(page, "several-values");
+    await openStory(page, `${QUERY_BAR}--several-values`);
     await findEntry(page).click();
     await page.keyboard.press("ArrowLeft");
     const field = page.getByRole("button", { name: "status", exact: true });
@@ -313,7 +314,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F8: Escape closes the list first, then abandons the draft", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await findEntry(page).click();
     await page.keyboard.type("status");
     await page.keyboard.press("Enter");
@@ -334,7 +335,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F9: Backspace selects the last chip, then removes it, focus on the previous", async ({
     page,
   }) => {
-    await openStory(page, "same-field-and");
+    await openStory(page, `${QUERY_BAR}--same-field-and`);
     await findEntry(page).click();
     const chips = await readChips(page);
     await page.keyboard.press("Backspace");
@@ -357,7 +358,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F10: a chip removed by pointer hands the stop to the next", async ({
     page,
   }) => {
-    await openStory(page, "same-field-and");
+    await openStory(page, `${QUERY_BAR}--same-field-and`);
     const chips = await readChips(page);
     const first = page.locator("#storybook-root .ds.query-chip").first();
     await first.hover();
@@ -374,7 +375,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F11: the clear control clears the chips and the search, then hides", async ({
     page,
   }) => {
-    await openStory(page, "same-field-and");
+    await openStory(page, `${QUERY_BAR}--same-field-and`);
     await findEntry(page).click();
     await page.keyboard.type("node-1");
     await page.keyboard.press("Enter");
@@ -393,7 +394,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F11b: with the query in the address, Back after a clear brings the clauses back", async ({
     page,
   }) => {
-    await openStory(page, "with-history");
+    await openStory(page, `${QUERY_BAR}--with-history`);
     const before = await readChips(page);
     expect(before).toEqual(["status is any of deployed, ready"]);
     await expect.poll(() => countRows(page)).toBe(24);
@@ -410,7 +411,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F12: free text Enter makes one search chip and searches the rows", async ({
     page,
   }) => {
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await findEntry(page).click();
     await page.keyboard.type("node-1");
     await page.keyboard.press("Enter");
@@ -421,7 +422,7 @@ test.describe("QueryBar, in Chromium", () => {
   });
 
   test("F13: two chips on one field both hold", async ({ page }) => {
-    await openStory(page, "same-field-and");
+    await openStory(page, `${QUERY_BAR}--same-field-and`);
     expect(await readChips(page)).toEqual([
       "status is any of deployed, ready",
       "tags is ex-gpu",
@@ -436,7 +437,7 @@ test.describe("QueryBar, in Chromium", () => {
     context,
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await openStory(page, "default");
+    await openStory(page, `${QUERY_BAR}--default`);
     await findEntry(page).click();
     await page.evaluate(() => navigator.clipboard.writeText("stat"));
     await page.keyboard.press("ControlOrMeta+V");
@@ -462,7 +463,7 @@ test.describe("QueryBar, in Chromium", () => {
     page,
   }) => {
     // The story's play opens an edit, types, and presses the outside control.
-    await openStory(page, "outside-change");
+    await openStory(page, `${QUERY_BAR}--outside-change`);
     const value = findPart(page, "Value for status");
     await expect(value).toBeFocused();
     await expect(value).toHaveValue("rea");
@@ -478,7 +479,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F16: overflowing chips hold one line and count the hidden; focus wraps them", async ({
     page,
   }) => {
-    await openStory(page, "overflow");
+    await openStory(page, `${QUERY_BAR}--overflow`);
     const field = page.locator("#storybook-root .ds.query-input .field");
     const resting = await field.boundingBox();
     await expect(page.locator("#storybook-root .hidden-count")).toBeVisible();
@@ -530,7 +531,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F17: an invalid value is marked, and the line below the field says the clause still applies", async ({
     page,
   }) => {
-    await openStory(page, "invalid-input");
+    await openStory(page, `${QUERY_BAR}--invalid-input`);
     const rows = await countRows(page);
     const value = findPart(page, "Value for memory");
     await expect(value).toBeFocused();
@@ -568,7 +569,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F18: clauses that cannot both hold warn, and Merge makes one range", async ({
     page,
   }) => {
-    await openStory(page, "contradiction");
+    await openStory(page, `${QUERY_BAR}--contradiction`);
     await recordAnnouncements(page);
     await expect(
       page.getByText("The memory filters cannot all hold, so nothing matches."),
@@ -594,7 +595,7 @@ test.describe("QueryBar, in Chromium", () => {
     // Wider than the narrow form, which hides the chips; each chip is made
     // wide, so the two wrap once the field takes focus.
     await page.setViewportSize({ width: 640, height: 720 });
-    await openStory(page, "contradiction");
+    await openStory(page, `${QUERY_BAR}--contradiction`);
     await page.addStyleTag({
       content: "#storybook-root .ds.query-chip { min-inline-size: 16rem; }",
     });
@@ -646,7 +647,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F19: a range is one chip; each bound edits in place, and removal takes both", async ({
     page,
   }) => {
-    await openStory(page, "range");
+    await openStory(page, `${QUERY_BAR}--range`);
     await recordAnnouncements(page);
     const rows = await countRows(page);
     // By keys alone: Left onto the chip, Enter opens its lower bound, Tab
@@ -703,7 +704,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F20: a refused link shows a refused chip whose reason is described, and Clear removes it", async ({
     page,
   }) => {
-    await openStory(page, "refused-link");
+    await openStory(page, `${QUERY_BAR}--refused-link`);
     const clear = page.getByRole("button", { name: "Clear status" });
     await expect(clear).toHaveAccessibleDescription(/^status: /);
     const line = page.locator(
@@ -727,7 +728,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F21b: a date preset typed by its label commits as it resolves", async ({
     page,
   }) => {
-    await openStory(page, "presets");
+    await openStory(page, `${QUERY_BAR}--presets`);
     // The story's play leaves the deployed value Entry open, presets first.
     const value = findPart(page, "Value for deployed");
     await expect(value).toBeFocused();
@@ -741,7 +742,7 @@ test.describe("QueryBar, in Chromium", () => {
   test("F21: a field's presets come first among its values, and commit as they resolve", async ({
     page,
   }) => {
-    await openStory(page, "presets");
+    await openStory(page, `${QUERY_BAR}--presets`);
     // The story's play leaves a draft open: Escape closes its list, then
     // drops it.
     await page.keyboard.press("Escape");

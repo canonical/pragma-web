@@ -117,7 +117,7 @@ describe("openWithoutScripts", () => {
       page as unknown as Page,
       browser as unknown as Browser,
       info as unknown as TestInfo,
-      "address",
+      "patterns-dataviews-controls-querybar--address",
       "",
     );
     const route = await request("http://nojs.test/machines?q=web");
@@ -126,7 +126,7 @@ describe("openWithoutScripts", () => {
       baseURL: "http://sb.test",
     });
     expect(rendered.goto).toHaveBeenCalledWith(
-      "/iframe.html?id=work-in-progress-dataviews-querybar--address&viewMode=story&query=q%3Dweb",
+      "/iframe.html?id=patterns-dataviews-controls-querybar--address&viewMode=story&query=q%3Dweb",
     );
     expect(settled).toEqual([false, true]);
     expect(context.close).toHaveBeenCalledTimes(1);

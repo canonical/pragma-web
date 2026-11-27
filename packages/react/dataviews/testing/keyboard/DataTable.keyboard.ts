@@ -27,35 +27,34 @@ type IndexedStory = {
 };
 
 /** The table's stories. */
-const TABLE = "_work_in_progress/DataViews/Renderers/DataTable";
+const TABLE = "patterns/DataViews/Renderers/DataTable";
 
 /** The sort panel's stories, the path to an ordering without Shift. */
-const SORT_PANEL = "_work_in_progress/DataViews/SortPanel";
+const SORT_PANEL = "patterns/DataViews/Controls/SortPanel";
 
 /** The filters' stories, the primary fields and the disclosure of the rest. */
-const FILTERS = "_work_in_progress/DataViews/Filters";
+const FILTERS = "patterns/DataViews/Controls/Filters";
 
 /** The table settings' stories, the path to every arrangement without a drag. */
-const SETTINGS = "_work_in_progress/DataViews/Settings";
+const SETTINGS = "patterns/DataViews/Controls/Settings";
 
 /** The cards' stories, a collection's records as the design system's cards. */
-const DATA_CARDS = "_work_in_progress/DataViews/Renderers/DataCards";
+const DATA_CARDS = "patterns/DataViews/Renderers/DataCards";
 
 /** The chart prototype's stories, a field's counts or range beside the filters. */
-const DATA_CHART = "_work_in_progress/DataViews/Renderers/DataChart";
+const DATA_CHART = "patterns/DataViews/Renderers/DataChart";
 
 /** The chart-with-table stories, a chart and its table behind one switch. */
-const DATA_CHART_WITH_TABLE =
-  "_work_in_progress/DataViews/Renderers/DataChartWithTable";
+const DATA_CHART_WITH_TABLE = "patterns/DataViews/Renderers/DataChartWithTable";
 
 /** The whole composition's stories, links with a refused clause among them. */
-const COMPOSITION = "_work_in_progress/Composition";
+const COMPOSITION = "Documentation/Guides/Composition";
 
 /** The stories over a REST endpoint, through TanStack Query. */
-const REST_API = "_work_in_progress/REST API";
+const REST_API = "Documentation/Data sources/REST API";
 
 /** The stories over a GraphQL endpoint, through Relay. */
-const GRAPHQL_API = "_work_in_progress/GraphQL API";
+const GRAPHQL_API = "Documentation/Data sources/GraphQL API";
 
 /**
  * The stories this pass walks: the table's own, the sort panel's, the
@@ -609,7 +608,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("SortLimitedToOneTerm: a refused Shift+Enter says why until the menu's choice is accepted", async ({
     page,
   }) => {
-    await openStory(page, findStory(TABLE, "Sort Limited To One Term").id);
+    await openStory(page, findStory(TABLE, "Sort limited to one term").id);
     const hostSort = page.getByRole("button", { name: "Host", exact: true });
     const status = page.getByRole("columnheader", {
       name: "Status",
@@ -658,7 +657,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("SortLimitedToOneTerm: placing a column's edge hides the refusal's reason, and the hint stands", async ({
     page,
   }) => {
-    await openStory(page, findStory(TABLE, "Sort Limited To One Term").id);
+    await openStory(page, findStory(TABLE, "Sort limited to one term").id);
     const hostSort = page.getByRole("button", { name: "Host", exact: true });
     const status = page.getByRole("columnheader", {
       name: "Status",
@@ -779,7 +778,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("Settings ArrangedByTheViewer: Enter opens the settings menu, Enter hides a column from it, focus returns to its button", async ({
     page,
   }) => {
-    await openStory(page, findStory(SETTINGS, "Arranged By The Viewer").id);
+    await openStory(page, findStory(SETTINGS, "Arranged by the viewer").id);
     const trigger = page.getByRole("button", {
       name: "Table settings",
       exact: true,
@@ -846,7 +845,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("DataCards TableOrCards: Enter on Table shows the table, Space on Cards brings the cards back, focus stays on the choice", async ({
     page,
   }) => {
-    await openStory(page, findStory(DATA_CARDS, "Table Or Cards").id);
+    await openStory(page, findStory(DATA_CARDS, "Table or cards").id);
     const choice = page.getByRole("group", {
       name: "Show machines as",
       exact: true,
@@ -877,7 +876,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("DataChart CountsBesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
     page,
   }) => {
-    await openStory(page, findStory(DATA_CHART, "Counts Beside Filters").id);
+    await openStory(page, findStory(DATA_CHART, "Counts beside filters").id);
     const summary = page
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");
@@ -969,7 +968,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   }) => {
     await openStory(
       page,
-      findStory(COMPOSITION, "Link With A Refused Filter").id,
+      findStory(COMPOSITION, "Link with a refused filter").id,
     );
     const clear = page.getByRole("button", { name: "Clear Status" });
     await tabTo(page, clear);
@@ -1011,7 +1010,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("REST API CountsAndNoneOf: Space clears a none-of set with focus kept in the filters, and Enter on the move button moves an any-of set", async ({
     page,
   }) => {
-    await openStory(page, findStory(REST_API, "Counts And None Of").id);
+    await openStory(page, findStory(REST_API, "Counts and none of").id);
     const summary = page
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");
@@ -1072,7 +1071,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
   test("Filters PrimaryFilters: Enter opens More filters, a control typed into inside keeps focus, and Enter closes it", async ({
     page,
   }) => {
-    await openStory(page, findStory(FILTERS, "Primary Filters").id);
+    await openStory(page, findStory(FILTERS, "Primary filters").id);
     const disclosure = page.locator("details").filter({
       has: page.locator("summary", { hasText: "More filters" }),
     });
