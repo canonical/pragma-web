@@ -134,6 +134,9 @@ export const pendingSvelteStories: Readonly<Record<string, readonly string[]>> =
       "Upload Failed",
       "File Messages",
       "Single File Chosen",
+      "Without Drop Area",
+      "Without File List",
+      "Image Preview",
     ],
     "lib/component/FileUploadField/FileUploadField.stories.tsx": [
       "Live",

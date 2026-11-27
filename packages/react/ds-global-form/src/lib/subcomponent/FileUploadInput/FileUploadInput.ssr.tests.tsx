@@ -104,4 +104,29 @@ describe("FileUploadInput (SSR)", () => {
       /<div class="drop-area-group">.*<p class="ds field-error">Too many files.<\/p><\/div>/,
     );
   });
+
+  it("server-renders the thumbnail without its preview tooltip", () => {
+    const html = renderToString(
+      <FileUploadInput value={[file("photo.png", 10, "image/png")]} />,
+    );
+    expect(html).not.toContain("tooltip");
+  });
+
+  it("server-renders the error class on the drop area while invalid", () => {
+    const html = renderToString(<FileUploadInput aria-invalid />);
+    expect(html).toContain('class="drop-area error"');
+  });
+
+  it("renders neither part when both are turned off", () => {
+    const html = renderToString(
+      <FileUploadInput
+        showDropArea={false}
+        showFileList={false}
+        value={[file("a.txt")]}
+      />,
+    );
+    expect(html).not.toContain("drop-area");
+    expect(html).not.toContain("file-list");
+    expect(html).toContain('type="file"');
+  });
 });

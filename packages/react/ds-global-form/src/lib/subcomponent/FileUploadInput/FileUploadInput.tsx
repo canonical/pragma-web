@@ -27,9 +27,14 @@ const EMPTY: File[] = [];
  * Each file's tile shows its name, optional size and an image thumbnail, and
  * any warning or error under it: `accept` and `maxSize` violations, the
  * `validateFile` result, and a failed upload. With an `upload` function the
- * input is live: it sends each valid file as soon as it is chosen, shows its
- * progress and result, cancels a running upload, and retries a failed one.
- * Without `upload` it only lists the files.
+ * input is live: it sends each valid file as soon as it is chosen and shows
+ * its progress, then its result for a moment. Closing a running upload cancels
+ * it and removes the file; a failed upload can be retried. Without `upload` it
+ * only lists the files. An image's thumbnail shows the whole image on hover.
+ *
+ * `showDropArea` and `showFileList` turn the two halves off. While `error` is
+ * set or `aria-invalid` is true, the drop area carries the `error`
+ * Criticality class, so its border and fill read the error colours.
  *
  * The native file `<input>` sits beside the drop area, not inside it, and
  * carries the `id`, `name` and `required`, so a `<label for>` reaches it and
@@ -60,6 +65,8 @@ export const FileUploadInput = ({
   upload,
   validateFile,
   showFileSize = true,
+  showDropArea = true,
+  showFileList = true,
   error,
   onUploadStatusChange,
   messages: messageOverrides,
@@ -152,11 +159,15 @@ export const FileUploadInput = ({
     }
   };
 
-  // In single-file mode the drop area, and the field error with it, hides
-  // once a file is chosen and returns when the file is removed.
-  const showDropArea = multiple || files.length === 0;
   // A disabled input draws no file list.
-  const showFileList = !disabled && files.length > 0;
+  const fileListShown = showFileList && !disabled && files.length > 0;
+  // In single-file mode the drop area, and the field error with it, hides
+  // once a file is chosen and returns when the file is removed. It stays when
+  // the file list is not drawn, since nothing else could then remove the file.
+  const dropAreaShown =
+    showDropArea && (multiple || files.length === 0 || !fileListShown);
+  const isInvalid =
+    Boolean(error) || ariaInvalid === true || ariaInvalid === "true";
 
   return (
     <div
@@ -165,13 +176,17 @@ export const FileUploadInput = ({
         .filter(Boolean)
         .join(" ")}
     >
-      {showDropArea && (
+      {dropAreaShown && (
         <div className="drop-area-group">
           {/* Drag and drop is a pointer shortcut: the button is the keyboard
               and assistive-technology path to the same file picker. */}
           {/* biome-ignore lint/a11y/noStaticElementInteractions: the drop target is a pointer-only shortcut for the button inside it */}
           <div
-            className={["drop-area", isDragOver && "drag-over"]
+            className={[
+              "drop-area",
+              isDragOver && "drag-over",
+              isInvalid && "error",
+            ]
               .filter(Boolean)
               .join(" ")}
             onDragOver={handleDragOver}
@@ -212,7 +227,7 @@ export const FileUploadInput = ({
         tabIndex={-1}
         aria-hidden="true"
       />
-      {showFileList && (
+      {fileListShown && (
         <ul className="file-list">
           {files.map((file) => {
             const key = keyOf(file);
@@ -227,7 +242,6 @@ export const FileUploadInput = ({
                 showFileSize={showFileSize}
                 messages={messages}
                 onRemove={removeFile}
-                onCancel={uploads.cancel}
                 onRetry={uploads.retry}
               />
             );

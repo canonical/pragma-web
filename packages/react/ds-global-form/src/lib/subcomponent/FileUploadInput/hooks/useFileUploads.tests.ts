@@ -6,15 +6,12 @@ const file = new File(["x"], "a.txt");
 const pending = () => new Promise<void>(() => {});
 
 describe("useFileUploads", () => {
-  it("ignores cancel and retry for a file it is not uploading", () => {
+  it("ignores a retry for a file it is not uploading", () => {
     const upload = vi.fn(pending);
     const { result } = renderHook(() =>
       useFileUploads([], { upload, canUpload: () => true }),
     );
-    act(() => {
-      result.current.cancel(file);
-      result.current.retry(file);
-    });
+    act(() => result.current.retry(file));
     expect(upload).not.toHaveBeenCalled();
     expect(result.current.states.size).toBe(0);
   });

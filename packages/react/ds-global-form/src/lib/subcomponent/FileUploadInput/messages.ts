@@ -18,7 +18,6 @@ const messages: FileUploadMessages = {
   retryUpload: (fileName) => `Retry upload of ${fileName}`,
   messageLevel: (level) => (level === "error" ? "Error:" : "Warning:"),
   uploadFailed: () => "File failed to upload.",
-  uploadCancelled: () => "Upload cancelled.",
   fileTooLarge: (maxSize) => `File size exceeds ${maxSize}.`,
   fileTypeNotAccepted: () => "File type is not accepted.",
   tooManyFiles: (maxFiles) =>

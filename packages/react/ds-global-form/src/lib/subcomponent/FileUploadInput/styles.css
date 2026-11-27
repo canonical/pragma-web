@@ -1,6 +1,24 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The whole image in the thumbnail's tooltip, uncropped. It fills the
+     tooltip's own maximum width, since the tooltip sizes to its content and an
+     image without an intrinsic size (an SVG with only a viewBox) would
+     otherwise collapse. A tall image is held to half the viewport and
+     letterboxed. */
+  .ds.tooltip.file-upload-preview img {
+    --file-upload-preview-inset: calc(2 * var(--tooltip-padding-horizontal));
+
+    display: block;
+    inline-size: calc(
+      var(--tooltip-max-width) -
+      var(--file-upload-preview-inset)
+    );
+    block-size: auto;
+    max-block-size: 50vh;
+    object-fit: contain;
+  }
+
   .ds.input.file-upload {
     position: relative;
     display: flex;
@@ -15,26 +33,11 @@
       gap: var(--dimension-100);
     }
 
-    /* The dashed outline is 4px dashes with 4px gaps. `border-style: dashed`
-       cannot set either length (the browser picks them from the border
-       width), so the four sides are painted as repeating gradients instead,
-       one per edge, over the fill. The outline therefore takes no layout
-       space; the padding is measured from the outer edge, as the spec's
-       border-box does.
-
-       The outline and fill read the Criticality channels. The field's error
-       state recolours them through `--file-upload-drop-area-*`, set on this
-       element only, rather than through the channels: those would cascade
-       into the Choose file button, whose border and text stay neutral. */
+    /* The border and fill read the Criticality channels; the drop area takes
+       the `error` class while the field is invalid. Their hover, active and
+       disabled values have no channel, so those states name the neutral
+       tokens. */
     & > .drop-area-group > .drop-area {
-      --file-upload-dash: 4px;
-      --file-upload-dash-gap: 4px;
-      --file-upload-dash-width: var(--dimension-stroke-thickness-medium);
-      --file-upload-dash-color: var(
-        --file-upload-drop-area-border,
-        var(--modifier-color-border, var(--color-border))
-      );
-
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -44,46 +47,12 @@
       min-block-size: calc(var(--dimension-200) * 7);
       padding: var(--dimension-200);
       gap: var(--dimension-100);
+      border: var(--dimension-stroke-thickness-medium) dashed
+        var(--modifier-color-border, var(--color-border));
       background-color: var(
-        --file-upload-drop-area-background,
-        var(--modifier-color-foreground-input, var(--color-foreground-input))
+        --modifier-color-foreground-input,
+        var(--color-foreground-input)
       );
-      background-image:
-        repeating-linear-gradient(
-          to right,
-          var(--file-upload-dash-color) 0 var(--file-upload-dash),
-          transparent 0
-            calc(var(--file-upload-dash) + var(--file-upload-dash-gap))
-        ),
-        repeating-linear-gradient(
-          to right,
-          var(--file-upload-dash-color) 0 var(--file-upload-dash),
-          transparent 0
-            calc(var(--file-upload-dash) + var(--file-upload-dash-gap))
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          var(--file-upload-dash-color) 0 var(--file-upload-dash),
-          transparent 0
-            calc(var(--file-upload-dash) + var(--file-upload-dash-gap))
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          var(--file-upload-dash-color) 0 var(--file-upload-dash),
-          transparent 0
-            calc(var(--file-upload-dash) + var(--file-upload-dash-gap))
-        );
-      background-position:
-        top left,
-        bottom left,
-        top left,
-        top right;
-      background-size:
-        100% var(--file-upload-dash-width),
-        100% var(--file-upload-dash-width),
-        var(--file-upload-dash-width) 100%,
-        var(--file-upload-dash-width) 100%;
-      background-repeat: no-repeat;
       transition: background-color var(--motion-duration-fast) ease;
 
       /* A file dragged over the area takes the hover fill. */
@@ -98,8 +67,19 @@
       }
 
       &:has(> .ds.button:disabled) {
-        --file-upload-dash-color: var(--color-border-disabled);
+        border-color: var(--color-border-disabled);
         background-color: var(--color-foreground-input-disabled);
+      }
+
+      /* The Choose file button stays neutral in the error state. The
+         Criticality class on the drop area sets these channels for the area's
+         own border and fill, but they inherit, and the button would read them
+         for its border, icon and focus ring. `initial` unsets each one, so the
+         button falls back to its own colours. */
+      & > .ds.button {
+        --modifier-color-border: initial;
+        --modifier-color-icon: initial;
+        --modifier-color-focus-ring: initial;
       }
     }
 
@@ -108,7 +88,6 @@
       font-size: var(--typography-text-primary-font-size);
       font-weight: var(--typography-text-primary-font-weight);
       color: var(--color-text);
-      text-align: center;
     }
 
     &.disabled > .drop-area-group > .drop-area > .drop-area-text {
@@ -189,17 +168,26 @@
       flex-direction: row;
     }
 
-    /* 60×36 (5:3). The image fills the box edge to edge, so its inset is the
-       same, zero, on every side; the height matches the tile's. */
-    & > .tile > .thumbnail {
+    /* With a preview, the tooltip's wrapper is the tile's flex item and the
+       thumbnail sits inside it. */
+    & > .tile > .thumbnail-preview {
+      display: flex;
+      flex-shrink: 0;
+
+      & > .target {
+        display: block;
+      }
+    }
+
+    /* 60×36 (5:3). The image fills the box edge to edge; the height matches
+       the tile's. */
+    & > .tile > .thumbnail,
+    & > .tile > .thumbnail-preview > .target > .thumbnail {
+      display: block;
       flex-shrink: 0;
       inline-size: 60px;
       block-size: 36px;
       overflow: hidden;
-      background-color: var(
-        --modifier-color-foreground-input,
-        var(--color-foreground-input)
-      );
 
       & > img {
         display: block;
@@ -265,7 +253,6 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      flex-shrink: 0;
       /* 6px; no dimension token declares this step. */
       gap: 6px;
     }
@@ -282,24 +269,6 @@
 
       & > .upload-progress {
         color: var(--color-text-muted);
-      }
-
-      & > .ds.icon,
-      & > .ds.spinner {
-        inline-size: var(--dimension-200);
-        block-size: var(--dimension-200);
-      }
-
-      & > .status-success {
-        color: var(--color-icon-success);
-      }
-
-      & > .status-warning {
-        color: var(--color-icon-warning);
-      }
-
-      & > .status-error {
-        color: var(--color-icon-error);
       }
     }
 
@@ -332,11 +301,5 @@
       justify-content: center;
       line-height: 1;
     }
-  }
-
-  /* ── Field error state ─────────────────────────────────────────────── */
-  .danger > .payload .ds.input.file-upload > .drop-area-group > .drop-area {
-    --file-upload-drop-area-border: var(--color-border-error);
-    --file-upload-drop-area-background: var(--color-foreground-input-error);
   }
 }
