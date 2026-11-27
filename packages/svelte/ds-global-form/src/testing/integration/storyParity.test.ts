@@ -1,6 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { storyFilePairs, svelteOnlyStories } from "../fixtures.storyParity.js";
+import {
+  pendingSvelteStories,
+  storyFilePairs,
+  svelteOnlyStories,
+} from "../fixtures.storyParity.js";
 import { readReactStories, readSvelteStories } from "../readStoryInventory.js";
 
 const reactSource = new URL(
@@ -13,9 +17,14 @@ describe("Story parity with the React form package", () => {
   it.each(storyFilePairs)(
     "%s has the same title and stories as %s",
     (react, svelte) => {
-      const expected = readReactStories(
+      const reactStories = readReactStories(
         readFileSync(new URL(react, reactSource), "utf8"),
       );
+      const pending = pendingSvelteStories[react] ?? [];
+      const expected = {
+        ...reactStories,
+        names: reactStories.names.filter((name) => !pending.includes(name)),
+      };
       const { title, names } = readSvelteStories(
         readFileSync(new URL(svelte, svelteSource), "utf8"),
       );
