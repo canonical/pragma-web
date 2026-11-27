@@ -1534,6 +1534,7 @@
         "@storybook/addon-svelte-csf": "^5.1.3",
         "@sveltejs/package": "3.0.0",
         "@sveltejs/vite-plugin-svelte": "^7.0.0",
+        "@tanstack/svelte-form": "1.33.5",
         "@types/bun": "^1.3.10",
         "@types/node": "^26.0.0",
         "@vitest/browser": "^5.0.0",
@@ -2314,7 +2315,19 @@
 
     "@sveltejs/vite-plugin-svelte": ["@sveltejs/vite-plugin-svelte@7.0.0", "", { "dependencies": { "deepmerge": "^4.3.1", "magic-string": "^0.30.21", "obug": "^2.1.0", "vitefu": "^1.1.2" }, "peerDependencies": { "svelte": "^5.46.4", "vite": "^8.0.0-beta.7 || ^8.0.0" } }, "sha512-ILXmxC7HAsnkK2eslgPetrqqW1BKSL7LktsFgqzNj83MaivMGZzluWq32m25j2mDOjmSKX7GGWahePhuEs7P/g=="],
 
+    "@tanstack/devtools-event-client": ["@tanstack/devtools-event-client@0.4.4", "", { "bin": { "intent": "./bin/intent.js" } }, "sha512-6T5Yop/793YI+H+5J8Hsyj4kCih9sl4t3ElLgKioW5hk3ocn+ZdSJ94tT7vL7uabxSugWYBZlOTMPzEw2puvQw=="],
+
+    "@tanstack/form-core": ["@tanstack/form-core@1.33.5", "", { "dependencies": { "@tanstack/devtools-event-client": "^0.4.1", "@tanstack/pacer-lite": "^0.1.1", "@tanstack/store": "^0.11.0" } }, "sha512-3dfx9MBP0aq5sXKteikG629X9oviptrQj0IFRk9YGcb+lB7Kv5x8S17oOSk1wUWgjQZ4xVJEMbKwOAODymocgA=="],
+
+    "@tanstack/pacer-lite": ["@tanstack/pacer-lite@0.1.1", "", {}, "sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w=="],
+
     "@tanstack/query-core": ["@tanstack/query-core@5.107.0", "", {}, "sha512-QrobCJilIr2futzukm0E9w/j7fEGweTNZL0cBJDTV0ek1PeNE32XqzQHUxqKc6grb9OxUZt6tz27lgu5fchK0w=="],
+
+    "@tanstack/store": ["@tanstack/store@0.11.3", "", {}, "sha512-/Mt3h2Qe67HmRMc5SJ+8jM2Fp7O4fBbwOlS0ujUvx34KgAvkvdLSHrJatv0PJG5fbvlDsACTawMMY4ptCpVI8w=="],
+
+    "@tanstack/svelte-form": ["@tanstack/svelte-form@1.33.5", "", { "dependencies": { "@tanstack/form-core": "1.33.5", "@tanstack/svelte-store": "^0.12.0" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-GGlLocQwc4f15EoslfSKSiFwGy1Wz8CPTl6LXcykg4XUEGOmgs8Dg4/RjNyHeN/qrbIMemWuwzbt2wXBq50eXg=="],
+
+    "@tanstack/svelte-store": ["@tanstack/svelte-store@0.12.4", "", { "dependencies": { "@tanstack/store": "0.11.3" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-WVEI3u8452msPICA6FNzs2hhcTG0XTZDdh9HvxCoIecR1aNMiYNIVKnb4SiGJWhRSK6Fv2kSn08/x1tBCuHa2w=="],
 
     "@testing-library/dom": ["@testing-library/dom@10.4.1", "", { "dependencies": { "@babel/code-frame": "^7.10.4", "@babel/runtime": "^7.12.5", "@types/aria-query": "^5.0.1", "aria-query": "5.3.0", "dom-accessibility-api": "^0.5.9", "lz-string": "^1.5.0", "picocolors": "1.1.1", "pretty-format": "^27.0.2" } }, "sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg=="],
 
