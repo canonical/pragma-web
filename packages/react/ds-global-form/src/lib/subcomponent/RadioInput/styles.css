@@ -66,10 +66,14 @@
       );
     }
 
+    /* Keyboard focus: draw the ring outside the control with a gap, so it
+     * reads as a separate ring rather than merging with the border. The gap
+     * is the border thickness. */
     &:focus-visible {
-      outline: none;
       border-color: var(--color-focus-ring);
-      box-shadow: 0 0 0 1px var(--color-focus-ring);
+      outline: var(--dimension-stroke-thickness-medium) solid
+        var(--color-focus-ring);
+      outline-offset: var(--dimension-stroke-thickness-medium);
     }
 
     &:disabled {
