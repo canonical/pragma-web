@@ -1524,6 +1524,7 @@
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
+        "@canonical/storybook-addon-msw": "^0.47.0",
         "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/svelte-ds-global": "^0.47.0",
@@ -1541,6 +1542,7 @@
         "@vitest/browser-playwright": "^5.0.0",
         "@vitest/coverage-istanbul": "^5.0.0",
         "@vitest/coverage-v8": "^5.0.0",
+        "msw": "^3.0.0",
         "playwright": "^1.61.1",
         "storybook": "^10.6.0",
         "svelte-check": "^4.7.8",
