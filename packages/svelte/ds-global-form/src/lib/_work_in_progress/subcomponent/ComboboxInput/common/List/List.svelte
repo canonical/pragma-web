@@ -1,52 +1,46 @@
 <script lang="ts">
-  import convertItemToString from "../../utils/convertItemToString.js";
   import type { ListProps } from "./types.js";
   import "./styles.css";
 
   const componentCssClassName = "ds combobox-list";
 
   let {
-    id,
     class: className,
     style,
     items,
+    menu,
+    getItem,
     highlightedIndex,
+    convertItemToString,
     fieldValue,
+    valueKey,
     isOpen,
-    onselect,
   }: ListProps = $props();
 
-  let listRef: HTMLUListElement | undefined = $state();
-
-  // Shows or hides the list popover whenever `isOpen` changes; the popover
-  // API is imperative, so it cannot be driven from markup.
-  $effect(() => {
-    // `listRef` is bound before effects run.
-    const list = listRef as HTMLUListElement;
+  /**
+   * Shows or hides the list popover as `isOpen` changes; the popover API is
+   * imperative, so markup cannot drive it.
+   */
+  const togglePopover = (list: HTMLElement) => {
     try {
       if (isOpen) list.showPopover();
       else list.hidePopover();
     } catch {
       // The popover API is unavailable or already in the target state.
     }
-  });
+  };
 
-  const isSelected = (value: string) =>
-    Array.isArray(fieldValue)
+  const isSelected = (item: (typeof items)[number]) => {
+    const value = String(item[valueKey]);
+    return Array.isArray(fieldValue)
       ? fieldValue.includes(value)
       : fieldValue === value;
+  };
 </script>
 
-<ul bind:this={listRef} {id} popover="manual" class={[componentCssClassName, className]} {style} role="listbox">{#each items as item, index (item.value)}<li
-      id={id ? `${id}-${index}` : undefined}
-      role="option"
-      aria-selected={isSelected(item.value)}
-      class={["p", highlightedIndex === index && "highlighted", isSelected(item.value) && "selected"]}
-      onclick={() => onselect?.(item)}
-      onkeydown={() => {}}
-    >{convertItemToString(item)}</li
-  >{/each}</ul>
+<ul popover="manual" class={[componentCssClassName, className]} {style} {...menu} {@attach togglePopover}>{#each items as item, index (item[valueKey])}<li {...getItem(index)} class={["p", highlightedIndex === index && "highlighted", isSelected(item) && "selected"]}>{convertItemToString(item)}</li>{/each}</ul>
 
 <!-- @component
-The popover listbox of a combobox.
+The popover listbox of a combobox. It spreads the builder's `menu` and
+`getItem(index)` attributes, as React's spreads downshift's prop getters.
 -->

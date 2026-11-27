@@ -152,21 +152,7 @@ describe("RatingInput", () => {
   });
 });
 
-describe("ComboboxInput", () => {
-  it("filters, highlights and selects one option", async () => {
-    const onblur = vi.fn();
-    const page = await render(Bound, { of: ComboboxInput, options, onblur });
-    const input = page.getByRole("combobox");
-    await userEvent.type(input, "an");
-    expect(page.container.querySelectorAll("li")).toHaveLength(1);
-    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowUp}{Enter}");
-    await expect.poll(() => readBound(page.container)).toBe("banana");
-    expect((input.element() as HTMLInputElement).value).toBe("Banana");
-    await userEvent.keyboard("{Escape}");
-    await userEvent.tab();
-    expect(onblur).toHaveBeenCalled();
-  });
-
+describe("ComboboxInput (multiple, until it moves onto the builders)", () => {
   it("adds and removes chips, then resets", async () => {
     const page = await render(Bound, {
       of: ComboboxInput,
@@ -188,16 +174,20 @@ describe("ComboboxInput", () => {
     await expect.poll(() => readBound(page.container)).toEqual([]);
   });
 
-  it("clears a single selection, ignoring Enter on an empty highlight", async () => {
-    const page = await render(Bound, {
-      of: ComboboxInput,
+  it("filters, moves the highlight and closes", async () => {
+    const onblur = vi.fn();
+    const page = await render(ComboboxInput, {
       options,
-      value: "apple",
+      isMultiple: true,
+      onblur,
     });
-    await userEvent.click(page.getByRole("combobox"));
-    await userEvent.keyboard("{Enter}");
-    await page.getByRole("button", { name: "Clear selection" }).click();
-    await expect.poll(() => readBound(page.container)).toBeNull();
+    const input = page.getByRole("combobox");
+    await userEvent.type(input, "an");
+    expect(page.container.querySelectorAll("li")).toHaveLength(1);
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowUp}{Escape}{Enter}");
+    expect(input.element().getAttribute("aria-expanded")).toBe("false");
+    await userEvent.tab();
+    expect(onblur).toHaveBeenCalled();
   });
 
   it("renders a field around the input", async () => {
@@ -213,39 +203,63 @@ describe("ComboboxInput", () => {
 });
 
 describe("List and ResetButton", () => {
-  it("marks highlighted and selected items and reports a pick", async () => {
-    const onselect = vi.fn();
+  const menu = { id: "l", role: "listbox" as const };
+  const getItem = (index: number) => ({
+    id: `l-${index}`,
+    role: "option" as const,
+    "aria-selected": index === 1,
+  });
+
+  it("spreads the builder attributes and marks highlighted and selected items", async () => {
     const page = await render(List, {
-      id: "l",
       items: options,
+      menu,
+      getItem,
       highlightedIndex: 1,
+      convertItemToString: (item) => item?.label ?? "",
       fieldValue: ["apple"],
+      valueKey: "value",
       isOpen: false,
-      onselect,
     });
-    const items = page.container.querySelectorAll("li");
+    const list = page.container.querySelector("ul") as HTMLElement;
+    expect(list.id).toBe("l");
+    expect(list.getAttribute("role")).toBe("listbox");
+    const items = list.querySelectorAll("li");
     expect(items[0].className).toBe("p selected");
     expect(items[1].className).toBe("p highlighted");
     expect(items[1].id).toBe("l-1");
-    (items[2] as HTMLElement).click();
-    expect(onselect).toHaveBeenCalledWith(options[2]);
-    const bare = await render(List, {
-      items: options,
-      highlightedIndex: -1,
-      fieldValue: undefined,
-      isOpen: false,
-    });
-    (bare.container.querySelector("li") as HTMLElement).click();
-    expect(bare.container.querySelector("li")?.hasAttribute("id")).toBe(false);
+    expect(items[1].getAttribute("aria-selected")).toBe("true");
   });
 
-  it("names the reset button from its messages", async () => {
+  it("marks the single selected value and reads a custom value key", async () => {
+    const page = await render(List, {
+      items: options,
+      menu,
+      getItem,
+      highlightedIndex: -1,
+      convertItemToString: (item) => item?.label ?? "",
+      fieldValue: "Cherry",
+      valueKey: "label",
+      isOpen: true,
+    });
+    const items = page.container.querySelectorAll("li");
+    expect(items[2].className).toBe("p selected");
+    await expect
+      .poll(() =>
+        (page.container.querySelector("ul") as HTMLElement).matches(
+          ":popover-open",
+        ),
+      )
+      .toBe(true);
+  });
+
+  it("renders the design system's primary button, named from its messages", async () => {
     const page = await render(ResetButton, {
       onclick: vi.fn(),
       messages: { reset: () => "Reset" },
     });
-    await expect
-      .element(page.getByRole("button", { name: "Reset" }))
-      .toBeInTheDocument();
+    const button = page.getByRole("button", { name: "Reset" }).element();
+    expect(button.className).toBe("ds button primary ds combobox-reset-button");
+    expect(button.querySelector("span.label")?.textContent).toBe("x");
   });
 });

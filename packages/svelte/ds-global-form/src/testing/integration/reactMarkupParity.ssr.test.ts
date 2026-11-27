@@ -11,15 +11,10 @@ const SVELTE_PROP_NAMES: Record<string, string> = {
 };
 
 /**
- * Cases captured ahead of the Svelte work that makes them pass: the combobox
- * moves onto downshift's markup in the next steps.
+ * Cases captured ahead of the Svelte work that makes them pass: the multiple
+ * combobox moves onto downshift's markup in the next combobox step.
  */
 const PENDING_CASES = new Set([
-  "combobox-single-empty",
-  "combobox-single-value",
-  "combobox-disabled",
-  "combobox-placeholder",
-  "combobox-description-error",
   "combobox-multiple-empty",
   "combobox-multiple-chips",
 ]);
