@@ -308,11 +308,21 @@ describe("validateRemotely on submit", () => {
     });
     input.addEventListener("invalid", onInvalid);
     const form = page.container.querySelector("form") as HTMLFormElement;
+    // The browser's interactive validation would move focus and take it from
+    // tests running beside this one: the submit again is recorded instead.
+    const requestSubmit = vi
+      .spyOn(form, "requestSubmit")
+      .mockImplementation(() => {});
     input.value = "taken";
-    form.requestSubmit();
+    form.dispatchEvent(
+      new SubmitEvent("submit", { bubbles: true, cancelable: true }),
+    );
     await expect.poll(readError).toBe("Name taken");
     expect(onInvalid).toHaveBeenCalled();
     expect(onsubmit).not.toHaveBeenCalled();
+    // Submitted again, the browser blocks the invalid form.
+    expect(requestSubmit).toHaveBeenCalledWith(null);
+    expect(form.checkValidity()).toBe(false);
   });
 
   it("stops a rejected value in a form without native validation", async () => {

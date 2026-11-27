@@ -18,6 +18,9 @@ async function renderFields(props: Record<string, unknown>) {
   return { page, readError, form };
 }
 
+// The tests fire `invalid` with `checkValidity()`, as a failed submit does,
+// but without the browser's interactive validation, which moves focus and
+// would take it from tests running beside these.
 describe("Field native validity", () => {
   it("shows the control's message from its first invalid event on", async () => {
     const { page, readError, form } = await renderFields({
@@ -27,7 +30,7 @@ describe("Field native validity", () => {
     await userEvent.fill(input, "a");
     await userEvent.fill(input, "");
     expect(readError()).toBeNull();
-    form().requestSubmit();
+    form().checkValidity();
     await expect.poll(readError).toBe(input.validationMessage);
     expect(input.validationMessage).not.toBe("");
     expect(input.getAttribute("aria-invalid")).toBe("true");
@@ -42,7 +45,7 @@ describe("Field native validity", () => {
     const { readError, form } = await renderFields({
       fields: [{ ...username, error: "Taken on the server" }],
     });
-    form().requestSubmit();
+    form().checkValidity();
     await expect.poll(readError).toBe("Taken on the server");
   });
 
@@ -51,7 +54,7 @@ describe("Field native validity", () => {
       fields: [username],
     });
     const input = page.container.querySelector("input") as HTMLInputElement;
-    form().requestSubmit();
+    form().checkValidity();
     await expect.poll(readError).not.toBeNull();
     form().reset();
     await expect.poll(readError).toBeNull();
@@ -63,7 +66,7 @@ describe("Field native validity", () => {
     const { page, readError, form } = await renderFields({
       fields: [username],
     });
-    form().requestSubmit();
+    form().checkValidity();
     await expect.poll(readError).not.toBeNull();
     await page.rerender({ fields: [{ ...username, condition: () => false }] });
     await expect.poll(readError).toBeNull();
@@ -99,7 +102,7 @@ describe("Field native validity", () => {
     });
     // The country select comes first and is valid.
     expect(page.container.querySelector("select")?.validationMessage).toBe("");
-    form().requestSubmit();
+    form().checkValidity();
     await expect.poll(readError).toBe("Not a number");
   });
 
