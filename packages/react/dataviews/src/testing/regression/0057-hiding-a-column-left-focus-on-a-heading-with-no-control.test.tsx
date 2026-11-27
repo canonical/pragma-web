@@ -34,6 +34,7 @@ describe("regression 0057 — hiding a column left focus on a heading with no co
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "status", header: "Status" },

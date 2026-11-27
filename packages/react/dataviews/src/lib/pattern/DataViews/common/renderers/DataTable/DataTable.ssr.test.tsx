@@ -46,7 +46,7 @@ describe("DataTable SSR", () => {
     // observes it, so nothing else would ask the source.
     // A stored width the server never reads: the tracks stay declarative.
     const readPresentation = vi.fn<PresentationStore["readPresentation"]>(
-      async () => ({ "table.width.name": 300 }),
+      async () => ({ "table.t.width.name": 300 }),
     );
     const heard = vi.fn<PresentationStore["subscribe"]>();
     const { provider } = createMachineProvider({
@@ -59,6 +59,7 @@ describe("DataTable SSR", () => {
     host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -85,6 +86,7 @@ describe("DataTable SSR", () => {
     host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -103,6 +105,7 @@ describe("DataTable SSR", () => {
     const { provider } = createMachineProvider();
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -123,6 +126,7 @@ describe("DataTable SSR", () => {
     });
     return renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         columns={columns}
@@ -162,6 +166,7 @@ describe("DataTable SSR", () => {
     provider.refresh();
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         columns={[{ id: "name", header: "Name", cell: Link }]}
@@ -179,7 +184,12 @@ describe("DataTable SSR", () => {
       rows: [buildMachine("m-1", "alpha")],
     });
     const html = renderToString(
-      <DataTable provider={provider} label="Machines" columns={columns} />,
+      <DataTable
+        id="t"
+        provider={provider}
+        label="Machines"
+        columns={columns}
+      />,
     );
     expect(source.calls).toHaveLength(0);
     expect(provider.state.get().result.status).toBe("idle");
@@ -188,7 +198,12 @@ describe("DataTable SSR", () => {
     // Deterministic: the same idle provider renders the same markup.
     expect(
       renderToString(
-        <DataTable provider={provider} label="Machines" columns={columns} />,
+        <DataTable
+          id="t"
+          provider={provider}
+          label="Machines"
+          columns={columns}
+        />,
       ),
     ).toBe(html);
   });
@@ -213,6 +228,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true },
@@ -266,6 +282,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"
@@ -289,6 +306,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"

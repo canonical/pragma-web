@@ -9,14 +9,15 @@ const columns: readonly DeclaredColumn[] = [
 ];
 
 describe("resolveArrangementParams", () => {
-  it("carries the stored order and hidden list as they are stored, another table's ids included", () => {
+  it("carries the stored order and hidden list as they are stored, undeclared ids included", () => {
     expect(
       resolveArrangementParams({
+        table: "t",
         columns,
         presentation: {
-          "table.order": ["region", "cores", "name", 3],
-          "table.hidden": ["zone", "status"],
-          "table.width.name": 200,
+          "table.t.order": ["region", "cores", "name", 3],
+          "table.t.hidden": ["zone", "status"],
+          "table.t.width.name": 200,
         },
       }),
     ).toEqual({
@@ -26,7 +27,9 @@ describe("resolveArrangementParams", () => {
   });
 
   it("gives the declared order where none is stored, and no hidden column where none is", () => {
-    expect(resolveArrangementParams({ columns, presentation: {} })).toEqual({
+    expect(
+      resolveArrangementParams({ table: "t", columns, presentation: {} }),
+    ).toEqual({
       order: ["name", "status", "cores"],
       hidden: [],
     });

@@ -14,14 +14,14 @@ const listIds = (arranged: readonly ArrangedColumn[]) =>
 
 describe("resolveColumnArrangement", () => {
   it("places the columns in their declared order, shown, with no width, when nothing is stored", () => {
-    expect(resolveColumnArrangement(columns, {})).toEqual(
+    expect(resolveColumnArrangement("t", columns, {})).toEqual(
       columns.map((column) => ({ column, hidden: false, width: null })),
     );
   });
 
   it("orders by the stored list, ignoring ids that name no column and repeats", () => {
-    const arranged = resolveColumnArrangement(columns, {
-      "table.order": ["owner", "region", "name", "owner", "cores", "status"],
+    const arranged = resolveColumnArrangement("t", columns, {
+      "table.t.order": ["owner", "region", "name", "owner", "cores", "status"],
     });
     expect(listIds(arranged)).toEqual(["owner", "name", "cores", "status"]);
   });
@@ -30,20 +30,22 @@ describe("resolveColumnArrangement", () => {
     // `cores` follows `status` in the declaration, so it follows it here.
     expect(
       listIds(
-        resolveColumnArrangement(columns, {
-          "table.order": ["owner", "status", "name"],
+        resolveColumnArrangement("t", columns, {
+          "table.t.order": ["owner", "status", "name"],
         }),
       ),
     ).toEqual(["owner", "status", "cores", "name"]);
     // A new first column comes first; one whose predecessors are all
     // unlisted follows the nearest listed one before it.
     expect(
-      listIds(resolveColumnArrangement(columns, { "table.order": ["owner"] })),
+      listIds(
+        resolveColumnArrangement("t", columns, { "table.t.order": ["owner"] }),
+      ),
     ).toEqual(["name", "status", "cores", "owner"]);
     expect(
       listIds(
-        resolveColumnArrangement(columns, {
-          "table.order": ["status", "owner"],
+        resolveColumnArrangement("t", columns, {
+          "table.t.order": ["status", "owner"],
         }),
       ),
     ).toEqual(["name", "status", "cores", "owner"]);
@@ -51,16 +53,20 @@ describe("resolveColumnArrangement", () => {
 
   it("reads a stored order that is not a list of ids as no order", () => {
     expect(
-      listIds(resolveColumnArrangement(columns, { "table.order": "owner" })),
+      listIds(
+        resolveColumnArrangement("t", columns, { "table.t.order": "owner" }),
+      ),
     ).toEqual(["name", "status", "cores", "owner"]);
     expect(
-      listIds(resolveColumnArrangement(columns, { "table.order": [1, null] })),
+      listIds(
+        resolveColumnArrangement("t", columns, { "table.t.order": [1, null] }),
+      ),
     ).toEqual(["name", "status", "cores", "owner"]);
   });
 
   it("hides the stored columns, less the ones not declared or not hideable", () => {
-    const arranged = resolveColumnArrangement(columns, {
-      "table.hidden": ["owner", "name", "region", "cores"],
+    const arranged = resolveColumnArrangement("t", columns, {
+      "table.t.hidden": ["owner", "name", "region", "cores"],
     });
     expect(arranged.map((column) => column.hidden)).toEqual([
       false,
@@ -73,23 +79,25 @@ describe("resolveColumnArrangement", () => {
   it("keeps at least one column visible: the first in order", () => {
     const hideable = [{ id: "a" }, { id: "b" }];
     expect(
-      resolveColumnArrangement(hideable, {
-        "table.hidden": ["a", "b"],
-        "table.order": ["b", "a"],
+      resolveColumnArrangement("t", hideable, {
+        "table.t.hidden": ["a", "b"],
+        "table.t.order": ["b", "a"],
       }).map(({ column, hidden }) => [column.id, hidden]),
     ).toEqual([
       ["b", false],
       ["a", true],
     ]);
-    expect(resolveColumnArrangement([], { "table.hidden": [] })).toEqual([]);
+    expect(resolveColumnArrangement("t", [], { "table.t.hidden": [] })).toEqual(
+      [],
+    );
   });
 
   it("carries a usable stored width and nothing else", () => {
-    const arranged = resolveColumnArrangement(columns, {
-      "table.width.name": 320,
-      "table.width.status": -1,
-      "table.width.cores": Number.NaN,
-      "table.width.owner": "wide",
+    const arranged = resolveColumnArrangement("t", columns, {
+      "table.t.width.name": 320,
+      "table.t.width.status": -1,
+      "table.t.width.cores": Number.NaN,
+      "table.t.width.owner": "wide",
     });
     expect(arranged.map((column) => column.width)).toEqual([
       320,
@@ -99,9 +107,9 @@ describe("resolveColumnArrangement", () => {
     ]);
     // Zero is a width; an unbounded one is none.
     expect(
-      resolveColumnArrangement(columns, {
-        "table.width.name": 0,
-        "table.width.status": Number.POSITIVE_INFINITY,
+      resolveColumnArrangement("t", columns, {
+        "table.t.width.name": 0,
+        "table.t.width.status": Number.POSITIVE_INFINITY,
       })
         .slice(0, 2)
         .map((column) => column.width),
@@ -110,9 +118,21 @@ describe("resolveColumnArrangement", () => {
 
   it("counts only declared ids towards hiding every column", () => {
     expect(
-      resolveColumnArrangement([{ id: "a" }, { id: "b" }], {
-        "table.hidden": ["a", "b", "zzz"],
+      resolveColumnArrangement("t", [{ id: "a" }, { id: "b" }], {
+        "table.t.hidden": ["a", "b", "zzz"],
       }).map((column) => column.hidden),
     ).toEqual([false, true]);
+  });
+
+  it("reads only its own table's keys", () => {
+    expect(
+      resolveColumnArrangement("t", columns, {
+        "table.u.order": ["status", "name"],
+        "table.u.hidden": ["cores"],
+        "table.u.width.name": 300,
+      }),
+    ).toEqual(
+      columns.map((column) => ({ column, hidden: false, width: null })),
+    );
   });
 });

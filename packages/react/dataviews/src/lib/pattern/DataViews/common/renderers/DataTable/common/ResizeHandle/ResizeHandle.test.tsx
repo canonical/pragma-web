@@ -21,6 +21,7 @@ const createLayoutOf = (
   columns: Parameters<typeof createColumnLayout>[0]["columns"],
 ): ColumnLayout =>
   createColumnLayout({
+    table: "t",
     columns,
     presentation: createMachineProvider().provider.presentation,
   });

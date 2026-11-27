@@ -24,6 +24,7 @@ describe("regression 0052 — a false child drew an empty settings cell", () => 
     const canConfigure = (): boolean => false;
     const { container } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name" }]}
         label="Machines"
@@ -34,6 +35,7 @@ describe("regression 0052 — a false child drew an empty settings cell", () => 
     // code: false is no element, and draws no cell either.
     const untyped = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name" }]}
         label="Machines"

@@ -16,29 +16,39 @@ const listShown = (
   declared: readonly DeclaredColumn[],
   presentation: ViewPresentation,
 ): readonly string[] =>
-  resolveColumnArrangement(declared, presentation)
+  resolveColumnArrangement("t", declared, presentation)
     .filter(({ hidden }) => !hidden)
     .map(({ column }) => column.id);
 
 describe("hideColumn", () => {
   it("adds the column to the hidden list, keeping every id the list held", () => {
-    const presentation = { "table.hidden": ["cores", "region", 7] };
-    const patch = hideColumn({ columns, presentation, id: "status" });
-    // A column another table declares stays hidden there.
-    expect(patch).toEqual({ "table.hidden": ["cores", "region", "status"] });
+    const presentation = { "table.t.hidden": ["cores", "region", 7] };
+    const patch = hideColumn({
+      table: "t",
+      columns,
+      presentation,
+      id: "status",
+    });
+    // An undeclared id stays in the list.
+    expect(patch).toEqual({ "table.t.hidden": ["cores", "region", "status"] });
     expect(listShown(columns, { ...presentation, ...patch })).toEqual(["name"]);
   });
 
   it("changes nothing for an unknown, hidden or unhideable column", () => {
-    expect(hideColumn({ columns, presentation: {}, id: "region" })).toBeNull();
+    expect(
+      hideColumn({ table: "t", columns, presentation: {}, id: "region" }),
+    ).toBeNull();
     expect(
       hideColumn({
+        table: "t",
         columns,
-        presentation: { "table.hidden": ["cores"] },
+        presentation: { "table.t.hidden": ["cores"] },
         id: "cores",
       }),
     ).toBeNull();
-    expect(hideColumn({ columns, presentation: {}, id: "name" })).toBeNull();
+    expect(
+      hideColumn({ table: "t", columns, presentation: {}, id: "name" }),
+    ).toBeNull();
   });
 
   it("never hides the last column shown", () => {
@@ -46,15 +56,16 @@ describe("hideColumn", () => {
       { id: "status" },
       { id: "cores" },
     ];
-    const presentation = { "table.hidden": ["cores"] };
+    const presentation = { "table.t.hidden": ["cores"] };
     expect(
-      hideColumn({ columns: hideable, presentation, id: "status" }),
+      hideColumn({ table: "t", columns: hideable, presentation, id: "status" }),
     ).toBeNull();
     // Nor the one a list naming every column leaves shown.
     expect(
       hideColumn({
+        table: "t",
         columns: hideable,
-        presentation: { "table.hidden": ["status", "cores"] },
+        presentation: { "table.t.hidden": ["status", "cores"] },
         id: "status",
       }),
     ).toBeNull();
@@ -102,6 +113,7 @@ describe("hideColumn", () => {
         for (const [step, { kind, id }] of sequence.entries()) {
           const change = kind === "hide" ? hideColumn : showColumn;
           const patch = change({
+            table: "t",
             columns: declared,
             presentation: owned.state.get().presentation,
             id,
@@ -110,12 +122,13 @@ describe("hideColumn", () => {
             owned.arrange(patch);
           }
           const arranged = resolveColumnArrangement(
+            "t",
             declared,
             owned.state.get().presentation,
           );
           // What is stored never hides every column it may, so the shown
           // column is the commands' doing, not the resolution's fallback.
-          const stored = owned.state.get().presentation["table.hidden"];
+          const stored = owned.state.get().presentation["table.t.hidden"];
           const storedHidden = Array.isArray(stored) ? stored : [];
           const broken = [
             arranged.some(({ hidden }) => !hidden) ? null : "no column shown",
@@ -146,4 +159,19 @@ describe("hideColumn", () => {
       expect(checked).toBe(6 ** 4 * 4);
     },
   );
+
+  it("writes only its own table's hidden list", () => {
+    expect(
+      hideColumn({
+        table: "t",
+        columns,
+        presentation: {
+          "table.u.order": ["status", "name"],
+          "table.u.hidden": ["cores"],
+          "table.u.width.name": 300,
+        },
+        id: "status",
+      }),
+    ).toEqual({ "table.t.hidden": ["status"] });
+  });
 });

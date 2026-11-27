@@ -82,11 +82,11 @@ describe("the announcer speaks once per root", () => {
     render(
       <>
         <DataViews provider={provider}>
-          <DataViews.DataTable columns={columns} label="First" />
-          <DataViews.DataTable columns={columns} label="Second" />
+          <DataViews.DataTable id="t" columns={columns} label="First" />
+          <DataViews.DataTable id="t" columns={columns} label="Second" />
           <DataViews.Pagination />
         </DataViews>
-        <DataTable provider={provider} columns={columns} label="Alone" />
+        <DataTable id="t" provider={provider} columns={columns} label="Alone" />
       </>,
     );
     expect(listRegions()).toHaveLength(2);
@@ -98,12 +98,12 @@ describe("the announcer speaks once per root", () => {
       <>
         <section aria-label="First root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="First" />
+            <DataViews.DataTable id="t" columns={columns} label="First" />
           </DataViews>
         </section>
         <section aria-label="Second root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="Second" />
+            <DataViews.DataTable id="t" columns={columns} label="Second" />
           </DataViews>
         </section>
       </>,
@@ -126,12 +126,12 @@ describe("the announcer speaks once per root", () => {
       <>
         <section aria-label="First root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="First" />
+            <DataViews.DataTable id="t" columns={columns} label="First" />
           </DataViews>
         </section>
         <section aria-label="Second root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="Second" />
+            <DataViews.DataTable id="t" columns={columns} label="Second" />
           </DataViews>
         </section>
       </>,
@@ -190,7 +190,7 @@ describe("the announcer speaks once per root", () => {
     render(
       <StrictMode>
         <DataViews provider={provider}>
-          <DataViews.DataTable columns={columns} label="Machines" />
+          <DataViews.DataTable id="t" columns={columns} label="Machines" />
         </DataViews>
       </StrictMode>,
     );
@@ -203,7 +203,7 @@ describe("the announcer speaks once per root", () => {
     const provider = createProvider();
     const html = renderToString(
       <DataViews provider={provider}>
-        <DataViews.DataTable columns={columns} label="Machines" />
+        <DataViews.DataTable id="t" columns={columns} label="Machines" />
       </DataViews>,
     );
     expect(html.match(/class="ds data-views-announcer"/g)).toHaveLength(1);
@@ -215,7 +215,12 @@ describe("the announcer speaks once per root", () => {
   it("says each term of a further ordering, each by the heading showing it", async () => {
     const provider = createProvider();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Name" }));
     fireEvent.click(screen.getByRole("button", { name: "Status" }), {
@@ -231,7 +236,12 @@ describe("the announcer speaks once per root", () => {
   it("says the source's own order once the reader states nothing, by a field no column shows", async () => {
     const provider = createProvider([{ field: "cores", direction: "desc" }]);
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     for (const _press of [1, 2, 3]) {
       fireEvent.click(screen.getByRole("button", { name: "Name" }));
@@ -245,7 +255,12 @@ describe("the announcer speaks once per root", () => {
   it("says that nothing orders the rows where the source documents no order", async () => {
     const provider = createProvider();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     for (const _press of [1, 2, 3]) {
       fireEvent.click(screen.getByRole("button", { name: "Name" }));
@@ -260,6 +275,7 @@ describe("the announcer speaks once per root", () => {
     const provider = createProvider();
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -291,7 +307,7 @@ describe("the announcer speaks once per root", () => {
           sortApplied: (terms) => `Trié par ${terms.join(", ")}`,
         }}
       >
-        <DataViews.DataTable columns={columns} label="Machines" />
+        <DataViews.DataTable id="t" columns={columns} label="Machines" />
       </DataViews>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

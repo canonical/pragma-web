@@ -29,6 +29,7 @@ describe("regression 0009 — a header link's focus lost on hydration", () => {
       }).provider;
     const buildTable = (provider: ReturnType<typeof build>) => (
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"

@@ -38,9 +38,16 @@ type OwnProps<
   readonly virtualization?: DataTableVirtualization;
   /**
    * `<DataTable.SettingsMenu />`, the table's column settings, or another
-   * element drawn in the settings cell as given.
+   * element drawn in the settings cell as given. Requires `id`.
    */
   readonly settings?: ReactElement | undefined;
+  /**
+   * The table's id: its settings are kept under `table.<id>.*`, the id
+   * URI-encoded (`a.b` gives `table.a%2Eb.order`, `order` gives
+   * `table.%6Frder.order`). Required with `settings`; an empty id counts
+   * as none.
+   */
+  readonly id?: string | undefined;
 };
 
 /**

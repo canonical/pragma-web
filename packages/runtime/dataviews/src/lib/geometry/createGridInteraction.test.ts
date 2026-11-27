@@ -11,6 +11,7 @@ const buildColumns = (): readonly ColumnToSize[] => [
 
 const createHarness = (declared: readonly ColumnToSize[] = buildColumns()) => {
   const layout = createColumnLayout({
+    table: "t",
     columns: declared,
     presentation: createPresentation(),
   });
@@ -227,6 +228,7 @@ describe("createGridInteraction", () => {
 
   it("watches nothing until it is asked to", () => {
     const layout = createColumnLayout({
+      table: "t",
       columns: buildColumns(),
       presentation: createPresentation(),
     });

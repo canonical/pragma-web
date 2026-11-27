@@ -35,6 +35,7 @@ describe("regression 0128 — a fixed last column stretched to the edge", () => 
     const { provider } = createMachineProvider();
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sizing: { kind: "fixed", px: 200 } },

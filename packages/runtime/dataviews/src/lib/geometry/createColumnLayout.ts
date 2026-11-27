@@ -29,12 +29,9 @@ const areOverridesEqual = (
  * with the widths the collection's presentation holds for them applied as
  * fixed overrides, each held to its declared bounds.
  *
- * The presentation is the one authority: the overrides are derived from
- * its arrangement whenever it is read, never kept here, and a resize is
- * written to it — so two tables on one provider never disagree on a width,
- * and a view opened re-layers every table at once. `state` is a read-only
- * channel over that derivation; subscribing to it subscribes to the
- * presentation, and construction subscribes to nothing.
+ * The presentation is the one authority: a resize is written to it under
+ * the table's id. `state` derives from it, and construction subscribes to
+ * nothing.
  *
  * @note Impure: keeps the last arrangement it derived from and the snapshot
  * it derived, so a read of an unchanged arrangement answers the same object.
@@ -45,7 +42,7 @@ const areOverridesEqual = (
 export default function createColumnLayout(
   config: ColumnLayoutConfig,
 ): ColumnLayout {
-  const { columns, presentation } = config;
+  const { table, columns, presentation } = config;
   const declared = new Map<string, ColumnSizing>();
   for (const column of columns) {
     if (column.id === "") {
@@ -85,6 +82,7 @@ export default function createColumnLayout(
     const overrides: Record<string, FixedSizing> = {};
     // Over the ids copied at construction, never the caller's array.
     for (const { column, width } of resolveColumnArrangement(
+      table,
       declaredColumns,
       arrangement,
     )) {
@@ -152,7 +150,7 @@ export default function createColumnLayout(
       if (readOverride(id)?.px === sizing.px) {
         return;
       }
-      presentation.arrange({ [spellWidthKey(id)]: sizing.px });
+      presentation.arrange({ [spellWidthKey(table, id)]: sizing.px });
     },
   };
 }

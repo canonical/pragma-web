@@ -40,6 +40,16 @@ const firstPage: ResultWindow = {
 };
 
 describe("decodeQuery", () => {
+  it("leaves a table's order and hidden parameters to the host", () => {
+    expect(decode("table.t.order=a&table.t.hidden=b").issues).toEqual([]);
+  });
+
+  it("reads a table's width parameter as an undeclared field", () => {
+    expect(decode("table.t.width.cpu__gte=1").issues).toMatchObject([
+      { code: "undeclared-field", field: "table.t.width.cpu" },
+    ]);
+  });
+
   it("defaults the window and decodes an empty parameter set", () => {
     const decoded = decode("");
     expect(decoded.slice).toEqual(noQuery);

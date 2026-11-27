@@ -83,6 +83,7 @@ const Composition = ({
     <DataViews.SavedViews />
     <DataViews.ActionBar />
     <DataViews.DataTable
+      id="t"
       columns={columns}
       label="Machines"
       selectable

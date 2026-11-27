@@ -739,7 +739,7 @@ describe("createSavedViews", () => {
     });
 
     it("lets go of an arrangement a snapshot drew under a view the store does not have", async () => {
-      const hidden = { "table.hidden": ["cores"] };
+      const hidden = { "table.t.hidden": ["cores"] };
       const provider = createDataViewsProvider({
         collection,
         source: createManualSource({ capabilities, answer: answerWith([]) })
@@ -1117,7 +1117,7 @@ describe("createSavedViews", () => {
       await views.saveAs("Failures");
       filterFailedOnly(readProviderHost(provider));
       await views.saveAs("Failures");
-      provider.presentation.arrange({ width: 120 });
+      provider.presentation.arrange({ "table.t.width.name": 120 });
       await views.saveAs("Failures");
       const ids = create.mock.calls.map(([draft]) => draft.id);
       expect(ids.at(0)).toMatch(/^[0-9a-f]{32}$/);
@@ -1317,21 +1317,21 @@ describe("createSavedViews", () => {
       );
       const views = readViews(provider);
       await waitForListing(views);
-      provider.presentation.arrange({ width: 100 });
+      provider.presentation.arrange({ "table.t.width.name": 100 });
       const saving = views.saveAs("Wide");
       await vi.waitFor(() => {
         expect(views.state.get().command?.status).toBe("pending");
       });
-      provider.presentation.arrange({ width: 150 });
+      provider.presentation.arrange({ "table.t.width.name": 150 });
       gate.resolve();
       const view = readView(await saving);
-      expect(view.presentation).toEqual({ width: 100 });
+      expect(view.presentation).toEqual({ "table.t.width.name": 100 });
       expect(provider.presentation.state.get().presentation).toEqual({
-        width: 150,
+        "table.t.width.name": 150,
       });
       await flushPresentation(writes);
       expect(await real.readPresentation({ view: view.id })).toEqual({
-        width: 150,
+        "table.t.width.name": 150,
       });
     });
 
@@ -1414,17 +1414,17 @@ describe("createSavedViews", () => {
       const { indexedDB, provider, host, views } = await observeFreshProvider();
       const readArrangement = () =>
         provider.presentation.state.get().presentation;
-      provider.presentation.arrange({ width: 100 });
+      provider.presentation.arrange({ "table.t.width.name": 100 });
       filterFailedOnly(host);
       const view = readView(await views.saveAs("Failed"));
       // The viewer's change to the open view sits over what it was saved with.
-      provider.presentation.arrange({ width: 150 });
-      expect(readArrangement()).toEqual({ width: 150 });
+      provider.presentation.arrange({ "table.t.width.name": 150 });
+      expect(readArrangement()).toEqual({ "table.t.width.name": 150 });
       await openIndexedDBTab(indexedDB).remove(view);
       await vi.waitFor(() => {
         expect(views.state.get().current).toBeNull();
       });
-      expect(readArrangement()).toEqual({ width: 100 });
+      expect(readArrangement()).toEqual({ "table.t.width.name": 100 });
     });
 
     it("writes a key removed while saving as null into the new view", async () => {
@@ -1445,23 +1445,23 @@ describe("createSavedViews", () => {
       );
       const views = readViews(provider);
       await waitForListing(views);
-      provider.presentation.arrange({ width: 100 });
+      provider.presentation.arrange({ "table.t.width.name": 100 });
       const saving = views.saveAs("Wide");
       await vi.waitFor(() => {
         expect(views.state.get().command?.status).toBe("pending");
       });
       // The viewer takes the width away while the view is being created.
-      provider.presentation.arrange({ width: undefined });
+      provider.presentation.arrange({ "table.t.width.name": undefined });
       gate.resolve();
       const view = readView(await saving);
-      expect(view.presentation).toEqual({ width: 100 });
+      expect(view.presentation).toEqual({ "table.t.width.name": 100 });
       // The new view was saved with the width; the viewer's own null masks it.
       expect(provider.presentation.state.get().presentation).toEqual({
-        width: null,
+        "table.t.width.name": null,
       });
       await flushPresentation(writes);
       expect(await real.readPresentation({ view: view.id })).toEqual({
-        width: null,
+        "table.t.width.name": null,
       });
     });
 
@@ -1469,19 +1469,19 @@ describe("createSavedViews", () => {
       vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
       const { provider, host, views, store } = await observeFreshProvider();
       const writes = vi.spyOn(store, "patchPresentation");
-      provider.presentation.arrange({ width: 120 });
+      provider.presentation.arrange({ "table.t.width.name": 120 });
       filterFailedOnly(host);
       const view = readView(await views.saveAs("Failed"));
-      expect(view.presentation).toEqual({ width: 120 });
+      expect(view.presentation).toEqual({ "table.t.width.name": 120 });
       // A change to the open view is the viewer's own: the view keeps what it
       // was saved with, and save writes the query alone.
-      provider.presentation.arrange({ width: 180 });
+      provider.presentation.arrange({ "table.t.width.name": 180 });
       filterCoresAtLeast(host, 8);
       const saved = readView(await views.save());
-      expect(saved.presentation).toEqual({ width: 120 });
+      expect(saved.presentation).toEqual({ "table.t.width.name": 120 });
       await flushPresentation(writes);
       expect(await store.readPresentation({ view: view.id })).toEqual({
-        width: 180,
+        "table.t.width.name": 180,
       });
     });
 
@@ -1493,7 +1493,7 @@ describe("createSavedViews", () => {
       views.state.subscribe(() => {
         published.push(views.state.get().modified);
       });
-      provider.presentation.arrange({ width: 300 });
+      provider.presentation.arrange({ "table.t.width.name": 300 });
       expect(views.state.get().modified).toBe(false);
       expect(published).toEqual([]);
     });
@@ -1508,11 +1508,11 @@ describe("createSavedViews", () => {
         id: "wide",
         name: "Wide",
         query: "status=failed",
-        presentation: { width: 240 },
+        presentation: { "table.t.width.name": 240 },
       });
       expect((await views.open("wide")).status).toBe("opened");
       // The viewer's own change to the open view, made before the conflict.
-      provider.presentation.arrange({ density: "dense" });
+      provider.presentation.arrange({ "table.t.hidden": ["dense"] });
       await other.update(
         { id: "wide", revision: 1 },
         { query: "status=running" },
@@ -1521,12 +1521,12 @@ describe("createSavedViews", () => {
       expect((await views.save()).status).toBe("conflict");
       // The stored view's saved arrangement layers; the viewer's own stays.
       expect(provider.presentation.state.get().presentation).toEqual({
-        width: 240,
-        density: "dense",
+        "table.t.width.name": 240,
+        "table.t.hidden": ["dense"],
       });
       await flushPresentation(writes);
       expect(await store.readPresentation({ view: "wide" })).toEqual({
-        density: "dense",
+        "table.t.hidden": ["dense"],
       });
     });
   });

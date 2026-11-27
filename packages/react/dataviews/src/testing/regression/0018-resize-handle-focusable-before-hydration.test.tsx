@@ -19,6 +19,7 @@ describe("regression 0018 — a resize handle focusable before hydration", () =>
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", resizable: true },

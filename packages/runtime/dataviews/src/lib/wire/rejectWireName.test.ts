@@ -17,4 +17,9 @@ describe("rejectWireName", () => {
       'field name "view" is a reserved query parameter',
     );
   });
+
+  it("refuses a name carrying a table's arrangement", () => {
+    expect(rejectWireName("table.machines.order")).not.toBeNull();
+    expect(rejectWireName("table.cores")).toBeNull();
+  });
 });

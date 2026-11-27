@@ -78,13 +78,13 @@ describe("readStartingPoint", () => {
         location: createMemoryLocation({ href }),
         snapshot: {
           query: "view=v1&status=failed",
-          presentation: { "table.hidden": ["cores"] },
+          presentation: { "table.t.hidden": ["cores"] },
         },
         keepsViews,
       }).restored;
     expect(restore("/machines", true)).toEqual({
       view: "v1",
-      presentation: { "table.hidden": ["cores"] },
+      presentation: { "table.t.hidden": ["cores"] },
     });
     expect(restore("/machines?view=v1&status=failed", true)?.view).toBe("v1");
     expect(restore("/machines?status=failed", true)).toBeUndefined();
@@ -108,39 +108,40 @@ describe("readStartingPoint", () => {
     // A link spelled where no script keeps the arrangement: the order whole,
     // with its hidden columns, asking the source for nothing.
     expect(
-      read("/machines?table.order=cores&table.order=status&table.hidden=status")
-        .linked,
+      read(
+        "/machines?table.t.order=cores&table.t.order=status&table.t.hidden=status",
+      ).linked,
     ).toEqual({
       view: null,
       presentation: {
-        "table.order": ["cores", "status"],
-        "table.hidden": ["status"],
+        "table.t.order": ["cores", "status"],
+        "table.t.hidden": ["status"],
       },
     });
-    expect(read("/machines?table.hidden=cores").linked).toEqual({
+    expect(read("/machines?table.t.hidden=cores").linked).toEqual({
       view: null,
-      presentation: { "table.hidden": ["cores"] },
+      presentation: { "table.t.hidden": ["cores"] },
     });
     // The snapshot's arrangement stays its own; the link names the view the
     // provider stands on, where it keeps views.
     const withSnapshot = read(
-      "/machines?view=v1&status=failed&table.hidden=cores",
+      "/machines?view=v1&status=failed&table.t.hidden=cores",
       true,
       {
         query: "view=v1",
-        presentation: { "table.width.cores": 80 },
+        presentation: { "table.t.width.cores": 80 },
       },
     );
     expect(withSnapshot.restored).toEqual({
       view: "v1",
-      presentation: { "table.width.cores": 80 },
+      presentation: { "table.t.width.cores": 80 },
     });
     expect(withSnapshot.linked).toEqual({
       view: "v1",
-      presentation: { "table.hidden": ["cores"] },
+      presentation: { "table.t.hidden": ["cores"] },
     });
     expect(
-      read("/machines?view=v1&table.hidden=cores").linked?.view,
+      read("/machines?view=v1&table.t.hidden=cores").linked?.view,
     ).toBeNull();
     expect(read("/machines?status=failed").linked).toBeUndefined();
   });
@@ -174,8 +175,8 @@ describe("readStartingPoint", () => {
         keepsViews: false,
       }).restored?.presentation;
     };
-    expect(readArrangement({ "table.hidden": ["cores"] })).toEqual({
-      "table.hidden": ["cores"],
+    expect(readArrangement({ "table.t.hidden": ["cores"] })).toEqual({
+      "table.t.hidden": ["cores"],
     });
     expect(readArrangement(null)).toEqual({});
     expect(readArrangement(["cores"])).toEqual({});

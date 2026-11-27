@@ -147,7 +147,7 @@ describe("DataViews.SortPanel", () => {
   it("lists a term whose column a table hides, since hiding orders nothing", () => {
     const { provider } = mount(statusFirst);
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["status", "cores"] });
+      provider.presentation.arrange({ "table.t.hidden": ["status", "cores"] });
     });
     expect(listTerms()).toEqual([
       "status, ascending",

@@ -5,7 +5,11 @@
  * through the settings part.
  */
 
-import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { createMemoryLocation } from "@canonical/dataviews-core";
+import {
+  createMemoryPresentation,
+  resolveMessages,
+} from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
@@ -38,6 +42,7 @@ const mountHook = (
   const hook = renderHook(() =>
     useColumnManagement(
       provider,
+      { table: "t", presentation: provider.presentation, shared: true },
       declared,
       headerRow,
       resolveMessages(),
@@ -98,6 +103,27 @@ describe("useColumnManagement", () => {
   it("spells no destination without a location", () => {
     const { hook } = mountHook();
     expect(hook.result.current.listDestinations()).toBeNull();
+  });
+
+  it("spells no destination for a table keeping its arrangement to itself", () => {
+    const { provider } = createMachineProvider({
+      location: createMemoryLocation({ href: "/machines" }),
+    });
+    const { result } = renderHook(() =>
+      useColumnManagement(
+        provider,
+        {
+          table: "table",
+          presentation: createMemoryPresentation(),
+          shared: false,
+        },
+        columns,
+        createRef<HTMLTableRowElement>(),
+        resolveMessages(),
+        () => {},
+      ),
+    );
+    expect(result.current.listDestinations()).toBeNull();
   });
 
   it("says where each change leaves the column, in the messages' words", () => {
@@ -238,7 +264,7 @@ describe("useColumnManagement", () => {
       unmounted.hook.result.current.changeColumn("status", "hide");
     });
     expect(unmounted.provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
   });
 });

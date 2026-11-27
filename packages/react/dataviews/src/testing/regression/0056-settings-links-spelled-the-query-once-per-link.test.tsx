@@ -24,6 +24,7 @@ describe("regression 0056 — settings links spelled the query once per link", (
     const spellQuery = vi.spyOn(readProviderHost(provider), "spellQuery");
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },

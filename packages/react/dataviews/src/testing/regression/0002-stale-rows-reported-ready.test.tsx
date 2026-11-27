@@ -50,7 +50,12 @@ describe("regression 0002 — stale rows reported ready", () => {
   it("keeps the rows in view and says they are stale, and why", () => {
     const { provider, source } = createSortableByName();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     act(() => {
       source.readLatest().deliver({
@@ -83,7 +88,12 @@ describe("regression 0002 — stale rows reported ready", () => {
   it("offers sorting only on the fields the source declares", () => {
     const { provider } = createSortableByName();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     expect(screen.getByRole("button", { name: "Name" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Status" })).toBeNull();

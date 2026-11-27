@@ -45,6 +45,7 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
 
 const mount = (props: CaseProps = {}) => {
   const layout = createColumnLayout({
+    table: "t",
     columns: [{ id: "name", sizing: { kind: "flex", weight: 1, minPx: 50 } }],
     presentation: createMachineProvider().provider.presentation,
   });
@@ -251,6 +252,7 @@ describe("HeaderCell", () => {
             offers={NONE}
             interaction={createGridInteraction(
               createColumnLayout({
+                table: "t",
                 columns: [],
                 presentation: createMachineProvider().provider.presentation,
               }),

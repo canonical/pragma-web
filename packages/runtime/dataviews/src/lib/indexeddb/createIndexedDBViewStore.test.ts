@@ -152,11 +152,44 @@ describe("createIndexedDBViewStore", () => {
 
     it("keeps presentation saved with the view", async () => {
       const store = openStoreOver(new IDBFactory());
-      const presentation = { widths: { name: 240 }, density: "compact" };
+      const presentation = {
+        "table.t.width.name": 240,
+        "table.t.hidden": ["compact"],
+      };
       await store.create({ ...failed, presentation });
       expect(await store.get("failed")).toMatchObject({
         view: { presentation },
       });
+    });
+
+    it("reads a view's tables' keys alone, dropping any other", async () => {
+      const store = openStoreOver(new IDBFactory());
+      await store.create({
+        ...failed,
+        presentation: { "table.order": ["a"], "table.t.hidden": ["b"] },
+      });
+      expect(await store.get("failed")).toMatchObject({
+        view: { presentation: { "table.t.hidden": ["b"] } },
+      });
+      const { views, unreadable } = await store.list();
+      expect(views.map((view) => view.presentation)).toEqual([
+        { "table.t.hidden": ["b"] },
+      ]);
+      expect(unreadable).toEqual([]);
+    });
+
+    it("replays a creation whose arrangement held a key it drops", async () => {
+      const store = openStoreOver(new IDBFactory());
+      const draft = {
+        ...failed,
+        presentation: { "table.order": ["a"], "table.t.hidden": ["b"] },
+      };
+      const first = readSaved(await store.create(draft));
+      expect(await store.create(draft)).toEqual({
+        status: "saved",
+        view: first,
+      });
+      expect((await store.list()).views).toHaveLength(1);
     });
 
     it("reports an id nothing was saved under as missing", async () => {
@@ -184,7 +217,7 @@ describe("createIndexedDBViewStore", () => {
 
     it.each([
       ["query", { query: "status=ready" }],
-      ["presentation", { presentation: { density: "open" } }],
+      ["presentation", { presentation: { "table.t.hidden": ["open"] } }],
     ])(
       "never takes a creation with a different %s for a replay",
       async (_, change) => {
@@ -241,11 +274,14 @@ describe("createIndexedDBViewStore", () => {
 
     it("keeps the arrangement a view was created with through every change", async () => {
       const store = openStoreOver(new IDBFactory());
-      await store.create({ ...failed, presentation: { density: "compact" } });
+      await store.create({
+        ...failed,
+        presentation: { "table.t.hidden": ["compact"] },
+      });
       const renamed = readSaved(
         await store.update({ id: "failed", revision: 1 }, { name: "Kept" }),
       );
-      expect(renamed.presentation).toEqual({ density: "compact" });
+      expect(renamed.presentation).toEqual({ "table.t.hidden": ["compact"] });
       const requeried = readSaved(
         await store.update(
           { id: "failed", revision: 2 },
@@ -254,7 +290,7 @@ describe("createIndexedDBViewStore", () => {
       );
       expect(requeried).toMatchObject({
         query: "status=running",
-        presentation: { density: "compact" },
+        presentation: { "table.t.hidden": ["compact"] },
       });
     });
 
@@ -320,9 +356,12 @@ describe("createIndexedDBViewStore", () => {
       const store = openStoreOver(indexedDB);
       const transaction = vi.spyOn(IDBDatabase.prototype, "transaction");
       await store.readPresentation("default");
-      await store.patchPresentation("default", { width: 1 });
+      await store.patchPresentation("default", { "table.t.width.name": 1 });
       // A view's own preferences are written only while the view exists.
-      await store.patchPresentation({ view: "v1" }, { width: 1 });
+      await store.patchPresentation(
+        { view: "v1" },
+        { "table.t.width.name": 1 },
+      );
       // The upgrade's own transaction aside.
       expect(
         transaction.mock.calls
@@ -381,35 +420,45 @@ describe("createIndexedDBViewStore", () => {
       await store.create(failed);
       expect(await store.readPresentation("default")).toEqual({});
       expect(
-        await store.patchPresentation("default", { density: "compact" }),
+        await store.patchPresentation("default", {
+          "table.t.hidden": ["compact"],
+        }),
       ).toEqual({ status: "saved" });
       expect(
-        await store.patchPresentation({ view: "failed" }, { width: 320 }),
+        await store.patchPresentation(
+          { view: "failed" },
+          { "table.t.width.name": 320 },
+        ),
       ).toEqual({ status: "saved" });
       expect(await store.readPresentation("default")).toEqual({
-        density: "compact",
+        "table.t.hidden": ["compact"],
       });
       expect(await store.readPresentation({ view: "failed" })).toEqual({
-        width: 320,
+        "table.t.width.name": 320,
       });
     });
 
     it("removes a key patched to undefined and keeps the rest", async () => {
       const store = openStoreOver(new IDBFactory());
       await store.patchPresentation("default", {
-        density: "compact",
-        width: 1,
+        "table.t.hidden": ["compact"],
+        "table.t.width.name": 1,
       });
-      await store.patchPresentation("default", { width: undefined });
+      await store.patchPresentation("default", {
+        "table.t.width.name": undefined,
+      });
       expect(await store.readPresentation("default")).toEqual({
-        density: "compact",
+        "table.t.hidden": ["compact"],
       });
     });
 
     it("patches nothing for a view that does not exist", async () => {
       const store = openStoreOver(new IDBFactory());
       expect(
-        await store.patchPresentation({ view: "gone" }, { width: 1 }),
+        await store.patchPresentation(
+          { view: "gone" },
+          { "table.t.width.name": 1 },
+        ),
       ).toEqual({ status: "missing" });
       expect(await store.readPresentation({ view: "gone" })).toEqual({});
     });
@@ -420,9 +469,17 @@ describe("createIndexedDBViewStore", () => {
       await store.create({ ...failed, id: "ready", query: "status=ready" });
       await store.pin("failed");
       await store.pin("ready");
-      await store.patchPresentation({ view: "failed" }, { width: 1, zoom: 2 });
-      await store.patchPresentation({ view: "ready" }, { width: 3 });
-      await store.patchPresentation("default", { density: "compact" });
+      await store.patchPresentation(
+        { view: "failed" },
+        { "table.t.width.name": 1, zoom: 2 },
+      );
+      await store.patchPresentation(
+        { view: "ready" },
+        { "table.t.width.name": 3 },
+      );
+      await store.patchPresentation("default", {
+        "table.t.hidden": ["compact"],
+      });
 
       await store.remove({ id: "failed", revision: 1 });
       // Recreated under the same id, nothing of the old view carries over.
@@ -432,10 +489,10 @@ describe("createIndexedDBViewStore", () => {
       });
       expect(await store.readPresentation({ view: "failed" })).toEqual({});
       expect(await store.readPresentation({ view: "ready" })).toEqual({
-        width: 3,
+        "table.t.width.name": 3,
       });
       expect(await store.readPresentation("default")).toEqual({
-        density: "compact",
+        "table.t.hidden": ["compact"],
       });
       expect(await store.get("ready")).toMatchObject({
         view: { pinned: true },
@@ -446,7 +503,9 @@ describe("createIndexedDBViewStore", () => {
       const indexedDB = new IDBFactory();
       const store = openStoreOver(indexedDB);
       await store.create(failed);
-      await store.patchPresentation("default", { density: "compact" });
+      await store.patchPresentation("default", {
+        "table.t.hidden": ["compact"],
+      });
       const buildPreference = (fields: Record<string, unknown>) => ({
         scope: machinesScope,
         target: "default",
@@ -474,7 +533,7 @@ describe("createIndexedDBViewStore", () => {
 
       // Every unreadable entry reads as absent, never as a misread value.
       expect(await store.readPresentation("default")).toEqual({
-        density: "compact",
+        "table.t.hidden": ["compact"],
         columns: { visible: ["a", null], n: 1 },
       });
       expect(await store.get("failed")).toMatchObject({
@@ -534,11 +593,11 @@ describe("createIndexedDBViewStore", () => {
       const first = openStoreOver(indexedDB);
       const second = openStoreOver(indexedDB);
       await Promise.all([
-        first.patchPresentation("default", { density: "compact" }),
-        second.patchPresentation("default", { density: "open" }),
+        first.patchPresentation("default", { "table.t.hidden": ["compact"] }),
+        second.patchPresentation("default", { "table.t.hidden": ["open"] }),
       ]);
       expect(await first.readPresentation("default")).toEqual({
-        density: "open",
+        "table.t.hidden": ["open"],
       });
     });
 
@@ -655,7 +714,9 @@ describe("createIndexedDBViewStore", () => {
       );
       await alice.create(failed);
       await alice.pin("failed");
-      await alice.patchPresentation("default", { density: "compact" });
+      await alice.patchPresentation("default", {
+        "table.t.hidden": ["compact"],
+      });
       await vi.waitFor(() => expect(aliceElsewhere).toHaveBeenCalledTimes(3));
 
       expect(heard).not.toHaveBeenCalled();
@@ -885,7 +946,7 @@ describe("createIndexedDBViewStore", () => {
     it("rejects a patch storage cannot hold, leaving the other keys unwritten", async () => {
       const store = openStoreOver(new IDBFactory());
       const patch = {
-        density: "compact",
+        "table.t.hidden": ["compact"],
         callback: (() => {}) as unknown as JsonValue,
       };
       await expect(store.patchPresentation("default", patch)).rejects.toThrow(
@@ -967,7 +1028,9 @@ describe("createIndexedDBViewStore", () => {
           return transaction;
         }),
       );
-      const patching = store.patchPresentation("default", { density: "open" });
+      const patching = store.patchPresentation("default", {
+        "table.t.hidden": ["open"],
+      });
       await expect(patching).rejects.toThrow(
         "view storage failed: the quota has been exceeded",
       );

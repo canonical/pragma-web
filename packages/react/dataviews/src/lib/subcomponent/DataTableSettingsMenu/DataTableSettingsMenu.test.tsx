@@ -69,6 +69,7 @@ const Composition = ({
 }) => (
   <DataViews provider={provider}>
     <DataViews.DataTable
+      id="t"
       columns={declared}
       label="Machines"
       settings={<DataTable.SettingsMenu />}
@@ -161,7 +162,12 @@ describe("DataTable.SettingsMenu", () => {
     ).toBe(findTrigger());
     view.unmount();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     expect(
       document.querySelector(".ds.data-table-settings-cell"),
@@ -172,6 +178,7 @@ describe("DataTable.SettingsMenu", () => {
     const { provider } = createProvider();
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -195,7 +202,7 @@ describe("DataTable.SettingsMenu", () => {
     expect(await readAnnouncement()).toBe("Status hidden");
     await waitForFocus(findTrigger());
     expect(provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
     // Presentation only: no request, no location write, the same query.
     expect(source.calls).toHaveLength(requests);
@@ -252,7 +259,7 @@ describe("DataTable.SettingsMenu", () => {
     expect(hideLast).toHaveClass("disabled");
     fireEvent.click(hideLast);
     expect(other.provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
   });
 
@@ -282,7 +289,7 @@ describe("DataTable.SettingsMenu", () => {
     await choose("Hide Status");
     await choose("Move Cores left");
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 240 });
+      provider.presentation.arrange({ "table.t.width.name": 240 });
     });
     return { provider, source, recording };
   };
@@ -312,7 +319,7 @@ describe("DataTable.SettingsMenu", () => {
 
   it("resets the columns a followed link chose, back to the arrangement declared", async () => {
     const { provider } = createProvider(
-      createMemoryLocation({ href: "/machines?table.hidden=status" }),
+      createMemoryLocation({ href: "/machines?table.t.hidden=status" }),
     );
     render(<Composition provider={provider} />);
     expect(listShown()).toEqual(["Name", "Cores"]);
@@ -357,7 +364,7 @@ describe("DataTable.SettingsMenu", () => {
     if (created.status !== "saved") {
       throw new Error(`the view was not saved: ${created.status}`);
     }
-    expect(created.view.presentation).toEqual({ "table.hidden": ["status"] });
+    expect(created.view.presentation).toEqual({ "table.t.hidden": ["status"] });
     authoring.unmount();
     // Another viewer, holding no change of their own, sees every column until
     // the view is opened: only the view can hide Status for them.
@@ -409,7 +416,12 @@ describe("DataTable.SettingsMenu", () => {
         createMemoryLocation({ href: `/machines${destination}` }),
       );
       const view = render(
-        <DataTable provider={provider} columns={columns} label="Machines" />,
+        <DataTable
+          id="t"
+          provider={provider}
+          columns={columns}
+          label="Machines"
+        />,
       );
       const shown = listShown();
       view.unmount();
@@ -419,9 +431,9 @@ describe("DataTable.SettingsMenu", () => {
     /** The arrangements a reader may stand on as the page loads. */
     const startingArrangements = [
       "/machines?status=running",
-      "/machines?table.hidden=status",
-      "/machines?table.order=cores&table.hidden=status",
-      "/machines?table.hidden=cores&table.order=cores&table.order=status",
+      "/machines?table.t.hidden=status",
+      "/machines?table.t.order=cores&table.t.hidden=status",
+      "/machines?table.t.hidden=cores&table.t.order=cores&table.t.order=status",
     ];
 
     /** Every link each starting arrangement's server markup offers. */

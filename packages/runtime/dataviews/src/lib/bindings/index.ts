@@ -49,6 +49,7 @@ export type {
   SpellColumnArrangementConfig,
 } from "../presentation/index.js";
 export {
+  createMemoryPresentation,
   hideColumn,
   moveColumn,
   resetColumnArrangement,

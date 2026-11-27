@@ -20,7 +20,7 @@ const mount = (columns: readonly DataTableColumn[]) => {
   const hook = renderHook(
     ({ declared }) => {
       renders += 1;
-      return useColumnArrangement(presentation, declared);
+      return useColumnArrangement("t", presentation, declared);
     },
     { initialProps: { declared: columns } },
   );
@@ -33,8 +33,8 @@ describe("useColumnArrangement", () => {
     expect(hook.result.current).toEqual([NAME, STATUS, CORES]);
     act(() => {
       presentation.arrange({
-        "table.order": ["cores", "name", "status"],
-        "table.hidden": ["status"],
+        "table.t.order": ["cores", "name", "status"],
+        "table.t.hidden": ["status"],
       });
     });
     expect(hook.result.current).toEqual([CORES, NAME]);
@@ -45,7 +45,7 @@ describe("useColumnArrangement", () => {
     const columns = hook.result.current;
     const renders = readRenders();
     act(() => {
-      presentation.arrange({ "table.width.name": 180 });
+      presentation.arrange({ "table.t.width.name": 180 });
     });
     expect(hook.result.current).toBe(columns);
     expect(readRenders()).toBe(renders);
@@ -64,7 +64,7 @@ describe("useColumnArrangement", () => {
     const pinned: DataTableColumn = { ...NAME, hideable: false };
     const { presentation, hook } = mount([pinned, STATUS]);
     act(() => {
-      presentation.arrange({ "table.hidden": ["name", "status"] });
+      presentation.arrange({ "table.t.hidden": ["name", "status"] });
     });
     expect(hook.result.current).toEqual([pinned]);
   });

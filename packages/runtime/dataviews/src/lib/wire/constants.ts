@@ -6,6 +6,7 @@
  */
 
 import { OPERATOR_ARITY, type PredicateOperator } from "../query/index.js";
+import type { ArrangementKeyPart } from "./types.js";
 
 /**
  * The delimiter between a field's wire name and its operator, and between
@@ -49,20 +50,29 @@ export const WRITTEN_QUERY_KEYS: readonly string[] = Object.freeze(
 export const VIEW_KEY = "view";
 
 /**
- * The parameter a column order is carried in where no script keeps the
- * arrangement: a repeated column id, spelled as the presentation key it
- * carries. It asks the source for nothing; the grammar reserves it, and
- * `readArrangementParams` reads it.
+ * The prefix of the parameters a table's arrangement is carried in where no
+ * script keeps it: `table.<id>.order` and `table.<id>.hidden`, as the
+ * presentation keys they carry.
  */
-export const ORDER_QUERY_KEY = "table.order";
+export const ARRANGEMENT_QUERY_PREFIX = "table.";
 
-/**
- * The parameter the hidden columns are carried in where no script keeps the
- * arrangement: a repeated column id, spelled as the presentation key it
- * carries. It asks the source for nothing; the grammar reserves it, and
- * `readArrangementParams` reads it.
- */
-export const HIDDEN_QUERY_KEY = "table.hidden";
+/** The prefix as a pattern's source. */
+export const ARRANGEMENT_QUERY_SOURCE = ARRANGEMENT_QUERY_PREFIX.replaceAll(
+  ".",
+  "\\.",
+);
+
+/** The parts a table keeps, which no spelled id may read as. */
+export const ARRANGEMENT_KEY_PARTS: readonly ArrangementKeyPart[] =
+  Object.freeze(["order", "hidden", "width"]);
+
+/** A spelled table id: any id, encoded so it holds no dot and names no part. */
+export const TABLE_ID_SOURCE = `(?!(?:${ARRANGEMENT_KEY_PARTS.join("|")})\\.)[^.]+`;
+
+/** A parameter carrying one table's order or hidden columns, and its parts. */
+export const ARRANGEMENT_QUERY_PATTERN = new RegExp(
+  `^${ARRANGEMENT_QUERY_SOURCE}(${TABLE_ID_SOURCE})\\.(order|hidden)$`,
+);
 
 /**
  * Parameter names the grammar reserves: those it writes, plus the
@@ -73,8 +83,6 @@ export const RESERVED_QUERY_KEYS: readonly string[] = Object.freeze([
   ...WRITTEN_QUERY_KEYS,
   VIEW_KEY,
   "item",
-  ORDER_QUERY_KEY,
-  HIDDEN_QUERY_KEY,
 ]);
 
 /**

@@ -25,6 +25,7 @@ describe("regression 0008 — a sort header was a dead button before hydration",
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "cores", header: "Cores", sortable: true }]}
         label="Machines"

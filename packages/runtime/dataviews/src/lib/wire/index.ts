@@ -1,9 +1,11 @@
 export { default as areQueryIssuesEqual } from "./areQueryIssuesEqual.js";
 export {
+  ARRANGEMENT_QUERY_SOURCE,
   OPERATOR_DELIMITER,
   QUERY_KEYS,
   RESERVED_QUERY_KEYS,
   SUFFIXED_OPERATORS,
+  TABLE_ID_SOURCE,
   VIEW_KEY,
   WRITTEN_QUERY_KEYS,
 } from "./constants.js";
@@ -16,6 +18,7 @@ export { default as readArrangementParams } from "./readArrangementParams.js";
 export { default as readOpenView } from "./readOpenView.js";
 export { default as readWireField } from "./readWireField.js";
 export { default as rejectWireName } from "./rejectWireName.js";
+export { default as spellArrangementKey } from "./spellArrangementKey.js";
 export { default as spellArrangementParams } from "./spellArrangementParams.js";
 export { default as spellWireKey } from "./spellWireKey.js";
 export { default as spellWireValues } from "./spellWireValues.js";

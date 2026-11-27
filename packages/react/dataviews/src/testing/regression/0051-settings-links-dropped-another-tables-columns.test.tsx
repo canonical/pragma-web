@@ -5,7 +5,8 @@
  * Before the fix, a link's arrangement was spelled from the columns of the
  * table the link was in, so its hidden list and its order named that table's
  * columns alone, and following it showed another table's hidden columns
- * again. A link now carries the stored lists whole.
+ * again. A link now carries the table's stored lists whole, and another
+ * table's parameters as they were.
  */
 
 import { createMemoryLocation } from "@canonical/dataviews-core";
@@ -19,12 +20,13 @@ describe("regression 0051 — settings links dropped another table's columns", (
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
       location: createMemoryLocation({
-        href: "/machines?table.order=owner&table.order=name&table.hidden=owner",
+        href: "/machines?table.t.order=owner&table.t.order=name&table.t.hidden=owner&table.other.hidden=name",
       }),
     });
     const container = document.createElement("div");
     container.innerHTML = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -38,7 +40,8 @@ describe("regression 0051 — settings links dropped another table's columns", (
       (link) => link.textContent === "Hide Status",
     );
     const params = new URLSearchParams(hide?.getAttribute("href") ?? "");
-    expect(params.getAll("table.hidden")).toEqual(["owner", "status"]);
-    expect(params.getAll("table.order")).toEqual(["owner", "name"]);
+    expect(params.getAll("table.t.hidden")).toEqual(["owner", "status"]);
+    expect(params.getAll("table.t.order")).toEqual(["owner", "name"]);
+    expect(params.getAll("table.other.hidden")).toEqual(["name"]);
   });
 });

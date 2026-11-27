@@ -44,7 +44,12 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 ];`;
 
 const renderCode = `<DataViews provider={provider}>
-  <DataViews.DataTable columns={columns} label="Machines" settings={<DataTable.SettingsMenu />} />
+  <DataViews.DataTable
+    id="machines"
+    columns={columns}
+    label="Machines"
+    settings={<DataTable.SettingsMenu />}
+  />
 </DataViews>`;
 
 /** Close the open settings menu from its button, leaving the story at rest. */
@@ -63,8 +68,8 @@ const closeMenu = async (canvas: ReturnType<typeof within>): Promise<void> => {
  */
 const arrangeForTheViewer = (provider: MachineProvider): void => {
   provider.presentation.arrange({
-    "table.order": ["status", "name", "cores", "owner"],
-    "table.hidden": ["owner"],
+    "table.machines.order": ["status", "name", "cores", "owner"],
+    "table.machines.hidden": ["owner"],
   });
 };
 
@@ -79,6 +84,7 @@ function Collection({
   return (
     <DataViews provider={provider} {...words}>
       <DataViews.DataTable
+        id="machines"
         columns={columns}
         label="Machines"
         settings={<Component />}
@@ -135,9 +141,8 @@ export const WithoutALocation: Story = {
 };
 
 /**
- * Hide a column: choosing Hide Owner takes the column out of every table on
- * the provider, says so politely, and returns focus to the settings button.
- * Nothing is asked of the source: the rows are the same rows.
+ * Hide a column: choosing Hide Owner takes the column out of this table,
+ * says so, and returns focus to the settings button.
  */
 export const HideAColumn: Story = {
   name: "Hide a column",
@@ -177,8 +182,8 @@ export const ArrangedByTheViewer: Story = {
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
-  "table.order": ["status", "name", "cores", "owner"],
-  "table.hidden": ["owner"],
+  "table.machines.order": ["status", "name", "cores", "owner"],
+  "table.machines.hidden": ["owner"],
 });`,
     render: renderCode,
   }),

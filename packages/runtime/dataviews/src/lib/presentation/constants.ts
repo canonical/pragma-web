@@ -1,9 +1,10 @@
 /**
  * The presentation domain's constants: the empty arrangement, how long
- * changes gather before they are written, and the keys the table's
- * arrangement is kept under.
+ * changes gather before they are written, and how the keys each table's
+ * arrangement is kept under are spelled.
  */
 
+import { ARRANGEMENT_QUERY_SOURCE, TABLE_ID_SOURCE } from "../wire/index.js";
 import type { ViewPresentation } from "./types.js";
 
 /** An arrangement holding nothing: what a target reads as before any change. */
@@ -22,15 +23,7 @@ export const WRITE_DELAY = 200;
  */
 export const WRITE_DEADLINE = 1000;
 
-/**
- * The prefix a column's width is kept under, followed by the column id.
- * Named for the renderer, so another renderer's arrangement never reads a
- * table's widths as its own.
- */
-export const WIDTH_KEY_PREFIX = "table.width.";
-
-/** The key the table's column order is kept under: a list of column ids. */
-export const ORDER_KEY = "table.order";
-
-/** The key the table's hidden columns are kept under: a list of column ids. */
-export const HIDDEN_KEY = "table.hidden";
+/** A key one table keeps: its order, its hidden columns, or a column's width. */
+export const TABLE_KEY_PATTERN = new RegExp(
+  `^${ARRANGEMENT_QUERY_SOURCE}${TABLE_ID_SOURCE}\\.(?:order|hidden|width\\..+)$`,
+);

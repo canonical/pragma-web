@@ -1,24 +1,24 @@
-import {
-  HIDDEN_KEY,
-  ORDER_KEY,
-  type ViewPresentation,
-} from "../presentation/index.js";
-import { readArrangementParams } from "../wire/index.js";
+import type { ViewPresentation } from "../presentation/index.js";
+import { readArrangementParams, spellArrangementKey } from "../wire/index.js";
 
 /**
- * The column arrangement a location carries where no script keeps it, as
- * the presentation keys it stands for, or null for none: the order only when
- * the location carries one, and the hidden columns whenever it carries
- * either, so a link naming an order shows every column it does not hide.
+ * Each table's order and hidden columns a location carries, as presentation
+ * keys, or null.
  */
 export default function readLocatedArrangement(
   params: URLSearchParams | undefined,
 ): ViewPresentation | null {
-  const carried = params === undefined ? null : readArrangementParams(params);
-  return carried === null
-    ? null
-    : {
-        ...(carried.order === null ? {} : { [ORDER_KEY]: carried.order }),
-        [HIDDEN_KEY]: carried.hidden,
-      };
+  const carried =
+    params === undefined ? new Map() : readArrangementParams(params);
+  if (carried.size === 0) {
+    return null;
+  }
+  const presentation: Record<string, readonly string[]> = {};
+  for (const [table, { order, hidden }] of carried) {
+    if (order !== null) {
+      presentation[spellArrangementKey(table, "order")] = order;
+    }
+    presentation[spellArrangementKey(table, "hidden")] = hidden;
+  }
+  return presentation;
 }

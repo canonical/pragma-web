@@ -2,6 +2,7 @@ import {
   type JsonValue,
   type PreferenceResult,
   type PresentationStore,
+  pickTableKeys,
   spellTargetKey,
 } from "../presentation/index.js";
 import type {
@@ -205,7 +206,7 @@ export default function createIndexedDBViewStore(
               view.name === draft.name &&
               view.query === draft.query &&
               JSON.stringify(view.presentation) ===
-                JSON.stringify(draft.presentation);
+                JSON.stringify(pickTableKeys(draft.presentation));
             written = { status: replayed ? "saved" : "conflict", view };
             return;
           }

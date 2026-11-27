@@ -54,6 +54,7 @@ describe("regression 0014 — a resize preview re-rendered every header menu", (
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           {

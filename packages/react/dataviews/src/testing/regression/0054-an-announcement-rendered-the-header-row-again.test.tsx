@@ -65,6 +65,7 @@ describe("regression 0054 — an announcement rendered the header row again", ()
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", hideable: false },

@@ -33,6 +33,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -49,7 +50,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
       .querySelector(".label");
     expect(label).not.toBeNull();
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["cores"] });
+      provider.presentation.arrange({ "table.t.hidden": ["cores"] });
     });
     expect(screen.getByRole("menuitem", { name: "Show Cores" })).toBeVisible();
     expect(

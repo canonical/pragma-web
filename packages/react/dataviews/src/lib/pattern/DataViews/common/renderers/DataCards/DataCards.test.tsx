@@ -279,6 +279,7 @@ describe("DataCards", () => {
           getRowLabel={(row) => row.name}
         />
         <DataTable
+          id="t"
           provider={provider}
           columns={fields}
           label="Machine table"

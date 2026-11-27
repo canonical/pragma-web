@@ -3,16 +3,18 @@ import createMemoryPresentationStore from "./createMemoryPresentationStore.js";
 
 describe("createMemoryPresentationStore", () => {
   it("starts holding a restored arrangement at the view it was drawn under, or as the default", async () => {
-    const presentation = { "table.width.name": 240 };
+    const presentation = { "table.t.width.name": 240 };
     const store = createMemoryPresentationStore({
       restored: { view: null, presentation },
     });
     expect(await store.readPresentation("default")).toEqual(presentation);
     expect(await store.readPresentation({ view: "v1" })).toEqual({});
-    await store.patchPresentation("default", { "table.width.name": undefined });
+    await store.patchPresentation("default", {
+      "table.t.width.name": undefined,
+    });
     expect(await store.readPresentation("default")).toEqual({});
     // The arrangement given is copied, never written through.
-    expect(presentation).toEqual({ "table.width.name": 240 });
+    expect(presentation).toEqual({ "table.t.width.name": 240 });
     const underView = createMemoryPresentationStore({
       restored: { view: "v1", presentation },
     });

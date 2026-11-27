@@ -37,6 +37,7 @@ const renderSettings = (href: string | null): string =>
   renderToString(
     <DataViews provider={createProvider(href)}>
       <DataViews.DataTable
+        id="t"
         columns={columns}
         label="Machines"
         settings={<DataTable.SettingsMenu />}
@@ -58,6 +59,7 @@ const listLinks = (markup: string): ReadonlyMap<string, URLSearchParams> =>
 /** The headings a provider standing on a destination shows, in order. */
 const listShownAt = (params: URLSearchParams): readonly string[] =>
   resolveColumnArrangement(
+    "t",
     columns,
     createProvider(`/machines?${params}`).presentation.state.get().presentation,
   )
@@ -102,11 +104,11 @@ describe("DataTable.SettingsMenu SSR", () => {
 
   it("links the reset, once there is something to reset, to the arrangement declared", () => {
     const links = listLinks(
-      renderSettings("/machines?table.order=cores&table.hidden=status"),
+      renderSettings("/machines?table.t.order=cores&table.t.hidden=status"),
     );
     const reset = links.get("Reset table settings");
-    expect(reset?.has("table.hidden")).toBe(false);
-    expect(reset?.has("table.order")).toBe(false);
+    expect(reset?.has("table.t.hidden")).toBe(false);
+    expect(reset?.has("table.t.order")).toBe(false);
     expect(listShownAt(reset ?? new URLSearchParams())).toEqual([
       "Name",
       "Status",

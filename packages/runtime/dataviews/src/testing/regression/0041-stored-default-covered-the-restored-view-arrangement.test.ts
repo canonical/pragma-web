@@ -18,18 +18,18 @@ import {
 describe("regression 0041 — a stored default covered the restored view arrangement", () => {
   it("draws the arrangement restored under a view over the stored default", async () => {
     const readPresentation = vi.fn<PresentationStore["readPresentation"]>(
-      async (target) => (target === "default" ? { "table.hidden": [] } : {}),
+      async (target) => (target === "default" ? { "table.t.hidden": [] } : {}),
     );
     const presentation = createPresentation({
       store: createStandInPresentationStore({ readPresentation }),
-      restored: { view: "v1", presentation: { "table.hidden": ["cores"] } },
+      restored: { view: "v1", presentation: { "table.t.hidden": ["cores"] } },
     });
     const release = presentation.observe();
     // The defaults' read settles: the presentation heard it first.
     expect(readPresentation).toHaveBeenCalledWith("default");
     await readPresentation.mock.results.at(0)?.value;
     expect(presentation.state.get().presentation).toEqual({
-      "table.hidden": ["cores"],
+      "table.t.hidden": ["cores"],
     });
     release();
   });

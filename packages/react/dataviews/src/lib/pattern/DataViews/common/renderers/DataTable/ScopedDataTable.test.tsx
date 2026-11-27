@@ -28,6 +28,7 @@ describe("ScopedDataTable", () => {
     expect(() =>
       render(
         <ScopedDataTable
+          id="t"
           settingsMenu={Menu}
           provider={{} as never}
           columns={columns}
@@ -48,6 +49,7 @@ describe("ScopedDataTable", () => {
     });
     render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -80,6 +82,7 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -103,6 +106,7 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -123,6 +127,7 @@ describe("ScopedDataTable", () => {
     const announce = vi.fn();
     render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -148,6 +153,7 @@ describe("ScopedDataTable", () => {
     const messages = resolveMessages();
     const { rerender } = render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -160,6 +166,7 @@ describe("ScopedDataTable", () => {
     );
     rerender(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}
@@ -180,6 +187,7 @@ describe("ScopedDataTable", () => {
     const ref = createRef<HTMLTableElement>();
     render(
       <ScopedDataTable
+        id="t"
         settingsMenu={Menu}
         provider={provider}
         columns={columns}

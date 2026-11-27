@@ -81,6 +81,7 @@ const renderLargeTable = (selectable = false) => {
   const { provider } = createMachineProvider({ rows });
   const view = render(
     <DataTable
+      id="t"
       provider={provider}
       columns={columns}
       label="Machines"
@@ -240,6 +241,7 @@ describe("virtualized DataTable, bounded work", () => {
     for (let cycle = 0; cycle < 25; cycle += 1) {
       const { unmount } = render(
         <DataTable
+          id="t"
           provider={provider}
           columns={columns}
           label="Machines"

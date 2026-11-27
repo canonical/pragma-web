@@ -210,15 +210,15 @@ describe("createPresentation", () => {
     const theirs = createPresentation({ store: theirsStore });
     observeUntilFinished(mine);
     observeUntilFinished(theirs);
-    mine.arrange({ "table.width.name": 120 });
-    theirs.arrange({ "table.width.status": 80 });
+    mine.arrange({ "table.t.width.name": 120 });
+    theirs.arrange({ "table.t.width.status": 80 });
     // Both writes go out and land; each tab then hears the other's.
     await flushPresentation(mineWrites);
     await flushPresentation(theirsWrites);
     await vi.waitFor(() => {
       expect(readArrangement(mine)).toEqual({
-        "table.width.name": 120,
-        "table.width.status": 80,
+        "table.t.width.name": 120,
+        "table.t.width.status": 80,
       });
       expect(readArrangement(theirs)).toEqual(readArrangement(mine));
     });
@@ -732,35 +732,35 @@ describe("createPresentation", () => {
       vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
       const presentation = createPresentation();
       observeUntilFinished(presentation);
-      presentation.arrange({ "table.width.name": 120 });
+      presentation.arrange({ "table.t.width.name": 120 });
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 120,
+        "table.t.width.name": 120,
       });
       presentation.show({
         id: "v1",
-        presentation: { "table.width.name": 300 },
+        presentation: { "table.t.width.name": 300 },
       });
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 300,
+        "table.t.width.name": 300,
       });
-      presentation.arrange({ "table.width.name": 150 });
+      presentation.arrange({ "table.t.width.name": 150 });
       presentation.show(null);
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 120,
+        "table.t.width.name": 120,
       });
       // The view's own layer was kept for it: shown again, it is read back.
       presentation.show({
         id: "v1",
-        presentation: { "table.width.name": 300 },
+        presentation: { "table.t.width.name": 300 },
       });
       await vi.waitFor(() => {
         expect(readArrangement(presentation)).toEqual({
-          "table.width.name": 150,
+          "table.t.width.name": 150,
         });
       });
-      presentation.arrange({ "table.width.name": undefined });
+      presentation.arrange({ "table.t.width.name": undefined });
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 300,
+        "table.t.width.name": 300,
       });
       expect(presentation.state.get().presentationReason).toBeNull();
     });
@@ -838,7 +838,7 @@ describe("createPresentation", () => {
 
   describe("createPresentation restored", () => {
     it("draws a restored arrangement before anything observes, and keeps it for the session in memory", async () => {
-      const restored = { "table.width.name": 240 };
+      const restored = { "table.t.width.name": 240 };
       // The store a presentation given none keeps in memory, holding the
       // restored arrangement as that one does, given here so the case can
       // wait for the read it starts to settle.
@@ -863,54 +863,54 @@ describe("createPresentation", () => {
       expect(readArrangement(presentation)).toEqual(restored);
       // It is the default arrangement: removing its key returns to the
       // declared one.
-      presentation.arrange({ "table.width.name": undefined });
+      presentation.arrange({ "table.t.width.name": undefined });
       expect(readArrangement(presentation)).toEqual({});
       release();
     });
 
     it("keeps an arrangement restored under a view as that view's own preferences without a store", async () => {
       const presentation = createPresentation({
-        restored: { view: "v1", presentation: { "table.width.name": 120 } },
+        restored: { view: "v1", presentation: { "table.t.width.name": 120 } },
       });
       const release = presentation.observe();
       presentation.show({
         id: "v1",
-        presentation: { "table.width.name": 300 },
+        presentation: { "table.t.width.name": 300 },
       });
       // The view's saved arrangement is drawn over the restored one until
       // the view's own preferences answer from the memory the session keeps,
       // which holds the restored arrangement as them.
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 300,
+        "table.t.width.name": 300,
       });
       await new Promise<void>((resolve) => {
         const unsubscribe = presentation.state.subscribe(() => {
-          if (readArrangement(presentation)["table.width.name"] === 120) {
+          if (readArrangement(presentation)["table.t.width.name"] === 120) {
             unsubscribe();
             resolve();
           }
         });
       });
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 120,
+        "table.t.width.name": 120,
       });
       release();
     });
 
     it("lets the store decide once it answers", async () => {
       const store = createMemoryPresentationStore();
-      await store.patchPresentation("default", { "table.order": ["cores"] });
+      await store.patchPresentation("default", { "table.t.order": ["cores"] });
       const presentation = createPresentation({
         store,
-        restored: { view: null, presentation: { "table.width.name": 240 } },
+        restored: { view: null, presentation: { "table.t.width.name": 240 } },
       });
       expect(readArrangement(presentation)).toEqual({
-        "table.width.name": 240,
+        "table.t.width.name": 240,
       });
       const release = presentation.observe();
       await vi.waitFor(() => {
         expect(readArrangement(presentation)).toEqual({
-          "table.order": ["cores"],
+          "table.t.order": ["cores"],
         });
       });
       release();
@@ -920,10 +920,10 @@ describe("createPresentation", () => {
       const readPresentation = vi.fn(async () => ({}));
       const presentation = createPresentation({
         store: createStandInPresentationStore({ readPresentation }),
-        restored: { view: "v1", presentation: { "table.hidden": ["cores"] } },
+        restored: { view: "v1", presentation: { "table.t.hidden": ["cores"] } },
       });
       expect(readArrangement(presentation)).toEqual({
-        "table.hidden": ["cores"],
+        "table.t.hidden": ["cores"],
       });
       const release = presentation.observe();
       // Reading the defaults, once it has settled, keeps it: they are not the
@@ -931,20 +931,20 @@ describe("createPresentation", () => {
       await settleCalls(readPresentation);
       expect(readPresentation).toHaveBeenCalledTimes(1);
       expect(readArrangement(presentation)).toEqual({
-        "table.hidden": ["cores"],
+        "table.t.hidden": ["cores"],
       });
       // The view shown with its saved arrangement: kept, until its own read.
       presentation.show({
         id: "v1",
-        presentation: { "table.order": ["name"] },
+        presentation: { "table.t.order": ["name"] },
       });
       expect(readArrangement(presentation)).toEqual({
-        "table.hidden": ["cores"],
-        "table.order": ["name"],
+        "table.t.hidden": ["cores"],
+        "table.t.order": ["name"],
       });
       await vi.waitFor(() => {
         expect(readArrangement(presentation)).toEqual({
-          "table.order": ["name"],
+          "table.t.order": ["name"],
         });
       });
       release();
@@ -953,7 +953,7 @@ describe("createPresentation", () => {
     it("lets go of an arrangement restored under a view when another view, or none, is shown", () => {
       const restored = {
         view: "v1",
-        presentation: { "table.hidden": ["cores"] },
+        presentation: { "table.t.hidden": ["cores"] },
       };
       const other = createPresentation({ restored });
       other.show({ id: "v2", presentation: {} });
@@ -973,7 +973,7 @@ describe("createPresentation", () => {
             throw new Error("storage is blocked");
           },
         }),
-        restored: { view: "v1", presentation: { "table.hidden": ["cores"] } },
+        restored: { view: "v1", presentation: { "table.t.hidden": ["cores"] } },
       });
       const release = presentation.observe();
       presentation.show({ id: "v1", presentation: {} });

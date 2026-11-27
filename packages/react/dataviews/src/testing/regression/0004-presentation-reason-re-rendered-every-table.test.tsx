@@ -40,6 +40,7 @@ describe("regression 0004 — a presentation reason re-rendered every table", ()
         }}
       >
         <DataTable
+          id="t"
           provider={provider}
           columns={[{ id: "name", header: "Name" }]}
           label="Machines"
@@ -49,7 +50,7 @@ describe("regression 0004 — a presentation reason re-rendered every table", ()
     await screen.findByRole("cell", { name: "alpha" });
     const settled = commits;
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 200 });
+      provider.presentation.arrange({ "table.t.width.name": 200 });
     });
     expect(commits).toBe(settled + 1);
     await waitFor(() => {
@@ -89,7 +90,7 @@ describe("regression 0004 — a presentation reason re-rendered every table", ()
     });
     const settled = commits;
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 200 });
+      provider.presentation.arrange({ "table.t.width.name": 200 });
     });
     // The width committed nothing here; the reason that followed did, once.
     expect(commits).toBe(settled);

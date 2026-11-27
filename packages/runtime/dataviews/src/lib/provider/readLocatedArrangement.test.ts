@@ -6,19 +6,22 @@ describe("readLocatedArrangement", () => {
     expect(
       readLocatedArrangement(
         new URLSearchParams(
-          "status=running&table.order=cores&table.order=name&table.hidden=status",
+          "status=running&table.t.order=cores&table.t.order=name&table.t.hidden=status",
         ),
       ),
-    ).toEqual({ "table.order": ["cores", "name"], "table.hidden": ["status"] });
+    ).toEqual({
+      "table.t.order": ["cores", "name"],
+      "table.t.hidden": ["status"],
+    });
   });
 
   it("keeps no order when only hidden columns are carried, and shows every column when only an order is", () => {
     expect(
-      readLocatedArrangement(new URLSearchParams("table.hidden=status")),
-    ).toEqual({ "table.hidden": ["status"] });
+      readLocatedArrangement(new URLSearchParams("table.t.hidden=status")),
+    ).toEqual({ "table.t.hidden": ["status"] });
     expect(
-      readLocatedArrangement(new URLSearchParams("table.order=cores")),
-    ).toEqual({ "table.order": ["cores"], "table.hidden": [] });
+      readLocatedArrangement(new URLSearchParams("table.t.order=cores")),
+    ).toEqual({ "table.t.order": ["cores"], "table.t.hidden": [] });
   });
 
   it("reads no arrangement from a location carrying none, or from no location", () => {

@@ -23,6 +23,7 @@ describe("ConnectedRecordList", () => {
           selectable
         />
         <DataViews.DataTable
+          id="t"
           columns={[{ id: "name", header: "Name" }]}
           label="Machine table"
           selectable

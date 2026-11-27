@@ -28,15 +28,16 @@ import type {
 } from "../common/index.js";
 
 /**
- * What the column management hook reads: the provider, the declared columns,
- * the header row taking a hidden column's focus, and the words and announcer
- * a change is said through.
+ * What the column management hook reads: the provider, where the table keeps
+ * its arrangement, the declared columns, the header row, and the words and
+ * announcer.
  */
 export type UseColumnManagementProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = readonly [
   provider: DataViewsProvider<TFields, TRow>,
+  arrangement: UseTableArrangementResult,
   columns: readonly DataTableColumn[],
   headerRow: RefObject<HTMLTableRowElement | null>,
   messages: DataViewsMessages,
@@ -100,10 +101,11 @@ export type UseTableGeometryResult = {
 };
 
 /**
- * What the arrangement hook takes: the presentation, then the columns it
- * arranges, in their declared order.
+ * What the arrangement hook takes: the table's name, the presentation, then
+ * the declared columns.
  */
 export type UseColumnArrangementProps = readonly [
+  table: string,
   presentation: Presentation,
   columns: readonly DataTableColumn[],
 ];
@@ -174,3 +176,26 @@ export type UseTabStopProps<
 
 /** The table's tab index: 0 where Tab reaches nothing inside, else -1. */
 export type UseTabStopResult = 0 | -1;
+
+/**
+ * What the arrangement hook reads: the provider, whether the table has
+ * settings, and its id.
+ */
+export type UseTableArrangementProps = readonly [
+  provider: Pick<DataViewsProvider<never, never>, "presentation">,
+  hasSettings: boolean,
+  options?: {
+    /** The table's id. */
+    readonly id?: string | undefined;
+  },
+];
+
+/** Where a table keeps its arrangement. */
+export type UseTableArrangementResult = {
+  /** The name the table's keys are spelled under. */
+  readonly table: string;
+  /** The presentation they are read from and written to. */
+  readonly presentation: Presentation;
+  /** Whether that is the provider's, which saved views and links carry. */
+  readonly shared: boolean;
+};

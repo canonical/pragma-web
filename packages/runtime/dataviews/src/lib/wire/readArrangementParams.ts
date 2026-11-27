@@ -1,25 +1,34 @@
-import { HIDDEN_QUERY_KEY, ORDER_QUERY_KEY } from "./constants.js";
+import readTableKey from "./readTableKey.js";
 import type { ArrangementParams } from "./types.js";
 
+/** The parameters one table's order and hidden columns were found under. */
+type FoundKeys = { readonly order?: string; readonly hidden?: string };
+
 /**
- * The column arrangement a set of parameters carries, or null for none.
- *
- * An order is carried whole, and the hidden columns with it: an order with
- * no hidden column hides none, since a list of no ids has no spelling. Hidden
- * columns carried alone leave the order to whatever lies beneath. A blank
- * value is a form control left empty, as it is for every other parameter,
- * and names no column.
+ * The column arrangement a set of parameters carries for each table, by
+ * its id; an order with no hidden parameter hides none, and a blank value
+ * names no column.
  */
 export default function readArrangementParams(
   params: URLSearchParams,
-): ArrangementParams | null {
-  if (!params.has(ORDER_QUERY_KEY) && !params.has(HIDDEN_QUERY_KEY)) {
-    return null;
+): ReadonlyMap<string, ArrangementParams> {
+  const tables = new Map<string, FoundKeys>();
+  for (const key of params.keys()) {
+    const read = readTableKey(key);
+    if (read !== null) {
+      const found = tables.get(read.table) ?? {};
+      tables.set(read.table, { [read.part]: key, ...found });
+    }
   }
   const listIds = (key: string): readonly string[] =>
     params.getAll(key).filter((id) => id !== "");
-  return {
-    order: params.has(ORDER_QUERY_KEY) ? listIds(ORDER_QUERY_KEY) : null,
-    hidden: listIds(HIDDEN_QUERY_KEY),
-  };
+  return new Map(
+    [...tables].map(([table, { order, hidden }]) => [
+      table,
+      {
+        order: order === undefined ? null : listIds(order),
+        hidden: hidden === undefined ? [] : listIds(hidden),
+      },
+    ]),
+  );
 }

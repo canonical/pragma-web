@@ -56,7 +56,7 @@ describe("hydrating a server render", () => {
     // from the viewer's own preferences would.
     const server = build({
       query: "",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
     server.refresh();
     const markup = renderToString(<MachineComposition provider={server} />);
@@ -65,7 +65,7 @@ describe("hydrating a server render", () => {
     );
     expect(handed).toEqual({
       query: "status=running&sort=cores__desc&page=2&size=50",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
 
     const container = document.createElement("div");

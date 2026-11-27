@@ -31,6 +31,7 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
     render(
       <DataViews provider={provider}>
         <DataViews.DataTable
+          id="t"
           columns={[{ id: "name", header: "Name" }]}
           label="Machines"
         />
@@ -94,6 +95,7 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
     const html = renderToString(
       <DataViews provider={provider}>
         <DataViews.DataTable
+          id="t"
           columns={[{ id: "name", header: "Name" }]}
           label="Machines"
         />
