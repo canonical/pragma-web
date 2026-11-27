@@ -1,0 +1,365 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import * as Stories from "./GettingStarted.stories.svelte";
+
+<Meta title="Documentation/Getting Started" />
+
+# Getting Started with Forms
+
+The form system provides a `Form` wrapper and a `Field` router. Built-in fields provide value binding, error display, and accessibility; custom components supply their own control. Every value is `$bindable`, a `Form` can hand its fields a form owner (such as `createFormState()`) that holds their state by name, and the layout uses CSS subgrid.
+
+## Installation
+
+```bash
+bun add @canonical/svelte-ds-global-form @canonical/styles
+```
+
+### Import the styles
+
+Two stylesheets are required, imported in your application's root stylesheet:
+
+```css
+/* 1. The global Pragma styles — CSS reset, typography baseline, and the design
+      tokens (colour, spacing, surfaces, states) every component reads. */
+@import url("@canonical/styles");
+
+/* 2. The form styles — input chrome, field layout, and per-component styles. */
+@import url("@canonical/svelte-ds-global-form/index.css");
+```
+
+Both are needed: the form stylesheet styles the inputs and field layout, but it
+consumes the design tokens defined by the global `@canonical/styles` — without
+the global import the form renders unstyled (missing colours, spacing, and the
+grid). The form package also builds on `@canonical/svelte-ds-global`.
+
+## Basic form
+
+A form needs a grid parent, a `Form` wrapper, and one or more `Field` components:
+
+<Canvas of={Stories.BasicForm} />
+
+### Why a grid parent?
+
+`Form` renders as a CSS subgrid (`grid-template-columns: subgrid; grid-column: 1 / -1`). It inherits column tracks from its parent grid rather than creating its own. This means the form's fields align with the page grid — labels, inputs, and error messages participate in the same column structure as surrounding content.
+
+## The Form component
+
+`Form` renders the form markup and passes native attributes, handlers and
+attachments through to the `<form>`.
+
+**Without an owner** the form is native. Each field holds its own value, the
+browser submits the form's entries, and its native validation blocks a submit
+with a missing required value. Give a field a starting `value`, or bind it to
+your own `$state` with `bind:value`. Use this for a form posted to a server, for
+example a SvelteKit action through `use:enhance` written as an attachment, and
+for a page that must work without JavaScript.
+
+```svelte
+<script lang="ts">
+  import { enhance } from "$app/forms";
+  import { fromAction } from "svelte/attachments";
+
+  let { form } = $props(); // the action's result
+</script>
+
+<Form method="POST" {@attach fromAction(enhance)}>
+  <Field name="name" inputType="text" label="Full name" value="Ada" />
+  <Field name="email" inputType="text" label="Email address" error={form?.errors?.email} />
+  <Button type="submit">Send</Button>
+</Form>
+```
+
+**With an owner**, every `Field` inside reads and writes its value, error and
+blur through the owner by `name`, and the owner sees each submit first, so it
+can stop an invalid one. `createFormState()` is the package's owner, opted into
+per form. Like React's `Form`, it has two modes:
+
+**Internal mode** (simple) — create the owner inline. Pass `onSubmit`, and
+optionally `defaultValues`, `validate` and a validation `mode`.
+
+```svelte
+<Form
+  owner={createFormState({
+    mode: "onBlur",
+    defaultValues: { name: "Ada", email: "" },
+    validate: (values) => ({ email: values.email ? undefined : "Email is required" }),
+    onSubmit: (values) => console.log(values),
+  })}
+>
+  <Field name="name" inputType="text" label="Full name" />
+  <Field name="email" inputType="text" label="Email address" />
+  <Button type="submit">Send</Button>
+</Form>
+```
+
+<Canvas of={Stories.InternalMode} />
+
+**External mode** (advanced) — keep the owner, so you can read `isSubmitting`
+and call `reset`. Reach for this when a submit is async, when the form state is
+shared across components, or for multi-step / wizard forms that keep one owner
+across steps.
+
+```svelte
+<script lang="ts">
+  import { createFormState, Field, Form } from "@canonical/svelte-ds-global-form";
+
+  const owner = createFormState({
+    defaultValues: { name: "", email: "" },
+    onSubmit: async (values) => {
+      await api.createUser(values); // your async call
+      owner.reset(); // clear back to defaultValues after a successful submit
+    },
+  });
+</script>
+
+<Form {owner}>
+  <Field name="name" inputType="text" label="Full name" />
+  <Field name="email" inputType="text" label="Email address" />
+  <Button type="submit" disabled={owner.isSubmitting}>
+    {owner.isSubmitting ? "Saving…" : "Send"}
+  </Button>
+</Form>
+```
+
+<Canvas of={Stories.ExternalMode} />
+
+An explicit `bind:value` or `error` on a field wins over the owner.
+
+### createFormState
+
+`createFormState(options)` holds `values`, `errors` and `touched` in `$state`,
+and reads them reactively. Its options follow react-hook-form's `useForm`:
+
+- `defaultValues`: the initial values, restored by `reset()`.
+- `validate(values)`: returns the messages of the invalid fields.
+- `mode`: when to validate. `"onSubmit"` (default) validates on submit only;
+  `"onChange"` on every change; `"onBlur"` when a field is left; `"onTouched"`
+  when a field is first left, then on its every change. After the first submit,
+  every mode validates a field again on its every change.
+- `onSubmit(values)`: called on a valid submit instead of posting. Leave it
+  unset and a valid form posts natively, for example to a SvelteKit action.
+
+An invalid submit does not post, and its first invalid control is focused. The
+browser's own validation runs before the owner's, so a missing required value
+shows the browser's message; add `novalidate` to the `Form` to show the owner's
+message instead. The owner also exposes `isSubmitted` and `isSubmitting`.
+
+The owner sees each submit before the form's other submit listeners, and a
+submit it stops reaches `onsubmit` but none of them. So with SvelteKit's
+`enhance`, leave `onSubmit` unset: an invalid form is stopped before `enhance`
+posts it, and a valid one is posted by `enhance`.
+
+## Understanding form owners
+
+An owner is the smallest contract a `Form` needs. Only `values` and `setValue`
+are required; the rest are optional:
+
+```ts
+type FormOwner<Values> = {
+  readonly values: Values; // read reactively by the fields
+  setValue(name, value): void; // `undefined` drops the value
+  getError?(name): string | undefined; // every message shows at once
+  blur?(name): void; // called when the user leaves the field
+  submit?(event): void; // sees each submit first; may prevent it
+};
+```
+
+There is no `subscribe`: every read must be reactive under runes, as reads of a
+`$state` object are. A field shows every error the owner returns, so when errors
+appear (on change, on blur, after a submit) is the owner's business.
+
+### Form libraries
+
+A form library whose state is not reactive under runes is adapted with
+`createBinding`, which subscribes the reading effects to the library's store.
+TanStack Form is one: its Svelte adapter's `form.state` does not update runes
+on its own.
+
+```ts
+import { createForm } from "@tanstack/svelte-form";
+import { createBinding } from "@canonical/svelte-ds-global-form";
+
+const form = createForm(() => ({ defaultValues: { email: "" } }));
+const owner = createBinding({
+  getValues: () => form.state.values,
+  setValue: (name, value) => form.setFieldValue(name, value),
+  subscribe: (notify) => form.store.subscribe(notify).unsubscribe,
+  getError: (name) => form.getFieldMeta(name)?.errors.at(0),
+  blur: (name) => form.setFieldMeta(name, (meta) => ({ ...meta, isBlurred: true })),
+});
+// <Form {owner} …> — validation, reset and submission stay TanStack's
+```
+
+### Asynchronous checks
+
+`createValidatedBinding(owner, checks)` adds asynchronous checks to an owner that
+can `reset`, such as a server lookup. Every write to a checked field starts its
+check, and the field keeps its previous message until the check settles; a
+check that fails (for example offline) keeps it too, as in React. Only the
+latest check counts, `reset` cancels them, a submit is stopped while a check's
+message shows, and `validate()` waits for every check. `runLatest(work)` is the
+latest-only runner underneath, for your own asynchronous work.
+
+```ts
+const owner = createValidatedBinding(createFormState(), {
+  username: async (value, signal) => {
+    const response = await fetch(`/api/usernames/${value}`, { signal });
+    return response.ok ? "That username is taken" : undefined;
+  },
+});
+```
+
+### Outside a form
+
+A field outside a `Form` with an owner binds to an owner with a function binding,
+and spreads `bindField(owner, name)` for the error and the blur handler. Hand
+the form's submit to the owner yourself:
+
+```svelte
+<Form onsubmit={owner.submit}>
+  <Field
+    name="email"
+    inputType="email"
+    label="Email"
+    bind:value={() => owner.values.email, (value) => owner.setValue("email", value)}
+    {...bindField(owner, "email")}
+  />
+</Form>
+```
+
+## The Field component
+
+`Field` is a type-safe router. The `inputType` prop selects the underlying input component, and TypeScript enforces that only valid props for that input type are accepted:
+
+<Canvas of={Stories.InputTypes} />
+
+Built-in fields use internal wrappers that provide:
+
+- Label rendering and `<label>` association
+- Description text (the `description` prop)
+- Error message display when validation fails
+- ARIA attributes (`aria-labelledby`, `aria-describedby`, `aria-errormessage`, `aria-invalid`)
+- A bindable `value` whose type follows `inputType`, read from the form owner by `name` when there is one
+
+Custom components render their own label, description and error, and bind their own `value`.
+
+## Input types
+
+<table>
+  <thead>
+    <tr>
+      <th>inputType</th>
+      <th>Component</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>"text"</code></td><td>TextField</td><td>Single-line text, also handles <code>"email"</code>, <code>"url"</code>, <code>"tel"</code></td></tr>
+    <tr><td><code>"password"</code></td><td>PasswordField</td><td>Password with a visibility toggle</td></tr>
+    <tr><td><code>"number"</code></td><td>NumberField</td><td>Number, bound as a number (or <code>null</code> while empty)</td></tr>
+    <tr><td><code>"textarea"</code></td><td>TextareaField</td><td>Multi-line text</td></tr>
+    <tr><td><code>"select"</code></td><td>SelectField</td><td>Native dropdown with <code>options</code> array</td></tr>
+    <tr><td><code>"checkbox"</code></td><td>CheckboxField</td><td>Single boolean toggle</td></tr>
+    <tr><td><code>"switch"</code></td><td>SwitchField</td><td>Single boolean toggle, as a switch</td></tr>
+    <tr><td><code>"choices"</code></td><td>ChoicesField</td><td>Radio buttons (single) or checkboxes (multiple) from <code>options</code></td></tr>
+    <tr><td><code>"rich-choices"</code></td><td>RichChoicesField</td><td>Radio/checkbox groups with rich option content</td></tr>
+    <tr><td><code>"combobox"</code></td><td>ComboboxField</td><td>Searchable select with filtering (work in progress)</td></tr>
+    <tr><td><code>"range"</code></td><td>RangeField</td><td>Numeric slider with <code>min</code> and <code>max</code></td></tr>
+    <tr><td><code>"date"</code></td><td>DateField</td><td>HTML5 date picker</td></tr>
+    <tr><td><code>"time"</code></td><td>TimeField</td><td>HTML5 time picker</td></tr>
+    <tr><td><code>"datetime"</code></td><td>DateTimeField</td><td>HTML5 datetime-local picker</td></tr>
+    <tr><td><code>"file"</code></td><td>FileUploadField</td><td>File picker with validation (<code>accept</code>, <code>maxSize</code>, <code>maxFiles</code>)</td></tr>
+    <tr><td><code>"color"</code></td><td>ColorField</td><td>Color picker with swatches and optional hex input (work in progress)</td></tr>
+    <tr><td><code>"phone"</code></td><td>PhoneField</td><td>International phone with country selector</td></tr>
+    <tr><td><code>"hidden"</code></td><td>HiddenField</td><td>Hidden form value (no visible UI)</td></tr>
+    <tr><td><code>"custom"</code></td><td>Your component</td><td>Custom input via the <code>component</code> prop</td></tr>
+  </tbody>
+</table>
+
+## Validation
+
+Validation messages come from the owner's `getError`, or from an explicit `error` prop such as a SvelteKit action result. The owner below validates a field when it is left (`mode: "onBlur"`) and every field on submit. Try leaving the fields empty to see error states:
+
+<Canvas of={Stories.WithValidation} />
+
+When validation fails, the field's wrapper applies a `.danger` class that shifts the input border to the error color, and the error message is rendered below the input with proper ARIA association.
+
+### Optional fields
+
+By default, fields are required. Mark a field as optional with the `isOptional` prop.
+
+## Middleware
+
+Native attributes, handlers and attachments on a `Field` are spread onto its
+control, so behaviour that changes the element is a Svelte attachment passed with
+`{@attach}`. Options are data: compute an `options` array in the application (a
+SvelteKit `load` for server rendering, an `$effect` to refetch) and pass it in.
+
+```svelte
+<Field
+  name="country"
+  inputType="select"
+  label="Country"
+  options={data.countries}
+  {@attach trackChanges}
+/>
+```
+
+## Conditional fields
+
+Fields can be shown or hidden based on other field values using the `condition` prop. Select "Company" below to reveal the company name field:
+
+<Canvas of={Stories.ConditionalField} />
+
+The `condition` prop takes a predicate. Inside a `Form` with an owner it receives the owner's values; otherwise it closes over your own `$state`. Runes track what it reads, so there is no dependency list. The field renders only when the predicate returns `true`; a hidden field is not submitted, and a field that becomes hidden drops its value (from the owner, or from your binding).
+
+## Form layout
+
+Forms inherit their column structure from the parent grid via subgrid. By default, labels stack above inputs (full-width fields). For side-by-side layout, use the `.form-layout-side` class:
+
+<Canvas of={Stories.SideLayout} />
+
+The layout is controlled by CSS custom properties:
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Default</th>
+      <th>Side layout</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>--form-label-columns</code></td><td><code>1 / -1</code> (full width)</td><td><code>1 / 3</code></td></tr>
+    <tr><td><code>--form-payload-columns</code></td><td><code>1 / -1</code> (full width)</td><td><code>3 / -1</code></td></tr>
+    <tr><td><code>--form-field-columns</code></td><td><code>1 / -1</code></td><td>Same</td></tr>
+  </tbody>
+</table>
+
+## Error state styling
+
+Form error states use a CSS class-based mechanism rather than modifier channel variables. When a field has a validation error:
+
+1. The `Wrapper` component adds a `.danger` class to the field container
+2. CSS targets `.danger > .payload .ds.input.chrome` to shift the border to the error color
+3. The error message renders below the input with `aria-errormessage` association
+
+This is a deliberate architectural choice. Form validation states are binary (valid/invalid) and driven by the form's error source, not by semantic modifier context. The form error mechanism and the modifier system are complementary but independent.
+
+## Custom fields
+
+For inputs not covered by the built-in types, use `inputType="custom"` with a `component`:
+
+```svelte
+<script lang="ts">
+  import { Field } from "@canonical/svelte-ds-global-form";
+  import MyDateRange from "./MyDateRange.svelte";
+</script>
+
+<Field name="period" inputType="custom" component={MyDateRange} label="Date range" />
+```
+
+Custom components receive every prop but `inputType` and `component` (the field `name`, `label`, `description`, `error` and any extra props, plus the owner's error and blur under a `Form` owner), bind their `value`, and render their own label, description and error, as React's `CustomComponent` does. See the [Creating Custom Fields](?path=/docs/global-form-guides-creating-custom-fields--docs) guide for implementation details.
+
+## Further reading
+
+- [Creating Custom Fields](?path=/docs/global-form-guides-creating-custom-fields--docs) — step-by-step custom input implementation

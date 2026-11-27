@@ -27,9 +27,6 @@
       description: "Supporting help text for this field.",
     },
   });
-
-  // The company field's condition reads the email field's bound value.
-  let email = $state("");
 </script>
 
 <Story name="Default" args={{ name: "full_name", inputType: "text" }} />
@@ -126,14 +123,13 @@ which owns its form binding and accessible label. -->
         inputType="text"
         description="Enter an email address ending with `@gmail.com` and you will be prompted for the company."
         label="Email"
-        bind:value={email}
       />
       <Component
         name="company"
         inputType="text"
         label="Company"
         isOptional
-        condition={() => email.endsWith("@gmail.com")}
+        condition={(values) => String(values.email ?? "").endsWith("@gmail.com")}
       />
     </div>
   {/snippet}

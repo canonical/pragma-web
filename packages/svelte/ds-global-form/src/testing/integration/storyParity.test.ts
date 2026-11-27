@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { storyFilePairs } from "../fixtures.storyParity.js";
+import { storyFilePairs, svelteOnlyStories } from "../fixtures.storyParity.js";
 import { readReactStories, readSvelteStories } from "../readStoryInventory.js";
 
 const reactSource = new URL(
@@ -16,10 +16,15 @@ describe("Story parity with the React form package", () => {
       const expected = readReactStories(
         readFileSync(new URL(react, reactSource), "utf8"),
       );
-      const actual = readSvelteStories(
+      const { title, names } = readSvelteStories(
         readFileSync(new URL(svelte, svelteSource), "utf8"),
       );
-      expect(actual).toEqual(expected);
+      const extras = svelteOnlyStories[svelte] ?? [];
+      expect(names.slice(names.length - extras.length)).toEqual(extras);
+      expect({
+        title,
+        names: names.slice(0, names.length - extras.length),
+      }).toEqual(expected);
     },
   );
 });
