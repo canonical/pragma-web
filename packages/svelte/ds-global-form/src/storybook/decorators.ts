@@ -7,9 +7,9 @@ interface FormDecoratorParams {
 }
 
 /**
- * Wraps a story in the Form shell (`form.ds.form.subgrid`), as a field would
- * sit in a form. There is no form owner yet: stories pass values and errors
- * to the fields directly.
+ * Wraps a story in a Form (`form.ds.form.subgrid`) with its own owner, as a
+ * field would sit in a form. A story's own `value` or `error` wins over the
+ * owner.
  */
 export const form =
   ({ className }: FormDecoratorParams = {}) =>

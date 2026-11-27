@@ -73,6 +73,11 @@ export const storyFilePairs: ReadonlyArray<readonly [string, string]> = [
     "lib/pattern/Field/Field.stories.tsx",
     "lib/pattern/Field/Field.stories.svelte",
   ],
+  ["lib/pattern/Form/Form.stories.tsx", "lib/pattern/Form/Form.stories.svelte"],
+  [
+    "lib/utils/middleware/middleware.stories.tsx",
+    "lib/utils/middleware/middleware.stories.svelte",
+  ],
   ...["ColorField", "ComboboxField", "RatingField"].map(
     (name) =>
       [
@@ -99,8 +104,17 @@ export const storyFilePairs: ReadonlyArray<readonly [string, string]> = [
     "lib/_work_in_progress/DensityTestbed/DensityTestbed.stories.svelte",
   ],
   ["docs/Surfaces.stories.tsx", "docs/Surfaces.stories.svelte"],
+  ["docs/GettingStarted.stories.tsx", "docs/GettingStarted.stories.svelte"],
   [
     "docs/examples/DensityExamples.stories.tsx",
     "docs/examples/DensityExamples.stories.svelte",
   ],
 ];
+
+/**
+ * Stories a Svelte file adds to its React counterpart, by Svelte path. Binding
+ * a field to an owner outside a `Form` has no React equivalent.
+ */
+export const svelteOnlyStories: Readonly<Record<string, readonly string[]>> = {
+  "lib/pattern/Form/Form.stories.svelte": ["Bind Field"],
+};

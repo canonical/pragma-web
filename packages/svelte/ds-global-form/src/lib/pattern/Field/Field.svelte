@@ -18,9 +18,35 @@
   import { TextareaField } from "../../component/TextareaField/index.js";
   import { TextField } from "../../component/TextField/index.js";
   import { TimeField } from "../../component/TimeField/index.js";
+  import { getFormOwnerContext } from "../../utils/owner/formOwnerContext.js";
   import type { FieldProps } from "./types.js";
 
   let { value = $bindable(), ...props }: FieldProps<Extra, Value> = $props();
+
+  const readOwner = getFormOwnerContext();
+  const owner = $derived(readOwner());
+  // Inside a form with an owner, the field binds to the owner's value by name,
+  // unless the caller binds a defined value of its own.
+  const valueOwner = $derived(value === undefined ? owner : undefined);
+
+  /**
+   * Adds the owner's error (when no `error` is passed) and blur to a field's
+   * props. Any owner error shows: when errors exist is the owner's business.
+   */
+  const withOwner = (rest: Record<string, unknown>) => {
+    if (!owner) return rest;
+    const ownerOf = owner;
+    const name = props.name;
+    const onblur = rest.onblur as ((event: FocusEvent) => void) | undefined;
+    return {
+      ...rest,
+      error: rest.error ?? ownerOf.getError?.(name),
+      onblur: (event: FocusEvent) => {
+        onblur?.(event);
+        ownerOf.blur?.(name);
+      },
+    };
+  };
 
   // The field owns the native input type: `inputType` routes and `type` is
   // dropped, so neither reaches the control.
@@ -31,13 +57,16 @@
       type: _type,
       ...rest
     } = props as Record<string, unknown>;
-    return rest;
+    return withOwner(rest);
   });
   // The bound value's type follows `inputType`, which the branches below
-  // narrow; these accessors carry it across without a cast per branch.
-  const getValue = () => value as never;
+  // narrow; these accessors carry it across without a cast per branch, and
+  // read and write the owner's value when the field is owned.
+  const getValue = () =>
+    (valueOwner ? valueOwner.values[props.name] : value) as never;
   const setValue = (next: unknown) => {
-    value = next as typeof value;
+    if (valueOwner) valueOwner.setValue(props.name, next);
+    else value = next as typeof value;
   };
   // A custom component gets every prop but the routing ones, and renders its
   // own label, description and error, as React's `CustomComponent` does.
@@ -48,7 +77,7 @@
       component,
       ...forwarded
     } = props as Record<string, unknown>;
-    return { component, forwarded };
+    return { component, forwarded: withOwner(forwarded) };
   });
 </script>
 

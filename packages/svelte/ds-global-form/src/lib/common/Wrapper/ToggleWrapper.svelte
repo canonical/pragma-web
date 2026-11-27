@@ -6,6 +6,7 @@
   } from "../../subcomponent/Field/index.js";
   import type { ToggleWrapperProps } from "../types.js";
   import useConditionalDisplay from "../useConditionalDisplay.svelte.js";
+  import useNativeValidity from "../useNativeValidity.svelte.js";
   import createControlProps from "./createControlProps.js";
   import "./styles.css";
   import "./ToggleWrapper.css";
@@ -31,7 +32,11 @@
 
   const uid = $props.id();
   const baseId = $derived(`${uid}-${name}`);
-  const isError = $derived(Boolean(error));
+  // Without an `error`, the field shows its control's native validation
+  // message once the control was invalid.
+  const nativeValidity = useNativeValidity();
+  const shownError = $derived(error ?? nativeValidity.message);
+  const isError = $derived(Boolean(shownError));
   // Toggle controls are not natively required: the label marker and
   // `aria-required` convey the field's optionality.
   const controlProps = $derived({
@@ -48,7 +53,7 @@
   );
 </script>
 
-{#if display.isVisible}<div {id} {style} class={[componentCssClassName, className, isError && "danger"]}>{#if headingLabel}<Label {name} tag="span" class="field-toggle-heading">{headingLabel}</Label>{/if}<!-- DOM order stays control-then-label; `labelPosition: "before"` moves
+{#if display.isVisible}<div {id} {style} class={[componentCssClassName, className, isError && "danger"]} {@attach nativeValidity.follow}>{#if headingLabel}<Label {name} tag="span" class="field-toggle-heading">{headingLabel}</Label>{/if}<!-- DOM order stays control-then-label; `labelPosition: "before"` moves
          the label visually through CSS, keeping the accessible order stable. --><div class={["field-toggle-control", `label-${labelPosition}`]}
       >{@render children(controlProps)}<Label
         {name}
@@ -59,7 +64,7 @@
       >{inlineLabel || name}</Label
     ></div
     >{#if description}<Description id={`${baseId}-description`}>{description}</Description
-    >{/if}{#if isError}<FieldError id={`${baseId}-error`}>{error}</FieldError
+    >{/if}{#if isError}<FieldError id={`${baseId}-error`}>{shownError}</FieldError
     >{/if}</div
 >{/if}
 
