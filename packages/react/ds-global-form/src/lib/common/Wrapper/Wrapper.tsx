@@ -1,6 +1,5 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
 import type React from "react";
-import { useMemo } from "react";
 import { states } from "../../constants.js";
 import {
   Description,
@@ -36,6 +35,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
 
   descriptionPosition = "leading",
   mockLabel = false,
+  errorSlot = "payload",
   ...otherProps
 }: WrapperProps<ComponentProps>): React.ReactElement => {
   const { fieldError, isError, ariaProps, registerProps } = useFieldWrapper(
@@ -50,17 +50,22 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
     },
   );
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: -
-  const componentProps = useMemo(
-    () => ({
-      name,
-      registerProps,
-      ...ariaProps.input,
-      ...otherProps,
-      required: !isOptional,
-    }),
-    [name, registerProps, ariaProps.input],
-  ) as unknown as ComponentProps;
+  const fieldErrorElement = isError && (
+    <FieldError {...ariaProps.error}>
+      {fieldError?.message?.toString()}
+    </FieldError>
+  );
+
+  // Computed inline (not memoised) so `...otherProps` — disabled, onChange,
+  // etc. — never goes stale between renders.
+  const componentProps = {
+    name,
+    registerProps,
+    ...ariaProps.input,
+    ...otherProps,
+    required: !isOptional,
+    ...(errorSlot === "input" ? { error: fieldErrorElement || undefined } : {}),
+  } as unknown as ComponentProps;
 
   return (
     <div
@@ -87,11 +92,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
         {descriptionPosition === "trailing" && description && (
           <Description {...ariaProps.description}>{description}</Description>
         )}
-        {isError && (
-          <FieldError {...ariaProps.error}>
-            {fieldError?.message?.toString()}
-          </FieldError>
-        )}
+        {errorSlot === "payload" && fieldErrorElement}
       </div>
     </div>
   );

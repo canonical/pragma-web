@@ -92,6 +92,12 @@ export type WrapperProps<ComponentProps> = BaseWrapperProps<ComponentProps> & {
   /* Render the label as plain text, not a <label>: for a group whose options
    * carry their own labels. The group references it with aria-labelledby. */
   mockLabel?: boolean;
+
+  /* Where the field error renders. "payload" (default) — after the input, in
+   * the payload; "input" — handed to the input as its `error` prop, for an
+   * input whose anatomy places the error among its own parts (the file
+   * upload renders it under its drop area). */
+  errorSlot?: "payload" | "input";
 } & ComponentProps;
 
 export type Middleware<ComponentProps> = (
