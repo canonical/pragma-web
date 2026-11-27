@@ -1,6 +1,6 @@
 import type { Locator } from "@vitest/browser/context";
 import type { ComponentProps } from "svelte";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, onTestFinished } from "vitest";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import Component from "./Link.svelte";
@@ -46,6 +46,10 @@ describe("Link component", () => {
     it("inherits parent color when appearance is soft", async () => {
       const parentColor = "rgb(255, 0, 0)";
 
+      const previousColor = document.body.style.color;
+      onTestFinished(() => {
+        document.body.style.color = previousColor;
+      });
       document.body.style.color = parentColor;
 
       const page = await render(Component, {

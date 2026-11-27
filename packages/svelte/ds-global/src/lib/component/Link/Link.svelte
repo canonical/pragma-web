@@ -7,8 +7,8 @@
   let { class: className, children, appearance, ...rest }: LinkProps = $props();
 </script>
 
-<a class={[componentCssClassName, className, appearance]} {...rest}>
-  {@render children?.()}
+<a class={[componentCssClassName, appearance, className]} {...rest}>
+  {@render children?.()}wh
 </a>
 
 <!-- @component

@@ -3,7 +3,7 @@
     text-decoration: none;
     color: var(--color-text-link);
 
-    &:visited {
+    &:not(.soft):visited {
       color: var(--color-text-link-visited);
     }
 
