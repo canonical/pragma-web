@@ -78,15 +78,14 @@
   });
 
   // Latest wins: a value changed while its lookup is pending discards the
-  // stale answer. While a lookup is pending nothing is shown as selected; the
-  // hidden input already carries the value.
+  // stale answer (the effect's cleanup cancels it). While a lookup is pending
+  // nothing is shown as selected; the hidden input already carries the value.
   const lookups = runLatest((lookup: Promise<Option | null>) => lookup);
 
   /** Selects the item of a value set from outside, looking it up first. */
   const reflectValue = (current: string | undefined) => {
     const pending = pendingInitialLookup;
     pendingInitialLookup = null;
-    lookups.cancel();
     if (current === combobox.selectedItem?.[valueKey]) return;
     const lookup =
       current === undefined
@@ -106,6 +105,8 @@
   $effect(() => {
     const current = value;
     untrack(() => reflectValue(current));
+    // A lookup still pending when the combobox goes away is discarded.
+    return () => lookups.cancel();
   });
 
   let inputElement: HTMLInputElement | undefined = $state();

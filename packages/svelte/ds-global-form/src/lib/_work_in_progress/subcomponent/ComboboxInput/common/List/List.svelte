@@ -38,7 +38,7 @@
   };
 </script>
 
-<ul popover="manual" class={[componentCssClassName, className]} {style} {...menu} {@attach togglePopover}>{#each items as item, index (item[valueKey])}<li {...getItem(index)} class={["p", highlightedIndex === index && "highlighted", isSelected(item) && "selected"]}>{convertItemToString(item)}</li>{/each}</ul>
+<ul popover="manual" class={[componentCssClassName, className]} {style} {...menu} {@attach togglePopover}>{#each items as item, index}<li {...getItem(index)} class={["p", highlightedIndex === index && "highlighted", isSelected(item) && "selected"]}>{convertItemToString(item)}</li>{/each}</ul>
 
 <!-- @component
 The popover listbox of a combobox. It spreads the builder's `menu` and

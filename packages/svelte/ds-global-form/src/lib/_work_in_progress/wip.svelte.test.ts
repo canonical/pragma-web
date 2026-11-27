@@ -253,6 +253,20 @@ describe("List and ResetButton", () => {
       .toBe(true);
   });
 
+  it("lists options that share a value, as React does", async () => {
+    const page = await render(List, {
+      items: [options[0], { ...options[0], label: "Apple again" }],
+      menu,
+      getItem,
+      highlightedIndex: -1,
+      convertItemToString: (item) => item?.label ?? "",
+      fieldValue: undefined,
+      valueKey: "value",
+      isOpen: false,
+    });
+    expect(page.container.querySelectorAll("li")).toHaveLength(2);
+  });
+
   it("renders the design system's primary button, named from its messages", async () => {
     const page = await render(ResetButton, {
       onclick: vi.fn(),
