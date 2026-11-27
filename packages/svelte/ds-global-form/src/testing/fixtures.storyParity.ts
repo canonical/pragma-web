@@ -1,0 +1,106 @@
+/**
+ * The React story files this package mirrors, each paired with its Svelte
+ * counterpart. Paths are relative to each package's `src/`; both packages keep
+ * work-in-progress inputs under `_work_in_progress/`.
+ */
+export const storyFilePairs: ReadonlyArray<readonly [string, string]> = [
+  [
+    "lib/common/Wrapper/Wrapper.stories.tsx",
+    "lib/common/Wrapper/Wrapper.stories.svelte",
+  ],
+  ...[
+    "CheckboxInput",
+    "DateInput",
+    "DateTimeInput",
+    "FileUploadInput",
+    "HiddenInput",
+    "NumberInput",
+    "PasswordInput",
+    "PhoneInput",
+    "RadioInput",
+    "RangeInput",
+    "SelectInput",
+    "SwitchInput",
+    "TextareaInput",
+    "TextInput",
+    "TimeInput",
+  ].map(
+    (name) =>
+      [
+        `lib/subcomponent/${name}/${name}.stories.tsx`,
+        `lib/subcomponent/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  ...["Description", "Error", "Label"].map(
+    (name) =>
+      [
+        `lib/subcomponent/Field/${name}/${name}.stories.tsx`,
+        `lib/subcomponent/Field/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  ...[
+    "CheckboxField",
+    "ChoicesField",
+    "DateField",
+    "DateTimeField",
+    "FileUploadField",
+    "HiddenField",
+    "NumberField",
+    "PasswordField",
+    "PhoneField",
+    "RangeField",
+    "RichChoicesField",
+    "SelectField",
+    "SwitchField",
+    "TextareaField",
+    "TextField",
+    "TimeField",
+  ].map(
+    (name) =>
+      [
+        `lib/component/${name}/${name}.stories.tsx`,
+        `lib/component/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  ...["ChoicesField", "RichChoicesField"].map(
+    (name) =>
+      [
+        `lib/component/${name}/common/Option/Option.stories.tsx`,
+        `lib/component/${name}/common/Option/Option.stories.svelte`,
+      ] as const,
+  ),
+  [
+    "lib/pattern/Field/Field.stories.tsx",
+    "lib/pattern/Field/Field.stories.svelte",
+  ],
+  ...["ColorField", "ComboboxField", "RatingField"].map(
+    (name) =>
+      [
+        `lib/_work_in_progress/component/${name}/${name}.stories.tsx`,
+        `lib/_work_in_progress/component/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  ...["ColorInput", "ComboboxInput", "RatingInput"].map(
+    (name) =>
+      [
+        `lib/_work_in_progress/subcomponent/${name}/${name}.stories.tsx`,
+        `lib/_work_in_progress/subcomponent/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  ...["List", "ResetButton"].map(
+    (name) =>
+      [
+        `lib/_work_in_progress/subcomponent/ComboboxInput/common/${name}/${name}.stories.tsx`,
+        `lib/_work_in_progress/subcomponent/ComboboxInput/common/${name}/${name}.stories.svelte`,
+      ] as const,
+  ),
+  [
+    "lib/_work_in_progress/DensityTestbed/DensityTestbed.stories.tsx",
+    "lib/_work_in_progress/DensityTestbed/DensityTestbed.stories.svelte",
+  ],
+  ["docs/Surfaces.stories.tsx", "docs/Surfaces.stories.svelte"],
+  [
+    "docs/examples/DensityExamples.stories.tsx",
+    "docs/examples/DensityExamples.stories.svelte",
+  ],
+];

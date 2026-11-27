@@ -1,0 +1,136 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Guides/Creating Custom Fields" />
+
+# Creating Custom Fields
+
+`Field` renders a custom `component` directly, passing its props except `inputType` and `component`, and binding its `value`. It does not add labels, descriptions, errors, conditional display or middleware to a custom component. Implement the capabilities your field needs. `Wrapper` and its helpers are internal and are not package exports.
+
+For example, this component binds its own input and supplies its own label and validation message:
+
+```svelte
+<!-- CodeField.svelte -->
+<script lang="ts">
+  import type { CustomControlProps } from "@canonical/svelte-ds-global-form";
+
+  let {
+    name,
+    label,
+    error,
+    value = $bindable(""),
+    maxCharacters,
+  }: CustomControlProps<string> & { maxCharacters: number } = $props();
+
+  const errorId = `${name}-error`;
+</script>
+
+<div>
+  <label for={name}>{label}</label>
+  <input
+    id={name}
+    {name}
+    maxlength={maxCharacters}
+    aria-invalid={Boolean(error)}
+    aria-describedby={error ? errorId : undefined}
+    bind:value
+  />
+  {#if error}<p id={errorId} role="alert">{error}</p>{/if}
+</div>
+```
+
+```svelte
+<!-- Example.svelte -->
+<script lang="ts">
+  import { Field, Form } from "@canonical/svelte-ds-global-form";
+  import CodeField from "./CodeField.svelte";
+
+  let code = $state("");
+  const error = $derived(
+    code.length > 0 && code.length < 8 ? "Enter all 8 characters" : undefined,
+  );
+</script>
+
+<Form method="POST">
+  <Field inputType="custom" component={CodeField} name="code"
+    label="Code" maxCharacters={8} {error} bind:value={code} />
+  <button type="submit">Submit</button>
+</Form>
+```
+
+The component's props are inferred in the markup: required custom props and their types are checked. `inputType` and `component` are reserved and cannot be custom component props. For a typed field map, supply the custom component's extra props (and its value type) to `FieldProps`:
+
+```svelte
+<script lang="ts">
+  import { Field, type FieldProps } from "@canonical/svelte-ds-global-form";
+  import CodeField from "./CodeField.svelte";
+
+  type CodeExtra = { maxCharacters: number };
+
+  const fields = [
+    { inputType: "text", name: "title", label: "Title" },
+    { inputType: "custom", component: CodeField, name: "code", label: "Code", maxCharacters: 8 },
+  ] satisfies FieldProps<CodeExtra, string>[];
+</script>
+
+{#each fields as field (field.name)}
+  <Field {...field} />
+{/each}
+```
+
+For a map with different custom components, use a separate discriminant to preserve each component/props pair. For example, alongside `CodeField` above:
+
+```svelte
+<!-- PrefixField.svelte -->
+<script lang="ts">
+  import type { CustomControlProps } from "@canonical/svelte-ds-global-form";
+
+  let {
+    name,
+    label,
+    value = $bindable(""),
+    prefix,
+  }: CustomControlProps<string> & { prefix: string } = $props();
+</script>
+
+<label>
+  {label}
+  <input {name} placeholder={prefix} bind:value />
+</label>
+```
+
+```svelte
+<script lang="ts">
+  import { Field, type FieldProps } from "@canonical/svelte-ds-global-form";
+  import CodeField from "./CodeField.svelte";
+  import PrefixField from "./PrefixField.svelte";
+
+  type CodeExtra = { maxCharacters: number };
+  type PrefixExtra = { prefix: string };
+
+  type Definition =
+    | { kind: "builtin"; field: Exclude<FieldProps, { inputType: "custom" }> }
+    | { kind: "code"; field: Extract<FieldProps<CodeExtra, string>, { inputType: "custom" }> }
+    | { kind: "prefix"; field: Extract<FieldProps<PrefixExtra, string>, { inputType: "custom" }> };
+
+  const definitions: Definition[] = [
+    { kind: "builtin", field: { inputType: "text", name: "title", label: "Title" } },
+    { kind: "code", field: { inputType: "custom", component: CodeField, name: "code", label: "Code", maxCharacters: 8 } },
+    { kind: "prefix", field: { inputType: "custom", component: PrefixField, name: "prefix", label: "Prefix", prefix: "Example" } },
+  ];
+</script>
+
+<!-- Render inside a Form: -->
+{#each definitions as definition (definition.field.name)}
+  {#if definition.kind === "builtin"}
+    <Field {...definition.field} />
+  {:else if definition.kind === "code"}
+    <Field {...definition.field} />
+  {:else}
+    <Field {...definition.field} />
+  {/if}
+{/each}
+```
+
+`inputType` alone cannot distinguish different custom variants, and spreading their heterogeneous union into `Field` does not infer a single matching props type. `FieldProps` without type arguments accepts custom components with no extra props and any value. Field names are strings, not paths inferred from a form model.
+
+For third-party controls, bind or forward the component's `value` to the control's own value and change events. Forward accessibility attributes to the focusable control and provide suitable labels and error relationships.

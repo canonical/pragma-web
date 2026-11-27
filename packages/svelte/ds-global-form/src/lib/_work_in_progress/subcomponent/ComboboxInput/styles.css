@@ -1,0 +1,73 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.form-combobox {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto;
+
+    & > .selected-items {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-050);
+      margin-block-end: var(--space-050);
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    & > .ds.input.combobox-input {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      anchor-name: --combobox-input;
+      display: flex;
+      align-items: stretch;
+      padding: 0;
+
+      & > input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        outline: none;
+        padding-inline: var(--form-input-padding-inline);
+      }
+
+      & > .ds.combobox-reset-button {
+        flex-shrink: 0;
+      }
+    }
+
+    & > .ds.combobox-list {
+      grid-column: 1 / -1;
+    }
+
+    & > .selected-items > .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      background-color: var(--color-foreground-secondary);
+      border: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+      border-radius: var(--dimension-radius-full, 9999px);
+      font-size: var(--typography-text-secondary-font-size);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background-color var(--motion-duration-fast) ease;
+
+      &:hover {
+        background-color: var(--color-foreground-secondary-hover);
+      }
+
+      & > .remove-icon {
+        font-size: 0.75em;
+        line-height: 1;
+      }
+    }
+  }
+}
