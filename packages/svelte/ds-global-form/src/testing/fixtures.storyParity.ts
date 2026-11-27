@@ -118,3 +118,26 @@ export const storyFilePairs: ReadonlyArray<readonly [string, string]> = [
 export const svelteOnlyStories: Readonly<Record<string, readonly string[]>> = {
   "lib/pattern/Form/Form.stories.svelte": ["Bind Field"],
 };
+
+/**
+ * Stories a React file has that its Svelte counterpart does not mirror yet, by
+ * React path. The file upload's live upload and per-file messages land in
+ * React first; the Svelte port adds these stories and empties this list.
+ */
+export const pendingSvelteStories: Readonly<Record<string, readonly string[]>> =
+  {
+    "lib/subcomponent/FileUploadInput/FileUploadInput.stories.tsx": [
+      "With Files",
+      "Drag Over",
+      "Live",
+      "Uploading",
+      "Upload Failed",
+      "File Messages",
+      "Single File Chosen",
+    ],
+    "lib/component/FileUploadField/FileUploadField.stories.tsx": [
+      "Live",
+      "Upload Failed",
+      "File Messages",
+    ],
+  };
