@@ -1,11 +1,16 @@
 import { flushSync, hydrate, unmount } from "svelte";
-import { describe, expect, it, onTestFinished } from "vitest";
+import { beforeAll, describe, expect, it, onTestFinished } from "vitest";
 import { userEvent } from "vitest/browser";
 import HydrationCombobox from "../../../../testing/HydrationCombobox.fixtures.svelte";
 import HydrationMultipleCombobox from "../../../../testing/HydrationMultipleCombobox.fixtures.svelte";
 import serveFixture from "../../../../testing/serveFixture.js";
+import warmFixtures from "../../../../testing/warmFixtures.js";
 
 describe("ComboboxInput hydration", () => {
+  beforeAll(() =>
+    warmFixtures("HydrationCombobox", "HydrationMultipleCombobox"),
+  );
+
   it("adopts the server markup with the same downshift IDs", async () => {
     const container = await serveFixture("HydrationCombobox");
     const input = container.querySelector(
@@ -23,10 +28,7 @@ describe("ComboboxInput hydration", () => {
 
     const app = hydrate(HydrationCombobox, { target: container });
     flushSync();
-    onTestFinished(() => {
-      unmount(app);
-      container.remove();
-    });
+    onTestFinished(() => unmount(app));
 
     // The server's elements are kept, with the same IDs and wiring.
     expect(container.querySelector('[role="combobox"]')).toBe(input);
@@ -68,10 +70,7 @@ describe("ComboboxInput hydration", () => {
 
     const app = hydrate(HydrationMultipleCombobox, { target: container });
     flushSync();
-    onTestFinished(() => {
-      unmount(app);
-      container.remove();
-    });
+    onTestFinished(() => unmount(app));
 
     // The server's chips are kept, and the keyboard reaches them.
     expect([...container.querySelectorAll(".chip")]).toEqual(chips);

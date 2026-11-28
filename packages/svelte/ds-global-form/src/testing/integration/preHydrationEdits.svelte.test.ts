@@ -1,8 +1,9 @@
 import { flushSync, hydrate, unmount } from "svelte";
-import { describe, expect, it, onTestFinished } from "vitest";
+import { beforeAll, describe, expect, it, onTestFinished } from "vitest";
 import HydrationAdoption from "../HydrationAdoption.fixtures.svelte";
 import HydrationPhone from "../HydrationPhone.fixtures.svelte";
 import serveFixture from "../serveFixture.js";
+import warmFixtures from "../warmFixtures.js";
 
 /** Types into a control as a user would before the page hydrates. */
 function edit(control: Element | null, value: string) {
@@ -16,6 +17,8 @@ function check(control: Element | null, checked: boolean) {
 }
 
 describe("Edits made before hydration", () => {
+  beforeAll(() => warmFixtures("HydrationAdoption", "HydrationPhone"));
+
   it("are kept by every bound control", async () => {
     const container = await serveFixture("HydrationAdoption");
     const byName = (name: string) =>
@@ -40,10 +43,7 @@ describe("Edits made before hydration", () => {
 
     const app = hydrate(HydrationAdoption, { target: container });
     flushSync();
-    onTestFinished(() => {
-      unmount(app);
-      container.remove();
-    });
+    onTestFinished(() => unmount(app));
 
     expect(
       JSON.parse(container.querySelector("output")?.textContent ?? "{}"),
@@ -77,7 +77,6 @@ describe("Edits made before hydration", () => {
       JSON.parse(container.querySelector("output")?.textContent ?? "{}"),
     ).toMatchObject({ text: "server", select: "a", phone: "+15551234" });
     unmount(app);
-    container.remove();
   });
 
   it("keep a phone country or number changed on its own", async () => {
@@ -88,10 +87,7 @@ describe("Edits made before hydration", () => {
     edit(container.querySelector("#number"), "555 0000");
     const app = hydrate(HydrationPhone, { target: container });
     flushSync();
-    onTestFinished(() => {
-      unmount(app);
-      container.remove();
-    });
+    onTestFinished(() => unmount(app));
     expect(
       JSON.parse(container.querySelector("output")?.textContent ?? "{}"),
     ).toEqual({
