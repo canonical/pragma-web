@@ -95,6 +95,68 @@ export const TextContexts: Story = {
   },
 };
 
+/** One button per importance, labelled by it. */
+const ImportanceRow = (args: React.ComponentProps<typeof Component>) => (
+  <div style={{ display: "flex", gap: "var(--dimension-200, 16px)" }}>
+    {MODIFIER_FAMILIES.importance.map((importance) => (
+      <Component key={importance} {...args} importance={importance}>
+        {importance}
+      </Component>
+    ))}
+  </div>
+);
+
+/**
+ * Every importance on a `.contrasted` surface, and again on a `.surface`
+ * nested inside it. The nested surface is the same polarity as the page, so
+ * its buttons must read the page's text colour, not the contrasted one they
+ * would otherwise inherit through `--surface-color-text`.
+ */
+export const OnContrastedSurface: Story = {
+  render: (args) => (
+    <div
+      className="contrasted"
+      style={{
+        display: "grid",
+        gap: "var(--dimension-200, 16px)",
+        background: "var(--surface-color-background)",
+        color: "var(--surface-color-text)",
+        padding: "var(--dimension-300, 24px)",
+      }}
+    >
+      <ImportanceRow {...args} />
+      <div
+        className="surface"
+        style={{
+          background: "var(--surface-color-background)",
+          color: "var(--surface-color-text, var(--color-text))",
+          padding: "var(--dimension-300, 24px)",
+        }}
+      >
+        <ImportanceRow {...args} />
+      </div>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // The label colour is what the shim fixes, so compare the two levels
+    // rather than pinning a token value: a secondary button on the contrasted
+    // surface and the same button on the nested same-polarity surface must
+    // not end up the same colour. Without the shim both inherit the
+    // contrasted text colour and these are equal.
+    const [onContrasted, onNested] = canvas.getAllByRole("button", {
+      name: "secondary",
+    });
+
+    if (!onContrasted || !onNested) {
+      throw new Error("expected a secondary button on each surface");
+    }
+
+    await expect(getComputedStyle(onNested).color).not.toBe(
+      getComputedStyle(onContrasted).color,
+    );
+  },
+};
+
 /** The importance × anticipation grid: importance as rows, the neutral base
  *  plus every anticipation as columns. Shared by the Matrix and DisabledMatrix
  *  stories. */
