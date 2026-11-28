@@ -105,7 +105,7 @@ describe("bundle isolation", () => {
     expect(modules.filter((id) => id.includes("/PaginationBar/"))).toEqual([]);
     expect(css).toContain("data-table");
     expect(css).not.toContain("virtual");
-  }, 60_000);
+  });
 
   it("ships no mock endpoint, query client or story code from the root", async () => {
     const { modules } = await bundle(`export * from ${quotePath("index.ts")};`);
@@ -120,7 +120,7 @@ describe("bundle isolation", () => {
         ),
       ),
     ).toEqual([]);
-  }, 60_000);
+  });
 
   it("loads the body without the table it is rendered into", async () => {
     // The entry point is named for its bytes: what it adds to a table is
@@ -132,7 +132,7 @@ describe("bundle isolation", () => {
     // Nothing of the table's own folder: the body renders rows through the
     // renderer the table hands it, so it knows no row of its own.
     expect(modules.filter((id) => id.includes("/DataTable/"))).toEqual([]);
-  }, 60_000);
+  });
 
   it("ships the implementation over one copy of the shared core", async () => {
     const { modules, css } = await bundle(
@@ -152,5 +152,5 @@ export { virtualizeRows } from ${quotePath("virtualization/index.ts")};`,
     ).toEqual([]);
     // A virtualized table's root rules ship with the table's own sheet.
     expect(css).toContain(".ds.data-table.bounded");
-  }, 60_000);
+  });
 });
