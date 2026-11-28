@@ -29,4 +29,7 @@ export type ListProps = {
 
   /* */
   isOpen: boolean;
+
+  /* The list's accessible name, when its combobox has no label element */
+  "aria-label"?: string;
 };

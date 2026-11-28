@@ -12,6 +12,7 @@ import {
   filterItems as defaultFilterItems,
   isPromise,
   settleLookup,
+  stopPageMovesAtEnds,
 } from "./utils/index.js";
 import "./styles.css";
 
@@ -30,6 +31,9 @@ const componentCssClassName = "ds form-combobox";
  * With a `name`, a hidden input carries the selected value, so a native form
  * post sends it without JavaScript. The visible text input stays unnamed, so
  * the value is posted once.
+ *
+ * The `id` and the ARIA props go to the text input; `aria-label` or
+ * `aria-labelledby` names the list too.
  */
 export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
   function SingleCombobox(
@@ -50,6 +54,12 @@ export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
       convertItemToString = defaultConvertItemToString,
       convertValueToItem = defaultConvertValueToItem,
       filterItems = defaultFilterItems,
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabelledBy,
+      "aria-describedby": ariaDescribedBy,
+      "aria-errormessage": ariaErrorMessage,
+      "aria-invalid": ariaInvalid,
+      "aria-required": ariaRequired,
     },
     fieldRef,
   ) {
@@ -105,6 +115,10 @@ export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
       getItemProps,
     } = useCombobox({
       items,
+      inputId: id,
+      labelId: ariaLabelledBy,
+      stateReducer: (state, actionAndChanges) =>
+        stopPageMovesAtEnds(state, actionAndChanges, items.length),
       onSelectedItemChange: handleSelectedItemChange,
       onInputValueChange,
       initialSelectedItem: isPromise(initialLookup) ? null : initialLookup,
@@ -164,7 +178,6 @@ export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
 
     return (
       <div
-        id={id}
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
@@ -172,15 +185,21 @@ export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
           <input
             className="p"
             {...getInputProps({
+              "aria-label": ariaLabel,
+              "aria-describedby": ariaDescribedBy,
+              "aria-errormessage": ariaErrorMessage,
+              "aria-invalid": ariaInvalid,
+              "aria-required": ariaRequired,
               disabled,
               placeholder,
               onBlur,
               ref: combinedRef,
             })}
           />
-          <ResetButton onClick={resetAndFocusInput} />
+          <ResetButton disabled={disabled} onClick={resetAndFocusInput} />
         </div>
         <List
+          aria-label={ariaLabel}
           isOpen={isOpen}
           getMenuProps={getMenuProps}
           getItemProps={getItemProps}

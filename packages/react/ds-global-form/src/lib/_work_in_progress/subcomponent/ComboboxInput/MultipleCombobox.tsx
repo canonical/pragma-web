@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Option } from "../../../subcomponent/types.js";
 import { List, ResetButton } from "./common/index.js";
 import { VALUE_KEY } from "./constants.js";
+import messages from "./messages.js";
 import type { ComboboxInputProps } from "./types.js";
 import {
   convertItemToString as defaultConvertItemToString,
@@ -11,6 +12,7 @@ import {
   filterItems as defaultFilterItems,
   isPromise,
   settleLookup,
+  stopPageMovesAtEnds,
 } from "./utils/index.js";
 import "./styles.css";
 
@@ -24,6 +26,9 @@ const componentCssClassName = "ds form-combobox";
  * With a `name`, one hidden input per selected value carries the selection, so
  * a native form post sends it without JavaScript. The visible text input stays
  * unnamed.
+ *
+ * The `id` and the ARIA props go to the text input; `aria-label` or
+ * `aria-labelledby` names the list too.
  *
  * @param {ComboboxInputProps} props - The component props
  * @returns {React.ReactElement} - Rendered MultipleCombobox component
@@ -45,6 +50,12 @@ const MultipleCombobox = ({
   convertValueToItem = defaultConvertValueToItem,
   filterItems = defaultFilterItems,
   onInputValueChangeFactory,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  "aria-errormessage": ariaErrorMessage,
+  "aria-invalid": ariaInvalid,
+  "aria-required": ariaRequired,
 }: ComboboxInputProps): React.ReactElement => {
   const values = value as string[] | undefined;
 
@@ -187,6 +198,10 @@ const MultipleCombobox = ({
     setInputValue, // Function to set input value
   } = useCombobox({
     items,
+    inputId: id,
+    labelId: ariaLabelledBy,
+    stateReducer: (state, actionAndChanges) =>
+      stopPageMovesAtEnds(state, actionAndChanges, items.length),
     // The selection lives in useMultipleSelection, not here. Pinning this to
     // null stops useCombobox remembering the last pick: otherwise picking that
     // option again (after removing its chip) is not a change and is ignored.
@@ -220,7 +235,6 @@ const MultipleCombobox = ({
 
   return (
     <div
-      id={id}
       style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
@@ -231,11 +245,15 @@ const MultipleCombobox = ({
             key={String(selectedItem[valueKey])}
             type="button"
             {...getSelectedItemProps({ selectedItem, index })}
+            aria-label={messages.remove(convertItemToString(selectedItem))}
+            disabled={disabled}
             onClick={() => removeSelectedItem(selectedItem)}
             className="chip"
           >
             {convertItemToString(selectedItem)}
-            <span className="remove-icon">×</span>
+            <span className="remove-icon" aria-hidden="true">
+              ×
+            </span>
           </button>
         ))}
       </div>
@@ -244,15 +262,23 @@ const MultipleCombobox = ({
       <div className="ds input combobox-input chrome">
         <input
           className="p"
-          {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+          {...getInputProps({
+            ...getDropdownProps({ preventKeyAction: isOpen }),
+            "aria-label": ariaLabel,
+            "aria-describedby": ariaDescribedBy,
+            "aria-errormessage": ariaErrorMessage,
+            "aria-invalid": ariaInvalid,
+            "aria-required": ariaRequired,
+          })}
           placeholder={placeholder}
           disabled={disabled}
         />
-        <ResetButton onClick={resetSelection} />
+        <ResetButton disabled={disabled} onClick={resetSelection} />
       </div>
 
       {/* Dropdown list of available options */}
       <List
+        aria-label={ariaLabel}
         isOpen={isOpen}
         getMenuProps={getMenuProps}
         getItemProps={getItemProps}

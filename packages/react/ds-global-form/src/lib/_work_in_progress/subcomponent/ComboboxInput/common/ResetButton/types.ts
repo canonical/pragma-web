@@ -17,5 +17,8 @@ export interface ResetButtonProps {
   /* Custom messages */
   messages?: ResetButtonMessages;
 
+  /* Whether the button is disabled, as its combobox is */
+  disabled?: boolean;
+
   onClick: (event?: React.MouseEvent<HTMLButtonElement>) => void;
 }
