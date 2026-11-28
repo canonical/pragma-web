@@ -4,6 +4,7 @@ import type {
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { ComponentProps } from "react";
 
 /**
  * What the list reads and commands: the members a provider and the root's
@@ -23,12 +24,7 @@ export type RecordListSort = {
   readonly label: string;
 };
 
-/**
- * Props the standalone list and its connected twin share.
- *
- * Exempt from the native-prop extension convention: a tutorial example kept
- * to the props it teaches.
- */
+/** Props the standalone list and its connected twin share. */
 export type RecordListOwnProps<TRow extends object = RowRecord> = {
   /** The list's accessible name. */
   readonly label: string;
@@ -45,10 +41,20 @@ export type RecordListOwnProps<TRow extends object = RowRecord> = {
   readonly messages?: Partial<DataViewsMessages>;
 };
 
-/** Props of the list body: the shared props, and the scope it reads. */
+type OwnProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+> = RecordListOwnProps<TRow> & {
+  /** The provider or root scope the list reads and commands. */
+  readonly scope: RecordListScope<TFields, TRow>;
+};
+
+/**
+ * Props of the list body: the shared props, the scope it reads, and the
+ * native props of its `section`.
+ */
 export type ScopedRecordListProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = RecordListOwnProps<TRow> & {
-  readonly scope: RecordListScope<TFields, TRow>;
-};
+> = OwnProps<TFields, TRow> &
+  Omit<ComponentProps<"section">, keyof OwnProps<TFields, TRow> | "children">;

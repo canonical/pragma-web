@@ -3,17 +3,10 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { RowChannels } from "@canonical/dataviews-core/bindings";
-import type { Ref } from "react";
+import type { ComponentProps, Ref } from "react";
 import type { DataTableColumn } from "../types.js";
 
-/**
- * Props of one rendered data row.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the row channels and column model, not forwarding a
- * caller's native props.
- */
-export type RowProps<TRow extends object> = {
+type OwnProps<TRow extends object> = {
   /** The provider's collection and selection, all its cells read. */
   readonly provider: Pick<
     DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
@@ -30,3 +23,7 @@ export type RowProps<TRow extends object> = {
   /** The row element, for a virtualized table to measure. */
   readonly ref?: Ref<HTMLTableRowElement> | undefined;
 };
+
+/** Props of one data row: its own, and the native props of its `tr`. */
+export type RowProps<TRow extends object> = OwnProps<TRow> &
+  Omit<ComponentProps<"tr">, keyof OwnProps<TRow> | "children">;

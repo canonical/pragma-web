@@ -81,4 +81,22 @@ describe("BodyCell", () => {
     expect(drawn).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("cell")).toHaveTextContent("alpha");
   });
+
+  it("hands a caller's class and attributes to its cell", () => {
+    const { provider, channels } = createChannelsOver(["name"]);
+    render(
+      <BodyCell
+        provider={provider}
+        channels={channels}
+        column={{ id: "name", header: "Name" }}
+        field="name"
+        className="extra"
+        title="Name"
+      />,
+      inRow(),
+    );
+    const cell = screen.getByRole("cell");
+    expect(cell.className).toBe("ds data-table-body-cell extra");
+    expect(cell).toHaveAttribute("title", "Name");
+  });
 });

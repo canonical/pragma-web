@@ -1,6 +1,7 @@
 import type { Query, SourceRefusal } from "@canonical/dataviews-core";
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { describe, expect, it } from "vitest";
 import {
   buildMachine,
@@ -25,7 +26,9 @@ const rebuilding: SourceRefusal = {
 
 /** The list over an observed provider, its rows delivered at once. */
 const renderList = (
-  props: Partial<RecordListOwnProps> = {},
+  props: Partial<
+    RecordListOwnProps & Omit<ComponentProps<"section">, "children">
+  > = {},
   provider: MachineProvider = createMachineProvider({ rows }).provider,
 ) => {
   const stop = provider.observe();
@@ -54,6 +57,13 @@ describe("ScopedRecordList", () => {
     expect(screen.queryByRole("status")).toBeNull();
     expect(screen.queryByRole("checkbox")).toBeNull();
     expect(screen.queryByRole("group")).toBeNull();
+  });
+
+  it("hands a caller's class and attributes to its region", () => {
+    renderList({ className: "extra", title: "Fleet" });
+    const region = screen.getByRole("region", { name: "Machines" });
+    expect(region.className).toBe("ds record-list extra");
+    expect(region).toHaveAttribute("title", "Fleet");
   });
 
   it("says its status in place of the rows", () => {

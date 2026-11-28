@@ -31,6 +31,8 @@ const BodyCell = <TRow extends object>({
   channels,
   column,
   field,
+  className,
+  ...rest
 }: BodyCellProps<TRow>): ReactElement => {
   const channel = channels.fields[field];
   if (channel === undefined) {
@@ -53,7 +55,10 @@ const BodyCell = <TRow extends object>({
   const Content = column.cell;
   return (
     <CellContext value={cell}>
-      <td className={componentCssClassName}>
+      <td
+        {...rest}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      >
         {Content === undefined ? (
           spellPrimitiveValue(value)
         ) : (

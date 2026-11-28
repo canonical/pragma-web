@@ -19,10 +19,14 @@ import type { ScopedRecordListProps } from "./types.js";
 /** The row scopes observe no single field: each item reads its whole record. */
 const NO_FIELDS: readonly string[] = [];
 
+const componentCssClassName = "ds record-list";
+
 /**
  * The list over a scope it is handed: the status, a checkbox per record, and
  * a sort the source can run. It does not observe; whoever hands it the scope
  * does — the standalone list, or the DataViews root.
+ *
+ * @implements ds:apps.subcomponent.record_list
  *
  * @experimental Pre-release: a tutorial example, not exported from the
  * package.
@@ -37,6 +41,8 @@ export default function ScopedRecordList<
   selectable = false,
   sortBy,
   messages,
+  className,
+  ...rest
 }: ScopedRecordListProps<TFields, TRow>): ReactElement {
   const words = useMemo(() => resolveMessages(messages), [messages]);
   const scripted = useIsScripted();
@@ -72,7 +78,12 @@ export default function ScopedRecordList<
     );
   };
   return (
-    <section aria-label={label} aria-busy={state.pendingRequestId !== null}>
+    <section
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      aria-label={label}
+      aria-busy={state.pendingRequestId !== null}
+    >
       {scripted && sortable ? (
         <fieldset>
           <legend>{sortBy.label}</legend>

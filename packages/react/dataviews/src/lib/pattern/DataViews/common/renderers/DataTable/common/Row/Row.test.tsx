@@ -3,7 +3,12 @@ import {
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { act, render, screen, within } from "@testing-library/react";
-import { createRef, type ReactNode, type Ref } from "react";
+import {
+  type ComponentProps,
+  createRef,
+  type ReactNode,
+  type Ref,
+} from "react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
   buildMachine,
@@ -23,6 +28,7 @@ const mountRow = ({
   position = undefined as number | undefined,
   gap = undefined as number | undefined,
   ref = undefined as Ref<HTMLTableRowElement> | undefined,
+  native = {} as ComponentProps<"tr">,
 } = {}) => {
   const { provider } = createMachineProvider();
   const host = readProviderHost(provider);
@@ -38,6 +44,7 @@ const mountRow = ({
   onTestFinished(scopes.observe());
   render(
     <Row
+      {...native}
       provider={provider}
       channels={scopes.readRow("m-1")}
       columns={COLUMNS}
@@ -101,5 +108,19 @@ describe("Row", () => {
   it("draws the unmounted space before it as its top margin", () => {
     mountRow({ gap: 40 });
     expect(screen.getByRole("row")).toHaveStyle({ marginBlockStart: "40px" });
+  });
+
+  it("hands a caller's class, style and attributes to its row", () => {
+    mountRow({
+      gap: 40,
+      native: { className: "extra", style: { color: "red" }, title: "Alpha" },
+    });
+    const row = screen.getByRole("row");
+    expect(row.className).toBe("ds data-table-row extra");
+    expect(row).toHaveAttribute(
+      "style",
+      "color: red; margin-block-start: 40px;",
+    );
+    expect(row).toHaveAttribute("title", "Alpha");
   });
 });
