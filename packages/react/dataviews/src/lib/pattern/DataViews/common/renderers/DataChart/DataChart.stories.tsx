@@ -347,7 +347,7 @@ export const Refreshing: Story = {
  * Render the story inside a root over the REST endpoint, which computes its
  * facets, starting on `query` when one is given.
  */
-const withRestBackedRoot = (query?: string): Decorator =>
+const wrapInRestBackedRoot = (query?: string): Decorator =>
   withMachineRoot({
     source: () => createRestMachineSource("live"),
     ...(query === undefined ? {} : { query }),
@@ -361,7 +361,7 @@ const withRestBackedRoot = (query?: string): Decorator =>
  */
 export const CountsRestBacked: Story = {
   name: "Counts REST backed",
-  decorators: [withRestBackedRoot("page=1&size=5")],
+  decorators: [wrapInRestBackedRoot("page=1&size=5")],
   render: ({ label }) => (
     <ConnectedChart type="bar" field="status" label={label} />
   ),
@@ -386,7 +386,7 @@ export const CountsRestBacked: Story = {
 export const RangeRestBacked: Story = {
   name: "Range REST backed",
   args: { type: "range", field: "cores", label: "Cores" },
-  decorators: [withRestBackedRoot()],
+  decorators: [wrapInRestBackedRoot()],
   render: ({ label }) => (
     <ConnectedChart type="range" field="cores" label={label} />
   ),
