@@ -28,6 +28,12 @@ import type { machines } from "./machines.js";
 export type { FacetValue } from "../src/storybook/machines/api/index.js";
 /** One machine record, the shape the stories and the tests share. */
 export type { Machine } from "../src/storybook/machines/index.js";
+/** The workload records the stories and the tests share. */
+export type {
+  Container,
+  VirtualMachine,
+  Workload,
+} from "../src/storybook/workloads/index.js";
 
 /** A channel a test publishes on: the read side plus `set`. */
 export type FakeChannel<T> = ReadonlyChannel<T> & {
@@ -292,13 +298,6 @@ export type QuickFilterProviderConfig = {
   readonly facets?:
     | readonly Exclude<keyof QuickHost, "id" | "name">[]
     | undefined;
-};
-
-/** A workload whose type decides which fields apply to it. */
-export type Workload = {
-  readonly id: string;
-  readonly type: "container" | "vm";
-  readonly host: string;
 };
 
 /** A source that hands each delivery on cue, counting its stops. */

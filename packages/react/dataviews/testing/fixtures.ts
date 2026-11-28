@@ -14,12 +14,14 @@ import type {
   DataViewsMessages,
 } from "@canonical/dataviews-core";
 import { createCollection } from "@canonical/dataviews-core";
+import elementAt from "./elementAt.js";
 import type {
   FacetCase,
   FacetRecord,
   OperatorCase,
   OperatorRecord,
   QuickHost,
+  Workload,
 } from "./types.js";
 
 /** Both counts answered exactly, as complete local input answers them. */
@@ -1081,3 +1083,21 @@ export const quickHosts: readonly QuickHost[] = Array.from(
     return index % 3 === 0 ? { ...host, owner: "ex:ana" } : host;
   },
 );
+
+/** One container and one virtual machine. */
+export const WORKLOAD_RECORDS: readonly Workload[] = [
+  {
+    id: "w-1",
+    name: "web",
+    type: "container",
+    image: "ubuntu/24.04",
+    host: { region: "eu-west" },
+  },
+  { id: "w-2", name: "db", type: "vm", cores: 4, host: { region: "eu-west" } },
+];
+
+/** The container `w-1` returning under its id as the virtual machine. */
+export const WORKLOAD_RETYPED: Workload = {
+  ...elementAt(WORKLOAD_RECORDS, 1),
+  id: "w-1",
+};

@@ -15,6 +15,8 @@ import {
   OPERATOR_RECORDS,
   RACK_COLLECTION,
   SERVER_RENDER_HREF,
+  WORKLOAD_RECORDS,
+  WORKLOAD_RETYPED,
 } from "./fixtures.js";
 
 describe("fixtures", () => {
@@ -71,6 +73,21 @@ describe("fixtures", () => {
 
     it("marks what a message is handed with a character no message says", () => {
       expect(JSON.stringify(ENGLISH)).not.toContain(MESSAGE_MARK);
+    });
+  });
+
+  describe("WORKLOAD_RECORDS", () => {
+    it("lists one workload of each type", () => {
+      expect(WORKLOAD_RECORDS.map(({ type }) => type)).toEqual([
+        "container",
+        "vm",
+      ]);
+    });
+  });
+
+  describe("WORKLOAD_RETYPED", () => {
+    it("is the first workload's id on a virtual machine", () => {
+      expect(WORKLOAD_RETYPED).toMatchObject({ id: "w-1", type: "vm" });
     });
   });
 });

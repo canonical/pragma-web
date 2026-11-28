@@ -37,6 +37,8 @@ export {
   quickHosts,
   RACK_COLLECTION,
   SERVER_RENDER_HREF,
+  WORKLOAD_RECORDS,
+  WORKLOAD_RETYPED,
 } from "./fixtures.js";
 export { default as installPopoverStandIn } from "./installPopoverStandIn.js";
 export { default as installResizeObserverStandIn } from "./installResizeObserverStandIn.js";

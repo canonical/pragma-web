@@ -133,11 +133,9 @@ describe("CardItem", () => {
 
   it("names a card by its identity where its title does not apply", () => {
     const { provider, channels } = observeRow({
-      fields: ["host"],
-      provider: createWorkloadProvider([
-        { id: "w-1", type: "vm", host: "kept" },
-      ]),
-      rowId: "w-1",
+      fields: ["image"],
+      provider: createWorkloadProvider().provider,
+      rowId: "w-2",
     });
     render(
       <ul>
@@ -145,14 +143,14 @@ describe("CardItem", () => {
           provider={provider}
           readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
-          title={{ id: "host", header: "Host" }}
+          title={{ id: "image", header: "Image" }}
           details={[]}
           selectable={false}
           nameRecord={() => null}
         />
       </ul>,
     );
-    expect(screen.getByRole("listitem", { name: "w-1" })).toBeInTheDocument();
+    expect(screen.getByRole("listitem", { name: "w-2" })).toBeInTheDocument();
   });
 
   it("throws when its title's field is not observed", () => {
