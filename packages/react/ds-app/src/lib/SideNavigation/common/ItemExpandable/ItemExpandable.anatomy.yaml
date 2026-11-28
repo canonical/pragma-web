@@ -1,11 +1,11 @@
 ---
-# SideNavigation.ItemButton — a navigation row that performs an action
-# instead of navigating (e.g. "Log out", "Create context"). A Footer-only
-# row kind: the content tree accepts links and plain labels, so this row
-# lives in a SideNavigation.Footer (rendered from a `control: "button"`
-# footer item or composed via the Footer's children).
+# SideNavigation.ItemExpandable — a collapsible row that discloses its own
+# (always-leaf) children instead of navigating. Native <details>/<summary>;
+# no role/aria-expanded authored (cs:ui_blocks.nojs.disclosure) — the element
+# supplies the disclosure semantics itself. Cannot link (no url) and cannot
+# nest further (children are SideNavigation.Item only).
 node:
-  uri: apps.subcomponent.side-navigation-item-button
+  uri: apps.subcomponent.side_navigation-item_expandable
   styles:
     layout.type: stack
     layout.direction: column
@@ -39,10 +39,17 @@ node:
               cardinality: "1"
               slotName: label
           - node:
-              role: slot
+              role: caret
+              styles:
+                appearance.color: color/icon
             relation:
-              cardinality: "0..1"
+              cardinality: "1"
               slotName: end
       relation:
         cardinality: "1"
         slotName: default
+    - node:
+        uri: apps.subcomponent.side_navigation-item
+      relation:
+        cardinality: "0..*"
+        slotName: children

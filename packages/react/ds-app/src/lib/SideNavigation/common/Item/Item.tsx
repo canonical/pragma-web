@@ -17,7 +17,7 @@ const componentCssClassName = "ds side-navigation-item";
  * composed via `children`, matching `Button`'s own convention — pass
  * anything, not only text.
  *
- * @implements ds:apps.subcomponent.side-navigation-item
+ * @implements ds:apps.subcomponent.side_navigation-item
  */
 const Item = ({
   url,

@@ -12,6 +12,8 @@ const componentCssClassName = "ds view-layout";
  * Divides its space between the view content (default slot, `1fr`) and an
  * optional contextual aside (named slot, `min-content`), per the ontology
  * instance `apps.layout.view_layout`.
+ *
+ * @implements ds:apps.layout.view_layout
  */
 const ViewLayout = ({
   className,
