@@ -36,8 +36,8 @@ describe("Group", () => {
   });
 
   it("starts with a divider when divider is set, before the header", async () => {
-    // Difference from React: the anatomy (SideNavigation.ItemGroup) draws a
-    // divider before every group except the first.
+    // The anatomy (SideNavigation.ItemGroup) draws a divider before every
+    // group except the first.
     const page = await render(Group, {
       label: "Hardware",
       divider: true,

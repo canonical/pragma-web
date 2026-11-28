@@ -1,7 +1,9 @@
 // Markup parity with @canonical/react-ds-app SideNavigation. The React
 // markup is captured by scripts/captureReactGolden.tsx; the rewrites below
-// are the documented differences from React (see the PR's "Differences from
-// React"), applied to the React markup before the comparison.
+// are the documented differences from React (SPEC.md, "Differences from
+// React"), applied to the React markup before the comparison. Both packages
+// follow the anatomy, so the only rewrites left are the two Svelte gaps: no
+// Tooltip and no script-positioned menu.
 
 import { render } from "@canonical/svelte-ssr-test";
 import { describe, expect, it } from "vitest";
@@ -62,36 +64,6 @@ function normalise(root: Element): string {
 /** The documented differences from React, applied to React's markup. */
 function applyDifferences(root: Element, props: Record<string, unknown>) {
   const document = root.ownerDocument;
-  const nav = root.querySelector(":scope > nav.side-navigation-content");
-  if (nav) {
-    // Content is a region holding the context switcher and then the <nav>.
-    const region = document.createElement("div");
-    region.className = nav.className;
-    region.id = nav.id;
-    const switcher = root.querySelector(
-      ":scope > .side-navigation-context-switcher",
-    );
-    if (switcher) region.append(switcher);
-    const landmark = document.createElement("nav");
-    landmark.setAttribute("aria-label", nav.getAttribute("aria-label") ?? "");
-    landmark.append(...nav.childNodes);
-    region.append(landmark);
-    nav.replaceWith(region);
-  }
-  // Every group but the first starts with a divider.
-  for (const group of root.querySelectorAll(
-    ".nav-tree > .side-navigation-group:not(:first-child)",
-  )) {
-    const divider = document.createElement("hr");
-    divider.className = "divider";
-    group.prepend(divider);
-  }
-  // The footer region always renders.
-  if (!root.querySelector(":scope > footer")) {
-    const footer = document.createElement("footer");
-    footer.className = "ds side-navigation-footer";
-    root.append(footer);
-  }
   // The menu surface has no script positioning: only its max-width is set.
   for (const surface of root.querySelectorAll(".contextual-menu__surface")) {
     const style = surface.getAttribute("style") ?? "";

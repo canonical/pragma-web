@@ -208,7 +208,7 @@ describe("NavTree", () => {
   });
 
   it("draws a divider before every group but the first, skipping empty groups", async () => {
-    // Difference from React: anatomy SideNavigation.ItemGroup.
+    // Anatomy: SideNavigation.ItemGroup.
     const root: NavRoot = {
       key: "root",
       items: [

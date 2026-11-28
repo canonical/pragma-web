@@ -40,8 +40,7 @@ describe("Content", () => {
   });
 
   it("renders the context switcher before the nav, outside the landmark", async () => {
-    // Difference from React: anatomy SideNavigation.Content > Context
-    // switcher, Nav.
+    // Anatomy: SideNavigation.Content > Context switcher, Nav.
     const page = await render(Content, { contextSwitcher });
     const region = page.container.firstElementChild as HTMLElement;
     const [switcher, nav] = Array.from(region.children);
