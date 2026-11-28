@@ -1,0 +1,31 @@
+/* The side navigation's brand slot: a brand-orange rectangle sized by the side
+ * navigation's logo tokens, with the circle-of-friends mark on the baseline
+ * grid. The rectangle overshoots a grid line by `--logo-overflow` and cancels
+ * it with its bottom margin, so the header stays a whole number of baseline
+ * units tall. */
+
+@layer app {
+  .ds.canonical-logo {
+    --mark-size: 4; /* the mark's side, in baseline units */
+    --mark-margin-top: 5; /* the gap above the mark, in baseline units */
+    --logo-overflow: 0.25rem;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    block-size: var(--sidenav-logo-block-size);
+    inline-size: var(--sidenav-logo-inline-size);
+    margin-block-end: calc(var(--space-baseline) - var(--logo-overflow));
+    background: var(--color-background-logo);
+
+    & > .mark {
+      display: block;
+      inline-size: calc(var(--space-baseline) * var(--mark-size));
+      block-size: calc(var(--space-baseline) * var(--mark-size));
+      margin-block-start: calc(var(--space-baseline) * var(--mark-margin-top));
+      /* The mark is part of the brand asset: white on the brand rectangle in
+         every theme, so it is not a themable value. */
+      fill: white;
+    }
+  }
+}

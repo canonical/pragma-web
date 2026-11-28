@@ -1,0 +1,43 @@
+@layer app {
+  /* The shell fills the area its parent gives it. The application layout
+     inside is block-size: 100%, so the side navigation spans that height and
+     the page scrolls inside <main> rather than the document. */
+  .ds.application-shell {
+    min-block-size: 0;
+
+    & .main {
+      box-sizing: border-box;
+      block-size: 100%;
+      overflow: auto;
+      padding-block: var(--container-gap-loose);
+      padding-inline-end: var(--grid-margin);
+    }
+
+    /* A side panel opened in the shell is fixed to the viewport and spans its
+       full height by default. When the shell sits under other chrome, such
+       as a top bar, the page sets --application-shell-overlay-inset-block-start
+       so the panel starts below it and that chrome stays usable. */
+    & .ds.side-panel {
+      inset-block-start: var(--application-shell-overlay-inset-block-start, 0);
+    }
+
+    /* Below the side navigation's small breakpoint (620px) the navigation
+       stops being a rail and becomes a bar that opens a full-screen menu,
+       so the layout stacks it above the page instead of beside it. */
+    @media (width < 620px) {
+      & > .ds.application-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      & .main {
+        padding-inline-start: var(--grid-margin);
+      }
+
+      /* On a phone the panel takes the whole screen. */
+      & .ds.side-panel {
+        inset-block-start: 0;
+      }
+    }
+  }
+}

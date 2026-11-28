@@ -1,5 +1,5 @@
 import previewConfig from "@canonical/storybook-config/preview";
-import "../src/styles.css";
+import "../src/styles/index.css";
 import * as decorators from "../src/storybook/decorators";
 
 export default {
