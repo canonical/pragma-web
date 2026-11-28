@@ -5,6 +5,7 @@ import {
   IDBObjectStore,
 } from "fake-indexeddb";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { installFakeClock } from "../../../testing/index.js";
 import type { JsonValue, PresentationStore } from "../presentation/index.js";
 import type { SavedView, ViewStore } from "../views/index.js";
 import createIndexedDBViewStore from "./createIndexedDBViewStore.js";
@@ -32,7 +33,6 @@ afterEach(() => {
   }
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  vi.useRealTimers();
 });
 
 const openStoreOver = (
@@ -132,7 +132,7 @@ const createRefusingFactory = (): IndexedDBFactory => ({
 describe("createIndexedDBViewStore", () => {
   describe("saved views", () => {
     it("creates a view and reads it back", async () => {
-      vi.useFakeTimers({ toFake: ["Date"] });
+      installFakeClock(["Date"]);
       vi.setSystemTime(new Date("2026-09-11T08:00:00.000Z"));
       const store = openStoreOver(new IDBFactory());
       const view = readSaved(await store.create(failed));
@@ -243,7 +243,7 @@ describe("createIndexedDBViewStore", () => {
     });
 
     it("saves changes at the view's revision and grows the revision", async () => {
-      vi.useFakeTimers({ toFake: ["Date"] });
+      installFakeClock(["Date"]);
       vi.setSystemTime(new Date("2026-09-11T08:00:00.000Z"));
       const store = openStoreOver(new IDBFactory());
       await store.create(failed);

@@ -32,6 +32,7 @@ import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   createMemoryViewStore,
   type IdentifiedRecord as Row,
+  renderAtRest,
 } from "../../../../../../../testing/index.js";
 import DataViews from "../../../Provider.js";
 import SavedViews from "./SavedViews.js";
@@ -85,32 +86,36 @@ const createProviderOver = (
     ...(presentation === undefined ? {} : { presentation }),
   });
 
+/** The control over `provider`, in StrictMode as an application mounts it. */
+const composeControl = (
+  provider: DataViewsProvider<Fields, Row>,
+  props: { label?: string } = {},
+) => (
+  <StrictMode>
+    <DataViews provider={provider}>
+      <SavedViews {...props} />
+    </DataViews>
+  </StrictMode>
+);
+
 const mount = (
   store: ViewStore,
   props: { label?: string } = {},
   presentation?: PresentationStore,
 ) => {
   const provider = createProviderOver(store, presentation);
-  const rendered = render(
-    <StrictMode>
-      <DataViews provider={provider}>
-        <SavedViews {...props} />
-      </DataViews>
-    </StrictMode>,
-  );
+  const rendered = render(composeControl(provider, props));
   return { provider, ...rendered };
 };
 
-/** The control once its views are listed. */
+/** The control once it is no longer busy: its views are listed. */
 const mountListed = async (
   store: ViewStore,
   presentation?: PresentationStore,
 ) => {
-  const mounted = mount(store, {}, presentation);
-  await waitFor(() => {
-    expect(getSelect()).toBeEnabled();
-  });
-  return mounted;
+  const provider = createProviderOver(store, presentation);
+  const rendered = await renderAtRest(composeControl(provider));
+  return { provider, ...rendered };
 };
 
 const getGroup = () => screen.getByRole("group", { name: "Saved views" });
@@ -121,6 +126,7 @@ const getSelect = () =>
 const getButton = (name: string) => screen.getByRole("button", { name });
 const queryStatus = () => getGroup().querySelector('.status[role="status"]');
 const queryNotices = () => getGroup().querySelector('.notices[role="status"]');
+const queryControls = () => getGroup().querySelector(".controls");
 
 const choose = async (view: SavedView): Promise<void> => {
   // A view is offered once the store has listed it.
@@ -128,6 +134,22 @@ const choose = async (view: SavedView): Promise<void> => {
   fireEvent.change(getSelect(), { target: { value: view.id } });
   await waitFor(() => {
     expect(getSelect()).toHaveValue(view.id);
+  });
+};
+
+/** The control with a save waiting on the store, said as pending. */
+const mountSaving = async (): Promise<void> => {
+  const { store } = createMemoryViewStore([failed]);
+  const gated: ViewStore = {
+    ...store,
+    update: () => new Promise(() => {}),
+  };
+  const { provider } = await mountListed(gated);
+  await choose(failed);
+  setStatus(provider, ["running"]);
+  fireEvent.click(getButton("Save"));
+  await waitFor(() => {
+    expect(queryStatus()).toHaveTextContent("Saving…");
   });
 };
 
@@ -197,6 +219,28 @@ describe("DataViews.SavedViews", () => {
       expect(getSelect()).toBeEnabled();
     });
     expect(queryNotices()).toHaveTextContent("");
+  });
+
+  it("is busy while it lists the views", () => {
+    mount(createMemoryViewStore([failed]).store);
+    expect(queryControls()).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("is not busy once the views are listed", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    expect(queryControls()).toHaveAttribute("aria-busy", "false");
+  });
+
+  it("is busy while a command waits on the store", async () => {
+    await mountSaving();
+    expect(queryControls()).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("keeps its statuses outside what is busy", async () => {
+    await mountSaving();
+    expect(getSelect().closest('[aria-busy="true"]')).not.toBeNull();
+    expect(queryStatus()?.closest('[aria-busy="true"]')).toBeNull();
+    expect(queryNotices()?.closest('[aria-busy="true"]')).toBeNull();
   });
 
   it("offers every view, and shows none open until one is chosen", async () => {

@@ -1,3 +1,4 @@
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { createRef, useState } from "react";
@@ -629,7 +630,8 @@ describe("QueryInput", () => {
       expect(own).toHaveAttribute("aria-expanded", "false");
     });
 
-    it("keep focus on the page when the host moves the stop after focus left", async () => {
+    it("keep focus on the page when the host moves the stop after focus left", () => {
+      installFakeClock();
       const view = render(
         <QueryInput {...base} activeItem="status" onActiveItemChange={() => {}}>
           <ChipItem id="status" />
@@ -638,13 +640,17 @@ describe("QueryInput", () => {
       const chip = screen.getByRole("button", { name: "status" });
       act(() => chip.focus());
       act(() => chip.blur());
-      await act(() => new Promise((resolve) => setTimeout(resolve)));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       view.rerender(
         <QueryInput {...base} activeItem="entry" onActiveItemChange={() => {}}>
           <ChipItem id="status" />
         </QueryInput>,
       );
-      await act(() => new Promise((resolve) => setTimeout(resolve)));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(document.body).toHaveFocus();
       expect(
         screen.getByRole("combobox", { name: "Filter machines" }),

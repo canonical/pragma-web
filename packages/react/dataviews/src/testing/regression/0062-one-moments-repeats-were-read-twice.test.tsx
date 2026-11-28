@@ -9,9 +9,10 @@
  * a new node and a live region of additions reads it.
  */
 
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, render } from "@testing-library/react";
 import { createRef } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   Announcer,
   type AnnouncerHandle,
@@ -19,11 +20,7 @@ import {
 } from "../../lib/common/index.js";
 
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 const HIDDEN = "Status hidden";

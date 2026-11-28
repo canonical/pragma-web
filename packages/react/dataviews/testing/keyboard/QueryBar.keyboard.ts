@@ -12,6 +12,7 @@
 import { expect, type Locator, type Page, test } from "playwright/test";
 import { QUERY_BAR } from "./constants.js";
 import openStory from "./openQueryBarStory.js";
+import waitForResizeReport from "./waitForResizeReport.js";
 
 /** The bar's own entry. */
 const findEntry = (page: Page): Locator =>
@@ -618,14 +619,9 @@ test.describe("QueryBar, in Chromium", () => {
     const y = (merge?.y ?? 0) + (merge?.height ?? 0) / 2;
     await page.mouse.move(x, y);
     await page.mouse.down();
-    // Two frames on, the press has been laid out: the field keeps focus and
-    // its wrap, and Merge stays under the pointer.
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-        ),
-    );
+    // Once the field's size is reported, the bar's observers have heard it:
+    // the field keeps focus and its wrap, and Merge stays under the pointer.
+    await waitForResizeReport(field);
     await expect(findEntry(page)).toBeFocused();
     await expect
       .poll(async () => (await field.boundingBox())?.height ?? 0)

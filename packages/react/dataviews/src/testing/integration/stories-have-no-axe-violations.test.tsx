@@ -161,8 +161,7 @@ describe("the query controls' played stories have no axe violations", () => {
       unmount();
       await Story.run();
       await expectNoAxeViolations(document.body);
-      // Two sweeps over sixty rows, and a play between them.
-    }, 15_000);
+    });
   }
 
   for (const [name, Story] of Object.entries(

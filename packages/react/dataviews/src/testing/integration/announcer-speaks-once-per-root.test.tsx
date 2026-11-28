@@ -8,19 +8,11 @@
  * reader states nothing.
  */
 
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
@@ -51,11 +43,7 @@ const createProvider = (
 // What is said in one moment, and what is said in the next, is time this
 // file decides rather than waits out.
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 /** Every announcer region in the document. */

@@ -10,23 +10,20 @@
  * never received the change.
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createStandInPresentationStore,
   flushPresentation,
+  installFakeClock,
 } from "../../../testing/index.js";
 import {
   createPresentation,
   type PresentationStore,
 } from "../../lib/presentation/index.js";
 
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 describe("regression 0016 — a view's change lost with its layer", () => {
   it("reports and retries a failed write made to a view no longer shown", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi
       .fn<PresentationStore["patchPresentation"]>()
       .mockRejectedValueOnce(new Error("view storage failed"))

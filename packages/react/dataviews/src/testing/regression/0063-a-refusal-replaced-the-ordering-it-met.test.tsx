@@ -8,8 +8,9 @@
  * now stands — so it stands under a topic of its own.
  */
 
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
@@ -26,11 +27,7 @@ const columns: readonly DataTableColumn[] = [
 ];
 
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 describe("regression 0063 — a refusal replaced the ordering it met", () => {

@@ -3,9 +3,11 @@
 export { default as answerFacetValues } from "./answerFacetValues.js";
 export { default as answerLiveRequests } from "./answerLiveRequests.js";
 export { default as answerOverHttp2 } from "./answerOverHttp2.js";
+export { default as awaitDelivery } from "./awaitDelivery.js";
 export { default as buildFleet } from "./buildFleet.js";
 export { default as buildMachine } from "./buildMachine.js";
-export { CHART_FACETS, DELIVERY_WAIT, MOCK_API_ORIGIN } from "./constants.js";
+export { CHART_FACETS, MOCK_API_ORIGIN } from "./constants.js";
+export { default as createCuedSource } from "./createCuedSource.js";
 export { default as createFacetedFleet } from "./createFacetedFleet.js";
 export { default as createFacetedManual } from "./createFacetedManual.js";
 export { default as createFakeChannel } from "./createFakeChannel.js";
@@ -47,6 +49,7 @@ export {
 export { default as openMenuFrom } from "./openMenuFrom.js";
 export { default as readAnnouncements } from "./readAnnouncements.js";
 export { default as readFailureReason } from "./readFailureReason.js";
+export { default as renderAtRest } from "./renderAtRest.js";
 export { default as renderDecorated } from "./renderDecorated.js";
 export { default as renderInRoot } from "./renderInRoot.js";
 export { default as renderRefusingTable } from "./renderRefusingTable.js";
@@ -55,6 +58,7 @@ export { default as requestRest } from "./requestRest.js";
 export { default as serveMockApi } from "./serveMockApi.js";
 export { default as silenceRenderErrors } from "./silenceRenderErrors.js";
 export { default as standInDialogs } from "./standInDialogs.js";
+export { default as subscribeToBusy } from "./subscribeToBusy.js";
 export { default as toggleDisclosure } from "./toggleDisclosure.js";
 export type * from "./types.js";
 export { default as waitForFocus } from "./waitForFocus.js";

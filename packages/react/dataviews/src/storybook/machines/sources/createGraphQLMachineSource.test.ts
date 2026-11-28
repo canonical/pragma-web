@@ -4,11 +4,11 @@ import {
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { HttpResponse } from "msw";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   answerLiveRequests,
   answerOverHttp2,
-  DELIVERY_WAIT,
+  awaitDelivery,
   readFailureReason,
   serveMockApi,
 } from "../../../../testing/index.js";
@@ -44,27 +44,20 @@ describe("createGraphQLMachineSource", () => {
         errors: [{ message: "the owners are unavailable", path: ["machines"] }],
       }),
     );
-    const deliveries: SourceDelivery<Machine>[] = [];
-    const stop = createGraphQLMachineSource("live").execute(
+    const delivery = await awaitDelivery(
+      createGraphQLMachineSource("live"),
       {
         requestId: "partial",
         slice: EMPTY_SLICE,
         window: DEFAULT_WINDOW,
         facets: [],
       },
-      (delivery) => {
-        deliveries.push(delivery);
-      },
+      (
+        taken,
+      ): taken is Extract<SourceDelivery<Machine>, { status: "succeeded" }> =>
+        taken.status === "succeeded",
     );
-    const rows = await vi
-      .waitFor(() => {
-        const last = deliveries.at(-1);
-        if (last?.status !== "succeeded") {
-          throw new Error("the page has not been delivered yet");
-        }
-        return last.page.rows;
-      }, DELIVERY_WAIT)
-      .finally(stop);
+    const rows = delivery.page.rows;
     expect(rows.map((row) => row.id)).toEqual([id]);
   });
 
@@ -83,34 +76,28 @@ describe("createGraphQLMachineSource", () => {
         },
       });
     });
-    const stop = createGraphQLMachineSource("live").execute(
-      {
-        requestId: "every-clause",
-        slice: {
-          ...EMPTY_SLICE,
-          filter: [
-            { field: "status", operator: "isAny", operands: ["failed"] },
-            { field: "status", operator: "isNone", operands: ["pending"] },
-            { field: "cores", operator: "gte", operands: [4] },
-            { field: "cores", operator: "lte", operands: [16] },
-            { field: "name", operator: "contains", operands: ["web"] },
-            { field: "region", operator: "contains", operands: ["eu-"] },
-            { field: "owner", operator: "contains", operands: ["ex:"] },
-          ],
-          search: "ivy",
-          sort: [
-            { field: "cores", direction: "desc" },
-            { field: "name", direction: "asc" },
-          ],
-        },
-        window: DEFAULT_WINDOW,
-        facets: [],
+    await awaitDelivery(createGraphQLMachineSource("live"), {
+      requestId: "every-clause",
+      slice: {
+        ...EMPTY_SLICE,
+        filter: [
+          { field: "status", operator: "isAny", operands: ["failed"] },
+          { field: "status", operator: "isNone", operands: ["pending"] },
+          { field: "cores", operator: "gte", operands: [4] },
+          { field: "cores", operator: "lte", operands: [16] },
+          { field: "name", operator: "contains", operands: ["web"] },
+          { field: "region", operator: "contains", operands: ["eu-"] },
+          { field: "owner", operator: "contains", operands: ["ex:"] },
+        ],
+        search: "ivy",
+        sort: [
+          { field: "cores", direction: "desc" },
+          { field: "name", direction: "asc" },
+        ],
       },
-      () => {},
-    );
-    await vi
-      .waitFor(() => expect(bodies).toHaveLength(1), DELIVERY_WAIT)
-      .finally(stop);
+      window: DEFAULT_WINDOW,
+      facets: [],
+    });
     expect(bodies.at(0)).toMatchObject({
       operationName: "MachinesQuery",
       variables: {

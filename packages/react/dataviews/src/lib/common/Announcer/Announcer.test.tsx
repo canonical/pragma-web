@@ -4,19 +4,16 @@
  * twice, and nothing once it has gone.
  */
 
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, render } from "@testing-library/react";
 import { createRef, StrictMode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import Announcer from "./Announcer.js";
 import { CLEAR_DELAY_MS, COALESCE_DELAY_MS } from "./constants.js";
 import type { AnnouncerHandle, AnnouncerTopic } from "./types.js";
 
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 /** The announcer mounted, with the way to speak and to read its region. */

@@ -7,7 +7,9 @@ import type {
   QueryLocation,
   ReadonlyChannel,
   SavedView,
+  Source,
   SourceCapabilities,
+  SourceDelivery,
   ViewStore,
 } from "@canonical/dataviews-core";
 import type {
@@ -15,6 +17,7 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
+import type { Mock } from "vitest";
 import type { BoundFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/BoundFilter/types.js";
 import type { PresenceFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/PresenceFilter/types.js";
 import type { TextFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/TextFilter/types.js";
@@ -223,18 +226,6 @@ export type BundleOutput = {
   )[];
 };
 
-/** What a story's requests to the mock endpoints have come to so far. */
-export type RequestsRead = {
-  /** Requests sent to an endpoint that answers, still waiting on it. */
-  readonly waiting: number;
-  /**
-   * Whether the page shows what its answers say: no request was sent, or
-   * one waits on the endpoint that never answers, or nothing on the page
-   * is still busy.
-   */
-  readonly settled: boolean;
-};
-
 /** One rule of the sheet: the selectors it resolves to, and its declarations. */
 export type ResolvedRule = {
   readonly selectors: readonly string[];
@@ -305,4 +296,12 @@ export type Workload = {
   readonly id: string;
   readonly type: "container" | "vm";
   readonly host: string;
+};
+
+/** A source that hands each delivery on cue, counting its stops. */
+export type CuedSource = {
+  readonly source: Source<Machine>;
+  /** Hand `delivery` to every request executed so far. */
+  readonly send: (delivery: SourceDelivery<Machine>) => void;
+  readonly stop: Mock<() => void>;
 };

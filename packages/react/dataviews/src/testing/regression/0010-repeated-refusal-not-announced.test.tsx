@@ -13,8 +13,9 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { fireEvent } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   readAnnouncements,
   renderRefusingTable,
@@ -25,11 +26,7 @@ const REFUSED = "Sort unchanged: this source orders by at most 1 term.";
 // The announcer's moment is time this case decides, not time it waits out:
 // what counts as one moment is the point.
 beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock("every");
 });
 
 describe("regression 0010 — a repeated refusal not announced", () => {

@@ -34,9 +34,16 @@
       margin: 0;
     }
 
+    & > .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--data-views-saved-views-gap);
+    }
+
     /* A closed dialog keeps the platform's own `display: none`. */
-    & > .picker,
-    & > .commands,
+    & > .controls > .picker,
+    & > .controls > .commands,
     & > .ds.data-views-saved-views-confirm[open] {
       display: flex;
       flex-wrap: wrap;
@@ -45,11 +52,11 @@
     }
 
     /* The select's chrome fills its container; in a row it takes its content. */
-    & > .picker > .ds.input.select {
+    & > .controls > .picker > .ds.input.select {
       inline-size: auto;
     }
 
-    & > .picker > .modified,
+    & > .controls > .picker > .modified,
     & > .notices {
       color: var(--data-views-saved-views-color-text-muted);
     }

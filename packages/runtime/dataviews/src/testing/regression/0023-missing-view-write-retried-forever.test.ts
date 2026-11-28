@@ -11,21 +11,17 @@
  */
 
 import { IDBFactory } from "fake-indexeddb";
-import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
-import { flushPresentation } from "../../../testing/index.js";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { flushPresentation, installFakeClock } from "../../../testing/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import {
   createPresentation,
   WRITE_DEADLINE,
 } from "../../lib/presentation/index.js";
 
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 describe("regression 0023 — a missing view's write retried forever", () => {
   it("drops the change with the view, and a refresh writes nothing again", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const indexedDB = new IDBFactory();
     const store = createIndexedDBViewStore({
       indexedDB,

@@ -1,4 +1,8 @@
-import { delay, HttpResponse, http } from "msw";
+import {
+  createDeferred,
+  type Deferred,
+} from "@canonical/dataviews-core/testing";
+import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
 import { serveMockApi } from "../../../../testing/index.js";
 import answerBehind from "./answerBehind.js";
@@ -7,10 +11,17 @@ import { MACHINES_QUERY_TEXT } from "./constants.js";
 /** What the endpoints saw, in order: each request's start and its answer. */
 const received: unknown[] = [];
 
+/** The next REST request to arrive hands over the gate holding its answer. */
+let arrival = createDeferred<Deferred<void>>();
+
 serveMockApi([
   http.get("*/api/live/machines", async ({ request }) => {
     received.push(`GET ${new URL(request.url).search}`);
-    await delay(5);
+    const gate = createDeferred<void>();
+    const arrived = arrival;
+    arrival = createDeferred();
+    arrived.resolve(gate);
+    await gate.promise;
     received.push("answered");
     return HttpResponse.json({ items: [] });
   }),
@@ -26,7 +37,14 @@ beforeEach(() => {
 
 describe("answerBehind", () => {
   it("asks the live REST endpoint for one record, then again once answered", async () => {
-    await answerBehind("rest");
+    const answered = answerBehind("rest");
+    const first = await arrival.promise;
+    expect(received).toEqual(["GET ?size=1"]);
+    first.resolve();
+    const second = await arrival.promise;
+    expect(received).toEqual(["GET ?size=1", "answered", "GET ?size=1"]);
+    second.resolve();
+    await answered;
     expect(received).toEqual([
       "GET ?size=1",
       "answered",

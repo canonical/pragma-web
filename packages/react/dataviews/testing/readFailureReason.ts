@@ -4,9 +4,8 @@ import {
   type Source,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
-import { vi } from "vitest";
 import type { Machine } from "../src/storybook/machines/index.js";
-import { DELIVERY_WAIT } from "./constants.js";
+import awaitDelivery from "./awaitDelivery.js";
 
 /**
  * Run one request through a story source and read the reason it fails
@@ -17,28 +16,16 @@ import { DELIVERY_WAIT } from "./constants.js";
 export default async function readFailureReason(
   source: Source<Machine>,
 ): Promise<string> {
-  const deliveries: SourceDelivery<Machine>[] = [];
-  const stop = source.execute(
+  const delivery = await awaitDelivery(
+    source,
     {
       requestId: "failure",
       slice: EMPTY_SLICE,
       window: DEFAULT_WINDOW,
       facets: [],
     },
-    (delivery) => {
-      deliveries.push(delivery);
-    },
+    (taken): taken is Extract<SourceDelivery<Machine>, { status: "failed" }> =>
+      taken.status === "failed",
   );
-  return (
-    vi
-      .waitFor(() => {
-        const last = deliveries.at(-1);
-        if (last?.status !== "failed") {
-          throw new Error("the request has not failed yet");
-        }
-        return last.failure.reason;
-      }, DELIVERY_WAIT)
-      // Stopped however the wait ends, so no request outlives its test.
-      .finally(stop)
-  );
+  return delivery.failure.reason;
 }

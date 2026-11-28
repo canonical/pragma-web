@@ -7,6 +7,7 @@ describe("fakeAnnouncerClock", () => {
     fakeAnnouncerClock();
     expect(vi.isFakeTimers()).toBe(true);
     const fired = vi.fn();
+    // biome-ignore lint/style/noRestrictedGlobals: drives a faked clock
     setTimeout(fired, 1000);
     vi.advanceTimersByTime(1000);
     expect(fired).toHaveBeenCalledTimes(1);

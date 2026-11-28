@@ -1,18 +1,13 @@
-import {
-  DEFAULT_WINDOW,
-  EMPTY_SLICE,
-  type SourceDelivery,
-} from "@canonical/dataviews-core";
+import { DEFAULT_WINDOW, EMPTY_SLICE } from "@canonical/dataviews-core";
 import { HttpResponse } from "msw";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   answerLiveRequests,
   answerOverHttp2,
-  DELIVERY_WAIT,
+  awaitDelivery,
   readFailureReason,
   serveMockApi,
 } from "../../../../testing/index.js";
-import type { Machine } from "../types.js";
 import createRestMachineSource from "./createRestMachineSource.js";
 
 // Each test answers the one request its source sends its own way.
@@ -115,22 +110,13 @@ describe("createRestMachineSource", () => {
         },
       }),
     );
-    const deliveries: SourceDelivery<Machine>[] = [];
-    const stop = createRestMachineSource("live").execute(
-      {
-        requestId: "facets",
-        slice: EMPTY_SLICE,
-        window: DEFAULT_WINDOW,
-        facets: ["status", "cores"],
-      },
-      (delivery) => {
-        deliveries.push(delivery);
-      },
-    );
-    await vi
-      .waitFor(() => expect(deliveries).toHaveLength(1), DELIVERY_WAIT)
-      .finally(stop);
-    expect(deliveries.at(0)).toMatchObject({
+    const delivery = await awaitDelivery(createRestMachineSource("live"), {
+      requestId: "facets",
+      slice: EMPTY_SLICE,
+      window: DEFAULT_WINDOW,
+      facets: ["status", "cores"],
+    });
+    expect(delivery).toMatchObject({
       status: "succeeded",
       page: {
         facets: {
@@ -152,22 +138,13 @@ describe("createRestMachineSource", () => {
     answerLiveRequests(server, "rest", () =>
       HttpResponse.json({ items: [], facets: "none" }),
     );
-    const deliveries: SourceDelivery<Machine>[] = [];
-    const stop = createRestMachineSource("live").execute(
-      {
-        requestId: "no-facets",
-        slice: EMPTY_SLICE,
-        window: DEFAULT_WINDOW,
-        facets: [],
-      },
-      (delivery) => {
-        deliveries.push(delivery);
-      },
-    );
-    await vi
-      .waitFor(() => expect(deliveries).toHaveLength(1), DELIVERY_WAIT)
-      .finally(stop);
-    expect(deliveries.at(0)).toMatchObject({ status: "succeeded" });
+    const delivery = await awaitDelivery(createRestMachineSource("live"), {
+      requestId: "no-facets",
+      slice: EMPTY_SLICE,
+      window: DEFAULT_WINDOW,
+      facets: [],
+    });
+    expect(delivery).toMatchObject({ status: "succeeded" });
   });
 
   it("gives a failed answer's own reason", async () => {
@@ -181,22 +158,13 @@ describe("createRestMachineSource", () => {
 
   it("reads no facets from an answer that carries none", async () => {
     answerLiveRequests(server, "rest", () => HttpResponse.json({ items: [] }));
-    const deliveries: SourceDelivery<Machine>[] = [];
-    const stop = createRestMachineSource("live").execute(
-      {
-        requestId: "facetless",
-        slice: EMPTY_SLICE,
-        window: DEFAULT_WINDOW,
-        facets: [],
-      },
-      (delivery) => {
-        deliveries.push(delivery);
-      },
-    );
-    await vi
-      .waitFor(() => expect(deliveries).toHaveLength(1), DELIVERY_WAIT)
-      .finally(stop);
-    expect(deliveries.at(0)).toMatchObject({ status: "succeeded" });
+    const delivery = await awaitDelivery(createRestMachineSource("live"), {
+      requestId: "facetless",
+      slice: EMPTY_SLICE,
+      window: DEFAULT_WINDOW,
+      facets: [],
+    });
+    expect(delivery).toMatchObject({ status: "succeeded" });
   });
 
   it("reads the answer's machines, leaving out any of another shape", async () => {
@@ -220,22 +188,13 @@ describe("createRestMachineSource", () => {
         ],
       }),
     );
-    const deliveries: SourceDelivery<Machine>[] = [];
-    const stop = createRestMachineSource("live").execute(
-      {
-        requestId: "mixed",
-        slice: EMPTY_SLICE,
-        window: DEFAULT_WINDOW,
-        facets: [],
-      },
-      (delivery) => {
-        deliveries.push(delivery);
-      },
-    );
-    await vi
-      .waitFor(() => expect(deliveries).toHaveLength(1), DELIVERY_WAIT)
-      .finally(stop);
-    expect(deliveries.at(0)).toMatchObject({
+    const delivery = await awaitDelivery(createRestMachineSource("live"), {
+      requestId: "mixed",
+      slice: EMPTY_SLICE,
+      window: DEFAULT_WINDOW,
+      facets: [],
+    });
+    expect(delivery).toMatchObject({
       status: "succeeded",
       page: { rows: [machine] },
     });

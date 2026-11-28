@@ -1410,24 +1410,22 @@ const columns: readonly DataTableColumn[] = [
       ),
     );
     const header = table.querySelector(".ds.data-table > .header");
+    const body = table.querySelector(".ds.data-table-body");
     const listRows = () => [
       ...table.querySelectorAll(".ds.data-table-body > tr"),
     ];
-    const waitFrames = async (): Promise<void> => {
-      for (let frame = 0; frame < 2; frame += 1) {
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-    };
-    await waitFrames();
     const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
-    const first = listRows().find(
-      (row) => row.getBoundingClientRect().bottom > headerBottom,
-    );
-    const top = first?.getBoundingClientRect().top;
-    await expect(top).toBeDefined();
-    // Settled, and measured: the row being read holds still.
-    await waitFrames();
-    await expect(first?.getBoundingClientRect().top).toBe(top);
+    /** The row index of the first row the header does not cover. */
+    const readFirstVisible = () =>
+      listRows()
+        .find((row) => row.getBoundingClientRect().bottom > headerBottom)
+        ?.getAttribute("aria-rowindex");
+    const anchor = readFirstVisible();
+    await expect(Number(anchor)).toBeGreaterThan(1000);
+    // Busy until every mounted row is measured and the scroll corrected.
+    await waitFor(() => expect(body).toHaveAttribute("aria-busy", "false"));
+    // The view stays on the row being read.
+    await expect(readFirstVisible()).toBe(anchor);
     // The mounted rows cover the viewport, with no blank band at either end.
     const mounted = listRows();
     await expect(

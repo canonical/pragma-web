@@ -1,3 +1,4 @@
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { createRef, useRef } from "react";
@@ -46,11 +47,16 @@ const Composite = ({
   );
 };
 
-const waitForNextTask = () =>
-  act(() => new Promise((resolve) => setTimeout(resolve)));
+/** Runs the task StopClaim waits for, on the faked clock. */
+const runNextTask = (): void => {
+  act(() => {
+    vi.runOnlyPendingTimers();
+  });
+};
 
 describe("StopClaim", () => {
   it("claims a move once focus has left for the page, so focus stays there", async () => {
+    installFakeClock();
     const isClaimingRef = { current: false };
     const onActiveItemChange = vi.fn(() => {
       expect(isClaimingRef.current).toBe(true);
@@ -65,7 +71,7 @@ describe("StopClaim", () => {
     );
     act(() => screen.getByRole("button", { name: "a" }).focus());
     act(() => screen.getByRole("button", { name: "a" }).blur());
-    await waitForNextTask();
+    runNextTask();
     view.rerender(
       <Composite
         activeItem="b"
@@ -74,7 +80,7 @@ describe("StopClaim", () => {
         isClaimingRef={isClaimingRef}
       />,
     );
-    await waitForNextTask();
+    runNextTask();
     expect(document.body).toHaveFocus();
     expect(onActiveItemChange).toHaveBeenCalledWith("b");
     expect(isClaimingRef.current).toBe(false);
@@ -105,6 +111,7 @@ describe("StopClaim", () => {
   });
 
   it("leaves a move after a removal unclaimed, so the next item takes focus", async () => {
+    installFakeClock();
     const onActiveItemChange = vi.fn();
     const view = render(
       <Composite
@@ -121,12 +128,13 @@ describe("StopClaim", () => {
         onActiveItemChange={onActiveItemChange}
       />,
     );
-    await waitForNextTask();
+    runNextTask();
     expect(screen.getByRole("button", { name: "b" })).toHaveFocus();
     expect(onActiveItemChange).not.toHaveBeenCalled();
   });
 
   it("leaves a move after a removal that fired focusout unclaimed, as in Chromium", async () => {
+    installFakeClock();
     const onActiveItemChange = vi.fn();
     const view = render(
       <Composite
@@ -150,7 +158,7 @@ describe("StopClaim", () => {
         onActiveItemChange={onActiveItemChange}
       />,
     );
-    await waitForNextTask();
+    runNextTask();
     view.rerender(
       <Composite
         activeItem="b"
@@ -158,7 +166,7 @@ describe("StopClaim", () => {
         onActiveItemChange={onActiveItemChange}
       />,
     );
-    await waitForNextTask();
+    runNextTask();
     expect(onActiveItemChange).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "b" })).toHaveFocus();
   });

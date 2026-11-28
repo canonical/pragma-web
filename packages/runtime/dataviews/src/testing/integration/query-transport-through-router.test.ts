@@ -13,6 +13,7 @@ import {
   route,
 } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
+import { waitForState } from "../../../testing/index.js";
 import { createPlatformLocation } from "../../lib/location/index.js";
 
 const routes = {
@@ -25,7 +26,7 @@ const routes = {
   // optional property types; the map is what the router runs on regardless.
 } as const satisfies Record<string, unknown>;
 
-const harness = () => {
+const createHarness = () => {
   const adapter = createMemoryAdapter();
   // Land on the route before the router's initial load so the fixture's
   // writes run against the matched /machines route, not the router's base.
@@ -35,41 +36,33 @@ const harness = () => {
   return { adapter, router, location };
 };
 
-/**
- * Resolve once the router's state satisfies a condition: at once when it
- * already does, otherwise on the first state the router publishes that does.
- */
-const until = (
-  router: Pick<ReturnType<typeof harness>["router"], "subscribe">,
+/** Resolve once the router's state satisfies `check`. */
+const waitForRouter = (
+  router: ReturnType<typeof createHarness>["router"],
   check: () => boolean,
+  awaited: string,
 ): Promise<void> =>
-  new Promise((resolve) => {
-    if (check()) {
-      resolve();
-      return;
-    }
-    const unsubscribe = router.subscribe(() => {
-      if (check()) {
-        unsubscribe();
-        resolve();
-      }
-    });
-  });
+  waitForState((listener) => router.subscribe(listener), check, awaited);
 
 describe("query transport through the router", () => {
   it("runs against the matched /machines route", async () => {
-    const { router } = harness();
-    await until(router, () => router.getState().match?.kind === "route");
+    const { router } = createHarness();
+    await waitForRouter(
+      router,
+      () => router.getState().match?.kind === "route",
+      "the matched route",
+    );
     expect(router.getState().match?.kind).toBe("route");
     expect(router.getState().location.pathname).toBe("/machines");
   });
 
   it("lets the router see adapter-driven writes through its own state", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
-    await until(
+    await waitForRouter(
       router,
       () => router.getState().location.searchParams.getAll("status").length > 0,
+      "the written statuses",
     );
     expect(router.getState().location.searchParams.getAll("status")).toEqual([
       "failed",
@@ -80,24 +73,27 @@ describe("query transport through the router", () => {
 
 describe("the router's scalar search helpers", () => {
   it("collapses repeated values on read — the documented lossy path", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
-    await until(
+    await waitForRouter(
       router,
       () => router.getState().location.searchParams.getAll("status").length > 0,
+      "the written statuses",
     );
     // The typed search machinery reads each key once.
     const typed = router.getState().location.searchParams.get("status");
     expect(typed).toBe("failed");
   });
+
   it("collapses repeated values through setSearchParams — the documented lossy write", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
     // The adapter's own state is synchronous; the router's store settles
     // through its async load pipeline.
-    await until(
+    await waitForRouter(
       router,
       () => router.getState().location.searchParams.getAll("status").length > 0,
+      "the written statuses",
     );
     router.setSearchParams({ page: "2" });
     // The adapter commits synchronously; the collapsed write is immediate.

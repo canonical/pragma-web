@@ -10,10 +10,11 @@
  * removal instead of the change.
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createStandInPresentationStore,
   flushPresentation,
+  installFakeClock,
 } from "../../../testing/index.js";
 import {
   createPresentation,
@@ -22,13 +23,9 @@ import {
   WRITE_DELAY,
 } from "../../lib/presentation/index.js";
 
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 describe("regression 0017 — a read outran a failing write", () => {
   it("keeps the change, reports the failure and retries the change itself", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     let failWrite: (error: Error) => void = () => {};
     const patchPresentation = vi
       .fn<PresentationStore["patchPresentation"]>()

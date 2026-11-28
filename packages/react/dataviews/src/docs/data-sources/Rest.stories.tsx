@@ -175,12 +175,14 @@ export const Answered: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
       ),
     );
     await userEvent.click(canvas.getByRole("checkbox", { name: "failed" }));
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–3 out of 3 rows",
@@ -219,6 +221,7 @@ export const Failed: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await expect(
       await canvas.findByText(
         "These rows could not be loaded: the machine inventory is unavailable.",
@@ -241,12 +244,14 @@ export const FailedOverKeptRows: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
       ),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await answerBehind("rest");
     await expect(
       await canvas.findByText(
         /These rows do not match the current query: the machines past the first page are unavailable/,
@@ -276,6 +281,7 @@ export const SortLimitedToOneTerm: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
@@ -317,6 +323,7 @@ export const TextApplied: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
@@ -328,6 +335,7 @@ export const TextApplied: Story = {
       canvas.queryByRole("textbox", { name: "Owner contains" }),
     ).toBeNull();
     await userEvent.type(host, "ELM");
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing row 1 out of 1",
@@ -358,6 +366,7 @@ export const CountsAndNoneOf: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
@@ -372,6 +381,7 @@ export const CountsAndNoneOf: Story = {
     await userEvent.click(
       within(status).getByRole("checkbox", { name: "failed" }),
     );
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–3 out of 3 rows",
@@ -385,6 +395,7 @@ export const CountsAndNoneOf: Story = {
         name: "Match none of these instead",
       }),
     );
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 9 rows",
@@ -413,6 +424,7 @@ export const StartsWithApplied: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
@@ -428,6 +440,7 @@ export const StartsWithApplied: Story = {
       canvas.queryByRole("textbox", { name: "Owner starts with" }),
     ).toBeNull();
     await userEvent.type(host, "B");
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing row 1 out of 1",

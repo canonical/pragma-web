@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createDeferred,
   createStandInPresentationStore,
+  installFakeClock,
 } from "../../../testing/index.js";
 import { WRITE_DEADLINE, WRITE_DELAY } from "./constants.js";
 import createPreferenceLayer from "./createPreferenceLayer.js";
@@ -9,11 +10,7 @@ import createPreferenceWriter from "./createPreferenceWriter.js";
 import type { PreferenceResult, PresentationStore } from "./types.js";
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  installFakeClock();
 });
 
 /** A writer over a stand-in store, with its write and the two callbacks spied. */

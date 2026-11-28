@@ -29,7 +29,8 @@ const componentCssClassName = "ds data-views-saved-views";
  * natively. A name that is empty, only spaces or another view's is refused
  * before anything is written, beside the input. The notices also say when
  * the arrangement is not being saved, which the provider's presentation
- * reports.
+ * reports. Its controls are busy while the views first load or a command
+ * waits on the store.
  *
  * @note Impure: observes the provider's views from an effect.
  *
@@ -133,91 +134,96 @@ export default function SavedViews({
         </noscript>
       ) : (
         <>
-          <div className="picker">
-            <label htmlFor={selectId} className="label">
-              {messages.view}
-            </label>
-            <SelectInput
-              ref={select}
-              id={selectId}
-              options={[
-                ...(current === null
-                  ? [{ value: "", label: messages.viewNone, disabled: true }]
-                  : []),
-                ...state.views.map((view) => ({
-                  value: view.id,
-                  label: view.name,
-                })),
-              ]}
-              value={current?.id ?? ""}
-              disabled={!listed}
-              aria-describedby={modified ? modifiedId : undefined}
-              onChange={(event) => {
-                void views.open(event.target.value);
-              }}
-            />
-            {modified ? (
-              <span id={modifiedId} className="modified">
-                {messages.viewModified}
-              </span>
-            ) : null}
-          </div>
-          <div className="commands">
-            <Button
-              type="button"
-              disabled={pending || current === null || !modified}
-              onClick={() => {
-                void views.save();
-              }}
-            >
-              {conflicted ? messages.overwriteView : messages.saveView}
-            </Button>
-            <Button
-              type="button"
-              disabled={pending || current === null || !modified}
-              onClick={views.revert}
-            >
-              {conflicted ? messages.discardViewChanges : messages.revertView}
-            </Button>
-            <Button
-              type="button"
-              disabled={pending || !listed}
-              commandfor={saveAsId}
-              command="show-modal"
-              onClick={recordOpener}
-            >
-              {messages.saveViewAs}
-            </Button>
-            <Button
-              type="button"
-              disabled={pending || current === null || !listed}
-              commandfor={renameId}
-              command="show-modal"
-              onClick={recordOpener}
-            >
-              {messages.renameView}
-            </Button>
-            <Button
-              type="button"
-              disabled={pending || current === null}
-              commandfor={removeId}
-              command="show-modal"
-              onClick={recordOpener}
-            >
-              {messages.deleteView}
-            </Button>
-            {listing.status === "failed" || presentationReason !== null ? (
+          <div
+            className="controls"
+            aria-busy={listing.status === "pending" || pending}
+          >
+            <div className="picker">
+              <label htmlFor={selectId} className="label">
+                {messages.view}
+              </label>
+              <SelectInput
+                ref={select}
+                id={selectId}
+                options={[
+                  ...(current === null
+                    ? [{ value: "", label: messages.viewNone, disabled: true }]
+                    : []),
+                  ...state.views.map((view) => ({
+                    value: view.id,
+                    label: view.name,
+                  })),
+                ]}
+                value={current?.id ?? ""}
+                disabled={!listed}
+                aria-describedby={modified ? modifiedId : undefined}
+                onChange={(event) => {
+                  void views.open(event.target.value);
+                }}
+              />
+              {modified ? (
+                <span id={modifiedId} className="modified">
+                  {messages.viewModified}
+                </span>
+              ) : null}
+            </div>
+            <div className="commands">
               <Button
-                ref={retry}
                 type="button"
+                disabled={pending || current === null || !modified}
                 onClick={() => {
-                  views.refresh();
-                  presentation.refresh();
+                  void views.save();
                 }}
               >
-                {messages.refreshViews}
+                {conflicted ? messages.overwriteView : messages.saveView}
               </Button>
-            ) : null}
+              <Button
+                type="button"
+                disabled={pending || current === null || !modified}
+                onClick={views.revert}
+              >
+                {conflicted ? messages.discardViewChanges : messages.revertView}
+              </Button>
+              <Button
+                type="button"
+                disabled={pending || !listed}
+                commandfor={saveAsId}
+                command="show-modal"
+                onClick={recordOpener}
+              >
+                {messages.saveViewAs}
+              </Button>
+              <Button
+                type="button"
+                disabled={pending || current === null || !listed}
+                commandfor={renameId}
+                command="show-modal"
+                onClick={recordOpener}
+              >
+                {messages.renameView}
+              </Button>
+              <Button
+                type="button"
+                disabled={pending || current === null}
+                commandfor={removeId}
+                command="show-modal"
+                onClick={recordOpener}
+              >
+                {messages.deleteView}
+              </Button>
+              {listing.status === "failed" || presentationReason !== null ? (
+                <Button
+                  ref={retry}
+                  type="button"
+                  onClick={() => {
+                    views.refresh();
+                    presentation.refresh();
+                  }}
+                >
+                  {messages.refreshViews}
+                </Button>
+              ) : null}
+            </div>
           </div>
           <NameForm
             ref={saveAsDialog}

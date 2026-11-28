@@ -8,7 +8,8 @@ const componentCssClassName = "ds data-table-body";
 /**
  * The table's body, virtualized: the entries near the viewport at their
  * logical positions, with the space of the rest as its padding and as the
- * top margin of a later run's first row.
+ * top margin of a later run's first row. It is busy while its rows are
+ * being measured.
  *
  * @implements ds:apps.subcomponent.data_table-body
  */
@@ -20,12 +21,8 @@ const VirtualBody = ({
   tracks,
 }: VirtualBodyProps): ReactElement => {
   const model = useDataViewsValue(rowModel);
-  const { mounted, body, readRowRef, onFocus, onBlur } = useVirtualRows(
-    entries,
-    estimatedRowHeight,
-    model,
-    { tracks },
-  );
+  const { mounted, measuring, body, readRowRef, onFocus, onBlur } =
+    useVirtualRows(entries, estimatedRowHeight, model, { tracks });
   // One flat list, keyed by entry id, so a row keeps its element as it
   // moves between runs. The space before the first run and after the last
   // is the body's block padding; the space between runs is the top margin
@@ -55,6 +52,7 @@ const VirtualBody = ({
     <tbody
       ref={body}
       className={componentCssClassName}
+      aria-busy={measuring}
       style={
         before === 0 && mounted.after === 0
           ? undefined

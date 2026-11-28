@@ -252,6 +252,15 @@ const listGapHeights = (table: HTMLElement): string[] => {
   ].filter((gap) => gap !== "");
 };
 
+/** The table's body row group. */
+const getBody = (table: HTMLElement): HTMLElement => {
+  const body = table.querySelector<HTMLElement>(".ds.data-table-body");
+  if (body === null) {
+    throw new Error("the table has no body");
+  }
+  return body;
+};
+
 /** The row showing one host. */
 const getRow = (host: string): HTMLElement => {
   const row = screen.getByText(host).closest<HTMLElement>("tr");
@@ -728,6 +737,49 @@ describe("virtualized DataTable", () => {
         ),
       );
       expect(table.scrollTop).toBe(4990);
+    });
+
+    it("is busy until each mounted row is measured", () => {
+      const { table } = renderVirtualizedTable();
+      const body = getBody(table);
+      expect(body).toHaveAttribute("aria-busy", "true");
+      const [first, ...rest] = listMountedHosts();
+      if (first === undefined) {
+        throw new Error("no row is mounted");
+      }
+      report(rest.map((host) => [getRow(host), 10] as const));
+      expect(body).toHaveAttribute("aria-busy", "true");
+      // Busy clears with the last measurement.
+      report([[getRow(first), 10]]);
+      expect(body).toHaveAttribute("aria-busy", "false");
+    });
+
+    it("is busy again for the rows a scroll mounts", () => {
+      const { table } = renderVirtualizedTable();
+      const body = getBody(table);
+      report(listMountedHosts().map((host) => [getRow(host), 10] as const));
+      scrollTo(table, 5000);
+      expect(body).toHaveAttribute("aria-busy", "true");
+      report(listMountedHosts().map((host) => [getRow(host), 10] as const));
+      expect(body).toHaveAttribute("aria-busy", "false");
+    });
+
+    it("is not busy once a correction lands", () => {
+      const { table } = renderVirtualizedTable();
+      report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
+      scrollTo(table, 5000);
+      report(
+        listMountedHosts().map((host) => [getRow(host), 10] as const),
+        500,
+      );
+      expect(table.scrollTop).toBe(4950);
+      expect(getBody(table)).toHaveAttribute("aria-busy", "false");
+    });
+
+    it("is never busy where nothing can measure", () => {
+      vi.stubGlobal("ResizeObserver", undefined);
+      const { table } = renderVirtualizedTable();
+      expect(getBody(table)).toHaveAttribute("aria-busy", "false");
     });
   });
 

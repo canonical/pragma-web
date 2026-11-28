@@ -6,7 +6,10 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import { createRestHandlers } from "../../../../../../storybook/machines/api/index.js";
+import {
+  answerBehind,
+  createRestHandlers,
+} from "../../../../../../storybook/machines/api/index.js";
 import type {
   Machine,
   MachineProviderConfig,
@@ -347,7 +350,7 @@ export const Refreshing: Story = {
  * Render the story inside a root over the REST endpoint, which computes its
  * facets, starting on `query` when one is given.
  */
-const withRestBackedRoot = (query?: string): Decorator =>
+const wrapInRestBackedRoot = (query?: string): Decorator =>
   withMachineRoot({
     source: () => createRestMachineSource("live"),
     ...(query === undefined ? {} : { query }),
@@ -361,16 +364,15 @@ const withRestBackedRoot = (query?: string): Decorator =>
  */
 export const CountsRestBacked: Story = {
   name: "Counts REST backed",
-  decorators: [withRestBackedRoot("page=1&size=5")],
+  decorators: [wrapInRestBackedRoot("page=1&size=5")],
   render: ({ label }) => (
     <ConnectedChart type="bar" field="status" label={label} />
   ),
   play: async ({ canvas }) => {
-    const table = await canvas.findByRole(
-      "table",
-      { name: "Machines by status, as a table" },
-      { timeout: 3000 },
-    );
+    await answerBehind("rest");
+    const table = await canvas.findByRole("table", {
+      name: "Machines by status, as a table",
+    });
     await expect(
       within(table)
         .getAllByRole("rowheader")
@@ -386,17 +388,16 @@ export const CountsRestBacked: Story = {
 export const RangeRestBacked: Story = {
   name: "Range REST backed",
   args: { type: "range", field: "cores", label: "Cores" },
-  decorators: [withRestBackedRoot()],
+  decorators: [wrapInRestBackedRoot()],
   render: ({ label }) => (
     <ConnectedChart type="range" field="cores" label={label} />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await expect(
-      await canvas.findByRole(
-        "img",
-        { name: "Cores: a range chart from 2 to 64" },
-        { timeout: 3000 },
-      ),
+      await canvas.findByRole("img", {
+        name: "Cores: a range chart from 2 to 64",
+      }),
     ).toBeVisible();
   },
 };
