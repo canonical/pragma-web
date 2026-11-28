@@ -26,6 +26,9 @@ const useOptionAriaProps = (name: string, optionValue: string) => {
         id: optionLabelId,
         htmlFor: optionBaseId,
       },
+      description: {
+        id: descriptionId,
+      },
     };
   }, [name, optionValue, uniqueId]);
   return props;

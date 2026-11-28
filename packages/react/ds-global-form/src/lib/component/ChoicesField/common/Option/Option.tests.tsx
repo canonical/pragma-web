@@ -67,4 +67,38 @@ describe("Choices Option", () => {
     );
     expect(screen.getByRole("radio")).toBeDisabled();
   });
+
+  it("renders the description and wires it to the input", () => {
+    render(
+      <Option
+        name="group"
+        type="radio"
+        option={{ ...baseOption, description: "Described choice" }}
+        checked={false}
+        disabled={false}
+        onChange={() => {}}
+      />,
+    );
+    const input = screen.getByRole("radio");
+    const description = screen.getByText("Described choice");
+    expect(description).toHaveAttribute(
+      "id",
+      input.getAttribute("aria-describedby"),
+    );
+  });
+
+  it("hides the description when showDescription is false", () => {
+    render(
+      <Option
+        name="group"
+        type="radio"
+        option={{ ...baseOption, description: "Described choice" }}
+        checked={false}
+        disabled={false}
+        onChange={() => {}}
+        showDescription={false}
+      />,
+    );
+    expect(screen.queryByText("Described choice")).not.toBeInTheDocument();
+  });
 });
