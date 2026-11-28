@@ -6,18 +6,18 @@
     --chip-color-background: var(--color-foreground-secondary);
     --chip-color-background-hover: var(--color-foreground-secondary-hover);
     --chip-color-background-active: var(--color-foreground-secondary-active);
-    --chip-color-border: var(--color-border-high-contrast);
+    --chip-color-border: var(--color-border);
     --chip-color-text: var(--color-text);
 
     --chip-border-radius: 1rem;
-    --chip-font-size: var(--font-size-small);
-    --chip-font-weight: var(--font-weight-default);
-    --chip-line-height: var(--line-height-small);
-    --chip-border-width: var(--spacing-border-width);
-    --chip-padding-vertical: var(--spacing-vertical-xsmall);
-    --chip-padding-horizontal: var(--spacing-horizontal-small);
-    --chip-margin-bottom: var(--spacing-vertical-small);
-    --chip-margin-left: var(--spacing-horizontal-medium);
+    --chip-font-size: var(--typography-text-secondary-font-size);
+    --chip-font-weight: var(--typography-text-secondary-font-weight);
+    --chip-line-height: var(--typography-text-secondary-line-height);
+    --chip-border-width: var(--dimension-stroke-thickness-medium);
+    --chip-padding-vertical: var(--dimension-050);
+    --chip-padding-horizontal: var(--dimension-100);
+    --chip-margin-bottom: var(--dimension-100);
+    --chip-margin-left: var(--dimension-150);
   }
 
   .ds.chip {
@@ -72,12 +72,12 @@
       background-position: center;
       display: inline-block;
       cursor: pointer;
-      margin-left: var(--spacing-horizontal-xsmall);
+      margin-left: var(--dimension-050);
       flex: 0 0 auto;
       border-radius: 50%;
       border-color: transparent;
-      height: var(--font-size-default);
-      width: var(--font-size-default);
+      height: var(--dimension-200);
+      width: var(--dimension-200);
     }
 
     &:is(button) {
@@ -106,7 +106,7 @@
       --badge-chip-margin-tweak: var(--dimension-025);
 
       align-self: center;
-      margin-left: var(--spacing-horizontal-small);
+      margin-left: var(--dimension-100);
       margin-right: var(--badge-chip-margin-tweak);
     }
   }
