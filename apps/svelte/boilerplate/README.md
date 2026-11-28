@@ -1,72 +1,15 @@
-# SvelteKit reference application
+# SvelteKit Boilerplate
 
-This is an initial server-rendered application, using SvelteKit for routing,
-head, server actions and navigation. Route files import domain pages and data
-from `src/domains`; no second router or process-wide request store is used.
-It uses the Svelte app-tier application, view and content layouts, global
-breadcrumbs, `@canonical/styles`, its design tokens and self-hosted fonts.
-The dashboard rail and create panel use native disclosure controls; generic
-app-tier side-navigation and side-panel components are not available in Svelte.
-The account flow is a **demo**, not authentication;
-real server reads and actions must authorize at the request boundary.
+A server-rendered Svelte application built on Canonical's design system,
+`@canonical/styles` and `@canonical/i18n-core`, with SvelteKit for routing,
+loading, form actions and streaming. It is the Svelte counterpart of the React
+reference application, `apps/react/boilerplate-vite`: the same routes, pages,
+components, messages, stories and behaviours, with Svelte idioms in place of
+React's mechanics.
 
-The `theme` cookie chooses light or dark on the server before first paint;
-without a valid cookie the styles follow their default/system behavior. The
-native preference form reloads the document and works without JavaScript.
-Kit announces the new document title; pathname navigation moves focus to the
-page heading, while query-only navigation retains Kit's normal focus behavior.
-The `visitor` cookie on catalog detail demonstrates request isolation only.
-Neither it nor the demo session is a trusted identity.
+## Quick start
 
-## Forms
-
-The forms with fields use `Form` and `Field` from `@canonical/svelte-ds-global-form`, the
-workspace package, and its stylesheet `@canonical/svelte-ds-global-form/index.css`.
-The app adds no form CSS of its own. Buttons are the global `Button`.
-
-- **Native forms and actions.** Contact, settings and instance creation are
-  `Form`s without an owner. They post to SvelteKit form actions, which decode
-  the native field map, validate it on the server and return `fail(400, …)`
-  with the values and message keys. Each field's `error` is the translated key
-  from that `fail()` data. They work without JavaScript.
-- **Enhancement.** Contact and instance creation add SvelteKit's `enhance` as an
-  attachment: `{@attach fromAction(enhance)}` on instance creation, and a small
-  typed attachment around `enhance(form, submit)` on contact. Contact's submit function accepts
-  one request in flight, keeps edits made while it is pending and tells an
-  earlier result from the current draft. A failed transport has an unknown
-  outcome and shows a retryable notice. Settings posts as a full page, with an
-  error summary linking to each field.
-- **Options from `load`.** The instance release options come from the
-  `/api/releases` endpoint, read in the page's `load` with `fetchOptions` and
-  Kit's `fetch`, so they render on the server.
-- **Remote validation.** The instance name is checked with `validateRemotely`
-  against `/api/instance-name` while the user types; a taken name blocks the
-  submit. The action checks again, since the check needs JavaScript.
-- **Form state.** The project preview uses `createFormState()` as the owner of a
-  GET form: the preview reads its values as the user types, and a submit posts
-  the form natively. The phone example posts its two native controls
-  (`number`, `number-country`) to an action decoded with `decodePhone`; when
-  hydrated it decodes them in the browser instead.
-
-The contact action is a local demonstration: no message is delivered.
-
-The dashboard's instance workflow creates, selects and removes bounded demo
-records in a browser cookie. It does not provision infrastructure. The session
-and records are client-controlled demonstration data, not authentication or a
-database; real actions require real authorization and server-side persistence.
-Removal in SSR has a separate confirmation page that works without JavaScript;
-when hydrated it uses the Svelte global Modal. The SPA stores demo records in
-localStorage and uses the same modal pattern.
-
-`@canonical/i18n-core` negotiates the request locale (cookie, then
-Accept-Language, then English); the per-layout locale source hydrates from the
-same value. English, French and Arabic include live browser switching, native
-fallback, direction, translations and number/plural examples. HTML responses
-are private/no-store because both theme and locale are request-specific.
-
-## Run
-
-Use the repository's pinned Bun and a supported Node version. From the root:
+From the repository root:
 
 ```sh
 bun install
@@ -76,48 +19,115 @@ bun run lerna run build --scope @canonical/svelte-boilerplate --include-dependen
 Then in `apps/svelte/boilerplate`:
 
 ```sh
-bun run dev
-bun run check
-bun run test
-bun run preview
-bun run build:spa
-bun run build:storybook
+bun run dev        # SSR dev server with HMR
 ```
 
-`preview` runs the built adapter-node server. Set `HOST`, `PORT` and `ORIGIN`
-as appropriate for deployment; see the adapter-node deployment documentation
-for proxy configuration. The tests launch the built server on an ephemeral
-loopback port, use local synthetic data and require Playwright Chromium already
-installed. Set `CHROMIUM_PATH` to an existing executable to override Playwright's
-default. `SERVER_RUNTIME=bun` runs the same adapter-node output with Bun; it is
-not a separate adapter-bun build. Styles refer to `/icons/*.svg`; the app serves
-the four criticality icons from the installed asset package. Vite reports these
-absolute URLs as unresolved at build time, but the built server serves them.
+## Builds
 
-The separate SPA build is emitted to `build-spa`; configure the static host to
-serve `200.html` as the fallback for every app route, without rewriting assets.
-The SPA uses browser locale negotiation, local-only contact validation,
-theme and settings stored in browser localStorage, and a sessionStorage demo
-account; no POST action, server dashboard, sitemap, HTTP redirect/status,
-or no-JavaScript application is available. Its forms validate in the browser
-through `onsubmit`; the release options are local and the instance name is not
-checked remotely. The static fallback starts with
-English/LTR markup until the client initializes. The static host must also serve
-the four criticality icons copied to `build-spa/icons/` from `@canonical/ds-assets`.
-Storybook has stories for the contact form (empty, server errors, Arabic), the
-catalog and the dashboard overview. A global decorator wraps every story in the
-app's locale source, driven by the locale toolbar; the contact stories use Kit
-mocks rather than a backend.
+| Build | Command | Output | Serve |
+| --- | --- | --- | --- |
+| SSR (adapter-node) | `bun run build` | `build/` | `bun run preview` (`node build/index.js`; Bun runs it too) |
+| SPA (adapter-static) | `bun run build:spa` | `build-spa/` | any static host, with `200.html` as the fallback for every app route |
+| Storybook | `bun run build:storybook` | `storybook-static/` | any static host |
 
-## Scope and gaps
+The SSR build is the reference. The SPA build renders the same pages from
+`src/spa/routes`, a second route tree with browser-only `load` functions: the
+theme and locale come from their cookies and the browser's languages, and the
+forms have no server to post to. Set `HOST`, `PORT` and `ORIGIN` for the SSR
+build as adapter-node documents.
 
-This is a partial reference. Native dashboard navigation, create disclosure and
-card layouts cover part of the shell, but do not implement the React side
-navigation, sliding side panel, card components or their full visual and
-interaction parity. Combobox is not used. No production authorization, screen
-reader audit, scroll-restoration test, proxy deployment test or full browser and
-Node version matrix has been performed. The Kit version is 2.70.3 rather than
-3.x: its Node requirement and TypeScript peer accommodate this repository's
-declared Node range and TypeScript 6.
+## Testing
 
-GraphQL is not part of the app or its checks.
+```sh
+bun run test:unit     # Vitest, the pure modules, in Node
+bun run test:browser  # builds, then Playwright Chromium against the SSR server, the SPA and Storybook
+bun run test          # both
+```
+
+The browser tests need Playwright's Chromium installed; set `CHROMIUM_PATH` to
+use another executable, and `SERVER_RUNTIME=bun` to run the SSR build with Bun.
+
+## Project structure
+
+```
+src/
+├── app.html, spa/app.html  The document shells (SSR, SPA)
+├── hooks.server.ts         Reads the theme and locale cookies; writes <html class lang dir>
+├── routes/                 The SSR route tree
+│   ├── (top-bar)/          Every page except the 404, under the top bar
+│   │   ├── (public)/       The public pages, in one constrained column
+│   │   └── dashboard/      The dashboard, in the application shell
+│   ├── preferences/, language/  The theme and language forms' targets without JavaScript
+│   ├── home/, icons/, sitemap.xml/
+├── spa/routes/             The SPA route tree: the same pages, browser-only loads
+├── params/                 Route matchers (the guide slug)
+├── layouts/                The layouts both trees share: root, top bar, public, error
+├── domains/                Feature domains, each owning its pages and data
+│   ├── marketing/          Home, guides
+│   ├── account/            Account (demo guard), login
+│   ├── catalog/            Product catalog — the data-layer example
+│   ├── contact/            Contact form
+│   └── dashboard/          An LXD-style application: side navigation, views,
+│                           a side panel and a modal
+├── i18n/                   Locale configuration and message catalogs (en/fr/ar)
+├── lib/                    Shared components (TopBar, ApplicationShell, …)
+├── styles/                 Application CSS, and the stand-ins' stylesheets
+└── storybook/              The locale decorator every story renders in
+```
+
+### Page layouts
+
+Layouts are route groups, so a page never renders its own frame. Every page
+except the 404 sits under `(top-bar)`: a top bar with the app's name, one link
+per area of the boilerplate, and the theme and language selectors. Under it a
+page takes one of two layouts:
+
+- `(public)` — the public pages: one constrained column.
+- `dashboard` — `ApplicationShell` from `src/lib`: the design system's
+  `ApplicationLayout` with the side navigation. Each dashboard page renders
+  `ViewLayout` and `ContentLayout` inside it.
+
+The dashboard's navigation is one tree of navigation items, built in
+`src/domains/dashboard/createDashboardNavigation.ts`. The side navigation
+renders it, and the breadcrumbs are projected from it.
+
+## Theme and language
+
+With JavaScript, the theme and language selectors apply on change, as the React
+app's do: `setTheme` swaps the theme class on `<html>` and writes the `theme`
+cookie, and the locale source re-translates the page, flips `<html lang dir>`
+and writes the `locale` cookie. Without JavaScript, each selector is a form
+that posts to `/preferences` or `/language`, which set the same cookie and send
+the reader back; the server then renders the class, `lang` and `dir`. Their
+Apply buttons sit in `<noscript>`, so they never show while JavaScript runs.
+
+Both cookies are `path=/`, `SameSite=Lax`, a one-year max age, `Secure` over
+HTTPS on the server, and not `httpOnly`, so the page can overwrite what the
+server set.
+
+## Without JavaScript
+
+Every form keeps working: contact and settings post to their page's action, the
+instance panel opens through `?create=1` and creates through an action, a
+Details button chooses through `?selected=`, and the danger-zone Modal opens
+and closes through invoker commands. With JavaScript, each of these behaves as
+the React page does, in place.
+
+## Data
+
+The catalog's `load` reads a page of products from local data in
+`src/domains/catalog/data.ts`, the same records as the React app's mock GraphQL
+schema; replace that module with a call to a real endpoint. GraphQL and Relay
+are not part of this app.
+
+## Gaps
+
+`@canonical/svelte-ds-*` does not ship these blocks yet, so the app renders
+their markup itself, with their stylesheets copied from the React packages into
+`src/styles/standins/`: `SideNavigation` (without the collapse toggle,
+tooltips or the small-screen menu), `SidePanel`, `Card`, `Tile`, `Timeline`,
+`InlineCode` and `Icon`. Swap each for the Svelte block when it lands, and
+delete its stand-in stylesheet.
+
+The account flow is a demo, not authentication; real reads and actions must
+authorize at the request boundary.
