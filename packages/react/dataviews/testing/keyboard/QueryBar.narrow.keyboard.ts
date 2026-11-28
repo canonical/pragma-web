@@ -13,8 +13,9 @@
 
 import { createRequire } from "node:module";
 import { expect, type Locator, type Page, test } from "playwright/test";
-import { QUERY_BAR, QUERY_BAR_NARROW } from "./constants.js";
+import { BAR_NARROW_REM, QUERY_BAR, QUERY_BAR_NARROW } from "./constants.js";
 import openStory from "./openQueryBarStory.js";
+import waitForResizeReport from "./waitForResizeReport.js";
 
 /** axe's browser build, injected into the page. */
 const AXE_PATH = createRequire(import.meta.url).resolve("axe-core/axe.min.js");
@@ -185,13 +186,24 @@ test.describe("QueryBar's narrow form, in Chromium", () => {
     expect(bar?.width ?? 0).toBeLessThan(600);
     expect(bar?.width ?? 0).toBeGreaterThan(560);
     const sheet = await openSheet(page, 1);
-    // Two frames on, the bar has heard of any width the lock changed.
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-        ),
-    );
+    const root = page.locator("#storybook-root .ds.data-views-query-bar");
+    // Once its size is reported, the bar's observers have the width the
+    // lock left; still below the threshold, it keeps the bar narrow.
+    await waitForResizeReport(root);
+    const { inline, threshold } = await root.evaluate((element, rem) => {
+      const style = getComputedStyle(element);
+      const remPx = Number.parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+      return {
+        inline:
+          element.clientWidth -
+          Number.parseFloat(style.paddingInlineStart) -
+          Number.parseFloat(style.paddingInlineEnd),
+        threshold: rem * remPx,
+      };
+    }, BAR_NARROW_REM);
+    expect(inline).toBeLessThan(threshold);
     await expect(sheet).toBeVisible();
     expect(
       await page.evaluate(
