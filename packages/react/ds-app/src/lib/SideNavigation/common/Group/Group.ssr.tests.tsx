@@ -14,7 +14,8 @@ describe("Group SSR", () => {
     expect(html).toContain("Machines");
   });
 
-  it("renders the divider before the header", () => {
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("renders the divider before the header", () => {
     const html = renderToString(
       <Group divider label="Hardware">
         <li>Machines</li>

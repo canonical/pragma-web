@@ -15,7 +15,8 @@ const componentCssClassName = "ds side-navigation-group";
  */
 const Group = ({
   label,
-  divider = false,
+  // The divider is hidden for now (operator, 2026-11-28); restore the render below.
+  divider: _divider = false,
   children,
   className,
   ...props
@@ -24,7 +25,7 @@ const Group = ({
     className={[componentCssClassName, className].filter(Boolean).join(" ")}
     {...props}
   >
-    {divider && <hr className="divider" />}
+    {/* {divider && <hr className="divider" />} */}
     {label != null && <GroupHeader>{label}</GroupHeader>}
     <ul className="list">{children}</ul>
   </section>

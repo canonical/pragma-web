@@ -23,7 +23,8 @@ describe("NavTree", () => {
     );
   });
 
-  it("gives every rendered group but the first a divider", () => {
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("gives every rendered group but the first a divider", () => {
     const root: NavRoot = {
       key: "root",
       items: [

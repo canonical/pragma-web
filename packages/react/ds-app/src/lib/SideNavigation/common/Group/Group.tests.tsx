@@ -32,7 +32,8 @@ describe("Group", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("starts with an unstyled hr.divider when divider is set", () => {
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("starts with an unstyled hr.divider when divider is set", () => {
     const { container } = render(
       <Group divider label="Hardware">
         <li>Machines</li>

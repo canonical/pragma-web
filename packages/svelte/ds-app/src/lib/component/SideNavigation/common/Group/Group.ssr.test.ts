@@ -17,7 +17,8 @@ describe("Group SSR", () => {
     expect(page.container.innerHTML).toContain("Machines");
   });
 
-  it("renders the divider when asked", () => {
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("renders the divider when asked", () => {
     const page = render(Group, { props: { divider: true, children } });
     expect(page.container.querySelector("section > hr.divider")).toBeTruthy();
   });

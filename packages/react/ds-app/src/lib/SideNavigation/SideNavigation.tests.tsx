@@ -374,7 +374,8 @@ describe("SideNavigation", () => {
     expect(switcher?.parentElement?.parentElement).toBe(rootEl);
   });
 
-  it("starts every group but the first with a divider", () => {
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("starts every group but the first with a divider", () => {
     const grouped: NavRoot = {
       key: "root",
       items: [
