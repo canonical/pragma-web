@@ -20,6 +20,7 @@ const en = {
   "theme.system": "System",
   "theme.light": "Light",
   "theme.dark": "Dark",
+  "preferences.apply": "Apply",
   "locale.label": "Language",
   "notFound.heading": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",

@@ -134,6 +134,57 @@ describe("server matrix (2×3) serves correctly", () => {
           // fallback serves index.html for every route and cannot express
           // router statuses.)
           if (cell.ssr) {
+            // The theme and language forms without JavaScript: each posts,
+            // gets the cookie and a 303 back, and the next render carries it.
+            const themeForm = await fetch(`${server.base}/preferences`, {
+              method: "POST",
+              redirect: "manual",
+              headers: {
+                "content-type": "application/x-www-form-urlencoded",
+                referer: `${server.base}/catalog`,
+              },
+              body: "theme=dark",
+            });
+            expect(themeForm.status).toBe(303);
+            expect(themeForm.headers.get("location")).toBe(
+              `${server.base}/catalog`,
+            );
+            const themeCookie = themeForm.headers.get("set-cookie") ?? "";
+            expect(themeCookie).toMatch(
+              /^theme=dark; Path=\/; Max-Age=31536000; SameSite=Lax/,
+            );
+            expect(themeCookie).not.toMatch(/HttpOnly/i);
+            const themed = await (
+              await fetch(`${server.base}/catalog`, {
+                headers: { cookie: themeCookie.split(";")[0] },
+              })
+            ).text();
+            expect(themed).toContain('class="app comfortable dark"');
+            expect(themed).toMatch(/<option value="dark" selected="">/);
+
+            const languageForm = await fetch(`${server.base}/language`, {
+              method: "POST",
+              redirect: "manual",
+              headers: { "content-type": "application/x-www-form-urlencoded" },
+              body: "locale=ar",
+            });
+            expect(languageForm.status).toBe(303);
+            expect(languageForm.headers.get("location")).toBe("/");
+            const localeCookie = languageForm.headers.get("set-cookie") ?? "";
+            expect(localeCookie).toMatch(
+              /^locale=ar; Path=\/; Max-Age=31536000; SameSite=Lax/,
+            );
+            const localized = await (
+              await fetch(`${server.base}/`, {
+                headers: { cookie: localeCookie.split(";")[0] },
+              })
+            ).text();
+            expect(localized).toContain('lang="ar"');
+            expect(localized).toContain('dir="rtl"');
+            expect(localized).toMatch(/<noscript><button[^>]*type="submit"/);
+          }
+
+          if (cell.ssr) {
             const notFound = await fetch(
               `${server.base}/definitely-not-a-page`,
             );

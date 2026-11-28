@@ -16,6 +16,7 @@ const fr: Record<MessageKey, MessageValue> = {
   "theme.system": "Système",
   "theme.light": "Clair",
   "theme.dark": "Sombre",
+  "preferences.apply": "Appliquer",
   "locale.label": "Langue",
   "notFound.heading": "Page introuvable",
   "notFound.body": "La page que vous recherchez n'existe pas.",

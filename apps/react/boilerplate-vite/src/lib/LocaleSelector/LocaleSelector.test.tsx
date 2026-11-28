@@ -57,4 +57,14 @@ describe("LocaleSelector component", () => {
     // Its own accessible name re-translates too.
     expect(screen.getByRole("combobox", { name: "اللغة" })).toBeInTheDocument();
   });
+
+  it("is a form posting to /language, with no Apply button while JavaScript runs", () => {
+    renderSelector();
+    const select = screen.getByRole("combobox", { name: "Language" });
+
+    expect(select).toHaveAttribute("name", "locale");
+    expect(select.closest("form")).toHaveAttribute("action", "/language");
+    expect(select.closest("form")).toHaveAttribute("method", "post");
+    expect(screen.queryByRole("button", { name: "Apply" })).toBeNull();
+  });
 });
