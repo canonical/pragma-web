@@ -3,7 +3,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix ds: <https://ds.canonical.com/>.
 
-ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.component.link, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header.
+ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.component.card, ds:implementation.svelte-ds-global.global.component.inline_code, ds:implementation.svelte-ds-global.global.component.link, ds:implementation.svelte-ds-global.global.component.tile, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.pattern.timeline, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.card-content, ds:implementation.svelte-ds-global.global.subcomponent.card-footer, ds:implementation.svelte-ds-global.global.subcomponent.card-header, ds:implementation.svelte-ds-global.global.subcomponent.card-image, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header, ds:implementation.svelte-ds-global.global.subcomponent.tile-content, ds:implementation.svelte-ds-global.global.subcomponent.tile-header, ds:implementation.svelte-ds-global.global.subcomponent.timeline-content, ds:implementation.svelte-ds-global.global.subcomponent.timeline-event.
 ds:implementation.svelte-ds-global.global.component.announcement a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.announcement;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Announcement/Announcement.svelte";
@@ -19,11 +19,26 @@ ds:implementation.svelte-ds-global.global.component.button a ds:ImplementationOb
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Button/Button.svelte";
     ds:importStatement "import { Button } from \"@canonical/svelte-ds-global\";";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Button/Button.svelte".
+ds:implementation.svelte-ds-global.global.component.card a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.card;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Card/Card.svelte";
+    ds:importStatement "import { Card } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Card/Card.svelte".
+ds:implementation.svelte-ds-global.global.component.inline_code a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.inline_code;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/InlineCode/InlineCode.svelte";
+    ds:importStatement "import { InlineCode } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/InlineCode/InlineCode.svelte".
 ds:implementation.svelte-ds-global.global.component.link a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.link;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Link/Link.svelte";
     ds:importStatement "import { Link } from \"@canonical/svelte-ds-global\";";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Link/Link.svelte".
+ds:implementation.svelte-ds-global.global.component.tile a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.tile;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Tile/Tile.svelte";
+    ds:importStatement "import { Tile } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Tile/Tile.svelte".
 ds:implementation.svelte-ds-global.global.pattern.modal a ds:ImplementationObject;
     ds:implementsBlock ds:global.pattern.modal;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/Modal.svelte";
@@ -34,10 +49,31 @@ ds:implementation.svelte-ds-global.global.pattern.skip_link a ds:ImplementationO
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/SkipLink/SkipLink.svelte";
     ds:importStatement "import { SkipLink } from \"@canonical/svelte-ds-global\";";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/_work_in_progress/SkipLink/SkipLink.svelte".
+ds:implementation.svelte-ds-global.global.pattern.timeline a ds:ImplementationObject;
+    ds:implementsBlock ds:global.pattern.timeline;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/pattern/Timeline/Timeline.svelte";
+    ds:importStatement "import { Timeline } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/pattern/Timeline/Timeline.svelte".
 ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.breadcrumbs-item;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Breadcrumbs/common/Item/Item.svelte";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Breadcrumbs/common/Item/Item.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.card-content a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.card-content;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Card/common/Content/Content.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Card/common/Content/Content.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.card-footer a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.card-footer;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Card/common/Footer/Footer.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Card/common/Footer/Footer.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.card-header a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.card-header;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Card/common/Header/Header.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Card/common/Header/Header.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.card-image a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.card-image;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Card/common/Image/Image.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Card/common/Image/Image.svelte".
 ds:implementation.svelte-ds-global.global.subcomponent.modal-content a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.modal-content;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/common/Content/Content.svelte";
@@ -50,3 +86,19 @@ ds:implementation.svelte-ds-global.global.subcomponent.modal-header a ds:Impleme
     ds:implementsBlock ds:global.subcomponent.modal-header;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/common/Header/Header.svelte";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/common/Header/Header.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.tile-content a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.tile-content;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Tile/common/Content/Content.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Tile/common/Content/Content.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.tile-header a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.tile-header;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Tile/common/Header/Header.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Tile/common/Header/Header.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.timeline-content a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.timeline-content;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/pattern/Timeline/common/Content/Content.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/pattern/Timeline/common/Content/Content.svelte".
+ds:implementation.svelte-ds-global.global.subcomponent.timeline-event a ds:ImplementationObject;
+    ds:implementsBlock ds:global.subcomponent.timeline-event;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/pattern/Timeline/common/Event/Event.svelte";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/pattern/Timeline/common/Event/Event.svelte".
