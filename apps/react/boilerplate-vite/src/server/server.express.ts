@@ -26,6 +26,7 @@ import fs from "node:fs";
 import * as process from "node:process";
 import express from "express";
 import { createServer as createViteServer } from "vite";
+import preferenceFormMiddleware from "./preferenceFormMiddleware.js";
 
 const PORT = Number(process.env.PORT) || 5174;
 
@@ -38,6 +39,9 @@ async function start() {
   });
 
   app.use(vite.middlewares);
+
+  // The theme and language forms post here without JavaScript.
+  app.use(preferenceFormMiddleware);
 
   app.use(async (req, res, next) => {
     const url = req.originalUrl || "/";

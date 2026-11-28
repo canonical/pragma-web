@@ -28,6 +28,7 @@ import fs from "node:fs";
 import * as process from "node:process";
 import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
+import { respondToPreferenceForm } from "./handlePreferenceForm.js";
 
 // Match Node's semantics for unhandled rejections: warn, don't die. Bun
 // kills the process by default, and a data-layer library's internal floating
@@ -56,6 +57,10 @@ Bun.serve({
     try {
       const asset = await handleAsset(req);
       if (asset) return asset;
+
+      // The theme and language forms post here without JavaScript.
+      const preferenceForm = await respondToPreferenceForm(req);
+      if (preferenceForm) return preferenceForm;
 
       if (url.pathname === "/sitemap.xml") {
         const { default: createSitemapRenderer } = await vite.ssrLoadModule(

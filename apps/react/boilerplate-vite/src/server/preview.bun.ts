@@ -35,6 +35,7 @@ import {
 import createAppRenderer from "../../dist/server/renderer.js";
 // @ts-expect-error — importing a build artifact with no declarations
 import createSitemapRenderer from "../../dist/server/sitemap.js";
+import { respondToPreferenceForm } from "./handlePreferenceForm.js";
 
 type CreateAppRenderer = typeof import("./renderer.js").default;
 type CreateSitemapRenderer = typeof import("../sitemap/renderer.js").default;
@@ -70,6 +71,10 @@ Bun.serve({
         return new Response(file);
       }
     }
+
+    // The theme and language forms post here without JavaScript.
+    const preferenceForm = await respondToPreferenceForm(req);
+    if (preferenceForm) return preferenceForm;
 
     if (url.pathname === "/sitemap.xml") {
       const renderer = (createSitemapRenderer as CreateSitemapRenderer)();

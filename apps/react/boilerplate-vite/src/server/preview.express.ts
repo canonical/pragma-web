@@ -33,6 +33,7 @@ import express from "express";
 import createAppRenderer from "../../dist/server/renderer.js";
 // @ts-expect-error — importing a build artifact with no declarations
 import createSitemapRenderer from "../../dist/server/sitemap.js";
+import preferenceFormMiddleware from "./preferenceFormMiddleware.js";
 
 type CreateAppRenderer = typeof import("./renderer.js").default;
 type CreateSitemapRenderer = typeof import("../sitemap/renderer.js").default;
@@ -46,6 +47,9 @@ const app = express();
 // file does not exist, so extensionless routes and rendered ones like
 // `/sitemap.xml` (never written to `dist`) reach the renderers below.
 app.use(express.static("dist/client", { index: false }));
+
+// The theme and language forms post here without JavaScript.
+app.use(preferenceFormMiddleware);
 
 app.use(async (req, res, next) => {
   try {
