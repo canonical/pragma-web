@@ -1,7 +1,7 @@
 // Ported from @canonical/react-ds-app SideNavigation ContextSwitcher
 
 import { tick } from "svelte";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import { badge, fixtureText, richLabel } from "../../test.fixtures.svelte";
@@ -29,7 +29,15 @@ const open = async (page: Page) => {
   await expect.element(menu(page)).toHaveAttribute("aria-hidden", "false");
 };
 
+/** Lets the menu's open or close transition finish before the next test. */
+const settle = () =>
+  Promise.allSettled(
+    document.getAnimations().map((animation) => animation.finished),
+  );
+
 describe("ContextSwitcher", () => {
+  afterEach(settle);
+
   it("shows the current context's name in the trigger, with menu-button semantics", async () => {
     const page = await render(ContextSwitcher, {
       currentContext: contexts[0],
@@ -190,7 +198,7 @@ describe("ContextSwitcher", () => {
       page.container.querySelector(
         '[role="menuitem"][tabindex="0"]',
       ) as HTMLElement;
-    await expect.poll(() => document.activeElement).toBe(roving());
+    await expect.element(roving()).toHaveFocus();
     roving().dispatchEvent(
       new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }),
     );

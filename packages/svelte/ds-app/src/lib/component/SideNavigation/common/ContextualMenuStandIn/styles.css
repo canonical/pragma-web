@@ -51,6 +51,10 @@
     &[aria-hidden="false"] {
       opacity: 1;
       visibility: visible;
+      /* Opening shows the surface at once and fades only its opacity, so a
+         row can take focus as soon as the menu opens. Closing still keeps it
+         visible through the fade (the rule above). */
+      transition-property: opacity;
 
       @starting-style {
         opacity: 0;
