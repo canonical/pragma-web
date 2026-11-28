@@ -43,6 +43,25 @@ Import components by name:
 
 Components accept standard HTML attributes for their underlying elements. For example, `ApplicationLayout` accepts the attributes of a native `div` element.
 
+`SideNavigation` renders the application's navigation rail from data:
+
+```svelte
+<script lang="ts">
+	import { page } from "$app/state";
+	import { ApplicationLayout, SideNavigation } from "@canonical/svelte-ds-app";
+	import { footerRoot, root } from "./navigation.js";
+</script>
+
+<ApplicationLayout>
+	{#snippet navigation()}
+		<SideNavigation {root} {footerRoot} currentUrl={page.url.pathname} applicationName="MAAS" />
+	{/snippet}
+	<main id="main-content"><!-- The skip link's target --></main>
+</ApplicationLayout>
+```
+
+Its rows are plain links, which SvelteKit routes on the client; pass a `link` snippet to change how they render. See `src/lib/component/SideNavigation/SPEC.md`.
+
 ## Styles
 
 `@canonical/styles` provides the global design tokens (colour, spacing, typography). Each component in this package co-locates its own component-level tokens in a `styles.css` file next to the component source. These component tokens reference the global tokens from `@canonical/design-tokens` and are included automatically when the component is imported.
@@ -71,7 +90,7 @@ The guarantee needs `@canonical/styles` on the page, and needs its statement fir
 
 An application's own **unlayered** CSS now beats every rule in this package, whatever the selectors on either side, because an unlayered author rule outranks every layered one. That is CSS working as designed, and it is the deliberate escape hatch: an application that needs to override a component writes a plain rule and it wins. An application that does *not* want to win by accident puts its CSS in `@layer app`.
 
-**Rule for contributors:** every component stylesheet under `src/lib` opens with that wrapper. `@keyframes` and a component's own `:root` token defaults go inside it; `@property` and `@font-face` registrations stay outside, above the block, because no layer sorts a registration. Never reach for `!important` to win a fight — an important declaration inverts the layer order, so it cannot be arbitrated by layers at all. The "Cascade Layers" section of the `@canonical/styles` README is the reference for the full order and for what is deliberately left unlayered.
+**Rule for contributors:** every component stylesheet under `src/lib` opens with that wrapper. The one exception is SideNavigation's private copies of the global Icon and ContextualMenu stylesheets (`common/Icon`, `common/ContextualMenuStandIn`): they keep the global tier's `ds.components.global` layer, as their React originals do, so SideNavigation's own rules still outrank them. `@keyframes` and a component's own `:root` token defaults go inside it; `@property` and `@font-face` registrations stay outside, above the block, because no layer sorts a registration. Never reach for `!important` to win a fight — an important declaration inverts the layer order, so it cannot be arbitrated by layers at all. The "Cascade Layers" section of the `@canonical/styles` README is the reference for the full order and for what is deliberately left unlayered.
 
 ## Development
 

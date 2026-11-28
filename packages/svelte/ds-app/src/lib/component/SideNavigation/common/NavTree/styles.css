@@ -1,0 +1,13 @@
+/*
+ * SideNavigation NavTree — internal wrapper for the rendered tree structure.
+ * `display: contents` makes it invisible in the box tree so Content's
+ * own flex/scroll layout applies directly to the rendered Group
+ * children. Group/GroupHeader/Item/ItemExpandable each own their
+ * own styles.
+  *
+ * Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+@layer ds.components.apps {
+  .ds.nav-tree {
+    display: contents;
+  }
+}
