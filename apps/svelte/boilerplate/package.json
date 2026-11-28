@@ -12,8 +12,11 @@
     "build:storybook": "storybook build",
     "storybook": "storybook dev -p 6009 --no-open",
     "preview": "node build/index.js",
-    "check": "APP_SPA=1 svelte-kit sync && APP_SPA=1 svelte-check --tsconfig ./tsconfig.spa.json && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:fix": "bun run check",
+    "check": "bun run check:biome && bun run check:ts",
+    "check:fix": "bun run check:biome:fix && bun run check:ts",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write",
+    "check:ts": "APP_SPA=1 svelte-kit sync && APP_SPA=1 svelte-check --tsconfig ./tsconfig.spa.json && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "bun run build:spa && bun run build:storybook && node --test test/spa.test.js && bun run build && node --test test/app.test.js"
   },
   "dependencies": {
@@ -25,18 +28,20 @@
     "@canonical/svelte-ds-global": "^0.47.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@canonical/biome-config": "0.46.0",
+    "@canonical/storybook-config": "^0.47.0",
+    "@storybook/addon-svelte-csf": "^5.1.3",
+    "@storybook/sveltekit": "^10.6.0",
     "@sveltejs/adapter-node": "5.5.4",
     "@sveltejs/adapter-static": "3.0.10",
     "@sveltejs/kit": "2.70.3",
     "@sveltejs/vite-plugin-svelte": "7.3.1",
-    "@canonical/storybook-config": "^0.47.0",
-    "@storybook/addon-svelte-csf": "^5.1.3",
-    "@storybook/sveltekit": "^10.6.0",
     "@types/node": "^26.0.0",
     "playwright": "^1.61.1",
+    "storybook": "^10.6.0",
     "svelte": "5.57.3",
     "svelte-check": "^4.4.5",
-    "storybook": "^10.6.0",
     "typescript": "~6.0.3",
     "vite": "8.3.5"
   },
@@ -44,6 +49,8 @@
     "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
   },
   "nx": {
-    "tags": ["playwright"]
+    "tags": [
+      "playwright"
+    ]
   }
 }

@@ -22,7 +22,7 @@ Neither it nor the demo session is a trusted identity.
 
 The forms with fields use `Form` and `Field` from `@canonical/svelte-ds-global-form`, the
 workspace package, and its stylesheet `@canonical/svelte-ds-global-form/index.css`.
-The app adds no form CSS of its own.
+The app adds no form CSS of its own. Buttons are the global `Button`.
 
 - **Native forms and actions.** Contact, settings and instance creation are
   `Form`s without an owner. They post to SvelteKit form actions, which decode
@@ -104,8 +104,10 @@ through `onsubmit`; the release options are local and the instance name is not
 checked remotely. The static fallback starts with
 English/LTR markup until the client initializes. The static host must also serve
 the four criticality icons copied to `build-spa/icons/` from `@canonical/ds-assets`.
-Storybook has empty, server-error and Arabic contact examples. Its locale toolbar
-drives the first two stories; they use Kit mocks rather than a backend.
+Storybook has stories for the contact form (empty, server errors, Arabic), the
+catalog and the dashboard overview. A global decorator wraps every story in the
+app's locale source, driven by the locale toolbar; the contact stories use Kit
+mocks rather than a backend.
 
 ## Scope and gaps
 

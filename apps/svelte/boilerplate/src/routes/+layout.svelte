@@ -1,12 +1,17 @@
 <script lang="ts">
+  import { Button } from "@canonical/svelte-ds-global";
   import "../styles.css";
-  import { page } from "$app/state";
-  import { afterNavigate } from "$app/navigation";
-  import { ApplicationLayout, ViewLayout, ContentLayout } from "@canonical/svelte-ds-app";
   import { createLocaleSource } from "@canonical/i18n-core";
+  import {
+    ApplicationLayout,
+    ContentLayout,
+    ViewLayout,
+  } from "@canonical/svelte-ds-app";
   import { setContext } from "svelte";
-  import { config, localeKey, translator } from "../i18n";
+  import { afterNavigate } from "$app/navigation";
+  import { page } from "$app/state";
   import DashboardNavigation from "../domains/dashboard/DashboardNavigation.svelte";
+  import { config, getTranslator, localeKey } from "../i18n";
   import type { LayoutProps } from "./$types";
 
   let { children, data }: LayoutProps = $props();
@@ -14,21 +19,29 @@
   // svelte-ignore state_referenced_locally
   const locale = createLocaleSource(config, { initial: data.locale });
   setContext(localeKey, locale);
-  let t = $derived(translator($locale));
+  let t = $derived(getTranslator($locale));
   afterNavigate(({ from, to }) => {
     if (from && to && from.url.pathname !== to.url.pathname && !to.url.hash) {
-      const heading = document.querySelector<HTMLElement>("main h1");
-      if (heading) { if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1"); heading.focus(); }
+      const headingElement = document.querySelector<HTMLElement>("main h1");
+      if (headingElement) {
+        if (!headingElement.hasAttribute("tabindex"))
+          headingElement.setAttribute("tabindex", "-1");
+        headingElement.focus();
+      }
     }
   });
+  // A new locale switches in place (the source persists it); the current one posts natively, so the server stores it.
   function changeLanguage(event: SubmitEvent) {
-    event.preventDefault();
     const form = event.currentTarget as HTMLFormElement;
     const value = new FormData(form).get("locale");
-    if (typeof value === "string" && config.locales.includes(value)) {
-      if (value === locale.get()) document.cookie = `locale=${value}; path=/; max-age=31536000; SameSite=Lax`;
-      else locale.set(value);
-    }
+    if (
+      typeof value !== "string" ||
+      value === locale.get() ||
+      !config.locales.includes(value)
+    )
+      return;
+    event.preventDefault();
+    locale.set(value);
   }
 </script>
 
@@ -42,14 +55,14 @@
       <option value="light" selected={data.theme === "light"}>{t("light")}</option>
       <option value="dark" selected={data.theme === "dark"}>{t("dark")}</option>
     </select>
-    <button type="submit">{t("apply")}</button>
+    <Button type="submit" importance="secondary">{t("apply")}</Button>
   </form>
   <form method="POST" action="/language" onsubmit={changeLanguage}>
     <label for="locale">{t("language")}</label>
     <select id="locale" name="locale">
       <option value="en" selected={data.locale === "en"}>English</option><option value="fr" selected={data.locale === "fr"}>Français</option><option value="ar" selected={data.locale === "ar"}>العربية</option>
     </select>
-    <button type="submit">{t("apply")}</button>
+    <Button type="submit" importance="secondary">{t("apply")}</Button>
   </form>
 </header>
 <ApplicationLayout>

@@ -1,15 +1,22 @@
 <script lang="ts">
-  import { fields, maxLength, validate, type Errors } from "../../../domains/contact/form";
+  import { Button } from "@canonical/svelte-ds-global";
   import { Field, Form } from "@canonical/svelte-ds-global-form";
-  import { localeSource, translator } from "../../../i18n";
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  import { fields, maxLength } from "../../../domains/contact/constants";
+  import { validate } from "../../../domains/contact/form";
+  import type { Errors } from "../../../domains/contact/types";
+  import { getLocaleSource, getTranslator } from "../../../i18n";
+
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
   let errors = $state<Errors>({});
   let submitted = $state(false);
   function submit(event: SubmitEvent) {
     event.preventDefault();
     const data = new FormData(event.currentTarget as HTMLFormElement);
-    errors = validate({ email: String(data.get("email") ?? ""), message: String(data.get("message") ?? "") });
+    errors = validate({
+      email: String(data.get("email") ?? ""),
+      message: String(data.get("message") ?? ""),
+    });
     submitted = !Object.keys(errors).length;
   }
 </script>
@@ -20,5 +27,5 @@
   {#each fields as field (field.name)}
     <Field {...field} id={field.name} label={t(field.label)} error={errors[field.name] ? t(errors[field.name]!) : undefined} maxlength={maxLength} />
   {/each}
-  <button type="submit">{t("send")}</button>
+  <Button type="submit">{t("send")}</Button>
 </Form>

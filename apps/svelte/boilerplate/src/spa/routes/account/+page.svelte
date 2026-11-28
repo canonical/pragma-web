@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { onMount } from "svelte";
-  import { localeSource, translator } from "../../../i18n";
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  import { getLocaleSource, getTranslator } from "../../../i18n";
+
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
   let allowed = $state(false);
   onMount(() => {
-    allowed = page.url.searchParams.get("auth") === "1" || sessionStorage.getItem("demo-session") === "yes";
+    allowed =
+      page.url.searchParams.get("auth") === "1" ||
+      sessionStorage.getItem("demo-session") === "yes";
     if (!allowed) void goto("/login?from=%2Faccount", { replaceState: true });
   });
 </script>

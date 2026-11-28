@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { localeSource, translator } from "../../../i18n";
+  import { Button } from "@canonical/svelte-ds-global";
   import { Field, Form } from "@canonical/svelte-ds-global-form";
-  import { readMaximum, settingsFields } from "../../../domains/dashboard/settings";
+  import { settingsFields } from "../../../domains/dashboard/constants";
   import ProjectDanger from "../../../domains/dashboard/ProjectDanger.svelte";
+  import { readMaximum } from "../../../domains/dashboard/settings";
+  import { getLocaleSource, getTranslator } from "../../../i18n";
   import type { PageProps } from "./$types";
+
   let { data, form }: PageProps = $props();
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
   let values = $derived(form?.values ?? data.settings);
   let errors = $derived(form && "errors" in form ? form.errors : {});
 </script>
@@ -36,6 +39,6 @@
       <Field {...field} id={field.name} label={t(field.label)} value={values[field.name]} error={errors?.name ? t(errors.name) : undefined} />
     {/if}
   {/each}
-  <button type="submit">{t("save")}</button>
+  <Button type="submit">{t("save")}</Button>
 </Form>
 <ProjectDanger />

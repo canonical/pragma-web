@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { localeSource, translator } from "../../i18n";
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  import { getLocaleSource, getTranslator } from "../../i18n";
+
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
 </script>
 <svelte:head>
   <title>{t("home")} | {t("brand")}</title>

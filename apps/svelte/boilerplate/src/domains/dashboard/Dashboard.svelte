@@ -1,10 +1,19 @@
 <script lang="ts">
-  import { localeSource, translator } from "../../i18n";
+  import { getLocaleSource, getTranslator } from "../../i18n";
+
   let { name, count }: { name: string; count: number } = $props();
-  const locale = localeSource();
-  let t = $derived(translator($locale));
-  let storage = $derived(new Intl.NumberFormat($locale, { style: "unit", unit: "terabyte", maximumFractionDigits: 1 }));
-  let relative = $derived(new Intl.RelativeTimeFormat($locale, { numeric: "auto" }));
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
+  let storage = $derived(
+    new Intl.NumberFormat($locale, {
+      style: "unit",
+      unit: "terabyte",
+      maximumFractionDigits: 1,
+    }),
+  );
+  let relative = $derived(
+    new Intl.RelativeTimeFormat($locale, { numeric: "auto" }),
+  );
   const events = [
     { key: "activityStart", value: -2, unit: "minute" },
     { key: "activitySnapshot", value: -14, unit: "minute" },

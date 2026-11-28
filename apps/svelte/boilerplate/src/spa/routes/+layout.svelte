@@ -1,29 +1,45 @@
 <script lang="ts">
   import "../../styles.css";
   import { createLocaleSource, negotiateLocale } from "@canonical/i18n-core";
-  import { page } from "$app/state";
-  import { afterNavigate } from "$app/navigation";
-  import { ApplicationLayout, ViewLayout, ContentLayout } from "@canonical/svelte-ds-app";
+  import {
+    ApplicationLayout,
+    ContentLayout,
+    ViewLayout,
+  } from "@canonical/svelte-ds-app";
   import { onMount, setContext } from "svelte";
-  import { config, localeKey, translator } from "../../i18n";
+  import { afterNavigate } from "$app/navigation";
+  import { page } from "$app/state";
   import DashboardNavigation from "../../domains/dashboard/DashboardNavigation.svelte";
+  import { config, getTranslator, localeKey } from "../../i18n";
   import type { LayoutProps } from "./$types";
+
   let { children }: LayoutProps = $props();
-  const locale = createLocaleSource(config, { initial: negotiateLocale(config, { cookieHeader: document.cookie, acceptLanguage: navigator.languages.join(",") }) });
+  const locale = createLocaleSource(config, {
+    initial: negotiateLocale(config, {
+      cookieHeader: document.cookie,
+      acceptLanguage: navigator.languages.join(","),
+    }),
+  });
   setContext(localeKey, locale);
-  let t = $derived(translator($locale));
+  let t = $derived(getTranslator($locale));
   afterNavigate(({ from, to }) => {
     if (from && to && from.url.pathname !== to.url.pathname && !to.url.hash) {
-      const heading = document.querySelector<HTMLElement>("main h1");
-      if (heading) { if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1"); heading.focus(); }
+      const headingElement = document.querySelector<HTMLElement>("main h1");
+      if (headingElement) {
+        if (!headingElement.hasAttribute("tabindex"))
+          headingElement.setAttribute("tabindex", "-1");
+        headingElement.focus();
+      }
     }
   });
   let theme = $state(localStorage.getItem("theme") ?? "");
   function changeTheme(value: string) {
     theme = value === "light" || value === "dark" ? value : "";
     document.documentElement.classList.remove("light", "dark");
-    if (theme) { document.documentElement.classList.add(theme); localStorage.setItem("theme", theme); }
-    else localStorage.removeItem("theme");
+    if (theme) {
+      document.documentElement.classList.add(theme);
+      localStorage.setItem("theme", theme);
+    } else localStorage.removeItem("theme");
   }
   onMount(() => changeTheme(theme));
 </script>

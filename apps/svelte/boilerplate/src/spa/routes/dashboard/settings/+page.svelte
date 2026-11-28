@@ -1,21 +1,53 @@
 <script lang="ts">
+  import { Button } from "@canonical/svelte-ds-global";
   import { Field, Form } from "@canonical/svelte-ds-global-form";
-  import { readMaximum, readSettings, settingsFields, validMaximum } from "../../../../domains/dashboard/settings";
-  import { localeSource, translator } from "../../../../i18n";
+  import { settingsFields } from "../../../../domains/dashboard/constants";
   import ProjectDanger from "../../../../domains/dashboard/ProjectDanger.svelte";
-  const locale = localeSource();
-  let t = $derived(translator($locale));
-  let values = $state(readSettings(localStorage.getItem("demo-settings") ?? undefined));
-  let errors = $state<{ name?: string; bridge?: string; maxInstances?: string }>({});
+  import {
+    isValidMaximum,
+    readMaximum,
+    readSettings,
+  } from "../../../../domains/dashboard/settings";
+  import { getLocaleSource, getTranslator } from "../../../../i18n";
+
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
+  let values = $state(
+    readSettings(localStorage.getItem("demo-settings") ?? undefined),
+  );
+  let errors = $state<{
+    name?: string;
+    bridge?: string;
+    maxInstances?: string;
+  }>({});
   let saved = $state(false);
   function submit(event: SubmitEvent) {
     event.preventDefault();
     const data = new FormData(event.currentTarget as HTMLFormElement);
     const text = (name: string) => String(data.get(name) ?? "");
-    const next = { name: text("name").trim(), bridge: text("bridge"), ipv6: data.has("ipv6"), snapshots: data.has("snapshots"), maxInstances: text("maxInstances") };
-    errors = { ...(!next.name || next.name.length > 60 ? { name: next.name.length > 60 ? "nameTooLong" : "nameError" } : {}), ...(!["lxdbr0", "ovn-1"].includes(next.bridge) ? { bridge: "bridgeError" } : {}), ...(!validMaximum(next.maxInstances) ? { maxInstances: "maximumError" } : {}) };
+    const next = {
+      name: text("name").trim(),
+      bridge: text("bridge"),
+      ipv6: data.has("ipv6"),
+      snapshots: data.has("snapshots"),
+      maxInstances: text("maxInstances"),
+    };
+    errors = {
+      ...(!next.name || next.name.length > 60
+        ? { name: next.name.length > 60 ? "nameTooLong" : "nameError" }
+        : {}),
+      ...(!["lxdbr0", "ovn-1"].includes(next.bridge)
+        ? { bridge: "bridgeError" }
+        : {}),
+      ...(!isValidMaximum(next.maxInstances)
+        ? { maxInstances: "maximumError" }
+        : {}),
+    };
     saved = !Object.keys(errors).length;
-    if (saved) { localStorage.setItem("demo-settings", JSON.stringify(next)); values = next; }
+    if (saved) {
+      localStorage.setItem("demo-settings", JSON.stringify(next));
+      values = next;
+    }
   }
 </script>
 <svelte:head><title>{t("settings")} | {t("brand")}</title></svelte:head>
@@ -34,6 +66,6 @@
     {:else if field.inputType === "number"}<Field {...field} id={field.name} label={t(field.label)} value={readMaximum(values.maxInstances)} error={errors.maxInstances ? t(errors.maxInstances) : undefined} />
     {:else}<Field {...field} id={field.name} label={t(field.label)} value={values[field.name]} error={errors.name ? t(errors.name) : undefined} />{/if}
   {/each}
-  <button type="submit">{t("save")}</button>
+  <Button type="submit">{t("save")}</Button>
 </Form>
 <ProjectDanger />

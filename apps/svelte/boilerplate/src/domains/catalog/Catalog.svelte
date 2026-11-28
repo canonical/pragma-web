@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { products } from "./data";
   import { createFormatters } from "@canonical/i18n-core";
-  import { localeSource, translator } from "../../i18n";
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  import { getLocaleSource, getTranslator } from "../../i18n";
+  import { products } from "./constants";
+
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
   let count = $derived(createFormatters($locale).formatNumber(products.length));
 </script>
 <svelte:head><title>{t("catalog")} | {t("brand")}</title></svelte:head>

@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { localeSource, translator } from "../../../i18n";
+  import { getLocaleSource, getTranslator } from "../../../i18n";
   import type { PageProps } from "./$types";
+
   let { form }: PageProps = $props();
-  const locale = localeSource();
-  let t = $derived(translator($locale));
+  const locale = getLocaleSource();
+  let t = $derived(getTranslator($locale));
 </script>
 <svelte:head><title>{t("phoneExample")} | {t("brand")}</title></svelte:head>
 <h1>{t("phoneExample")}</h1>

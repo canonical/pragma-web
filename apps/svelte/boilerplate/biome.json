@@ -1,0 +1,12 @@
+{
+  "extends": ["@canonical/biome-config"],
+  "files": {
+    "includes": [
+      "!.svelte-kit",
+      "!build",
+      "!build-spa",
+      "!storybook-static",
+      "!src/app.html"
+    ]
+  }
+}
