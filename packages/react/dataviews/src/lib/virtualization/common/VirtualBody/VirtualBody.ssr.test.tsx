@@ -30,6 +30,7 @@ describe("virtualized DataTable SSR", () => {
     );
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         columns={[{ id: "name", header: "Name" }]}

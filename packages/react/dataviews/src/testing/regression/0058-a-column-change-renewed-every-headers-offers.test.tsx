@@ -52,6 +52,7 @@ describe("regression 0058 — a column change renewed every header's offers", ()
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -67,19 +68,19 @@ describe("regression 0058 — a column change renewed every header's offers", ()
     );
     renders.mockClear();
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 240 });
+      provider.presentation.arrange({ "table.t.width.name": 240 });
     });
     expect(renders).not.toHaveBeenCalled();
     // Owner hidden: Cores is now last shown, and Status takes the same
     // changes as before.
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["owner"] });
+      provider.presentation.arrange({ "table.t.hidden": ["owner"] });
     });
     expect(renders).not.toHaveBeenCalled();
     // Cores hidden too: Status is now last shown, and can move right no
     // more, so its menu renders its new offers.
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["owner", "cores"] });
+      provider.presentation.arrange({ "table.t.hidden": ["owner", "cores"] });
     });
     expect(renders).toHaveBeenCalled();
   });

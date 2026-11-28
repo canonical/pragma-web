@@ -6,31 +6,43 @@ describe("resetColumnArrangement", () => {
   it("removes the order, the hidden columns and every width, and nothing else", () => {
     expect(
       resetColumnArrangement({
+        table: "t",
         presentation: {
-          "table.order": ["cores"],
-          "table.hidden": ["status"],
-          "table.width.name": 200,
+          "table.t.order": ["cores"],
+          "table.t.hidden": ["status"],
+          "table.t.width.name": 200,
           "cards.size": "large",
         },
       }),
     ).toEqual({
-      "table.order": undefined,
-      "table.hidden": undefined,
-      "table.width.name": undefined,
+      "table.t.order": undefined,
+      "table.t.hidden": undefined,
+      "table.t.width.name": undefined,
     });
     expect(
-      resetColumnArrangement({ presentation: { "cards.size": "large" } }),
+      resetColumnArrangement({
+        table: "t",
+        presentation: {
+          "cards.size": "large",
+          "table.u.order": ["cores"],
+          "table.u.hidden": ["status"],
+          "table.u.width.name": 200,
+        },
+      }),
     ).toEqual({});
   });
 
   it("clears the columns a followed link chose once adopted, with a view named or none", () => {
-    const hidden = { "table.hidden": ["status"] };
+    const hidden = { "table.t.hidden": ["status"] };
     const underDefault = createPresentation({
       linked: { view: null, presentation: hidden },
     });
     const releaseDefault = underDefault.observe();
     underDefault.arrange(
-      resetColumnArrangement({ presentation: underDefault.state.get().own }),
+      resetColumnArrangement({
+        table: "t",
+        presentation: underDefault.state.get().own,
+      }),
     );
     expect(underDefault.state.get().presentation).toEqual({});
     releaseDefault();
@@ -40,7 +52,10 @@ describe("resetColumnArrangement", () => {
     underView.show({ id: "v1", presentation: {} });
     const releaseView = underView.observe();
     underView.arrange(
-      resetColumnArrangement({ presentation: underView.state.get().own }),
+      resetColumnArrangement({
+        table: "t",
+        presentation: underView.state.get().own,
+      }),
     );
     expect(underView.state.get().presentation).toEqual({});
     releaseView();
@@ -50,19 +65,20 @@ describe("resetColumnArrangement", () => {
     const presentation = createPresentation();
     presentation.show({
       id: "v1",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
     presentation.arrange({
-      "table.hidden": ["cores"],
-      "table.width.name": 200,
+      "table.t.hidden": ["cores"],
+      "table.t.width.name": 200,
     });
     presentation.arrange(
       resetColumnArrangement({
+        table: "t",
         presentation: presentation.state.get().presentation,
       }),
     );
     expect(presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
   });
 });

@@ -32,7 +32,11 @@ const listItems = (
     removable,
     hideable,
     offers,
-  }: Pick<HeaderMenuProps, "sortable" | "removable" | "hideable" | "offers">,
+    columnsReason,
+  }: Pick<
+    HeaderMenuProps,
+    "sortable" | "removable" | "hideable" | "offers" | "columnsReason"
+  >,
   messages: DataViewsMessages,
 ): DropdownMenuEntry[] => {
   const sort: DropdownMenuEntry[] = sortable
@@ -45,21 +49,36 @@ const listItems = (
         { type: "separator", key: "separator" },
       ]
     : [];
+  // Waiting, the reason stands first and no column change can be chosen.
+  const waiting = columnsReason !== null;
+  const reason: DropdownMenuEntry[] = waiting
+    ? [
+        { key: "reason", label: columnsReason, disabled: true },
+        { type: "separator", key: "separator:reason" },
+      ]
+    : [];
   const hide: DropdownMenuEntry[] = hideable
-    ? [{ key: "hide", label: messages.hideColumn, disabled: !offers.hide }]
+    ? [
+        {
+          key: "hide",
+          label: messages.hideColumn,
+          disabled: waiting || !offers.hide,
+        },
+      ]
     : [];
   return [
+    ...reason,
     ...sort,
     ...hide,
     {
       key: "move-left",
       label: messages.moveColumnLeft,
-      disabled: !offers["move-left"],
+      disabled: waiting || !offers["move-left"],
     },
     {
       key: "move-right",
       label: messages.moveColumnRight,
-      disabled: !offers["move-right"],
+      disabled: waiting || !offers["move-right"],
     },
   ];
 };
@@ -80,6 +99,7 @@ const HeaderMenu = ({
   removable,
   hideable,
   offers,
+  columnsReason,
   onPlace,
   onRemoveFromSort,
   onChangeColumn,
@@ -87,8 +107,12 @@ const HeaderMenu = ({
   const messages = useContext(MessagesContext);
   const labelId = useId();
   const items = useMemo(
-    () => listItems({ sortable, removable, hideable, offers }, messages),
-    [sortable, removable, hideable, offers, messages],
+    () =>
+      listItems(
+        { sortable, removable, hideable, offers, columnsReason },
+        messages,
+      ),
+    [sortable, removable, hideable, offers, columnsReason, messages],
   );
   // One identity while the column holds, so the menu's own context holds.
   const choose = useCallback(

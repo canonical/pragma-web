@@ -42,10 +42,10 @@ describe("regression 0038 — a view arrangement was lost without a presentation
       id: "a",
       name: "Failed",
       query: "status=failed",
-      presentation: { "table.order": ["name"] },
+      presentation: { "table.t.order": ["name"] },
     });
     const query = "view=a&status=failed&page=1&size=50";
-    const drawn = { "table.order": ["name"], "table.width.cores": 120 };
+    const drawn = { "table.t.order": ["name"], "table.t.width.cores": 120 };
     const { location } = createRecordingLocation({
       href: `/machines?${query}`,
     });

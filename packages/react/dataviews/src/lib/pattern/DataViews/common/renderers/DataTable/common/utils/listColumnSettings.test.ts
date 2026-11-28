@@ -33,17 +33,18 @@ describe("listColumnSettings", () => {
       for (const order of listPermutations(ids)) {
         for (let hiddenSet = 0; hiddenSet < 8; hiddenSet += 1) {
           const presentation = {
-            "table.order": [...order],
-            "table.hidden": ids.filter(
+            "table.t.order": [...order],
+            "table.t.hidden": ids.filter(
               (_, at) => (hiddenSet & (1 << at)) !== 0,
             ),
           };
           for (const { column, offers } of listColumnSettings(
             columns,
             presentation,
+            "t",
             [],
           )) {
-            const config = { columns, presentation, id: column.id };
+            const config = { table: "t", columns, presentation, id: column.id };
             expect(
               offers,
               `${column.id} over ${JSON.stringify(presentation)}`,
@@ -67,11 +68,12 @@ describe("listColumnSettings", () => {
       { id: "b", header: "B" },
       { id: "c", header: "C" },
     ];
-    const before = listColumnSettings(columns, {}, []);
+    const before = listColumnSettings(columns, {}, "t", []);
     // Widths change nothing a column takes.
     const widened = listColumnSettings(
       columns,
-      { "table.width.a": 200 },
+      { "table.t.width.a": 200 },
+      "t",
       before,
     );
     expect(widened.map(({ offers }) => offers)).toEqual(
@@ -84,7 +86,8 @@ describe("listColumnSettings", () => {
     // and leaves the first's alone.
     const hidden = listColumnSettings(
       columns,
-      { "table.hidden": ["c"] },
+      { "table.t.hidden": ["c"] },
+      "t",
       before,
     );
     expect(hidden.at(0)?.offers).toBe(before.at(0)?.offers);

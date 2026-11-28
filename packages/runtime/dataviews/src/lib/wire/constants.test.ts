@@ -4,12 +4,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { HIDDEN_KEY, ORDER_KEY } from "../presentation/index.js";
 import { createSchema } from "../schema/index.js";
 import {
-  HIDDEN_QUERY_KEY,
+  ARRANGEMENT_QUERY_PATTERN,
+  ARRANGEMENT_QUERY_PREFIX,
   OPERATOR_DELIMITER,
-  ORDER_QUERY_KEY,
   PRESENCE_VALUES,
   QUERY_KEYS,
   RESERVED_QUERY_KEYS,
@@ -18,6 +17,7 @@ import {
 import isOwnedKey from "./isOwnedKey.js";
 import readWireField from "./readWireField.js";
 import rejectWireName from "./rejectWireName.js";
+import spellArrangementKey from "./spellArrangementKey.js";
 import spellWireKey from "./spellWireKey.js";
 
 describe("the wire grammar's names", () => {
@@ -48,8 +48,6 @@ describe("the wire grammar's names", () => {
       "cursor",
       "view",
       "item",
-      "table.order",
-      "table.hidden",
     ]);
     expect(Object.isFrozen(RESERVED_QUERY_KEYS)).toBe(true);
     expect(Object.isFrozen(SUFFIXED_OPERATORS)).toBe(true);
@@ -73,8 +71,14 @@ describe("the wire grammar's names", () => {
 
   it("spells the arrangement's parameters as the presentation stores them", () => {
     // A link decodes into the presentation by name, so the two must agree.
-    expect(ORDER_QUERY_KEY).toBe(ORDER_KEY);
-    expect(HIDDEN_QUERY_KEY).toBe(HIDDEN_KEY);
+    expect(ARRANGEMENT_QUERY_PREFIX).toBe("table.");
+    for (const name of ["order", "hidden"] as const) {
+      expect(
+        ARRANGEMENT_QUERY_PATTERN.exec(
+          spellArrangementKey("machines", name),
+        )?.slice(1),
+      ).toEqual(["machines", name]);
+    }
   });
 
   it("spells isAny as the bare field name and the rest with the delimiter", () => {
@@ -105,6 +109,9 @@ describe("the wire grammar's names", () => {
     );
     expect(rejectWireName("item")).toBe(
       'field name "item" is a reserved query parameter',
+    );
+    expect(rejectWireName("table.t.order")).toBe(
+      'field name "table.t.order" is a reserved query parameter',
     );
   });
 

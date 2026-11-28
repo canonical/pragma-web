@@ -86,6 +86,8 @@ type OwnProps = {
    * table's, one object per column while the arrangement holds.
    */
   readonly offers: HeaderColumnOffers;
+  /** Why no column can change yet, or null; its menu says it first. */
+  readonly columnsReason: string | null;
   /** Hide or move a column, from its menu; one identity for every column. */
   readonly onChangeColumn: (
     columnId: string,

@@ -14,7 +14,6 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0056 — settings links spelled the query once per link", () => {
   it("spells the query once for every link the menu offers", () => {
@@ -25,6 +24,7 @@ describe("regression 0056 — settings links spelled the query once per link", (
     const spellQuery = vi.spyOn(readProviderHost(provider), "spellQuery");
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -32,7 +32,7 @@ describe("regression 0056 — settings links spelled the query once per link", (
           { id: "cores", header: "Cores" },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     expect(markup.match(/<a [^>]*href=/g)?.length).toBeGreaterThan(3);

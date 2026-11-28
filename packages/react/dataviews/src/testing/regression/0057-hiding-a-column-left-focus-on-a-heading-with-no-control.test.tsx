@@ -18,7 +18,6 @@ import {
   openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0057 — hiding a column left focus on a heading with no control", () => {
   let uninstallPopovers: () => void;
@@ -35,13 +34,14 @@ describe("regression 0057 — hiding a column left focus on a heading with no co
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "status", header: "Status" },
           { id: "name", header: "Name", hideable: false },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(

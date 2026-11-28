@@ -13,7 +13,6 @@ import {
   QueryBar,
   SavedViews,
   Search,
-  Settings,
   SortPanel,
 } from "./common/index.js";
 import { useProviderState } from "./hooks/index.js";
@@ -70,7 +69,6 @@ const Provider = Object.assign(
     QueryBar,
     SavedViews,
     Search,
-    Settings,
     SortPanel,
   },
 );

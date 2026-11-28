@@ -32,7 +32,7 @@ const collection = createCollection({
 
 describe("regression 0029 — a restored view arrangement became the default", () => {
   it("draws the view's arrangement until it opens, and none of it once the view is left", async () => {
-    const hidden = { "table.hidden": ["cores"] };
+    const hidden = { "table.t.hidden": ["cores"] };
     // The view store holds A; the arrangement lives in memory.
     const views = openIndexedDBTab(new IDBFactory());
     await views.create({

@@ -26,6 +26,7 @@ export default function renderRefusingTable(): {
   });
   render(
     <DataTable
+      id="t"
       provider={provider}
       columns={[
         { id: "name", header: "Name", sortable: true },

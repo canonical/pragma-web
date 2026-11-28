@@ -23,7 +23,6 @@ import {
   machines,
 } from "../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
-import { DataViews } from "../../../index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -47,7 +46,7 @@ describe("DataTable SSR", () => {
     // observes it, so nothing else would ask the source.
     // A stored width the server never reads: the tracks stay declarative.
     const readPresentation = vi.fn<PresentationStore["readPresentation"]>(
-      async () => ({ "table.width.name": 300 }),
+      async () => ({ "table.t.width.name": 300 }),
     );
     const heard = vi.fn<PresentationStore["subscribe"]>();
     const { provider } = createMachineProvider({
@@ -60,6 +59,7 @@ describe("DataTable SSR", () => {
     host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -86,6 +86,7 @@ describe("DataTable SSR", () => {
     host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -104,6 +105,7 @@ describe("DataTable SSR", () => {
     const { provider } = createMachineProvider();
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable
@@ -124,6 +126,7 @@ describe("DataTable SSR", () => {
     });
     return renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         columns={columns}
@@ -137,13 +140,20 @@ describe("DataTable SSR", () => {
       "a sortable column",
       { columns: [{ id: "name", header: "Name", sortable: true }] },
     ],
-    ["settings", { settings: <DataViews.Settings /> }],
+    ["settings", { settings: <DataTable.SettingsMenu /> }],
   ])("is no tab stop before scripts run with a location and %s", (_, props) => {
     expect(renderLocated(props)).toMatch(/<table[^>]* tabindex="-1"/);
   });
 
   it("is a tab stop before scripts run with a location and no link", () => {
     expect(renderLocated({})).toMatch(/<table[^>]* tabindex="0"/);
+  });
+
+  it("is a tab stop before scripts run with settings of its own", () => {
+    // Only the settings menu draws links; another element draws none.
+    expect(renderLocated({ settings: <span>Mine</span> })).toMatch(
+      /<table[^>]* tabindex="0"/,
+    );
   });
 
   it("is a tab stop before scripts run even where a row's cell holds a link", () => {
@@ -156,6 +166,7 @@ describe("DataTable SSR", () => {
     provider.refresh();
     const html = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         columns={[{ id: "name", header: "Name", cell: Link }]}
@@ -173,7 +184,12 @@ describe("DataTable SSR", () => {
       rows: [buildMachine("m-1", "alpha")],
     });
     const html = renderToString(
-      <DataTable provider={provider} label="Machines" columns={columns} />,
+      <DataTable
+        id="t"
+        provider={provider}
+        label="Machines"
+        columns={columns}
+      />,
     );
     expect(source.calls).toHaveLength(0);
     expect(provider.state.get().result.status).toBe("idle");
@@ -182,7 +198,12 @@ describe("DataTable SSR", () => {
     // Deterministic: the same idle provider renders the same markup.
     expect(
       renderToString(
-        <DataTable provider={provider} label="Machines" columns={columns} />,
+        <DataTable
+          id="t"
+          provider={provider}
+          label="Machines"
+          columns={columns}
+        />,
       ),
     ).toBe(html);
   });
@@ -207,6 +228,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true },
@@ -260,6 +282,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"
@@ -283,6 +306,7 @@ describe("DataTable SSR", () => {
     });
     const markup = renderToString(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"

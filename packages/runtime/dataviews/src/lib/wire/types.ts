@@ -143,3 +143,6 @@ export type RecordedConjunct = {
   readonly issue: QueryIssue | null;
   readonly record: ConjunctRecord;
 };
+
+/** A part of a table's arrangement a key or parameter is spelled for. */
+export type ArrangementKeyPart = "order" | "hidden" | "width";

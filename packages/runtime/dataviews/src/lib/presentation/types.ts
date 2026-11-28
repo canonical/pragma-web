@@ -321,8 +321,8 @@ export type ArrangedColumn<TColumn extends DeclaredColumn = DeclaredColumn> = {
 };
 
 /**
- * What a column command reads: the columns a renderer declares, the
- * arrangement in force, and the column the command changes.
+ * What a column command reads: the table's id, the columns a renderer
+ * declares, the arrangement in force, and the column the command changes.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -330,6 +330,8 @@ export type ArrangedColumn<TColumn extends DeclaredColumn = DeclaredColumn> = {
 export type ColumnCommandConfig<
   TColumn extends DeclaredColumn = DeclaredColumn,
 > = {
+  /** The id of the table whose keys the change reads and writes. */
+  readonly table: string;
   /** The columns as the renderer declares them, in their declared order. */
   readonly columns: readonly TColumn[];
   /** The arrangement in force. */
@@ -365,6 +367,8 @@ export type MoveColumnConfig<TColumn extends DeclaredColumn = DeclaredColumn> =
 export type SpellColumnArrangementConfig<
   TColumn extends DeclaredColumn = DeclaredColumn,
 > = {
+  /** The id of the table whose arrangement the link carries. */
+  readonly table: string;
   /** The parameters the link carries; left unchanged. */
   readonly params: URLSearchParams;
   /** The columns as the renderer declares them, in their declared order. */

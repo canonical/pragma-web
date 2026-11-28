@@ -309,7 +309,7 @@ describe("createDataViewsProvider", () => {
         }),
         snapshot: {
           query: "view=v1&status=failed",
-          presentation: { "table.hidden": ["cpu"] },
+          presentation: { "table.t.hidden": ["cpu"] },
         },
       });
       expect(list).not.toHaveBeenCalled();
@@ -320,7 +320,7 @@ describe("createDataViewsProvider", () => {
       // What it stands on, read from the snapshot alone.
       expect(readProviderHost(provider).view.get()).toBe("v1");
       expect(provider.presentation.state.get().presentation).toEqual({
-        "table.hidden": ["cpu"],
+        "table.t.hidden": ["cpu"],
       });
     });
 
@@ -666,11 +666,11 @@ describe("createDataViewsProvider", () => {
       });
       provider.refresh();
       provider.selection.set(["m-1"]);
-      provider.presentation.arrange({ "table.width.cpu": 120 });
+      provider.presentation.arrange({ "table.t.width.cpu": 120 });
       const snapshot = provider.readSnapshot();
       expect(snapshot).toEqual({
         query: "status=failed&sort=cpu__desc&page=2&size=10",
-        presentation: { "table.width.cpu": 120 },
+        presentation: { "table.t.width.cpu": 120 },
       });
       // Two members, both plain JSON: nothing of the selection rides along.
       expect(Object.keys(snapshot).sort()).toEqual(["presentation", "query"]);
@@ -683,7 +683,7 @@ describe("createDataViewsProvider", () => {
       });
       const snapshot = {
         query: "status=failed&page=3&size=10",
-        presentation: { "table.hidden": ["cpu"] },
+        presentation: { "table.t.hidden": ["cpu"] },
       };
       const provider = createDataViewsProvider({
         collection: machines,
@@ -697,7 +697,7 @@ describe("createDataViewsProvider", () => {
       expect(started.window).toMatchObject({ page: 3, size: 10 });
       expect(started.result.status).toBe("idle");
       expect(provider.presentation.state.get().presentation).toEqual({
-        "table.hidden": ["cpu"],
+        "table.t.hidden": ["cpu"],
       });
       expect(provider.issues.get()).toEqual([]);
       // What it reads back is what it was handed.
@@ -759,14 +759,14 @@ describe("createDataViewsProvider", () => {
         location: createMemoryLocation({ href: "/machines?status=cancelled" }),
         snapshot: {
           query: "status=failed",
-          presentation: { "table.width.cpu": 80 },
+          presentation: { "table.t.width.cpu": 80 },
         },
       });
       expect(provider.state.get().slice.filter.at(0)?.operands).toEqual([
         "cancelled",
       ]);
       expect(provider.presentation.state.get().presentation).toEqual({
-        "table.width.cpu": 80,
+        "table.t.width.cpu": 80,
       });
     });
 
@@ -781,7 +781,7 @@ describe("createDataViewsProvider", () => {
       const first = build();
       first.setSort([{ field: "updated", direction: "asc" }]);
       first.navigateWindow({ page: 4 });
-      first.presentation.arrange({ "table.order": ["cpu", "status"] });
+      first.presentation.arrange({ "table.t.order": ["cpu", "status"] });
       const second = build(JSON.parse(JSON.stringify(first.readSnapshot())));
       expect(second.state.get().slice).toEqual(first.state.get().slice);
       expect(second.state.get().window).toEqual(first.state.get().window);

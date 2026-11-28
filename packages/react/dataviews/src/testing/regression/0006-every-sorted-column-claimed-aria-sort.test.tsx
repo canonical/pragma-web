@@ -26,6 +26,7 @@ describe("regression 0006 — every sorted column claimed aria-sort", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true },

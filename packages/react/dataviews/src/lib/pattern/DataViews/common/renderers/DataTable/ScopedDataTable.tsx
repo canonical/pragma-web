@@ -55,6 +55,7 @@ import {
   useColumnArrangement,
   useColumnManagement,
   useHeaderSort,
+  useTableArrangement,
   useTableGeometry,
   useTabStop,
 } from "./hooks/index.js";
@@ -107,6 +108,8 @@ export default function ScopedDataTable<
   settings,
   messages,
   announce,
+  settingsMenu,
+  id,
   className,
   style,
   ref,
@@ -117,6 +120,10 @@ export default function ScopedDataTable<
       "DataTable requires a provider created by createDataViewsProvider",
     );
   }
+  const hasSettings = isValidElement(settings);
+  // Where the table keeps its arrangement: under its id in the provider's
+  // presentation, or for the mount without one.
+  const arrangement = useTableArrangement(provider, hasSettings, { id });
   // Observed for as long as the table is mounted: a standalone table is a
   // mount that reads the provider, and the ref-count makes a table inside
   // a root that already observes cost nothing.
@@ -138,7 +145,11 @@ export default function ScopedDataTable<
   // the interaction or one row scope, nor re-render one cell. The two keys
   // are separate because they answer different questions — a caller's
   // inline `header` node must not cost anyone a new layout.
-  const rendered = useColumnArrangement(provider.presentation, columns);
+  const rendered = useColumnArrangement(
+    arrangement.table,
+    arrangement.presentation,
+    columns,
+  );
   const model = useStableValue(rendered, areColumnModelsEqual);
 
   const fields = useMemo<readonly string[]>(
@@ -155,16 +166,13 @@ export default function ScopedDataTable<
     [declaredTracks],
   );
 
-  // The layout is this table's view over the provider's presentation: its
-  // widths are read from there and a resize is written there, so nothing
-  // here holds a width of its own.
+  // The layout is this table's view over the presentation it keeps its
+  // arrangement in: its widths are read from there and a resize is written
+  // there, so nothing here holds a width of its own.
+  const { table, presentation } = arrangement;
   const layout = useMemo(
-    () =>
-      createColumnLayout({
-        columns: declaredTracks,
-        presentation: provider.presentation,
-      }),
-    [declaredTracks, provider],
+    () => createColumnLayout({ table, columns: declaredTracks, presentation }),
+    [declaredTracks, table, presentation],
   );
   const interaction = useMemo(() => createGridInteraction(layout), [layout]);
   // Subscribed from an effect, never from the render that built it: React
@@ -214,16 +222,25 @@ export default function ScopedDataTable<
     settings: columnSettings,
     readOffers,
     resettable,
+    reason,
     changeColumn,
     resetColumns,
     listDestinations,
-  } = useColumnManagement(provider, columns, headerRow, messages, announce);
+  } = useColumnManagement(
+    provider,
+    arrangement,
+    columns,
+    headerRow,
+    messages,
+    announce,
+  );
   // One value while none of it changes, so a frame of a resize re-renders
   // no settings menu.
   const menu = useMemo<SettingsMenuProps>(
     () => ({
       settings: columnSettings,
       resettable,
+      reason,
       hydrated,
       onChange: changeColumn,
       onReset: resetColumns,
@@ -232,6 +249,7 @@ export default function ScopedDataTable<
     [
       columnSettings,
       resettable,
+      reason,
       hydrated,
       changeColumn,
       resetColumns,
@@ -260,23 +278,24 @@ export default function ScopedDataTable<
   const renderer = status === null ? showStatus : statusRenderer;
 
   // A header's controls: a sort the source honours, and a resize handle on
-  // every column but the last, whose edge is the table's own.
+  // every column but the last, whose edge is the table's own; the header
+  // keeps the handle's place while column changes wait.
   const isSortable = (column: DataTableColumn): boolean =>
     column.sortable === true && orderable.has(readFieldName(column));
   const isResizable = (column: DataTableColumn, position: number): boolean =>
     column.resizable === true && position < rendered.length - 1;
-  // The table is a tab stop only where nothing inside is.
+  // The table is a tab stop only where nothing inside is; only the
+  // settings menu draws links of its own.
   const tabIndex = useTabStop(
     provider,
     headerRow,
     rendered,
     isSortable,
-    isValidElement(settings),
+    hasSettings && settings.type === settingsMenu,
   );
 
   // The tracks a row renders: selection, the columns, the settings cell.
-  const tracks =
-    Number(selectable) + rendered.length + Number(isValidElement(settings));
+  const tracks = Number(selectable) + rendered.length + Number(hasSettings);
 
   // One renderer for either body, held while what it closes over holds:
   // the bodies key, place and measure rows without knowing them.
@@ -317,6 +336,7 @@ export default function ScopedDataTable<
           lays rows out as grids, so no row sizes itself by its content. */}
       <table
         tabIndex={tabIndex}
+        id={id}
         {...rest}
         ref={attach}
         className={[
@@ -374,6 +394,7 @@ export default function ScopedDataTable<
                   onPlace={headerSort.placeColumn}
                   onRemoveFromSort={headerSort.removeFromSort}
                   offers={readOffers(column.id)}
+                  columnsReason={reason}
                   onChangeColumn={changeColumn}
                   interaction={interaction}
                   resizable={isResizable(column, position)}
@@ -388,13 +409,14 @@ export default function ScopedDataTable<
                 />
               );
             })}
-            {!isValidElement(settings) ? null : (
+            {hasSettings ? (
               <SettingsCell
                 settings={settings}
+                settingsMenu={settingsMenu}
                 menu={menu}
                 reserve={geometry.reserve}
               />
-            )}
+            ) : null}
           </tr>
         </thead>
         {virtualization === undefined ? (

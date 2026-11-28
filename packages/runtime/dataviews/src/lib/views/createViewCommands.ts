@@ -1,6 +1,7 @@
 import {
   arePresentationsEqual,
   diffPresentations,
+  pickTableKeys,
   type ViewPresentation,
 } from "../presentation/index.js";
 import type { Slice } from "../query/index.js";
@@ -159,11 +160,13 @@ export default function createViewCommands(
           slice,
           presentation.state.get().presentation,
         );
+        // A view keeps its tables' keys alone.
+        const kept = pickTableKeys(snapshot.presentation);
         const retried =
           draft !== null &&
           draft.name === trimmed &&
           draft.query === snapshot.query &&
-          arePresentationsEqual(draft.presentation, snapshot.presentation)
+          arePresentationsEqual(draft.presentation, kept)
             ? draft
             : null;
         // A retried creation may have landed: its own view takes no name.
@@ -174,7 +177,8 @@ export default function createViewCommands(
         const attempt: ViewDraft = {
           id: retried?.id ?? mintViewId(),
           name: trimmed,
-          ...snapshot,
+          query: snapshot.query,
+          presentation: kept,
         };
         return async () => {
           draft = attempt;

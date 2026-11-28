@@ -31,10 +31,10 @@ describe("regression 0019 — a cleared sort reason came back", () => {
     fireEvent.click(status, { shiftKey: true });
     expect(findReason()).not.toBeEmptyDOMElement();
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["status"] });
+      provider.presentation.arrange({ "table.t.hidden": ["status"] });
     });
     act(() => {
-      provider.presentation.arrange({ "table.hidden": [] });
+      provider.presentation.arrange({ "table.t.hidden": [] });
     });
     expect(findReason()).toBeEmptyDOMElement();
   });

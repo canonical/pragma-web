@@ -1,11 +1,11 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
-import * as Stories from "./Settings.stories";
+import * as Stories from "./DataTableSettingsMenu.stories";
 
 <Meta of={Stories} name="Recipes" />
 
-# DataViews.Settings recipes
+# DataTable.SettingsMenu recipes
 
-`DataViews.Settings` is the table's column settings: a menu in the table header's settings cell with each column's visibility, its place, and a reset. It takes no props. Given to a table as its `settings`, it is put in the header's settings cell, and the table supplies the columns, their arrangement and the commands that change it; anywhere else it throws. It works the same inside a standalone `DataTable` and a `DataViews.DataTable`.
+`DataTable.SettingsMenu` is a table's column settings, given as its `settings`: each column's visibility and place, and a reset. A table with settings needs an `id`.
 
 ## Settings in a table
 
@@ -16,7 +16,11 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import {
+  DataTable,
+  DataViews,
+  type DataTableColumn,
+} from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 
@@ -37,9 +41,10 @@ export function Machines() {
   return (
     <DataViews provider={provider}>
       <DataViews.DataTable
+        id="machines"
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>
   );
@@ -50,7 +55,7 @@ export function Machines() {
 
 ## Hiding and moving are presentation
 
-What the menu changes is the provider's presentation, which every table on the provider reads, so two tables never disagree about a column. A column hidden or moved asks the source for nothing: the query, the rows and the URL's query stay as they were. Choosing an item closes the menu and returns focus to the settings button, and the table says what changed politely — "Owner hidden", "Cores moved to position 2 of 4". With a presentation store the arrangement is kept for the viewer; without one it lasts the session. A saved view remembers the arrangement it was saved with, hidden columns included, and resetting while it is open returns to that arrangement.
+Each table keeps its arrangement under its `id` — `table.machines.order`, `table.machines.hidden`, `table.machines.width.<column>` — and a change asks the source for nothing. While a linked view loads, every change is disabled and the menu says why. The table announces each change. A saved view keeps the arrangement it was saved with, and reset returns to it.
 
 Hiding a sorted column keeps the ordering: the rows stay ordered by it, and `DataViews.SortPanel` still lists its term, where it can be moved or removed. The heading of the ordering's first term carries `aria-sort` wherever that column now stands; while it is hidden no heading does, and no later term's heading takes the claim over.
 
@@ -60,6 +65,6 @@ Hiding a sorted column keeps the ordering: the rows stay ordered by it, and `Dat
 
 ## Before any script runs
 
-Without scripting the settings button still opens its menu, a native popover, and each change it can reach is a real link, where the provider has a location to lead to: the same page and query, carrying the column order and the hidden columns its change leaves. Without a location nothing is offered, since no link would lead anywhere.
+Without scripting the settings button still opens its menu, a native popover, and each change it can reach is a real link, where the provider has a location to lead to: the same page and query, carrying the column order and the hidden columns its change leaves, named for the table's URI-encoded id: `table.machines.order` and `table.machines.hidden`. Without a location there is no link: the button appears once scripts can drive it, disabled until they run.
 
 Header drag and touch long-press reordering are not offered yet; the menu is the path to every arrangement, and it needs no pointer.

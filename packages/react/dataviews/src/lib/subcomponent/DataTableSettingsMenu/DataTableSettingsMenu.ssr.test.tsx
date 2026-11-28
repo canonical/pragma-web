@@ -2,7 +2,7 @@
  * On the server the settings are a closed popover of real links, each to the
  * page its change leads to, keeping the rest of the query: the popover opens
  * with no script. A destination draws the arrangement its change names, read by
- * a provider standing on it, and nothing is offered without a location.
+ * a provider standing on it.
  */
 
 import { createMemoryLocation } from "@canonical/dataviews-core";
@@ -12,9 +12,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-} from "../../../../../../../testing/index.js";
-import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
+} from "../../../../testing/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../pattern/DataViews/index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", hideable: false },
@@ -34,9 +37,10 @@ const renderSettings = (href: string | null): string =>
   renderToString(
     <DataViews provider={createProvider(href)}>
       <DataViews.DataTable
+        id="t"
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>,
   );
@@ -55,13 +59,14 @@ const listLinks = (markup: string): ReadonlyMap<string, URLSearchParams> =>
 /** The headings a provider standing on a destination shows, in order. */
 const listShownAt = (params: URLSearchParams): readonly string[] =>
   resolveColumnArrangement(
+    "t",
     columns,
     createProvider(`/machines?${params}`).presentation.state.get().presentation,
   )
     .filter((placed) => !placed.hidden)
     .map((placed) => String(placed.column.header));
 
-describe("DataViews.Settings SSR", () => {
+describe("DataTable.SettingsMenu SSR", () => {
   it("renders a closed popover of links keeping the query, before the menu's roles", () => {
     const markup = renderSettings("/machines?status=running&page=1&tab=a");
     expect(markup).toContain('popover="auto"');
@@ -99,11 +104,11 @@ describe("DataViews.Settings SSR", () => {
 
   it("links the reset, once there is something to reset, to the arrangement declared", () => {
     const links = listLinks(
-      renderSettings("/machines?table.order=cores&table.hidden=status"),
+      renderSettings("/machines?table.t.order=cores&table.t.hidden=status"),
     );
     const reset = links.get("Reset table settings");
-    expect(reset?.has("table.hidden")).toBe(false);
-    expect(reset?.has("table.order")).toBe(false);
+    expect(reset?.has("table.t.hidden")).toBe(false);
+    expect(reset?.has("table.t.order")).toBe(false);
     expect(listShownAt(reset ?? new URLSearchParams())).toEqual([
       "Name",
       "Status",
@@ -115,9 +120,12 @@ describe("DataViews.Settings SSR", () => {
     ).toBe(false);
   });
 
-  it("offers no link without a location to lead to", () => {
+  it("offers no link, and a disabled button, without a location to lead to", () => {
     const markup = renderSettings(null);
     expect(markup).not.toContain("<a ");
-    expect(markup).not.toContain("popover");
+    // The button is drawn, disabled and named, holding the cell's place.
+    expect(markup).toMatch(
+      /<button[^>]* disabled=""[^>]* aria-label="Table settings"/,
+    );
   });
 });

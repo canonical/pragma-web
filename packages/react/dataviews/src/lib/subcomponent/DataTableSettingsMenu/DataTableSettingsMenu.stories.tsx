@@ -1,26 +1,29 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../../storybook/decorators/index.js";
-import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
+import { withAppScope } from "../../../storybook/decorators/index.js";
 import {
+  type MachineProvider,
   showConsumerCode,
   useMachineProvider,
-} from "../../../../../../storybook/machines/index.js";
-import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
-import type { StoryWords } from "../../../../../../storybook/types.js";
-import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
-import Component from "./Settings.js";
+} from "../../../storybook/machines/index.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
+import type { DataTableColumn } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../pattern/DataViews/index.js";
+import Component from "./DataTableSettingsMenu.js";
 
 /** The part's props, and the words the story's root speaks. */
 type StoryArgs = ComponentProps<typeof Component> & StoryWords;
 
 const meta = {
-  title: "patterns/DataViews/Controls/Settings",
-  tags: ["experimental"],
+  title: "subcomponents/DataTableSettingsMenu",
   component: Component,
+  tags: ["experimental"],
   decorators: [withAppScope],
+  // The menu is a top-layer popover, so docs preview each story in its own
+  // frame, tall enough for the open menu.
+  parameters: { docs: { story: { inline: false, iframeHeight: "440px" } } },
 } satisfies Meta<StoryArgs>;
 
 export default meta;
@@ -41,7 +44,12 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 ];`;
 
 const renderCode = `<DataViews provider={provider}>
-  <DataViews.DataTable columns={columns} label="Machines" settings={<DataViews.Settings />} />
+  <DataViews.DataTable
+    id="machines"
+    columns={columns}
+    label="Machines"
+    settings={<DataTable.SettingsMenu />}
+  />
 </DataViews>`;
 
 /** Close the open settings menu from its button, leaving the story at rest. */
@@ -60,8 +68,8 @@ const closeMenu = async (canvas: ReturnType<typeof within>): Promise<void> => {
  */
 const arrangeForTheViewer = (provider: MachineProvider): void => {
   provider.presentation.arrange({
-    "table.order": ["status", "name", "cores", "owner"],
-    "table.hidden": ["owner"],
+    "table.machines.order": ["status", "name", "cores", "owner"],
+    "table.machines.hidden": ["owner"],
   });
 };
 
@@ -76,6 +84,7 @@ function Collection({
   return (
     <DataViews provider={provider} {...words}>
       <DataViews.DataTable
+        id="machines"
         columns={columns}
         label="Machines"
         settings={<Component />}
@@ -92,7 +101,7 @@ function Collection({
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -111,14 +120,34 @@ export const Default: Story = {
 };
 
 /**
- * Hide a column: choosing Hide Owner takes the column out of every table on
- * the provider, says so politely, and returns focus to the settings button.
- * Nothing is asked of the source: the rows are the same rows.
+ * Without a location: no change leads anywhere before scripts run, so the
+ * button is drawn disabled and hidden until scripting can drive it. Here
+ * scripts run, so it shows, enabled, and opens the menu.
+ */
+export const WithoutALocation: Story = {
+  parameters: showConsumerCode({
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    declarations: columnsCode,
+    render: renderCode,
+  }),
+  render: (args) => <Collection {...pickStoryWords(args)} />,
+  play: async ({ canvas }) => {
+    const trigger = await canvas.findByRole("button", {
+      name: "Table settings",
+    });
+    await expect(trigger).toBeVisible();
+    await expect(trigger).toBeEnabled();
+  },
+};
+
+/**
+ * Hide a column: choosing Hide Owner takes the column out of this table,
+ * says so, and returns focus to the settings button.
  */
 export const HideAColumn: Story = {
   name: "Hide a column",
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -150,11 +179,11 @@ export const HideAColumn: Story = {
 export const ArrangedByTheViewer: Story = {
   name: "Arranged by the viewer",
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
-  "table.order": ["status", "name", "cores", "owner"],
-  "table.hidden": ["owner"],
+  "table.machines.order": ["status", "name", "cores", "owner"],
+  "table.machines.hidden": ["owner"],
 });`,
     render: renderCode,
   }),

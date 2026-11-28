@@ -100,6 +100,8 @@ export type ColumnLayoutState = {
  * name may change or move before the first release.
  */
 export type ColumnLayoutConfig = {
+  /** The id of the table whose widths are read and written. */
+  readonly table: string;
   readonly columns: readonly ColumnToSize[];
   readonly presentation: Presentation;
 };

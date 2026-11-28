@@ -49,7 +49,7 @@ describe("regression 0023 — a missing view's write retried forever", () => {
     presentation.show({ id: "v1", presentation: {} });
     // Another tab deletes the view; this tab's resize is still gathering.
     await store.remove(created.view);
-    presentation.arrange({ "table.width.name": 120 });
+    presentation.arrange({ "table.t.width.name": 120 });
     await flushPresentation(patchPresentation);
     expect(patchPresentation).toHaveBeenCalledTimes(1);
     // The session hears of the deletion and leaves the view.

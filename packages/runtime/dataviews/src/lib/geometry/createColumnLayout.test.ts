@@ -22,7 +22,11 @@ const createLayoutOver = (
   presentation: OwnedPresentation = createPresentation(),
 ) => ({
   presentation,
-  layout: createColumnLayout({ columns: buildColumns(), presentation }),
+  layout: createColumnLayout({
+    table: "t",
+    columns: buildColumns(),
+    presentation,
+  }),
 });
 
 describe("createColumnLayout", () => {
@@ -43,12 +47,14 @@ describe("createColumnLayout", () => {
     const presentation = createPresentation();
     expect(() =>
       createColumnLayout({
+        table: "t",
         columns: [{ id: "", sizing: { kind: "fixed", px: 1 } }],
         presentation,
       }),
     ).toThrow("must not be empty");
     expect(() =>
       createColumnLayout({
+        table: "t",
         columns: [
           { id: "name", sizing: { kind: "fixed", px: 1 } },
           { id: "name", sizing: { kind: "fixed", px: 2 } },
@@ -65,26 +71,26 @@ describe("createColumnLayout", () => {
   it("derives fixed overrides from the presentation's widths, held to the declared bounds", () => {
     const { presentation, layout } = createLayoutOver();
     presentation.arrange({
-      [spellWidthKey("name")]: 340,
-      [spellWidthKey("zone")]: 900,
-      [spellWidthKey("status")]: 40,
+      [spellWidthKey("t", "name")]: 340,
+      [spellWidthKey("t", "zone")]: 900,
+      [spellWidthKey("t", "status")]: 40,
     });
     expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 340 });
     // A flexible column is held to its declared maximum, a fixed one goes
     // anywhere from zero.
     expect(layout.readEffective("zone")).toEqual({ kind: "fixed", px: 300 });
     expect(layout.readEffective("status")).toEqual({ kind: "fixed", px: 40 });
-    presentation.arrange({ [spellWidthKey("name")]: 10 });
+    presentation.arrange({ [spellWidthKey("t", "name")]: 10 });
     expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 120 });
   });
 
   it("keeps the declared sizing where the presentation holds no usable width", () => {
     const { presentation, layout } = createLayoutOver();
     presentation.arrange({
-      [spellWidthKey("name")]: -5,
-      [spellWidthKey("status")]: Number.NaN,
-      [spellWidthKey("zone")]: "wide",
-      "table.width.other": 200,
+      [spellWidthKey("t", "name")]: -5,
+      [spellWidthKey("t", "status")]: Number.NaN,
+      [spellWidthKey("t", "zone")]: "wide",
+      "table.t.width.other": 200,
     });
     expect(layout.state.get().overrides).toEqual({});
     for (const column of buildColumns()) {
@@ -94,10 +100,14 @@ describe("createColumnLayout", () => {
 
   it("writes an override to the presentation, so every layout over it agrees", () => {
     const { presentation, layout } = createLayoutOver();
-    const other = createColumnLayout({ columns: buildColumns(), presentation });
+    const other = createColumnLayout({
+      table: "t",
+      columns: buildColumns(),
+      presentation,
+    });
     layout.setOverride("name", { kind: "fixed", px: 340 });
     expect(presentation.state.get().presentation).toEqual({
-      [spellWidthKey("name")]: 340,
+      [spellWidthKey("t", "name")]: 340,
     });
     expect(other.readEffective("name")).toEqual({ kind: "fixed", px: 340 });
     expect(other.state.get()).toBe(other.state.get());
@@ -121,6 +131,7 @@ describe("createColumnLayout", () => {
       store: createStandInPresentationStore({ patchPresentation }),
     });
     const layout = createColumnLayout({
+      table: "t",
       columns: buildColumns(),
       presentation,
     });
@@ -133,7 +144,7 @@ describe("createColumnLayout", () => {
     layout.setOverride("name", { kind: "fixed", px: 340 });
     release();
     expect(patchPresentation.mock.calls).toEqual([
-      ["default", { [spellWidthKey("name")]: 340 }],
+      ["default", { [spellWidthKey("t", "name")]: 340 }],
     ]);
   });
 
@@ -153,7 +164,7 @@ describe("createColumnLayout", () => {
     // A presentation change that moves no width of these columns is silent,
     // and the snapshot keeps its identity.
     const after = layout.state.get();
-    presentation.arrange({ "table.order": ["zone"] });
+    presentation.arrange({ "table.t.order": ["zone"] });
     expect(heard).toHaveLength(2);
     expect(layout.state.get()).toBe(after);
     stopFirst();
@@ -164,7 +175,11 @@ describe("createColumnLayout", () => {
   it("keeps the declared sizing immune to caller mutations", () => {
     const input = buildColumns();
     const presentation = createPresentation();
-    const layout = createColumnLayout({ columns: input, presentation });
+    const layout = createColumnLayout({
+      table: "t",
+      columns: input,
+      presentation,
+    });
     (input as { id: string; sizing: unknown }[]).push({
       id: "sneaky",
       sizing: { kind: "fixed", px: 1 },
@@ -172,7 +187,7 @@ describe("createColumnLayout", () => {
     expect(() => layout.readEffective("sneaky")).toThrow("unknown column id");
     // A width stored for the column pushed later is nobody's: the layout
     // derives over the ids it copied, so it neither throws nor applies it.
-    presentation.arrange({ [spellWidthKey("sneaky")]: 200 });
+    presentation.arrange({ [spellWidthKey("t", "sneaky")]: 200 });
     expect(layout.state.get().overrides).toEqual({});
   });
 
@@ -192,8 +207,9 @@ describe("createColumnLayout", () => {
       { px: 120 },
     ];
     for (const value of stored) {
-      const arrangement = { [spellWidthKey("status")]: value };
+      const arrangement = { [spellWidthKey("t", "status")]: value };
       const [resolved] = resolveColumnArrangement(
+        "t",
         [{ id: "status" }],
         arrangement,
       );

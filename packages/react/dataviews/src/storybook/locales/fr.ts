@@ -175,6 +175,7 @@ const fr: DataViewsMessages = {
   moveNamedColumnRight: (name) => `Déplacer ${name} vers la droite`,
   columnAlwaysShown: (name) => `${name} est toujours affichée`,
   resetTableSettings: "Réinitialiser les paramètres du tableau",
+  columnsPending: "Les colonnes pourront changer une fois la vue liée chargée.",
 
   columnHidden: (name) => `${name} masquée`,
   columnShown: ({ name, position, total }) =>

@@ -26,6 +26,7 @@ describe("regression 0007 — a declared default shown as unsorted", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true },

@@ -651,7 +651,7 @@ describe("DataViews.SavedViews", () => {
     );
     expect(queryNotices()).toHaveTextContent("1 saved view cannot be read.");
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 120 });
+      provider.presentation.arrange({ "table.t.width.name": 120 });
     });
     await waitFor(() => {
       expect(queryNotices()).toHaveTextContent(

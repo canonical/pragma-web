@@ -28,6 +28,7 @@ describe("regression 0013 — closed header menus listened to the window", () =>
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true },
@@ -67,6 +68,7 @@ describe("regression 0013 — closed header menus listened to the window", () =>
     const renderTable = (sortable: boolean) =>
       render(
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             { id: "name", header: "Name", sortable },

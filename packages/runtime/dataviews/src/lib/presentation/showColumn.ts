@@ -1,4 +1,4 @@
-import { HIDDEN_KEY } from "./constants.js";
+import { spellArrangementKey } from "../wire/index.js";
 import listStoredIds from "./listStoredIds.js";
 import resolveColumnArrangement from "./resolveColumnArrangement.js";
 import type { ColumnCommandConfig, PresentationPatch } from "./types.js";
@@ -15,11 +15,12 @@ import type { ColumnCommandConfig, PresentationPatch } from "./types.js";
  * name may change or move before the first release.
  */
 export default function showColumn({
+  table,
   columns,
   presentation,
   id,
 }: ColumnCommandConfig): PresentationPatch | null {
-  const arranged = resolveColumnArrangement(columns, presentation);
+  const arranged = resolveColumnArrangement(table, columns, presentation);
   const target = arranged.find(({ column }) => column.id === id);
   if (target === undefined || !target.hidden) {
     return null;
@@ -31,8 +32,9 @@ export default function showColumn({
       .filter(({ column, hidden }) => !hidden && column.hideable !== false)
       .map(({ column }) => column.id),
   );
+  const key = spellArrangementKey(table, "hidden");
   return {
-    [HIDDEN_KEY]: listStoredIds(presentation[HIDDEN_KEY]).filter(
+    [key]: listStoredIds(presentation[key]).filter(
       (stored) => stored !== id && !keptShown.has(stored),
     ),
   };

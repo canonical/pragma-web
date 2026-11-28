@@ -23,28 +23,28 @@ import {
 describe("regression 0076 — a linked arrangement lost under an open view", () => {
   it("shows the link's columns over a view saved hiding them, drawn from the first render", () => {
     const presentation = createPresentation({
-      linked: { view: "v1", presentation: { "table.hidden": [] } },
+      linked: { view: "v1", presentation: { "table.t.hidden": [] } },
     });
     expect(presentation.state.get().presentation).toEqual({
-      "table.hidden": [],
+      "table.t.hidden": [],
     });
     const release = presentation.observe();
     // Still drawn until the view it named is shown.
     expect(presentation.state.get().presentation).toEqual({
-      "table.hidden": [],
+      "table.t.hidden": [],
     });
     presentation.show({
       id: "v1",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
-    expect(presentation.state.get().presentation["table.hidden"]).toEqual([]);
-    expect(presentation.state.get().own).toEqual({ "table.hidden": [] });
+    expect(presentation.state.get().presentation["table.t.hidden"]).toEqual([]);
+    expect(presentation.state.get().own).toEqual({ "table.t.hidden": [] });
     // Another view shown: the link was that view's alone.
     presentation.show({
       id: "v2",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
-    expect(presentation.state.get().presentation["table.hidden"]).toEqual([
+    expect(presentation.state.get().presentation["table.t.hidden"]).toEqual([
       "status",
     ]);
     release();
@@ -58,8 +58,8 @@ describe("regression 0076 — a linked arrangement lost under an open view", () 
     // A store holding Status hidden and a width of its own, which takes what
     // is written to it.
     let stored: ViewPresentation = {
-      "table.hidden": ["status"],
-      "table.width.name": 80,
+      "table.t.hidden": ["status"],
+      "table.t.width.name": 80,
     };
     const readPresentation = vi.fn(async () => stored);
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
@@ -77,23 +77,23 @@ describe("regression 0076 — a linked arrangement lost under an open view", () 
         readPresentation,
         patchPresentation,
       }),
-      linked: { view: null, presentation: { "table.hidden": [] } },
+      linked: { view: null, presentation: { "table.t.hidden": [] } },
     });
     const release = presentation.observe();
     // The read has landed, since its width is drawn, and the link stands.
     await vi.waitFor(() => {
       expect(presentation.state.get().presentation).toEqual({
-        "table.hidden": [],
-        "table.width.name": 80,
+        "table.t.hidden": [],
+        "table.t.width.name": 80,
       });
     });
     expect(presentation.state.get().own).toEqual({
-      "table.hidden": [],
-      "table.width.name": 80,
+      "table.t.hidden": [],
+      "table.t.width.name": 80,
     });
     await vi.advanceTimersByTimeAsync(WRITE_DEADLINE);
     expect(patchPresentation).toHaveBeenCalledWith("default", {
-      "table.hidden": [],
+      "table.t.hidden": [],
     });
     const reads = readPresentation.mock.calls.length;
     presentation.refresh();
@@ -102,24 +102,24 @@ describe("regression 0076 — a linked arrangement lost under an open view", () 
     });
     await vi.advanceTimersByTimeAsync(0);
     expect(presentation.state.get().presentation).toEqual({
-      "table.hidden": [],
-      "table.width.name": 80,
+      "table.t.hidden": [],
+      "table.t.width.name": 80,
     });
     release();
   });
 
   it("draws the link until it is adopted when a view is shown before anything observes", () => {
     const presentation = createPresentation({
-      linked: { view: "v1", presentation: { "table.hidden": [] } },
+      linked: { view: "v1", presentation: { "table.t.hidden": [] } },
     });
     presentation.show({
       id: "v1",
-      presentation: { "table.hidden": ["status"] },
+      presentation: { "table.t.hidden": ["status"] },
     });
-    expect(presentation.state.get().presentation["table.hidden"]).toEqual([]);
+    expect(presentation.state.get().presentation["table.t.hidden"]).toEqual([]);
     const release = presentation.observe();
-    expect(presentation.state.get().presentation["table.hidden"]).toEqual([]);
-    expect(presentation.state.get().own).toEqual({ "table.hidden": [] });
+    expect(presentation.state.get().presentation["table.t.hidden"]).toEqual([]);
+    expect(presentation.state.get().own).toEqual({ "table.t.hidden": [] });
     release();
   });
 });

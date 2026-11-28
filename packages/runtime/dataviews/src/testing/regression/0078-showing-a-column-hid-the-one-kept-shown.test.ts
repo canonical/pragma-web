@@ -32,11 +32,16 @@ describe("regression 0078 — showing a column hid the one kept shown", () => {
     };
     /** The ids a table shows over the presentation, in order. */
     const listShown = (columns: readonly { readonly id: string }[]) =>
-      resolveColumnArrangement(columns, presentation.state.get().presentation)
+      resolveColumnArrangement(
+        "t",
+        columns,
+        presentation.state.get().presentation,
+      )
         .filter(({ hidden }) => !hidden)
         .map(({ column }) => column.id);
     apply(
       hideColumn({
+        table: "t",
         columns: second,
         presentation: presentation.state.get().presentation,
         id: "c",
@@ -44,6 +49,7 @@ describe("regression 0078 — showing a column hid the one kept shown", () => {
     );
     apply(
       hideColumn({
+        table: "t",
         columns: first,
         presentation: presentation.state.get().presentation,
         id: "b",
@@ -53,6 +59,7 @@ describe("regression 0078 — showing a column hid the one kept shown", () => {
     expect(listShown(second)).toEqual(["b"]);
     apply(
       showColumn({
+        table: "t",
         columns: second,
         presentation: presentation.state.get().presentation,
         id: "c",

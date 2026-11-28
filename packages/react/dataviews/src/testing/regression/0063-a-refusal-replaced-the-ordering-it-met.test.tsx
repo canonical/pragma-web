@@ -41,7 +41,12 @@ describe("regression 0063 — a refusal replaced the ordering it met", () => {
       capabilities: declareMachineOrdering(1),
     });
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

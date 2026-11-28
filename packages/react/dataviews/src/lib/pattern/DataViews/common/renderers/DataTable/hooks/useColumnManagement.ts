@@ -1,9 +1,11 @@
 import type {
   JsonValue,
   PresentationPatch,
+  ReadonlyChannel,
   RowRecord,
   SchemaFieldDefinition,
   ViewPresentation,
+  ViewsState,
 } from "@canonical/dataviews-core";
 import {
   type ColumnCommandConfig,
@@ -71,37 +73,33 @@ const applyPatch = (
     ),
   );
 
+/** What a provider keeping no views is read as: nothing listed, ever. */
+const NO_VIEWS: ReadonlyChannel<ViewsState | null> = {
+  get: () => null,
+  subscribe: () => () => {},
+};
+
+/** Whether the views are being listed, or failed to be and wait on a refresh. */
+const isListingView = (views: ViewsState | null): boolean =>
+  views?.listing.status === "pending" || views?.listing.status === "failed";
+
+/** The view shown, by its id, or null. */
+const readShownView = (views: ViewsState | null): string | null =>
+  views?.current?.id ?? null;
+
 /** The ids an arrangement shows, in its order. */
 const listShownIds = (
   columns: readonly DataTableColumn[],
   presentation: ViewPresentation,
+  table: string,
 ): readonly string[] =>
-  resolveColumnArrangement(columns, presentation)
+  resolveColumnArrangement(table, columns, presentation)
     .filter(({ hidden }) => !hidden)
     .map(({ column }) => column.id);
 
 /**
- * The table's column management: each declared column with the changes it
- * takes now, whether a reset would change anything, the commands that hide,
- * show, move and reset columns, each saying what it did through the table's
- * announcer, and where each change leads without scripting.
- *
- * Every change is presentation: it is written to the provider's
- * presentation and asks the source for nothing, so it moves no query, no
- * request and no location. A change that would leave the arrangement as it
- * is changes nothing, except that asking to hide a column declared
- * `hideable: false` announces that it is always shown. The commands read
- * the latest arrangement and columns, not this render's, and hold one
- * identity each. When hiding a column takes the focus with it — its own
- * header's menu is gone — focus moves to the nearest heading holding a
- * control: the one now standing where it stood, then those after it, then
- * those before it, and the table's settings last. A reset clears the
- * viewer's own layer alone, so it is offered only while that layer holds
- * something to clear.
- *
- * Each column's offers are read from one resolution of the arrangement, and
- * a column keeps its offers object while its changes hold, so a width
- * committed renders no header's menu again.
+ * The table's column management: each column's changes, the commands
+ * that hide, show, move and reset columns, and their no-script links.
  */
 export default function useColumnManagement<
   TFields extends readonly SchemaFieldDefinition[],
@@ -109,16 +107,16 @@ export default function useColumnManagement<
 >(
   ...[
     provider,
+    { table, presentation, shared },
     columns,
     headerRow,
     messages,
     announce,
   ]: UseColumnManagementProps<TFields, TRow>
 ): UseColumnManagementResult {
-  const { presentation } = provider;
   const declared = useStableValue(columns, areColumnsEqual);
   // The arrangement alone: a change to the reason re-renders no table.
-  const arrangement = useDataViewsValue(presentation.state, {
+  const arranged = useDataViewsValue(presentation.state, {
     select: (shown) => shown.presentation,
   });
   // The list last handed out, whose offers objects a new list keeps where a
@@ -127,8 +125,8 @@ export default function useColumnManagement<
   // first is harmless.
   const previous = useRef<readonly ColumnSetting[]>([]);
   const derived = useMemo(
-    () => listColumnSettings(declared, arrangement, previous.current),
-    [declared, arrangement],
+    () => listColumnSettings(declared, arranged, table, previous.current),
+    [declared, arranged, table],
   );
   // Held at one reference while they say the same: a resize writes a width,
   // which changes no column's visibility or place.
@@ -140,6 +138,14 @@ export default function useColumnManagement<
     () => new Map(settings.map(({ column, offers }) => [column.id, offers])),
     [settings],
   );
+  // The view a link opened, while the views are listed and it is not shown:
+  // a change now would land beneath that view's arrangement. Only a table
+  // keeping its arrangement in the provider's presentation waits.
+  const opened = useDataViewsValue(readProviderHost(provider).view);
+  const viewsState = provider.views?.state ?? NO_VIEWS;
+  const listing = useDataViewsValue(viewsState, { select: isListingView });
+  const shownView = useDataViewsValue(viewsState, { select: readShownView });
+  const waiting = shared && listing && opened !== null && shownView !== opened;
   const readOffers = useCallback(
     (columnId: string): ColumnSetting["offers"] => {
       const offers = offersById.get(columnId);
@@ -156,8 +162,10 @@ export default function useColumnManagement<
     select: (shown) => shown.own,
   });
   const resettable = useMemo(
-    () => Object.keys(resetColumnArrangement({ presentation: own })).length > 0,
-    [own],
+    () =>
+      Object.keys(resetColumnArrangement({ table, presentation: own })).length >
+      0,
+    [own, table],
   );
 
   // Where a hidden column stood among the shown ones, until the render that
@@ -214,6 +222,7 @@ export default function useColumnManagement<
       }
       const current = presentation.state.get().presentation;
       const patch = CHANGES[change]({
+        table,
         columns,
         presentation: current,
         id: columnId,
@@ -231,7 +240,7 @@ export default function useColumnManagement<
         }
         return;
       }
-      const before = listShownIds(columns, current).indexOf(columnId);
+      const before = listShownIds(columns, current, table).indexOf(columnId);
       presentation.arrange(patch);
       if (change === "hide") {
         recoverAt.current = before;
@@ -245,6 +254,7 @@ export default function useColumnManagement<
       const shown = listShownIds(
         columns,
         presentation.state.get().presentation,
+        table,
       );
       const position = shown.indexOf(columnId) + 1;
       const word =
@@ -259,6 +269,7 @@ export default function useColumnManagement<
 
   const resetColumns = useStableCallback(() => {
     const patch = resetColumnArrangement({
+      table,
       presentation: presentation.state.get().own,
     });
     if (Object.keys(patch).length === 0) {
@@ -271,6 +282,11 @@ export default function useColumnManagement<
   const { spellQuery } = readProviderHost(provider);
   const listDestinations = useStableCallback(
     (): SettingsDestinations | null => {
+      // A table without an id keeps its arrangement for the mount: no link
+      // carries it.
+      if (!shared) {
+        return null;
+      }
       // The same query from the page it stands on, read once for every
       // link: a change to the columns asks the source for nothing, so the
       // window stays where it is.
@@ -279,15 +295,16 @@ export default function useColumnManagement<
       if (params === null) {
         return null;
       }
-      // Spelled from the stored lists, so a link keeps what another table
-      // over the same presentation holds.
+      // Spelled from the table's stored lists, so a link keeps the ids of
+      // columns it no longer declares, and another table's parameters.
       const spell = (next: ViewPresentation | null): string =>
-        `?${spellColumnArrangement({ params, columns, presentation: next })}`;
+        `?${spellColumnArrangement({ table, params, columns, presentation: next })}`;
       const current = presentation.state.get().presentation;
       const changes = new Map<string, string>();
       for (const column of columns) {
         for (const change of COLUMN_CHANGES) {
           const patch = CHANGES[change]({
+            table,
             columns,
             presentation: current,
             id: column.id,
@@ -308,6 +325,7 @@ export default function useColumnManagement<
     settings,
     readOffers,
     resettable,
+    reason: waiting ? messages.columnsPending : null,
     changeColumn,
     resetColumns,
     listDestinations,

@@ -18,9 +18,10 @@ import areColumnOffersEqual from "./areColumnOffersEqual.js";
 export default function listColumnSettings(
   columns: readonly DataTableColumn[],
   presentation: ViewPresentation,
+  table: string,
   previous: readonly ColumnSetting[],
 ): readonly ColumnSetting[] {
-  const arranged = resolveColumnArrangement(columns, presentation);
+  const arranged = resolveColumnArrangement(table, columns, presentation);
   const shown = arranged.filter(({ hidden }) => !hidden);
   const places = new Map(shown.map(({ column }, at) => [column.id, at]));
   const kept = new Map(

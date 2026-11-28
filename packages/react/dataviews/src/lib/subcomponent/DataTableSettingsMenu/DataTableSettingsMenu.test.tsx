@@ -1,6 +1,5 @@
-import { assertInvariant } from "@canonical/dataviews-core/bindings";
 /**
- * DataViews.Settings in its table: the settings cell holding the menu, every
+ * DataTable.SettingsMenu in its table: the settings cell holding the menu, every
  * change written to the presentation and announced, nothing asked of the
  * source, at least one column always shown, and — without scripts — real
  * links whose destinations draw the arrangement the enhanced menu makes.
@@ -10,6 +9,7 @@ import {
   createMemoryLocation,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import { createRecordingLocation } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
@@ -35,14 +35,15 @@ import {
   type MachineProvider,
   openMenuFrom,
   readAnnouncements,
+  silenceRenderErrors,
   waitForFocus,
   waitForFrames,
-} from "../../../../../../../testing/index.js";
-import DataViews from "../../../Provider.js";
+} from "../../../../testing/index.js";
 import {
   DataTable,
   type DataTableColumn,
-} from "../../renderers/DataTable/index.js";
+} from "../../pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../pattern/DataViews/index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", hideable: false },
@@ -68,9 +69,10 @@ const Composition = ({
 }) => (
   <DataViews provider={provider}>
     <DataViews.DataTable
+      id="t"
       columns={declared}
       label="Machines"
-      settings={<DataViews.Settings />}
+      settings={<DataTable.SettingsMenu />}
     />
   </DataViews>
 );
@@ -122,7 +124,7 @@ const choose = async (name: string): Promise<void> => {
 const readAnnouncement = async (): Promise<string | null> =>
   (await readAnnouncements()).at(-1) ?? null;
 
-describe("DataViews.Settings", () => {
+describe("DataTable.SettingsMenu", () => {
   let uninstallPopovers: () => void;
   beforeAll(() => {
     uninstallPopovers = installPopoverStandIn();
@@ -133,17 +135,16 @@ describe("DataViews.Settings", () => {
 
   it("throws outside a table's settings cell", () => {
     const { provider } = createProvider();
-    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
-    onTestFinished(() => {
-      errors.mockRestore();
-    });
+    silenceRenderErrors();
     expect(() =>
       render(
         <DataViews provider={provider}>
-          <DataViews.Settings />
+          <DataTable.SettingsMenu />
         </DataViews>,
       ),
-    ).toThrow("DataViews.Settings must be used as a DataTable's settings");
+    ).toThrow(
+      "DataTable.SettingsMenu must be given to a DataTable as its settings",
+    );
   });
 
   it("ends the header in a settings cell holding the menu, and a table without it has none", () => {
@@ -161,7 +162,12 @@ describe("DataViews.Settings", () => {
     ).toBe(findTrigger());
     view.unmount();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     expect(
       document.querySelector(".ds.data-table-settings-cell"),
@@ -172,10 +178,11 @@ describe("DataViews.Settings", () => {
     const { provider } = createProvider();
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await choose("Hide Cores");
@@ -195,7 +202,7 @@ describe("DataViews.Settings", () => {
     expect(await readAnnouncement()).toBe("Status hidden");
     await waitForFocus(findTrigger());
     expect(provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
     // Presentation only: no request, no location write, the same query.
     expect(source.calls).toHaveLength(requests);
@@ -252,7 +259,7 @@ describe("DataViews.Settings", () => {
     expect(hideLast).toHaveClass("disabled");
     fireEvent.click(hideLast);
     expect(other.provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
   });
 
@@ -282,7 +289,7 @@ describe("DataViews.Settings", () => {
     await choose("Hide Status");
     await choose("Move Cores left");
     act(() => {
-      provider.presentation.arrange({ "table.width.name": 240 });
+      provider.presentation.arrange({ "table.t.width.name": 240 });
     });
     return { provider, source, recording };
   };
@@ -312,7 +319,7 @@ describe("DataViews.Settings", () => {
 
   it("resets the columns a followed link chose, back to the arrangement declared", async () => {
     const { provider } = createProvider(
-      createMemoryLocation({ href: "/machines?table.hidden=status" }),
+      createMemoryLocation({ href: "/machines?table.t.hidden=status" }),
     );
     render(<Composition provider={provider} />);
     expect(listShown()).toEqual(["Name", "Cores"]);
@@ -357,7 +364,7 @@ describe("DataViews.Settings", () => {
     if (created.status !== "saved") {
       throw new Error(`the view was not saved: ${created.status}`);
     }
-    expect(created.view.presentation).toEqual({ "table.hidden": ["status"] });
+    expect(created.view.presentation).toEqual({ "table.t.hidden": ["status"] });
     authoring.unmount();
     // Another viewer, holding no change of their own, sees every column until
     // the view is opened: only the view can hide Status for them.
@@ -409,7 +416,12 @@ describe("DataViews.Settings", () => {
         createMemoryLocation({ href: `/machines${destination}` }),
       );
       const view = render(
-        <DataTable provider={provider} columns={columns} label="Machines" />,
+        <DataTable
+          id="t"
+          provider={provider}
+          columns={columns}
+          label="Machines"
+        />,
       );
       const shown = listShown();
       view.unmount();
@@ -419,9 +431,9 @@ describe("DataViews.Settings", () => {
     /** The arrangements a reader may stand on as the page loads. */
     const startingArrangements = [
       "/machines?status=running",
-      "/machines?table.hidden=status",
-      "/machines?table.order=cores&table.hidden=status",
-      "/machines?table.hidden=cores&table.order=cores&table.order=status",
+      "/machines?table.t.hidden=status",
+      "/machines?table.t.order=cores&table.t.hidden=status",
+      "/machines?table.t.hidden=cores&table.t.order=cores&table.t.order=status",
     ];
 
     /** Every link each starting arrangement's server markup offers. */

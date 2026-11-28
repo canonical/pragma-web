@@ -78,8 +78,8 @@ const observeResize = (
  * selection track, whose width is the stylesheet's: it is read back from the
  * cell that track sizes, observed for as long as that cell is there.
  *
- * Two tables on one provider read one presentation, so they share the
- * arrangement while resolving their own widths against their own container.
+ * Two tables with one id share the arrangement while resolving their own
+ * widths against their own container.
  */
 export default function useTableGeometry(
   ...[layout, interaction, columnIds]: UseTableGeometryProps

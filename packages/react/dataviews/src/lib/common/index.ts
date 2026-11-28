@@ -1,14 +1,6 @@
 /**
- * The machinery the standalone parts and the composition share, outside
- * any ontology tier: the announcer a root speaks through, the cell context a
- * table installs and a column's own renderer reads, the field declaration
- * every renderer shows a record by, the words a table installs over its
- * private parts, the switch that shows one collection through the renderer a
- * reader chooses, the status a renderer shows above what it draws, the
- * settings menu a table installs in its settings cell and what it was given
- * as its settings reads, and a Condition's mark and text for assistive
- * technology only. Any tier may depend on `common/` downward; `common/`
- * never depends on a tier.
+ * What the parts and the composition share, outside any ontology tier.
+ * Any tier may depend on `common/`; `common/` depends on none.
  */
 
 export * from "./Announcer/index.js";

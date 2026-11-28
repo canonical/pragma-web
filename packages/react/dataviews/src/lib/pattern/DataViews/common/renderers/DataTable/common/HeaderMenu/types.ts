@@ -33,6 +33,8 @@ export type HeaderMenuProps = {
    * again.
    */
   readonly offers: HeaderColumnOffers;
+  /** Why no column can change yet, shown first, Hide and Move disabled. */
+  readonly columnsReason: string | null;
   /**
    * Sort by a column in a direction. One identity for every column, so a
    * render of the header row renders no menu again.

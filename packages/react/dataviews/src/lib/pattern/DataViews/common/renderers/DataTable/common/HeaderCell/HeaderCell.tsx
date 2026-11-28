@@ -67,6 +67,7 @@ export default function HeaderCell({
   onPlace,
   onRemoveFromSort,
   offers,
+  columnsReason,
   onChangeColumn,
   onClearRefusal,
   interaction,
@@ -95,6 +96,8 @@ export default function HeaderCell({
   const shown = useRef<HTMLSpanElement | null>(null);
   // The reason's span is drawn only on a sortable header once scripts run.
   const drawsReason = sortable && hydrated;
+  // While columns are held no width can change, so the handle waits.
+  const held = columnsReason !== null;
   useEffect(() => {
     const node = reasonRef.current;
     if (!drawsReason || node === null || !canAnchorPopover(node)) {
@@ -237,19 +240,22 @@ export default function HeaderCell({
           removable={removable}
           hideable={column.hideable !== false}
           offers={offers}
+          columnsReason={columnsReason}
           onPlace={onPlace}
           onRemoveFromSort={onRemoveFromSort}
           onChangeColumn={onChangeColumn}
         />
       ) : null}
-      {/* A focusable handle whose keys resize only once scripts run: none
-          before then, so nothing is offered that does not work. */}
-      {resizable && !hydrated ? (
+      {/* A focusable handle whose keys resize only once scripts run and
+          while columns may change: none otherwise, so nothing is offered
+          that does not work. */}
+      {resizable && (!hydrated || held) ? (
         // The handle's place, kept until it arrives, so the label does not
-        // shrink at hydration. Without scripting the stylesheet drops it.
+        // shrink at hydration or as held columns are let go. Without
+        // scripting the stylesheet drops it.
         <span className="handle-slot" aria-hidden="true" />
       ) : null}
-      {resizable && hydrated ? (
+      {resizable && hydrated && !held ? (
         <ResizeHandle
           interaction={interaction}
           columnId={column.id}

@@ -8,7 +8,7 @@
 # no chevron: an IconButton opening a menu in a native popover, referenced
 # rather than re-specified. The menu's surface, items, separators, keyboard
 # model and focus return are its own. The public part
-# that renders this menu is `DataViews.Settings`.
+# that renders this menu is `DataTable.SettingsMenu`.
 #
 # Names — one per part, the same in the design, the DOM and here:
 #   settings menu   design "DataTable.SettingsMenu"
@@ -30,11 +30,12 @@
 #
 # States:
 #   - before scripts run: the popover opens with no script, and each item a
-#     change can reach is a real link; nothing at all where the provider has
-#     no location to lead to.
+#     change can reach is a real link; a disabled Table settings button
+#     where the provider has no location.
 #   - once scripts run: closed (the button alone) or open (the menu).
+#   - while a linked view loads: the reason first, every item disabled.
 #
-# Accessibility (DataViews component coverage, "DataViews.Settings": 1.3.1,
+# Accessibility (DataViews component coverage, "DataTable.SettingsMenu": 1.3.1,
 # 2.1.1, 2.4.3, 2.5.7, 4.1.2-4.1.3):
 #   settings cell   A column header holding the trigger.
 #   trigger         A native button named "Table settings", with

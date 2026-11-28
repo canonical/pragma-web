@@ -173,6 +173,7 @@ const renderVirtualizedTable = (
   const view = render(
     wrap(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -451,6 +452,7 @@ describe("virtualized DataTable", () => {
       });
       view.rerender(
         <DataTable
+          id="t"
           provider={provider}
           columns={columns}
           label="Machines"
@@ -777,6 +779,7 @@ describe("virtualized DataTable", () => {
       const calls = renderStatus.mock.calls.length;
       view.rerender(
         <DataTable
+          id="t"
           provider={provider}
           columns={columns}
           label="Machines"
@@ -818,12 +821,14 @@ describe("virtualized DataTable", () => {
     render(
       <>
         <DataTable
+          id="t"
           provider={first}
           columns={columns}
           label="First"
           virtualization={virtualization}
         />
         <DataTable
+          id="t"
           provider={second}
           columns={columns}
           label="Second"
@@ -871,6 +876,7 @@ describe("virtualized DataTable", () => {
     render(
       <StrictMode>
         <DataTable
+          id="t"
           provider={provider}
           columns={columns}
           label="Machines"
@@ -890,6 +896,7 @@ describe("virtualized DataTable", () => {
     const { provider, view } = renderVirtualizedTable();
     view.rerender(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -936,6 +943,7 @@ describe("virtualized DataTable", () => {
     preload(provider, buildMachines(100));
     const table = (
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"

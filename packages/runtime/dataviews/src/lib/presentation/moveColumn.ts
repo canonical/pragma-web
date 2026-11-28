@@ -1,4 +1,4 @@
-import { ORDER_KEY } from "./constants.js";
+import { spellArrangementKey } from "../wire/index.js";
 import listStoredIds from "./listStoredIds.js";
 import resolveColumnArrangement from "./resolveColumnArrangement.js";
 import type { MoveColumnConfig, PresentationPatch } from "./types.js";
@@ -13,19 +13,19 @@ import type { MoveColumnConfig, PresentationPatch } from "./types.js";
  * The order written keeps every id the stored order held where it stood:
  * the declared columns take the stored places of declared columns in their
  * new order, and those the stored order does not name follow. The ids of
- * columns the renderer does not declare stay in place, so another table
- * over the same presentation keeps its own order.
+ * columns the renderer no longer declares stay in place.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
 export default function moveColumn({
+  table,
   columns,
   presentation,
   id,
   offset,
 }: MoveColumnConfig): PresentationPatch | null {
-  const arranged = resolveColumnArrangement(columns, presentation);
+  const arranged = resolveColumnArrangement(table, columns, presentation);
   const shown = arranged
     .filter(({ hidden }) => !hidden)
     .map(({ column }) => column.id);
@@ -48,9 +48,10 @@ export default function moveColumn({
   const declared = new Set(order);
   // Each stored place of a declared column takes the next declared column
   // in the new order; every other stored id keeps its place.
+  const key = spellArrangementKey(table, "order");
   const merged: string[] = [];
   let taken = 0;
-  for (const stored of listStoredIds(presentation[ORDER_KEY])) {
+  for (const stored of listStoredIds(presentation[key])) {
     if (declared.has(stored)) {
       // A slice rather than `at`: every declared id stored has its place in
       // the new order, so an absent one is impossible, and a guard for it
@@ -61,5 +62,5 @@ export default function moveColumn({
       merged.push(stored);
     }
   }
-  return { [ORDER_KEY]: [...merged, ...order.slice(taken)] };
+  return { [key]: [...merged, ...order.slice(taken)] };
 }

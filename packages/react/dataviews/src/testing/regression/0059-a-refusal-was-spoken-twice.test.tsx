@@ -50,7 +50,7 @@ const refuseInComposition = async (): Promise<{
     <DataViews provider={provider}>
       <DataViews.Filters />
       <DataViews.SavedViews />
-      <DataViews.DataTable columns={columns} label="Machines" />
+      <DataViews.DataTable id="t" columns={columns} label="Machines" />
       <DataViews.Pagination />
     </DataViews>,
   );

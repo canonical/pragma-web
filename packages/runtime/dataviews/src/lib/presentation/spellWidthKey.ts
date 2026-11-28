@@ -1,6 +1,6 @@
-import { WIDTH_KEY_PREFIX } from "./constants.js";
+import { spellArrangementKey } from "../wire/index.js";
 
-/** The key a column's width is kept under in the collection's presentation. */
-export default function spellWidthKey(id: string): string {
-  return `${WIDTH_KEY_PREFIX}${id}`;
+/** The key one table keeps a column's width under. */
+export default function spellWidthKey(table: string, column: string): string {
+  return `${spellArrangementKey(table, "width")}.${column}`;
 }

@@ -34,6 +34,7 @@ describe("regression 0023 — opening a menu left focus on the document", () => 
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"

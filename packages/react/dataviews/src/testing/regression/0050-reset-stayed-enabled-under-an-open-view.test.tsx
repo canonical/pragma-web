@@ -22,6 +22,7 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 beforeEach(() => {
@@ -50,24 +51,25 @@ describe("regression 0050 — reset stayed enabled under an open view", () => {
     render(
       <DataViews provider={provider}>
         <DataViews.DataTable
+          id="t"
           columns={[
             { id: "name", header: "Name" },
             { id: "status", header: "Status" },
           ]}
           label="Machines"
-          settings={<DataViews.Settings />}
+          settings={<DataTable.SettingsMenu />}
         />
       </DataViews>,
     );
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["status"] });
+      provider.presentation.arrange({ "table.t.hidden": ["status"] });
     });
     const created = await act(() => views.saveAs("Without status"));
     if (created.status !== "saved") {
       throw new Error(`the view was not saved: ${created.status}`);
     }
     act(() => {
-      provider.presentation.arrange({ "table.hidden": undefined });
+      provider.presentation.arrange({ "table.t.hidden": undefined });
     });
     await act(() => views.open(created.view.id));
     await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));

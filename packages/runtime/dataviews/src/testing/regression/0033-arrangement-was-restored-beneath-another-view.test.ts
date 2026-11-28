@@ -28,7 +28,7 @@ const machines = createCollection({
 
 const snapshot = {
   query: "view=x&status=failed",
-  presentation: { "table.hidden": ["cores"] },
+  presentation: { "table.t.hidden": ["cores"] },
 };
 
 describe("regression 0033 — an arrangement was restored beneath another view", () => {

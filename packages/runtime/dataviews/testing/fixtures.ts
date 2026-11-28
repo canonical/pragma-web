@@ -686,10 +686,10 @@ export const LINKS_VALID_TODAY: readonly LinkReading[] = [
     encoded: "view=ex-saved&status=failed&page=1&size=50",
   },
   {
-    params: "table.order=hostname&table.hidden=cpu",
+    params: "table.t.order=hostname&table.t.hidden=cpu",
     slice: { filter: [], search: null, sort: [], group: [] },
     issues: [],
-    encoded: "table.order=hostname&table.hidden=cpu&page=1&size=50",
+    encoded: "table.t.order=hostname&table.t.hidden=cpu&page=1&size=50",
   },
   {
     params: "tab=ex-one&status=failed&tab=ex-two&ref=ex",

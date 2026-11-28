@@ -23,7 +23,7 @@ describe("DataViews.DataTable", () => {
 
   it("fails clearly outside a DataViews root", () => {
     expect(() =>
-      render(<DataTable columns={columns} label="Machines" />),
+      render(<DataTable id="t" columns={columns} label="Machines" />),
     ).toThrow("DataViews.DataTable must be used inside a DataViews root");
   });
 
@@ -31,7 +31,7 @@ describe("DataViews.DataTable", () => {
     const { provider, source } = createMachineProvider();
     render(
       <DataViews provider={provider}>
-        <DataTable columns={columns} label="Machines" className="rows" />
+        <DataTable id="t" columns={columns} label="Machines" className="rows" />
       </DataViews>,
     );
     // The root observed the provider, which asked the source for its page.
@@ -53,7 +53,7 @@ describe("DataViews.DataTable", () => {
     });
     render(
       <DataViews provider={provider}>
-        <DataTable columns={columns} label="Machines" />
+        <DataTable id="t" columns={columns} label="Machines" />
       </DataViews>,
     );
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();

@@ -5,7 +5,12 @@ import type {
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { ComponentProps, ReactElement, ReactNode } from "react";
+import type {
+  ComponentProps,
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+} from "react";
 import type { AnnouncerTopic } from "../../../../../common/index.js";
 import type { DataTableVirtualization } from "../../../../../virtualization/types.js";
 import type { DataTableColumn } from "./common/index.js";
@@ -32,9 +37,17 @@ type OwnProps<
   /** Mounts only the rows near the viewport, from `virtualizeRows`. */
   readonly virtualization?: DataTableVirtualization;
   /**
-   * What the header's settings cell holds, such as `<DataViews.Settings />`.
+   * `<DataTable.SettingsMenu />`, the table's column settings, or another
+   * element drawn in the settings cell as given. Requires `id`.
    */
   readonly settings?: ReactElement | undefined;
+  /**
+   * The table's id: its settings are kept under `table.<id>.*`, the id
+   * URI-encoded (`a.b` gives `table.a%2Eb.order`, `order` gives
+   * `table.%6Frder.order`). Required with `settings`; an empty id counts
+   * as none.
+   */
+  readonly id?: string | undefined;
 };
 
 /**
@@ -60,6 +73,8 @@ export type ScopedDataTableProps<
     readonly messages: DataViewsMessages;
     /** Say an outcome through the announcer of the table's UI scope. */
     readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+    /** `DataTable.SettingsMenu`, drawn as the menu when given as `settings`. */
+    readonly settingsMenu: JSXElementConstructor<never>;
   };
 
 /**
@@ -73,7 +88,10 @@ export type ScopedDataTableProps<
 export type DataTableProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = Omit<ScopedDataTableProps<TFields, TRow>, "messages" | "announce"> & {
+> = Omit<
+  ScopedDataTableProps<TFields, TRow>,
+  "messages" | "announce" | "settingsMenu"
+> & {
   /** The words the table renders and announces, over the English record. */
   readonly messages?: Partial<DataViewsMessages>;
 };

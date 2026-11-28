@@ -104,7 +104,7 @@ describe("DataViews root", () => {
     render(
       <StrictMode>
         <Root provider={provider}>
-          <DataViews.DataTable columns={columns} label="Machines" />
+          <DataViews.DataTable id="t" columns={columns} label="Machines" />
         </Root>
       </StrictMode>,
     );
@@ -125,13 +125,13 @@ describe("DataViews root", () => {
     const second = createMachineProvider();
     const { rerender, unmount } = render(
       <Root provider={first.provider}>
-        <DataViews.DataTable columns={columns} label="Machines" />
+        <DataViews.DataTable id="t" columns={columns} label="Machines" />
       </Root>,
     );
     expect(listLive(first.source)).toHaveLength(1);
     rerender(
       <Root provider={second.provider}>
-        <DataViews.DataTable columns={columns} label="Machines" />
+        <DataViews.DataTable id="t" columns={columns} label="Machines" />
       </Root>,
     );
     expect(listLive(first.source)).toHaveLength(0);
@@ -158,7 +158,7 @@ describe("DataViews root", () => {
     render(
       <StrictMode>
         <Root provider={provider}>
-          <DataViews.DataTable columns={columns} label="Machines" />
+          <DataViews.DataTable id="t" columns={columns} label="Machines" />
         </Root>
       </StrictMode>,
     );

@@ -32,7 +32,6 @@ import {
 } from "../../../testing/index.js";
 import HeaderCell from "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 vi.mock(
   "../../lib/pattern/DataViews/common/renderers/DataTable/common/HeaderCell/HeaderCell.js",
@@ -66,13 +65,14 @@ describe("regression 0054 — an announcement rendered the header row again", ()
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", hideable: false },
           { id: "status", header: "Status" },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));

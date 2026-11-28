@@ -3,16 +3,24 @@
  * given and through the announcer it is given, never resolving its own,
  * and takes its root's native props.
  */
+import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { createStandInViewStore } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  installPopoverStandIn,
+  openMenuFrom,
 } from "../../../../../../../testing/index.js";
+
 import type { DataTableColumn } from "./common/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
+
+/** Stands in for `DataTable.SettingsMenu`. */
+const Menu = (): null => null;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", resizable: true },
@@ -25,6 +33,8 @@ describe("ScopedDataTable", () => {
     expect(() =>
       render(
         <ScopedDataTable
+          id="t"
+          settingsMenu={Menu}
           provider={{} as never}
           columns={columns}
           label="Machines"
@@ -44,6 +54,8 @@ describe("ScopedDataTable", () => {
     });
     render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -75,11 +87,13 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
         selectable
-        settings={<span>Settings</span>}
+        settings={<Menu />}
         messages={resolveMessages()}
         announce={() => {}}
       />,
@@ -97,6 +111,8 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -116,6 +132,8 @@ describe("ScopedDataTable", () => {
     const announce = vi.fn();
     render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -140,6 +158,8 @@ describe("ScopedDataTable", () => {
     const messages = resolveMessages();
     const { rerender } = render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -151,6 +171,8 @@ describe("ScopedDataTable", () => {
     );
     rerender(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -165,11 +187,104 @@ describe("ScopedDataTable", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps a header's menu while a linked view is listed, saying why first", async () => {
+    onTestFinished(installPopoverStandIn());
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        settings={<Menu />}
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const menu = await openMenuFrom(
+      screen.getByRole("button", { name: "Column options for Status" }),
+    );
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
+    expect(items.at(0)).toHaveTextContent(
+      "Columns can change once the linked view has loaded.",
+    );
+    for (const item of items) {
+      expect(item).toHaveClass("disabled");
+    }
+  });
+
+  it("draws no resize handle while a linked view is listed, keeping its place", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    expect(screen.queryByRole("separator", { name: "Name" })).toBeNull();
+    // The handle's place stays, so the label does not move as it returns.
+    expect(
+      screen
+        .getByRole("columnheader", { name: /Name/ })
+        .querySelector(".handle-slot"),
+    ).not.toBeNull();
+  });
+
+  it("keeps holding a header's menu once the linked view's listing fails", async () => {
+    onTestFinished(installPopoverStandIn());
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({
+        list: () => Promise.reject(new Error("offline")),
+      }),
+    });
+    onTestFinished(provider.observe());
+    await vi.waitFor(() =>
+      expect(provider.views?.state.get().listing.status).toBe("failed"),
+    );
+    render(
+      <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        settings={<Menu />}
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const menu = await openMenuFrom(
+      screen.getByRole("button", { name: "Column options for Status" }),
+    );
+    expect(menu.querySelector('[role="menuitem"]')).toHaveTextContent(
+      "Columns can change once the linked view has loaded.",
+    );
+  });
+
   it("takes the native props of its root, merging the class name, style and ref", () => {
     const { provider } = createMachineProvider({ rows: [] });
     const ref = createRef<HTMLTableElement>();
     render(
       <ScopedDataTable
+        id="t"
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"

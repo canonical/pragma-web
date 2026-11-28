@@ -27,6 +27,7 @@ const createMeasuredNode = <TTag extends "table" | "th">(
 
 const mount = (columns: readonly ColumnToSize[]) => {
   const layout = createColumnLayout({
+    table: "t",
     columns,
     presentation: createMachineProvider().provider.presentation,
   });

@@ -17,7 +17,10 @@ import {
   installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const columns: readonly DataTableColumn[] = [
@@ -73,9 +76,10 @@ const renderOrdered = (arrangement?: ViewPresentation) => {
     <DataViews provider={provider}>
       <DataViews.SortPanel />
       <DataViews.DataTable
+        id="t"
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>,
   );
@@ -118,7 +122,9 @@ describe("hidden columns keep the ordering", () => {
   });
 
   it("lets no heading claim while the first term's column is hidden, and lists both terms in the sort panel", async () => {
-    const { expectOrderingKept } = renderOrdered({ "table.hidden": ["cores"] });
+    const { expectOrderingKept } = renderOrdered({
+      "table.t.hidden": ["cores"],
+    });
     // No later term's column takes the claim over.
     await choose("Hide Status");
     await choose("Show Cores");
@@ -129,7 +135,7 @@ describe("hidden columns keep the ordering", () => {
 
   it("claims from wherever the first term's column stands once it is shown again", async () => {
     const { expectOrderingKept } = renderOrdered({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
     await choose("Show Status");
     await choose("Move Status left");

@@ -19,7 +19,10 @@ import {
   type SortTerm,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  assertInvariant,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import type { ManualSource } from "@canonical/dataviews-core/testing";
 import {
   buildPage,
@@ -66,6 +69,7 @@ import {
   openMenuFrom,
   type MachineProvider as Provider,
   readAnnouncements,
+  silenceRenderErrors,
   waitForFocus,
 } from "../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
@@ -128,6 +132,7 @@ const renderLoadedTable = (
   const { provider, source } = createMachineProvider({ rows });
   const view = render(
     <DataTable
+      id="t"
       provider={provider}
       columns={columns}
       label="Machines"
@@ -152,6 +157,7 @@ const renderDeliveredTable = (
   const { provider, source } = createMachineProvider();
   const view = render(
     <DataTable
+      id="t"
       provider={provider}
       columns={columns}
       label="Machines"
@@ -176,6 +182,7 @@ describe("DataTable", () => {
     expect(() =>
       render(
         <DataTable
+          id="t"
           provider={notAProvider}
           columns={columns}
           label="Machines"
@@ -249,6 +256,7 @@ describe("DataTable", () => {
     const seen: (HTMLDivElement | null)[] = [];
     const { unmount } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -271,6 +279,7 @@ describe("DataTable", () => {
     let cleanups = 0;
     const { unmount } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -301,6 +310,7 @@ describe("DataTable", () => {
             rerender
           </button>
           <DataTable
+            id="t"
             provider={provider}
             columns={columns}
             label="Machines"
@@ -326,6 +336,7 @@ describe("DataTable", () => {
     const ref = createRef<HTMLTableElement>();
     const { unmount } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -381,6 +392,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "ready", header: "Ready" },
@@ -508,6 +520,7 @@ describe("DataTable", () => {
     });
     const view = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={columnsInView}
         label="Machines"
@@ -913,8 +926,8 @@ describe("DataTable", () => {
         );
         act(() => {
           provider.presentation.arrange({
-            "table.hidden": layout.hidden,
-            "table.order": layout.order,
+            "table.t.hidden": layout.hidden,
+            "table.t.order": layout.order,
           });
         });
         const orderings = Object.values(layout.claims).includes(undefined)
@@ -1060,6 +1073,7 @@ describe("DataTable", () => {
       }).provider;
     const buildTable = (provider: Provider) => (
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"
@@ -1248,7 +1262,7 @@ describe("DataTable", () => {
     ["a sortable column", { columns: [{ ...plainName, sortable: true }] }],
     ["a resizable column", { columns: [{ ...plainName, resizable: true }] }],
     ["selection", { selectable: true }],
-    ["settings and header menus", { settings: <DataViews.Settings /> }],
+    ["settings and header menus", { settings: <DataTable.SettingsMenu /> }],
   ])("is no tab stop with %s", (_, props) => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -1256,6 +1270,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         {...props}
@@ -1296,6 +1311,7 @@ describe("DataTable", () => {
     });
     const renderTable = (selectable: boolean) => (
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable={selectable}
@@ -1371,6 +1387,7 @@ describe("DataTable", () => {
     });
     const renderTable = (selectable: boolean) => (
       <DataTable
+        id="t"
         provider={provider}
         label="Machines"
         selectable={selectable}
@@ -1458,14 +1475,14 @@ describe("DataTable", () => {
       ],
     );
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["status"] });
+      provider.presentation.arrange({ "table.t.hidden": ["status"] });
     });
     await openMenuOf("Name");
     const hide = screen.getByRole("menuitem", { name: "Hide column" });
     expect(hide).toHaveClass("disabled");
     fireEvent.click(hide);
     expect(provider.presentation.state.get().presentation).toEqual({
-      "table.hidden": ["status"],
+      "table.t.hidden": ["status"],
     });
   });
 
@@ -1475,10 +1492,11 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     expect(screen.getAllByRole("columnheader")).toHaveLength(1);
@@ -1532,6 +1550,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", sortable: true, resizable: true },
@@ -1609,6 +1628,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"
@@ -1668,7 +1688,12 @@ describe("DataTable", () => {
   it("renders pending in place of the rows, silently, before any arrive", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     // The first request is out and unanswered: there is no outcome to
     // announce, so the row is not a `role="status"` live region.
@@ -1680,7 +1705,12 @@ describe("DataTable", () => {
   it("renders a failure in place of the rows, and announces it", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     fail(source, "the inventory is unreachable");
     expect(
@@ -1782,6 +1812,7 @@ describe("DataTable", () => {
     // not held behind the one it was mounted with.
     view.rerender(
       <DataTable
+        id="t"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -1957,6 +1988,7 @@ describe("DataTable", () => {
             rerender
           </button>
           <DataTable
+            id="t"
             provider={provider}
             // Rebuilt on every render: content, not array identity, keys the
             // registry, so nothing may be re-minted.
@@ -2012,6 +2044,7 @@ describe("DataTable", () => {
     ).toEqual(["Name", "Status"]);
     view.rerender(
       <DataTable
+        id="t"
         provider={provider}
         columns={[...columns, { id: "cores", header: "Cores" }]}
         label="Machines"
@@ -2056,47 +2089,117 @@ describe("DataTable", () => {
     expect(renders).toEqual([]);
   });
 
-  it("keeps two tables on one provider agreed on every width: one authority", async () => {
+  it("throws for settings without an id", () => {
+    const { provider } = createMachineProvider();
+    silenceRenderErrors();
+    expect(() =>
+      render(
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          settings={<DataTable.SettingsMenu />}
+        />,
+      ),
+    ).toThrow("DataTable takes an id with settings");
+  });
+
+  it("draws its id on the table element", () => {
+    const { provider } = createMachineProvider();
+    render(
+      <DataTable
+        id="machines"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
+    );
+    expect(screen.getByRole("table", { name: "Machines" })).toHaveAttribute(
+      "id",
+      "machines",
+    );
+  });
+
+  it("keeps the arrangement of a table without an id to itself", () => {
+    const { provider } = createMachineProvider();
+    provider.presentation.arrange({ "table.table.hidden": ["status"] });
+    render(
+      <DataTable
+        provider={provider}
+        columns={[
+          { id: "name", header: "Name", resizable: true },
+          { id: "status", header: "Status" },
+        ]}
+        label="Machines"
+      />,
+    );
+    // The provider's keys are not its own, and a resize stays in the mount.
+    expect(
+      screen.getByRole("columnheader", { name: /Status/ }),
+    ).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
+    expect(
+      screen
+        .getByRole("table", { name: "Machines" })
+        .style.getPropertyValue("--data-table-columns"),
+    ).toBe("112px 96px");
+    expect(provider.presentation.state.get().presentation).toEqual({
+      "table.table.hidden": ["status"],
+    });
+  });
+
+  it("keeps each table's widths under its own id, written once", async () => {
     const patchPresentation = vi.fn(async () => ({ status: "saved" }) as const);
     const { provider } = createMachineProvider({
       presentation: createStandInPresentationStore({ patchPresentation }),
     });
+    const resizable: readonly DataTableColumn[] = [
+      { id: "name", header: "Name", resizable: true },
+      { id: "status", header: "Status" },
+    ];
     render(
       <>
         <DataTable
+          id="machines"
           provider={provider}
-          columns={[
-            { id: "name", header: "Name", resizable: true },
-            { id: "status", header: "Status" },
-          ]}
+          columns={resizable}
           label="Machines"
         />
-        <DataTable provider={provider} columns={columns} label="Elsewhere" />
+        <DataTable
+          id="elsewhere"
+          provider={provider}
+          columns={resizable}
+          label="Elsewhere"
+        />
       </>,
     );
     const readTracks = (name: string): string =>
       screen
         .getByRole("table", { name })
         .style.getPropertyValue("--data-table-columns");
-    // A resize in one table is written to the presentation once, and the
-    // other table reads it from there: nothing echoes it back.
-    fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
-    for (const name of ["Machines", "Elsewhere"]) {
-      // jsdom reports a zero-width container, so the solver publishes each
-      // column's own reservation; the declarative form is the server path.
-      expect(readTracks(name)).toBe("112px 96px");
-    }
-    act(() => {
-      provider.presentation.arrange({ "table.width.status": 200 });
+    // jsdom reports a zero-width container, so the solver publishes each
+    // column's own reservation; the declarative form is the server path.
+    const [first] = screen.getAllByRole("separator");
+    fireEvent.keyDown(assertInvariant(first, "Machines has a handle"), {
+      key: "ArrowRight",
     });
-    for (const name of ["Machines", "Elsewhere"]) {
-      expect(readTracks(name)).toBe("112px 200px");
-    }
-    // One write reaches the store, the resize and the arrangement merged:
-    // the other table read the widths, and echoed nothing back.
+    expect(readTracks("Machines")).toBe("112px 96px");
+    expect(readTracks("Elsewhere")).toBe("96px 96px");
+    act(() => {
+      provider.presentation.arrange({ "table.elsewhere.width.status": 200 });
+    });
+    expect(readTracks("Machines")).toBe("112px 96px");
+    expect(readTracks("Elsewhere")).toBe("96px 200px");
+    // One write reaches the store, each width under its table's id.
     await waitFor(() => {
       expect(patchPresentation.mock.calls).toEqual([
-        ["default", { "table.width.name": 112, "table.width.status": 200 }],
+        [
+          "default",
+          {
+            "table.machines.width.name": 112,
+            "table.elsewhere.width.status": 200,
+          },
+        ],
       ]);
     });
   });
@@ -2107,6 +2210,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "constructor", header: "Name", field: "name" },
@@ -2129,6 +2233,7 @@ describe("DataTable", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name", hideable: false },
@@ -2145,8 +2250,8 @@ describe("DataTable", () => {
     expect(listHeaders()).toEqual(["Name", "Status", "Cores"]);
     act(() => {
       provider.presentation.arrange({
-        "table.order": ["cores", "region", "name"],
-        "table.hidden": ["status", "name"],
+        "table.t.order": ["cores", "region", "name"],
+        "table.t.hidden": ["status", "name"],
       });
     });
     expect(listHeaders()).toEqual(["Cores", "Name"]);
@@ -2167,8 +2272,9 @@ describe("DataTable", () => {
       name: "Wide",
       query: "",
       presentation: {
-        "table.width.name": 240,
-        "table.order": ["status", "name"],
+        "table.machines.width.name": 240,
+        "table.machines.order": ["status", "name"],
+        "table.elsewhere.hidden": ["status"],
       },
     });
     const patchPresentation = vi.fn(async () => ({ status: "saved" }) as const);
@@ -2181,8 +2287,18 @@ describe("DataTable", () => {
     });
     const { unmount } = render(
       <>
-        <DataTable provider={provider} columns={columns} label="Machines" />
-        <DataTable provider={provider} columns={columns} label="Elsewhere" />
+        <DataTable
+          id="machines"
+          provider={provider}
+          columns={columns}
+          label="Machines"
+        />
+        <DataTable
+          id="elsewhere"
+          provider={provider}
+          columns={columns}
+          label="Elsewhere"
+        />
       </>,
     );
     const listHeaders = (name: string): string[] =>
@@ -2192,14 +2308,14 @@ describe("DataTable", () => {
     await act(async () => {
       await provider.views?.open(view.id);
     });
-    for (const name of ["Machines", "Elsewhere"]) {
-      expect(listHeaders(name)).toEqual(["Status", "Name"]);
-      expect(
-        screen
-          .getByRole("table", { name })
-          .style.getPropertyValue("--data-table-columns"),
-      ).toBe("96px 240px");
-    }
+    const readTracks = (name: string): string =>
+      screen
+        .getByRole("table", { name })
+        .style.getPropertyValue("--data-table-columns");
+    expect(listHeaders("Machines")).toEqual(["Status", "Name"]);
+    expect(readTracks("Machines")).toBe("96px 240px");
+    expect(listHeaders("Elsewhere")).toEqual(["Name"]);
+    expect(readTracks("Elsewhere")).not.toContain("240px");
     // Applying a view's arrangement is not a resize: nothing is written
     // back. Unmounting releases the last observer, which sends every write
     // the tables queued before the check runs — so an echo cannot hide
@@ -2256,6 +2372,7 @@ describe("DataTable", () => {
       const { provider } = createMachineProvider();
       const renderView = (selectable: boolean) => (
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             { id: "name", header: "Name", sizing: { kind: "fixed", px: 100 } },
@@ -2301,6 +2418,7 @@ describe("DataTable", () => {
     // nothing published, the selection track stands alone.
     render(
       <DataTable
+        id="t"
         provider={createMachineProvider().provider}
         columns={[]}
         label="Machines"
@@ -2332,6 +2450,7 @@ describe("DataTable", () => {
       const { provider } = createMachineProvider();
       const { unmount } = render(
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             { id: "name", header: "Name", sizing: { kind: "fixed", px: 100 } },
@@ -2443,6 +2562,7 @@ describe("DataTable", () => {
     });
     const { container } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={unsortedColumns}
         label="Machines"
@@ -2480,6 +2600,7 @@ describe("DataTable", () => {
       const { unmount } = render(
         <StrictMode>
           <DataTable
+            id="t"
             provider={provider}
             // Sortable columns: a header menu mounts only while open, so a
             // closed one observes nothing and what is counted is the table's.
@@ -2521,7 +2642,12 @@ describe("DataTable", () => {
     const { provider, source } = createMachineProvider();
     const table = (
       <StrictMode>
-        <DataTable provider={provider} columns={columns} label="Machines" />
+        <DataTable
+          id="t"
+          provider={provider}
+          columns={columns}
+          label="Machines"
+        />
       </StrictMode>
     );
     const { rerender, unmount } = render(table);
@@ -2554,11 +2680,16 @@ describe("DataTable", () => {
     // a standalone table outside it observing the same provider.
     const root = render(
       <DataViews provider={provider}>
-        <DataViews.DataTable columns={columns} label="Inside" />
+        <DataViews.DataTable id="t" columns={columns} label="Inside" />
       </DataViews>,
     );
     const standalone = render(
-      <DataTable provider={provider} columns={columns} label="Outside" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Outside"
+      />,
     );
     // Three observers, one request.
     expect(source.calls).toHaveLength(1);
@@ -2638,6 +2769,7 @@ describe("DataTable", () => {
     expect(screen.getByRole("separator")).toHaveAccessibleName("Name");
     view.rerender(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", resizable: true }]}
         label="Machines"
@@ -2666,6 +2798,7 @@ describe("DataTable", () => {
       const { provider } = createMachineProvider();
       render(
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             {
@@ -2741,6 +2874,7 @@ describe("DataTable", () => {
         const { provider } = createMachineProvider();
         const view = render(
           <DataTable
+            id="t"
             provider={provider}
             columns={[
               {
@@ -2907,7 +3041,12 @@ describe("DataTable", () => {
       },
     });
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
     // No sort control on either column; their menus only hide and move.
     expect(screen.queryByRole("button", { name: "Name" })).toBeNull();
@@ -2930,7 +3069,12 @@ describe("DataTable", () => {
     fail(source, "offline");
     const statusMessage = screen.getByRole("status");
     view.rerender(
-      <DataTable provider={provider} columns={[...columns]} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={[...columns]}
+        label="Machines"
+      />,
     );
     act(() => {
       provider.selection.add(["m-1"]);
@@ -3053,6 +3197,7 @@ describe("DataTable", () => {
       });
       const view = render(
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             { id: "name", header: "Name", sortable: true },
@@ -3077,7 +3222,12 @@ describe("DataTable", () => {
     it("has no axe violation while rows are pending, and once they have failed", async () => {
       const { provider, source } = createMachineProvider();
       const view = render(
-        <DataTable provider={provider} columns={columns} label="Machines" />,
+        <DataTable
+          id="t"
+          provider={provider}
+          columns={columns}
+          label="Machines"
+        />,
       );
       await expectNoAxeViolations(view.container);
       fail(source, "the inventory is unreachable");
@@ -3091,7 +3241,12 @@ describe("DataTable", () => {
       const markup = (
         <DataViews provider={provider}>
           <DataViews.Filters />
-          <DataTable provider={provider} columns={columns} label="Machines" />
+          <DataTable
+            id="t"
+            provider={provider}
+            columns={columns}
+            label="Machines"
+          />
         </DataViews>
       );
       // The server's markup, with the Clear links, then the page once
@@ -3122,6 +3277,7 @@ describe("DataTable", () => {
       const container = document.createElement("div");
       container.innerHTML = renderToString(
         <DataTable
+          id="t"
           provider={provider}
           columns={[
             { id: "name", header: "Name", sortable: true },

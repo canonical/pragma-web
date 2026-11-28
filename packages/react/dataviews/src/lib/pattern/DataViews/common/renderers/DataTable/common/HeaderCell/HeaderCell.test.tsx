@@ -45,6 +45,7 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
 
 const mount = (props: CaseProps = {}) => {
   const layout = createColumnLayout({
+    table: "t",
     columns: [{ id: "name", sizing: { kind: "flex", weight: 1, minPx: 50 } }],
     presentation: createMachineProvider().provider.presentation,
   });
@@ -68,6 +69,7 @@ const mount = (props: CaseProps = {}) => {
         reason={null}
         removable={false}
         offers={NONE}
+        columnsReason={null}
         interaction={createGridInteraction(layout)}
         resizable={false}
         bounds={{ min: 50, max: Number.POSITIVE_INFINITY }}
@@ -249,8 +251,10 @@ describe("HeaderCell", () => {
             reason={null}
             removable={false}
             offers={NONE}
+            columnsReason={null}
             interaction={createGridInteraction(
               createColumnLayout({
+                table: "t",
                 columns: [],
                 presentation: createMachineProvider().provider.presentation,
               }),

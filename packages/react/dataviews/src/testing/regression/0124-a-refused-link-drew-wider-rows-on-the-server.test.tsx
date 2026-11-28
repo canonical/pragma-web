@@ -48,6 +48,7 @@ describe("regression 0124 — a refused link drew wider rows on the server", () 
         <DataViews.Search label="Search machines" />
         <DataViews.Filters />
         <DataViews.DataTable
+          id="t"
           columns={[{ id: "name", header: "Name", sortable: true }]}
           label="Machines"
         />

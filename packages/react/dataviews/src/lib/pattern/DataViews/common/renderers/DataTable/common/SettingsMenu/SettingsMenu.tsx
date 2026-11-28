@@ -75,11 +75,12 @@ const listItems = (
   {
     settings,
     resettable,
+    reason,
     onChange,
     onReset,
   }: Pick<
     SettingsMenuProps,
-    "settings" | "resettable" | "onChange" | "onReset"
+    "settings" | "resettable" | "reason" | "onChange" | "onReset"
   >,
   messages: DataViewsMessages,
   destinations: SettingsDestinations | null,
@@ -100,7 +101,15 @@ const listItems = (
       ? { ...item, Component: ItemLabel }
       : { ...item, url, Component: ItemLabel };
   };
-  const items = settings.flatMap((setting): DropdownMenuEntry[] => {
+  // Waiting, every item is disabled, and the reason stands first.
+  const waiting = reason !== null;
+  const items: DropdownMenuEntry[] = waiting
+    ? [
+        buildItem("reason", reason, true, undefined),
+        { type: "separator", key: "separator:reason" },
+      ]
+    : [];
+  const changes = settings.flatMap((setting): DropdownMenuEntry[] => {
     const { id, hideable } = setting.column;
     const entries = listChanges(setting).map((change) => {
       const key = spellDestinationKey(id, change);
@@ -112,58 +121,49 @@ const listItems = (
       // and choosing it says so again, so a reader who cannot see a greyed
       // item still hears why.
       return hideable === false && change === "hide"
-        ? buildItem(key, describeAlwaysShown(setting, messages), false, url)
+        ? buildItem(key, describeAlwaysShown(setting, messages), waiting, url)
         : buildItem(
             key,
             describeChange(setting, change, messages),
-            !setting.offers[change],
+            waiting || !setting.offers[change],
             url,
           );
     });
     return [...entries, { type: "separator", key: `separator:${id}` }];
   });
   items.push(
+    ...changes,
     buildItem(
       "reset",
       messages.resetTableSettings,
-      !resettable,
+      waiting || !resettable,
       destinations?.reset,
     ),
   );
   return { items, actions, labels };
 };
 
-/**
- * Almost all configurable aspects of the table are available through the
- * table settings menu. This menu provides a centralized interface accessed
- * through a settings wheel (gear) icon button in the table header for
- * column reordering, column pinning, column visibility, and resetting user
- * customizations.
- *
- * This implementation covers each column's visibility and place and the
- * reset, as links before scripts run where the provider has a location.
- *
- * @implements ds:apps.subcomponent.data_table-settings_menu
- */
+/** What draws `DataTable.SettingsMenu` in the table's settings cell. */
 const SettingsMenu = ({
   settings,
   resettable,
+  reason,
   hydrated,
   onChange,
   onReset,
   listDestinations,
-}: SettingsMenuProps): ReactElement | null => {
+}: SettingsMenuProps): ReactElement => {
   const messages = useContext(MessagesContext);
   // Read only before scripts run: after, every item acts in place.
   const destinations = hydrated ? null : listDestinations();
   const { items, actions, labels } = useMemo(
     () =>
       listItems(
-        { settings, resettable, onChange, onReset },
+        { settings, resettable, reason, onChange, onReset },
         messages,
         destinations,
       ),
-    [settings, resettable, onChange, onReset, messages, destinations],
+    [settings, resettable, reason, onChange, onReset, messages, destinations],
   );
   const choose = useCallback(
     (item: DropdownMenuItem) => {
@@ -172,11 +172,9 @@ const SettingsMenu = ({
     },
     [actions],
   );
-  // No location before scripts run: no link leads anywhere, so nothing is
-  // offered.
-  if (!hydrated && destinations === null) {
-    return null;
-  }
+  // No location before scripts run: no link leads anywhere, so the button
+  // is drawn disabled, keeping its name and its place.
+  const disabled = !hydrated && destinations === null;
   return (
     <LabelsContext value={labels}>
       <MenuTrigger
@@ -184,6 +182,7 @@ const SettingsMenu = ({
         importance="tertiary"
         className={componentCssClassName}
         aria-label={messages.tableSettings}
+        disabled={disabled}
         items={items}
         onSelect={choose}
       />

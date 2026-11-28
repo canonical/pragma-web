@@ -66,6 +66,7 @@ describe("RendererSwitch SSR", () => {
                 label: "Table",
                 content: (
                   <DataViews.DataTable
+                    id="t"
                     columns={columns}
                     label="Machines"
                     selectable

@@ -1,12 +1,11 @@
 /**
- * The settings cell, mounted on its own in a header row: it draws what the
- * table was given as its settings, hands that the table's settings menu,
- * and attaches to the table's geometry.
+ * The settings cell, mounted on its own in a header row: it draws the
+ * table's settings menu, or the settings it was given, and attaches to the
+ * table's geometry.
  */
 import { render, screen } from "@testing-library/react";
-import { type ReactNode, useContext } from "react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { SettingsMenuContext } from "../../../../../../../common/index.js";
 import type { SettingsMenuProps } from "../SettingsMenu/index.js";
 import SettingsCell from "./SettingsCell.js";
 import type { SettingsCellProps } from "./types.js";
@@ -20,13 +19,14 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
   </table>
 );
 
-/** What a table's settings draw: the menu the cell hands them. */
-const Settings = () => useContext(SettingsMenuContext);
+/** Stands in for `DataTable.SettingsMenu`. */
+const Menu = (): null => null;
 
 /** A menu over no columns, every callback a spy. */
 const MENU: SettingsMenuProps = {
   settings: [],
   resettable: false,
+  reason: null,
   hydrated: true,
   onChange: () => {},
   onReset: () => {},
@@ -40,7 +40,8 @@ const mount = (props: Partial<SettingsCellProps> = {}) => {
   const view = render(
     <HeaderRow>
       <SettingsCell
-        settings={<Settings />}
+        settings={<Menu />}
+        settingsMenu={Menu}
         menu={MENU}
         reserve={reserve}
         {...props}
@@ -56,7 +57,7 @@ describe("SettingsCell", () => {
     expect(screen.getByRole("columnheader")).toHaveTextContent("Arrange");
   });
 
-  it("hands the settings the table's menu, rendered", () => {
+  it("draws the table's menu", () => {
     mount();
     expect(screen.getByRole("columnheader")).toContainElement(
       screen.getByRole("button", { name: "Table settings" }),

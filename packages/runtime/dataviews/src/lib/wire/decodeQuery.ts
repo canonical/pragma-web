@@ -10,11 +10,8 @@ import {
 } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
 import { listQueryRefusals, type SourceCapabilities } from "../source/index.js";
-import {
-  OPERATOR_DELIMITER,
-  QUERY_KEYS,
-  RESERVED_QUERY_KEYS,
-} from "./constants.js";
+import { OPERATOR_DELIMITER, QUERY_KEYS } from "./constants.js";
+import isReservedKey from "./isReservedKey.js";
 import readKeyPredicate from "./readKeyPredicate.js";
 import readUndeclaredField from "./readUndeclaredField.js";
 import readWireField from "./readWireField.js";
@@ -277,9 +274,9 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       issues.push(...reading.issues);
       continue;
     }
-    if (RESERVED_QUERY_KEYS.includes(key)) {
+    if (isReservedKey(key)) {
       // A reserved name the grammar does not read here — the annotation
-      // names — is the host's to interpret.
+      // names, a table's arrangement — is the host's to interpret.
       continue;
     }
     const definition = schema.findField(readWireField(key));

@@ -30,7 +30,9 @@ const mountTable = (columns: Parameters<typeof DataTable>[0]["columns"]) => {
     rows: [buildMachine("m-1", "alpha")],
     capabilities: declareCapabilities(machines, {}),
   });
-  render(<DataTable provider={provider} columns={columns} label="Machines" />);
+  render(
+    <DataTable id="t" provider={provider} columns={columns} label="Machines" />,
+  );
   return provider;
 };
 

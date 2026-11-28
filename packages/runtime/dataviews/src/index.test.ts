@@ -142,6 +142,7 @@ describe("public surface", () => {
       "createColumnLayout",
       "createFilterInputs",
       "createGridInteraction",
+      "createMemoryPresentation",
       "createRowScopes",
       "cycleSortTerm",
       "foldText",

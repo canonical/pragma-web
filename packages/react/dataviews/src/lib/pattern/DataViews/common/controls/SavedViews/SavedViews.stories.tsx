@@ -56,7 +56,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <DataTable provider={provider} columns={columns} label="Machines" />
+  <DataTable id="machines" provider={provider} columns={columns} label="Machines" />
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`;
 
@@ -102,6 +102,7 @@ function Collection({
       />
       {children}
       <DataTable
+        id="machines"
         provider={provider}
         columns={columns}
         label="Machines"
@@ -315,9 +316,9 @@ const wideHosts: ViewDraft = {
   name: "Wide hosts",
   query: "",
   presentation: {
-    "table.width.name": 320,
-    "table.order": ["owner", "name", "status", "cores"],
-    "table.hidden": ["cores"],
+    "table.machines.width.name": 320,
+    "table.machines.order": ["owner", "name", "status", "cores"],
+    "table.machines.hidden": ["cores"],
   },
 };
 

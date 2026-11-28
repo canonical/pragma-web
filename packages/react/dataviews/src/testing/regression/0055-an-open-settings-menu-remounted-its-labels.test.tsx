@@ -17,7 +17,6 @@ import {
   openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0055 — an open settings menu remounted its labels", () => {
   let uninstallPopovers: () => void;
@@ -34,6 +33,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[
           { id: "name", header: "Name" },
@@ -41,7 +41,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
           { id: "cores", header: "Cores" },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
@@ -50,7 +50,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
       .querySelector(".label");
     expect(label).not.toBeNull();
     act(() => {
-      provider.presentation.arrange({ "table.hidden": ["cores"] });
+      provider.presentation.arrange({ "table.t.hidden": ["cores"] });
     });
     expect(screen.getByRole("menuitem", { name: "Show Cores" })).toBeVisible();
     expect(

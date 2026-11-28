@@ -4,7 +4,7 @@
  *
  * Before the fix, the header's settings cell was drawn whenever the table's
  * children were not undefined, so the ordinary conditional
- * `{canConfigure && <DataViews.Settings />}` left an empty column header and
+ * `{canConfigure && <DataTable.SettingsMenu />}` left an empty column header and
  * reserved the settings track for it. The cell is now filled by the named
  * `settings` prop, which is typed to take an element or nothing, and is drawn
  * only for a valid element, so the same conditional passed from untyped code
@@ -15,7 +15,6 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0052 — a false child drew an empty settings cell", () => {
   it("draws no settings cell for a conditional that renders nothing, typed or not", () => {
@@ -25,21 +24,23 @@ describe("regression 0052 — a false child drew an empty settings cell", () => 
     const canConfigure = (): boolean => false;
     const { container } = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name" }]}
         label="Machines"
-        settings={canConfigure() ? <DataViews.Settings /> : undefined}
+        settings={canConfigure() ? <DataTable.SettingsMenu /> : undefined}
       />,
     );
     // The children's conditional, carried over to the prop from untyped
     // code: false is no element, and draws no cell either.
     const untyped = render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name" }]}
         label="Machines"
         // @ts-expect-error — a conditional's false is no element.
-        settings={canConfigure() && <DataViews.Settings />}
+        settings={canConfigure() && <DataTable.SettingsMenu />}
       />,
     );
     expect(

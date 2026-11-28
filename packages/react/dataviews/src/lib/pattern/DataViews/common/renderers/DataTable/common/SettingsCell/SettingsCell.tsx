@@ -1,25 +1,24 @@
-import { type ReactElement, useMemo } from "react";
-import { SettingsMenuContext } from "../../../../../../../common/index.js";
+import type { ReactElement } from "react";
 import { SettingsMenu } from "../SettingsMenu/index.js";
 import type { SettingsCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-settings-cell";
 
 /**
- * The header's settings cell, ending the header row: it draws what the table
- * was given as its settings, and hands that the table's settings menu,
- * rendered, one element while the menu's facts and commands hold.
+ * The header's settings cell, ending the header row: it draws the table's
+ * settings menu where the settings are `DataTable.SettingsMenu`, and any
+ * other settings as given.
  *
  * @implements ds:apps.subcomponent.data_table-settings_cell
  */
 export default function SettingsCell({
   settings,
+  settingsMenu,
   menu,
   reserve,
   className,
   ...rest
 }: SettingsCellProps): ReactElement {
-  const rendered = useMemo(() => <SettingsMenu {...menu} />, [menu]);
   return (
     <th
       {...rest}
@@ -27,7 +26,7 @@ export default function SettingsCell({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       ref={reserve}
     >
-      <SettingsMenuContext value={rendered}>{settings}</SettingsMenuContext>
+      {settings.type === settingsMenu ? <SettingsMenu {...menu} /> : settings}
     </th>
   );
 }

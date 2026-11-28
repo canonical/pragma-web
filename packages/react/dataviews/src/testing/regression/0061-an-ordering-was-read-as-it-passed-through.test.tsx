@@ -41,7 +41,12 @@ describe("regression 0061 — an ordering was read as it passed through", () => 
       capabilities: declareMachineOrdering(2),
     });
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

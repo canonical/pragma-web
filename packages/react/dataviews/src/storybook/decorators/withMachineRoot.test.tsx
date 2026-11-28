@@ -9,6 +9,7 @@ describe("withMachineRoot", () => {
   it("renders the story inside a root over the machines", async () => {
     renderDecorated(withMachineRoot(), () => (
       <DataViews.DataTable
+        id="t"
         columns={[{ id: "name", header: "Host" }]}
         label="Machines"
       />

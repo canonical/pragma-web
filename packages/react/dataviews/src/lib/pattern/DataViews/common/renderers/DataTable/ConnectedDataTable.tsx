@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { useDataViewsRoot } from "../../../hooks/index.js";
+import DataTable from "./DataTable.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 import type { DataViewsDataTableProps } from "./types.js";
 
@@ -32,6 +33,7 @@ export default function ConnectedDataTable(
       provider={provider}
       messages={messages}
       announce={announce}
+      settingsMenu={DataTable.SettingsMenu}
     />
   );
 }

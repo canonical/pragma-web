@@ -38,6 +38,7 @@ const mountTable = () => {
   });
   render(
     <DataTable
+      id="t"
       provider={provider}
       columns={[
         {

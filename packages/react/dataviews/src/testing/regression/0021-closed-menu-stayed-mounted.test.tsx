@@ -49,6 +49,7 @@ describe("regression 0021 — a closed menu stayed mounted", () => {
     });
     render(
       <DataTable
+        id="t"
         provider={provider}
         columns={[{ id: "name", header: "Name", sortable: true }]}
         label="Machines"

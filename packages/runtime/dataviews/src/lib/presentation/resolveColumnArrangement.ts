@@ -1,4 +1,4 @@
-import { HIDDEN_KEY, ORDER_KEY } from "./constants.js";
+import { spellArrangementKey } from "../wire/index.js";
 import listStoredIds from "./listStoredIds.js";
 import spellWidthKey from "./spellWidthKey.js";
 import type {
@@ -42,16 +42,18 @@ const orderColumns = <TColumn extends DeclaredColumn>(
  */
 const readWidth = (
   presentation: ViewPresentation,
+  table: string,
   id: string,
 ): number | null => {
-  const width = presentation[spellWidthKey(id)];
+  const width = presentation[spellWidthKey(table, id)];
   return typeof width === "number" && Number.isFinite(width) && width >= 0
     ? width
     : null;
 };
 
 /**
- * Place a renderer's declared columns as the arrangement in force has them.
+ * Place a renderer's declared columns as the arrangement in force has them,
+ * reading only the keys the table kept under its id.
  *
  * The order is the stored list of column ids: an id naming no declared
  * column is ignored, and a declared column the list does not name takes
@@ -68,6 +70,7 @@ const readWidth = (
 export default function resolveColumnArrangement<
   TColumn extends DeclaredColumn,
 >(
+  table: string,
   columns: readonly TColumn[],
   presentation: ViewPresentation,
 ): readonly ArrangedColumn<TColumn>[] {
@@ -75,13 +78,16 @@ export default function resolveColumnArrangement<
   /** The ids a stored list names among the declared columns, once each. */
   const listKnownIds = (key: string): Set<string> =>
     new Set(listStoredIds(presentation[key]).filter((id) => known.has(id)));
-  const order = orderColumns(columns, listKnownIds(ORDER_KEY));
+  const order = orderColumns(
+    columns,
+    listKnownIds(spellArrangementKey(table, "order")),
+  );
   const hideable = new Set(
     columns
       .filter((column) => column.hideable !== false)
       .map((column) => column.id),
   );
-  const hidden = listKnownIds(HIDDEN_KEY);
+  const hidden = listKnownIds(spellArrangementKey(table, "hidden"));
   for (const id of hidden) {
     if (!hideable.has(id)) {
       hidden.delete(id);
@@ -94,6 +100,6 @@ export default function resolveColumnArrangement<
   return order.map((column) => ({
     column,
     hidden: hidden.has(column.id),
-    width: readWidth(presentation, column.id),
+    width: readWidth(presentation, table, column.id),
   }));
 }

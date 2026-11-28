@@ -64,7 +64,12 @@ describe("regression 0064 — only the first reason was read", () => {
             ],
     });
     render(
-      <DataTable provider={provider} columns={columns} label="Machines" />,
+      <DataTable
+        id="t"
+        provider={provider}
+        columns={columns}
+        label="Machines"
+      />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

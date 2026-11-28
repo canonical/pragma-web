@@ -282,6 +282,36 @@ describe("createViewCommands", () => {
     expect(applied).toEqual([{ current: created, views: [created] }]);
   });
 
+  it("saves a view's tables' keys alone", async () => {
+    const create = vi.fn<ViewStore["create"]>(async () => ({
+      status: "saved",
+      view: buildStoredView({ id: "v9" }),
+    }));
+    const { commands, presentation } = createCommandsOver(
+      createStandInViewStore({ create }),
+    );
+    presentation.arrange({ "table.order": ["a"], "table.t.hidden": ["b"] });
+    await commands.saveAs("Mine");
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({ presentation: { "table.t.hidden": ["b"] } }),
+    );
+  });
+
+  it("retries a creation under its id when the arrangement held a key it drops", async () => {
+    const create = vi.fn<ViewStore["create"]>(async () => {
+      throw new Error("offline");
+    });
+    const { commands, presentation } = createCommandsOver(
+      createStandInViewStore({ create }),
+    );
+    presentation.arrange({ "table.order": ["a"], "table.t.hidden": ["b"] });
+    await commands.saveAs("Mine").catch(() => {});
+    await commands.saveAs("Mine").catch(() => {});
+    const [first, second] = create.mock.calls.map(([draft]) => draft.id);
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(second).toBe(first);
+  });
+
   it("moves the changes made while saving as onto the new view", async () => {
     const answer = createDeferred<ViewCreateResult>();
     const { commands, presentation } = createCommandsOver(

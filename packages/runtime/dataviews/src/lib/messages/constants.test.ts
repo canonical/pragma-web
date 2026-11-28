@@ -168,6 +168,9 @@ describe("constants", () => {
       expect(m.moveNamedColumnRight("Status")).toBe("Move Status right");
       expect(m.columnAlwaysShown("Name")).toBe("Name is always shown");
       expect(m.resetTableSettings).toBe("Reset table settings");
+      expect(m.columnsPending).toBe(
+        "Columns can change once the linked view has loaded.",
+      );
     });
 
     it("words what a change to the columns announces, with its place", () => {
