@@ -5,7 +5,10 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import { createRestHandlers } from "../../../../../../storybook/machines/api/index.js";
+import {
+  answerBehind,
+  createRestHandlers,
+} from "../../../../../../storybook/machines/api/index.js";
 import type {
   Machine,
   MachineFields,
@@ -453,6 +456,7 @@ export const RestBacked: Story = {
   ],
   render: ({ label }) => <RestBackedMachines label={label} />,
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",

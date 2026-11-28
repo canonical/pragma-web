@@ -6,7 +6,10 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import { createRestHandlers } from "../../../../../../storybook/machines/api/index.js";
+import {
+  answerBehind,
+  createRestHandlers,
+} from "../../../../../../storybook/machines/api/index.js";
 import type {
   Machine,
   MachineProviderConfig,
@@ -366,11 +369,10 @@ export const CountsRestBacked: Story = {
     <ConnectedChart type="bar" field="status" label={label} />
   ),
   play: async ({ canvas }) => {
-    const table = await canvas.findByRole(
-      "table",
-      { name: "Machines by status, as a table" },
-      { timeout: 3000 },
-    );
+    await answerBehind("rest");
+    const table = await canvas.findByRole("table", {
+      name: "Machines by status, as a table",
+    });
     await expect(
       within(table)
         .getAllByRole("rowheader")
@@ -391,12 +393,11 @@ export const RangeRestBacked: Story = {
     <ConnectedChart type="range" field="cores" label={label} />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("rest");
     await expect(
-      await canvas.findByRole(
-        "img",
-        { name: "Cores: a range chart from 2 to 64" },
-        { timeout: 3000 },
-      ),
+      await canvas.findByRole("img", {
+        name: "Cores: a range chart from 2 to 64",
+      }),
     ).toBeVisible();
   },
 };

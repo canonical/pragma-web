@@ -126,12 +126,14 @@ export const Answered: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 rows",
       ),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 6–10 rows",
@@ -170,6 +172,7 @@ export const Failed: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("graphql");
     await expect(
       await canvas.findByText(
         "These rows could not be loaded: the machine inventory is unavailable.",
@@ -192,12 +195,14 @@ export const FailedOverKeptRows: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 rows",
       ),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    await answerBehind("graphql");
     await expect(
       await canvas.findByText(
         /These rows do not match the current query: the machines past the first page are unavailable/,
@@ -258,6 +263,7 @@ export const TextApplied: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 rows",
@@ -265,6 +271,7 @@ export const TextApplied: Story = {
     );
     const host = canvas.getByRole("textbox", { name: "Host contains" });
     await userEvent.type(host, "ELM");
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(readPaginationSummary(canvas)).toHaveTextContent("Showing row 1"),
     );
@@ -297,6 +304,7 @@ export const CountsAndNoneOf: Story = {
   ),
   play: async ({ canvas }) => {
     const status = canvas.getByRole("group", { name: "Status is any of" });
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(
         within(status).getByRole("checkbox", { name: "failed" }),
@@ -305,6 +313,7 @@ export const CountsAndNoneOf: Story = {
     await userEvent.click(
       within(status).getByRole("checkbox", { name: "failed" }),
     );
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(
         canvas.queryByRole("cell", { name: "alder.example.com" }),
@@ -315,6 +324,7 @@ export const CountsAndNoneOf: Story = {
         name: "Match none of these instead",
       }),
     );
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(
         canvas.getByRole("cell", { name: "alder.example.com" }),
@@ -342,6 +352,7 @@ export const StartsWithApplied: Story = {
     />
   ),
   play: async ({ canvas }) => {
+    await answerBehind("graphql");
     await userEvent.selectOptions(
       await canvas.findByRole("combobox", { name: "How Owner matches" }),
       "startsWith",
@@ -353,6 +364,7 @@ export const StartsWithApplied: Story = {
       canvas.queryByRole("combobox", { name: "How Region matches" }),
     ).toBeNull();
     await userEvent.type(owner, "EX:I");
+    await answerBehind("graphql");
     await waitFor(() =>
       expect(
         canvas.getByRole("cell", { name: "ironwood.example.com" }),
