@@ -201,6 +201,26 @@ describe("createCombobox keyboard behaviour", () => {
     expect(onSelectedItemChange).toHaveBeenCalledExactlyOnceWith(fruits[2]);
   });
 
+  it("reports every pick of a selection pinned to null", async () => {
+    const onSelectedItemChange = vi.fn();
+    const page = await render(Combobox, {
+      items: fruits,
+      isSelectionPinned: true,
+      onSelectedItemChange,
+    });
+    (page.container.querySelector("input") as HTMLInputElement).focus();
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    // A pinned selection opens without a highlight, as nothing is selected.
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect
+      .poll(() => onSelectedItemChange.mock.calls)
+      .toEqual([[fruits[0]], [fruits[0]]]);
+    expect(readState(page.container)).toMatchObject({
+      selected: null,
+      inputValue: "Apple",
+    });
+  });
+
   it("does not prevent a closed list's Enter, so a form can submit", async () => {
     const { input } = await setUp();
     const event = new KeyboardEvent("keydown", {

@@ -7,10 +7,13 @@
   let {
     items,
     initialSelectedItem,
+    isSelectionPinned = false,
     onSelectedItemChange,
   }: {
     items: Option[];
     initialSelectedItem?: Option | null;
+    /** Pins the selection to `null`, as a multiple combobox does. */
+    isSelectionPinned?: boolean;
     onSelectedItemChange?: (item: Option | null) => void;
   } = $props();
 
@@ -20,6 +23,9 @@
     getItems: () => items,
     convertItemToString: (item) => (item ? item.label : ""),
     initialSelectedItem,
+    selectedItem: isSelectionPinned
+      ? { get: () => null, set: () => {} }
+      : undefined,
     onSelectedItemChange,
   });
 </script>

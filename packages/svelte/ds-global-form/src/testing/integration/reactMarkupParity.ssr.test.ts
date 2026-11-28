@@ -10,15 +10,6 @@ const SVELTE_PROP_NAMES: Record<string, string> = {
   autoComplete: "autocomplete",
 };
 
-/**
- * Cases captured ahead of the Svelte work that makes them pass: the multiple
- * combobox moves onto downshift's markup in the next combobox step.
- */
-const PENDING_CASES = new Set([
-  "combobox-multiple-empty",
-  "combobox-multiple-chips",
-]);
-
 /** Maps a golden case to the props of the Svelte Field. */
 function createSvelteProps(key: string) {
   const { props, error, value } = goldenCases[key];
@@ -39,20 +30,15 @@ describe("React markup parity", () => {
     props: { inputType: "text", name: "probe" },
   });
 
-  it.each(caseKeys.filter((key) => !PENDING_CASES.has(key)))(
-    "renders the %s markup",
-    (key) => {
-      const svelte = render(Field, {
-        // biome-ignore lint/suspicious/noExplicitAny: golden props are data
-        props: createSvelteProps(key) as any,
-      });
-      const react = window.document.createElement("div");
-      react.innerHTML = reactGolden[key];
-      expect(normalizeMarkup(svelte.container)).toBe(normalizeMarkup(react));
-    },
-  );
-
-  it.skip.each([...PENDING_CASES])("renders the %s markup", () => {});
+  it.each(caseKeys)("renders the %s markup", (key) => {
+    const svelte = render(Field, {
+      // biome-ignore lint/suspicious/noExplicitAny: golden props are data
+      props: createSvelteProps(key) as any,
+    });
+    const react = window.document.createElement("div");
+    react.innerHTML = reactGolden[key];
+    expect(normalizeMarkup(svelte.container)).toBe(normalizeMarkup(react));
+  });
 
   it("covers every shipped input type", () => {
     const covered = new Set(

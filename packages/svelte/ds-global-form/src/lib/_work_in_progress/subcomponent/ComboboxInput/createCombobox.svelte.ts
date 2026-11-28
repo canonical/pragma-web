@@ -23,6 +23,12 @@ export type ComboboxOptions = {
    * Without it the builder keeps the text in its own state.
    */
   inputValue?: StateAccessor<string>;
+  /**
+   * Holds the selected item outside the builder. A selection a multiple
+   * combobox keeps elsewhere pins it to `null`, as React pins downshift's
+   * `selectedItem`, so picking the same item again is still a change.
+   */
+  selectedItem?: StateAccessor<Option | null>;
   /** Called when the user changes the selection, not when `selectItem` does. */
   onSelectedItemChange?: (item: Option | null) => void;
   /** Called whenever the typed text changes, whatever changed it. */
@@ -63,7 +69,7 @@ export class Combobox {
   isOpen = $state(false);
   highlightedIndex = $state(-1);
   // Raw, so the item keeps its identity and is found among the items.
-  selectedItem: Option | null = $state.raw(null);
+  #selectedItem: Option | null = $state.raw(null);
   #inputValue = $state("");
 
   readonly #options: ComboboxOptions;
@@ -88,6 +94,17 @@ export class Combobox {
     const selected = options.initialSelectedItem ?? null;
     this.selectedItem = selected;
     if (selected) this.inputValue = options.convertItemToString(selected);
+  }
+
+  /** The selected item. */
+  get selectedItem(): Option | null {
+    const accessor = this.#options.selectedItem;
+    return accessor ? accessor.get() : this.#selectedItem;
+  }
+
+  set selectedItem(next: Option | null) {
+    if (this.#options.selectedItem) this.#options.selectedItem.set(next);
+    else this.#selectedItem = next;
   }
 
   /** The typed text. */
@@ -211,10 +228,12 @@ export class Combobox {
 
   /**
    * Applies a state change, then reports what changed. A change to the
-   * selection is reported only when `isUserChange`.
+   * selection is reported only when `isUserChange`, against the selection
+   * before the change, so a pinned selection still reports each pick.
    */
   #apply(changes: Changes, isUserChange = true): void {
     const previousItem = this.selectedItem;
+    const { selectedItem } = changes;
     const previousInputValue = this.inputValue;
     if (changes.isOpen !== undefined) this.isOpen = changes.isOpen;
     if (changes.highlightedIndex !== undefined)
@@ -222,8 +241,12 @@ export class Combobox {
     if (changes.selectedItem !== undefined)
       this.selectedItem = changes.selectedItem;
     if (changes.inputValue !== undefined) this.inputValue = changes.inputValue;
-    if (isUserChange && this.selectedItem !== previousItem)
-      this.#options.onSelectedItemChange?.(this.selectedItem);
+    if (
+      isUserChange &&
+      selectedItem !== undefined &&
+      selectedItem !== previousItem
+    )
+      this.#options.onSelectedItemChange?.(selectedItem);
     if (this.inputValue !== previousInputValue)
       this.#options.onInputValueChange?.(this.inputValue);
   }

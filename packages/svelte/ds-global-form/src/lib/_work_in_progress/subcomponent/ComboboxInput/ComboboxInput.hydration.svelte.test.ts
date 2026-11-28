@@ -2,6 +2,7 @@ import { flushSync, hydrate, unmount } from "svelte";
 import { describe, expect, it, onTestFinished } from "vitest";
 import { userEvent } from "vitest/browser";
 import HydrationCombobox from "../../../../testing/HydrationCombobox.fixtures.svelte";
+import HydrationMultipleCombobox from "../../../../testing/HydrationMultipleCombobox.fixtures.svelte";
 import serveFixture from "../../../../testing/serveFixture.js";
 
 describe("ComboboxInput hydration", () => {
@@ -48,5 +49,40 @@ describe("ComboboxInput hydration", () => {
     await expect
       .poll(() => container.querySelector("output")?.textContent)
       .toBe('"apple"');
+  });
+
+  it("adopts the server chips and hidden inputs of a multiple combobox", async () => {
+    const container = await serveFixture("HydrationMultipleCombobox");
+    const chips = [...container.querySelectorAll(".chip")];
+    const readPosted = () =>
+      [...container.querySelectorAll('input[type="hidden"]')].map(
+        (input) => (input as HTMLInputElement).value,
+      );
+    expect(chips.map((chip) => chip.textContent)).toEqual([
+      "Apple×",
+      "Banana×",
+    ]);
+    expect(readPosted()).toEqual(["apple", "banana"]);
+
+    const app = hydrate(HydrationMultipleCombobox, { target: container });
+    flushSync();
+    onTestFinished(() => {
+      unmount(app);
+      container.remove();
+    });
+
+    // The server's chips are kept, and the keyboard reaches them.
+    expect([...container.querySelectorAll(".chip")]).toEqual(chips);
+    const input = container.querySelector(
+      '[role="combobox"]',
+    ) as HTMLInputElement;
+    input.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect.poll(() => document.activeElement).toBe(chips[1]);
+    await userEvent.keyboard("{Backspace}");
+    await expect
+      .poll(() => container.querySelector("output")?.textContent)
+      .toBe('["apple"]');
+    expect(readPosted()).toEqual(["apple"]);
   });
 });

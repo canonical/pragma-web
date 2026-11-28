@@ -1,107 +1,227 @@
 <script lang="ts">
+  import { untrack } from "svelte";
+  import type { Option } from "../../../subcomponent/types.js";
+  import runLatest from "../../../utils/owner/runLatest.js";
   import { List, ResetButton } from "./common/index.js";
+  import { VALUE_KEY } from "./constants.js";
+  import createCombobox from "./createCombobox.svelte.js";
+  import createMultipleSelection from "./createMultipleSelection.svelte.js";
   import type { ComboboxInputProps } from "./types.js";
-  import defaultConvertItemToString from "./utils/convertItemToString.js";
-  import defaultFilterItems from "./utils/filterItems.js";
+  import {
+    convertItemToString as defaultConvertItemToString,
+    convertValueToItem as defaultConvertValueToItem,
+    filterItems as defaultFilterItems,
+    isPromise,
+    settleLookup,
+  } from "./utils/index.js";
   import "./styles.css";
 
-  // The S1 multiple combobox, kept until it moves onto the combobox builders:
-  // it has neither downshift's IDs and ARIA nor hidden inputs yet.
+  const componentCssClassName = "ds form-combobox";
+
   let {
     id,
     class: className,
     style,
+    name,
     options,
     value = $bindable(),
     inputValue = $bindable(""),
     disabled = false,
     placeholder,
     openOnReset = false,
+    valueKey = VALUE_KEY,
     convertItemToString = defaultConvertItemToString,
+    convertValueToItem = defaultConvertValueToItem,
     filterItems = defaultFilterItems,
     onblur,
   }: Omit<ComboboxInputProps, "isMultiple" | "value"> & {
     value?: string[];
   } = $props();
 
-  const listId = $props.id();
-  let inputRef: HTMLInputElement | undefined = $state();
-  let isOpen = $state(false);
-  let highlightedIndex = $state(-1);
+  const uid = $props.id();
 
-  const selectedValues = $derived(value ?? []);
-  const selectedItems = $derived(
-    options.filter((option) => selectedValues.includes(option.value)),
+  // As in the single combobox, the list shows every option until the text
+  // first changes, then is filtered by the text and follows `options`.
+  let isFiltered = $state(false);
+  const items = $derived(
+    isFiltered ? filterItems(options, inputValue) : options,
   );
-  const items = $derived(filterItems(options, inputValue));
 
-  function selectItem(value_: string) {
-    if (!selectedValues.includes(value_)) value = [...selectedValues, value_];
-    inputValue = "";
-    isOpen = false;
-  }
+  const isOption = (item: Option | null): item is Option => Boolean(item);
 
-  function removeItem(value_: string) {
-    value = selectedValues.filter((item) => item !== value_);
-  }
+  // The first values are looked up once, while rendering, so synchronous
+  // answers are chips in the server render. Promises are kept for the first
+  // sync to await, instead of looking the values up twice. A rejected lookup
+  // counts as not found.
+  const initialLookups = untrack(() =>
+    (value ?? []).map((current) =>
+      settleLookup(convertValueToItem(current, options, valueKey)),
+    ),
+  );
+  let pendingInitialLookups = initialLookups.some(isPromise)
+    ? initialLookups
+    : null;
 
-  function reset() {
-    value = [];
-    inputValue = "";
-    inputRef?.focus();
-    isOpen = openOnReset;
-  }
+  let selectedItems: Option[] = $state.raw(
+    pendingInitialLookups
+      ? []
+      : (initialLookups as (Option | null)[]).filter(isOption),
+  );
+  // Whether chips are hidden while lookups are pending.
+  let isPending = false;
+  // Values an asynchronous lookup could not resolve, so a new `options` or
+  // `convertValueToItem` does not fetch them again.
+  const unresolved = new Set<string>();
 
-  function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      isOpen = true;
-      highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      highlightedIndex = Math.max(highlightedIndex - 1, 0);
-    } else if (event.key === "Enter" && isOpen && items.at(highlightedIndex)) {
-      event.preventDefault();
-      selectItem((items.at(highlightedIndex) as { value: string }).value);
-    } else if (event.key === "Escape") {
-      isOpen = false;
+  const selection = createMultipleSelection({
+    getSelectedItems: () => selectedItems,
+    onSelectedItemsChange: (next) => {
+      selectedItems = next;
+      const picked = next.map((item) => item[valueKey] as string);
+      // While lookups are pending no chip is shown, so a pick adds to the
+      // value instead of replacing the values still being looked up. Only a
+      // value with entries can be pending.
+      value = isPending
+        ? [...new Set([...(value as string[]), ...picked])]
+        : picked;
+    },
+    isKeyActionPrevented: () => combobox.isOpen,
+  });
+
+  const combobox = createCombobox({
+    id: `downshift-${uid}`,
+    getItems: () => items,
+    convertItemToString: (item) => convertItemToString(item),
+    // The selection lives in the chips. Pinning the combobox's own to `null`
+    // makes picking an option again, after its chip is removed, a change.
+    selectedItem: { get: () => null, set: () => {} },
+    inputValue: {
+      get: () => inputValue,
+      set: (next) => {
+        inputValue = next;
+      },
+    },
+    onInputValueChange: () => {
+      isFiltered = true;
+    },
+    onSelectedItemChange: (item) => {
+      if (
+        item &&
+        !selectedItems.some((selected) => selected[valueKey] === item[valueKey])
+      ) {
+        selection.addSelectedItem(item);
+        inputValue = "";
+      }
+    },
+  });
+
+  // Latest wins: values changed while their lookups are pending discard the
+  // stale answers (the effect's cleanup cancels them).
+  const lookups = runLatest((pending: Promise<(Option | null)[]>) => pending);
+
+  /**
+   * Shows the chips of values set from outside. A value that already has a
+   * chip (the user just picked it) is not looked up again. While lookups are
+   * pending no chip is shown; the hidden inputs already carry the values.
+   */
+  const reflectValues = (current: string[]) => {
+    for (const unresolvedValue of unresolved)
+      if (!current.includes(unresolvedValue))
+        unresolved.delete(unresolvedValue);
+    const shown = new Map(
+      selectedItems.map((item) => [String(item[valueKey]), item]),
+    );
+    const answers =
+      pendingInitialLookups ??
+      current.map(
+        (currentValue) =>
+          shown.get(currentValue) ??
+          (unresolved.has(currentValue)
+            ? null
+            : settleLookup(
+                convertValueToItem(currentValue, options, valueKey),
+              )),
+      );
+    pendingInitialLookups = null;
+    if (!answers.some(isPromise)) {
+      isPending = false;
+      selectedItems = (answers as (Option | null)[]).filter(isOption);
+      return;
     }
-  }
+    isPending = true;
+    selectedItems = [];
+    lookups.run(Promise.all(answers)).then((outcome) => {
+      if (outcome.status !== "done") return;
+      outcome.value.forEach((item, index) => {
+        if (!item && isPromise(answers[index])) unresolved.add(current[index]);
+      });
+      isPending = false;
+      selectedItems = outcome.value.filter(isOption);
+    });
+  };
+
+  $effect(() => {
+    const current = value ?? [];
+    // As React's, the chips follow a new `options`, lookup or `valueKey` too.
+    void [options, convertValueToItem, valueKey];
+    untrack(() => reflectValues(current));
+    // Lookups still pending when the combobox goes away are discarded.
+    return () => lookups.cancel();
+  });
+
+  // The values to post: every value, also those still being looked up.
+  const postedValues = $derived((value ?? []).filter(Boolean));
+
+  let inputElement: HTMLInputElement | undefined = $state();
+
+  const resetSelection = () => {
+    selectedItems = [];
+    inputValue = "";
+    // [] (never undefined), so an owner with a default value stores the
+    // cleared selection instead of reverting to its default.
+    value = [];
+    (inputElement as HTMLInputElement).focus();
+    if (openOnReset) combobox.openMenu();
+  };
+
+  // The dropdown's handlers run before the combobox's, as downshift composes
+  // `getDropdownProps` into `getInputProps`.
+  const handleKeyDown = (event: KeyboardEvent) => {
+    selection.dropdown.onkeydown?.(event);
+    combobox.input.onkeydown(event);
+  };
+
+  const handleClick = () => {
+    selection.dropdown.onclick?.();
+    combobox.input.onclick();
+  };
+
+  const handleBlur = (event: FocusEvent) => {
+    combobox.input.onblur(event);
+    onblur?.(event);
+  };
 </script>
 
-<div {id} {style} class={["ds form-combobox", className]}><div class="selected-items">{#each selectedItems as item (item.value)}<button type="button" class="chip" onclick={() => removeItem(item.value)}>{convertItemToString(item)}<span class="remove-icon">×</span></button>{/each}</div><div class="ds input combobox-input chrome"><input
-      bind:this={inputRef}
-      class="p"
-      role="combobox"
-      aria-autocomplete="list"
-      aria-expanded={isOpen}
-      aria-controls={listId}
-      {placeholder}
-      {disabled}
-      bind:value={inputValue}
-      oninput={() => {
-        isOpen = true;
-        highlightedIndex = -1;
-      }}
-      onkeydown={handleKeyDown}
-      {onblur}
-    /><ResetButton onclick={reset} /></div><List
-    menu={{ id: listId, role: "listbox" }}
-    getItem={(index) => ({
-      id: `${listId}-${index}`,
-      role: "option",
-      "aria-selected": index === highlightedIndex,
-      onclick: () => selectItem(items[index].value),
-    })}
+<div {id} {style} class={[componentCssClassName, className]}><div class="selected-items">{#each selectedItems as item, index}<button type="button" {...selection.getSelectedItem(index)} onclick={() => selection.removeSelectedItem(item)} class="chip">{convertItemToString(item)}<span class="remove-icon">×</span></button>{/each}</div><div class="ds input combobox-input chrome"><input bind:this={inputElement} class="p" {...combobox.input} {...selection.dropdown} onkeydown={handleKeyDown} onclick={handleClick} {disabled} {placeholder} onblur={handleBlur} /><ResetButton onclick={resetSelection} /></div><List
+    menu={combobox.menu}
+    getItem={(index) => combobox.getItem(index)}
     {items}
-    {highlightedIndex}
-    fieldValue={value}
+    highlightedIndex={combobox.highlightedIndex}
+    fieldValue={selectedItems.map((item) => String(item[valueKey]))}
     {convertItemToString}
-    valueKey="value"
-    {isOpen}
-  /></div>
+    {valueKey}
+    isOpen={combobox.isOpen}
+  />{#if name}{#each postedValues as postedValue}<input type="hidden" {name} value={postedValue} />{/each}{/if}</div>
 
 <!-- @component
-Multiple-selection combobox, rendered as chips. Work in progress: it moves onto
-the combobox builders, with downshift's markup, in the next step.
+Multiple-selection combobox, after React's `MultipleCombobox`: the selected
+options are chips before a filterable text input over a listbox, with
+downshift's IDs and ARIA. Bind `value` for the selected values and
+`inputValue` for the typed text. ArrowLeft moves from an empty input to the
+chips, ArrowLeft and ArrowRight move between them, and Backspace or Delete
+removes one; clicking a chip removes it.
+
+With a `name`, one hidden input per selected value carries the selection, so a
+native form post sends it without JavaScript. The visible text input stays
+unnamed.
 -->

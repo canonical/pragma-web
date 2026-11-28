@@ -11,7 +11,6 @@ import {
   List,
   ResetButton,
 } from "./subcomponent/ComboboxInput/common/index.js";
-import { ComboboxInput } from "./subcomponent/ComboboxInput/index.js";
 import { RatingInput } from "./subcomponent/RatingInput/index.js";
 
 const options = [
@@ -152,44 +151,7 @@ describe("RatingInput", () => {
   });
 });
 
-describe("ComboboxInput (multiple, until it moves onto the builders)", () => {
-  it("adds and removes chips, then resets", async () => {
-    const page = await render(Bound, {
-      of: ComboboxInput,
-      options,
-      isMultiple: true,
-      openOnReset: true,
-    });
-    const input = page.getByRole("combobox");
-    await userEvent.click(input);
-    await userEvent.keyboard("{ArrowDown}{Enter}");
-    (page.container.querySelectorAll("li")[2] as HTMLElement).click();
-    (page.container.querySelectorAll("li")[0] as HTMLElement).click();
-    await expect
-      .poll(() => readBound(page.container))
-      .toEqual(["apple", "cherry"]);
-    await page.getByRole("button", { name: /Apple/ }).click();
-    await expect.poll(() => readBound(page.container)).toEqual(["cherry"]);
-    await page.getByRole("button", { name: "Clear selection" }).click();
-    await expect.poll(() => readBound(page.container)).toEqual([]);
-  });
-
-  it("filters, moves the highlight and closes", async () => {
-    const onblur = vi.fn();
-    const page = await render(ComboboxInput, {
-      options,
-      isMultiple: true,
-      onblur,
-    });
-    const input = page.getByRole("combobox");
-    await userEvent.type(input, "an");
-    expect(page.container.querySelectorAll("li")).toHaveLength(1);
-    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowUp}{Escape}{Enter}");
-    expect(input.element().getAttribute("aria-expanded")).toBe("false");
-    await userEvent.tab();
-    expect(onblur).toHaveBeenCalled();
-  });
-
+describe("ComboboxField", () => {
   it("renders a field around the input", async () => {
     const page = await render(ComboboxField, {
       name: "fruit",
