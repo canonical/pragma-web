@@ -4,8 +4,8 @@ import {
   findAncestorPath,
   prepareIndex,
 } from "@canonical/ds-utils";
+import type { NavRoot } from "@canonical/svelte-ds-app";
 import type { BreadcrumbItem } from "@canonical/svelte-ds-global";
-import type { NavRoot } from "../../lib/ApplicationShell/index.js";
 
 /**
  * Projects a navigation tree onto the breadcrumb trail of one of its items.

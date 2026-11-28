@@ -84,7 +84,7 @@ page takes one of two layouts:
 
 - `(public)` — the public pages: one constrained column.
 - `dashboard` — `ApplicationShell` from `src/lib`: the design system's
-  `ApplicationLayout` with the side navigation. Each dashboard page renders
+  `ApplicationLayout` with its `SideNavigation`. Each dashboard page renders
   `ViewLayout` and `ContentLayout` inside it.
 
 The dashboard's navigation is one tree of navigation items, built in
@@ -124,8 +124,7 @@ are not part of this app.
 
 `@canonical/svelte-ds-*` does not ship these blocks yet, so the app renders
 their markup itself, with their stylesheets copied from the React packages into
-`src/styles/standins/`: `SideNavigation` (without the collapse toggle,
-tooltips or the small-screen menu), `SidePanel`, `Card`, `Tile`, `Timeline`,
+`src/styles/standins/`: `SidePanel`, `Card`, `Tile`, `Timeline`,
 `InlineCode` and `Icon`. Swap each for the Svelte block when it lands, and
 delete its stand-in stylesheet.
 

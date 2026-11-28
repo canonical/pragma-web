@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { ApplicationLayout } from "@canonical/svelte-ds-app";
+  import { ApplicationLayout, SideNavigation } from "@canonical/svelte-ds-app";
   import { createAppTranslator, getLocaleSource } from "../../i18n/index.js";
   import CanonicalLogo from "../CanonicalLogo/index.js";
-  import SideNavigation from "./common/SideNavigation/index.js";
   import type { ApplicationShellProps } from "./types.js";
   import "./styles.css";
 
@@ -25,7 +24,15 @@
 <div {...rest} class={[componentCssClassName, "surface", className]}>
   <ApplicationLayout>
     {#snippet navigation()}
-      <SideNavigation aria-label={label} applicationName={t("app.name")} {currentUrl} {footerRoot} messages={{ skipToContent: () => t("shell.skipToContent") }} {root}>
+      <SideNavigation aria-label={label} applicationName={t("app.name")} {currentUrl} {footerRoot} messages={{
+          skipToContent: () => t("shell.skipToContent"),
+          collapseNavigation: () => t("shell.collapseNavigation"),
+          expandNavigation: () => t("shell.expandNavigation"),
+          collapse: () => t("shell.collapse"),
+          expand: () => t("shell.expand"),
+          openMenu: () => t("shell.openMenu"),
+          closeMenu: () => t("shell.closeMenu"),
+        }} {root}>
         {#snippet brand()}<CanonicalLogo {currentUrl} />{/snippet}
       </SideNavigation>
     {/snippet}
@@ -34,13 +41,12 @@
 </div>
 
 <!-- @component
-An application's frame: the design system's `ApplicationLayout`, with the side
-navigation in the navigation slot and the page in `<main>`.
+An application's frame: the design system's `ApplicationLayout`, with its
+`SideNavigation` in the navigation slot and the page in `<main>`.
 
 The side navigation follows the page: `currentUrl` marks the active item.
-`<main id="main-content">` is the side navigation's skip-link target. Until
-`@canonical/svelte-ds-app` ships `SideNavigation`, the slot holds a stand-in
-with the same props.
+`<main id="main-content">` is the side navigation's skip-link target. Its plain
+links route through SvelteKit, so it needs no `link` snippet.
 
 The shell is a `.surface`: the design system's components read their colours
 from the surface channels it sets, and the side panels and modals opened inside

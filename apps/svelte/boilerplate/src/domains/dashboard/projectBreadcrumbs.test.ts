@@ -1,5 +1,5 @@
+import type { NavRoot } from "@canonical/svelte-ds-app";
 import { describe, expect, it } from "vitest";
-import type { NavRoot } from "../../lib/ApplicationShell/types.js";
 import projectBreadcrumbs from "./projectBreadcrumbs.js";
 
 const root: NavRoot = {

@@ -1,9 +1,9 @@
-import type { MessageKey } from "../../i18n/index.js";
 import {
   createHelpItem,
   type FooterRoot,
   type NavRoot,
-} from "../../lib/ApplicationShell/index.js";
+} from "@canonical/svelte-ds-app";
+import type { MessageKey } from "../../i18n/index.js";
 
 export interface DashboardNavigation {
   /** The side navigation's tree, labelled in the active locale. */

@@ -207,9 +207,10 @@ describe("the server", () => {
     assert.match(html, /class="ds application-shell surface"/);
     assert.match(html, /<main class="main" id="main-content">/);
     assert.match(html, /href="#main-content">Skip to main content</);
+    assert.match(html, /class="ds side-navigation"/);
     assert.match(
       html,
-      /<a aria-current="page" class="row" href="\/dashboard">/,
+      /<a[^>]*(aria-current="page"[^>]*href="\/dashboard"|href="\/dashboard"[^>]*aria-current="page")[^>]*>\s*<span class="start">/,
     );
     assert.match(
       html,
@@ -608,6 +609,51 @@ describe("the pages", () => {
           .getAttribute("href"),
         "https://ubuntu.com/legal",
       );
+    });
+  });
+
+  test("the side navigation collapses from its toggle and Ctrl+B", async () => {
+    await withPage({}, async (page) => {
+      await open(page, "/dashboard");
+      const sideNavigation = page.locator(".ds.side-navigation");
+      assert.equal(await sideNavigation.getAttribute("data-expanded"), "true");
+      await page.getByRole("button", { name: "Collapse navigation" }).click();
+      assert.equal(await sideNavigation.getAttribute("data-expanded"), "false");
+      await page.getByRole("button", { name: "Expand navigation" }).waitFor();
+      await page.keyboard.press("Control+b");
+      assert.equal(await sideNavigation.getAttribute("data-expanded"), "true");
+      await page.keyboard.press("Control+b");
+      assert.equal(await sideNavigation.getAttribute("data-expanded"), "false");
+    });
+  });
+
+  test("the side navigation is a menu on a small screen", async () => {
+    await withPage({ viewport: { width: 400, height: 800 } }, async (page) => {
+      await open(page, "/dashboard");
+      const sideNavigation = page.locator(".ds.side-navigation");
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector(".ds.side-navigation")
+            ?.getAttribute("data-expanded") === "false",
+      );
+      const menu = page.getByRole("button", { name: "Expand navigation" });
+      assert.equal((await menu.textContent())?.trim(), "Menu");
+      await menu.click();
+      assert.equal(
+        (
+          await page
+            .getByRole("button", { name: "Collapse navigation" })
+            .textContent()
+        )?.trim(),
+        "Close menu",
+      );
+      assert.equal(await sideNavigation.getAttribute("data-expanded"), "true");
+      await page
+        .getByRole("navigation", { name: "Dashboard" })
+        .getByRole("link", { name: "Instances" })
+        .click();
+      await page.waitForURL(`${base}/dashboard/instances`);
     });
   });
 });

@@ -1,8 +1,8 @@
 <script lang="ts" module>
+  import { createHelpItem } from "@canonical/svelte-ds-app";
   import { defineMeta } from "@storybook/addon-svelte-csf";
   import { expect, within } from "storybook/test";
   import Component from "./ApplicationShell.svelte";
-  import createHelpItem from "./createHelpItem.js";
 
   const { Story } = defineMeta({
     title: "common/ApplicationShell",
