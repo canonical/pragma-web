@@ -1,9 +1,10 @@
 <script lang="ts" module>
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { fireEvent } from "storybook/test";
+  import { fireEvent, userEvent, waitFor } from "storybook/test";
   import {
     failOnceUpload,
     longNamedIso,
+    portraitImage,
     reportPdf,
     sampleFile,
     sampleImage,
@@ -171,5 +172,21 @@ area's place, above the file list, and describes the file actions. -->
     files: [reportPdf(), sampleImage()],
     multiple: true,
     showFileList: false,
+  }}
+/>
+
+<!-- Hovering an image's thumbnail shows the whole image, uncropped, in a
+tooltip: the thumbnail crops this tall image to its 5:3 box. The story hovers
+it on load. -->
+<Story
+  name="Image Preview"
+  args={{ files: [portraitImage()], multiple: true }}
+  play={async ({ canvasElement }) => {
+    const thumbnail = await waitFor(() => {
+      const found = canvasElement.querySelector(".thumbnail-preview .thumbnail");
+      if (!found) throw new Error("The thumbnail has no preview yet.");
+      return found;
+    });
+    await userEvent.hover(thumbnail);
   }}
 />
