@@ -21,7 +21,13 @@ export interface I18nContextValue {
   catalogs: Record<Locale, Messages>;
 }
 
-/** Props for `I18nProvider`. */
+/**
+ * Props for `I18nProvider`.
+ *
+ * Exempt from the native-prop extension convention: `I18nProvider` renders a
+ * context provider and no DOM element, so it has no root tag whose native
+ * props these could extend.
+ */
 export interface I18nProviderProps {
   /** The subtree that reads the i18n runtime through the hooks. */
   children: ReactNode;
