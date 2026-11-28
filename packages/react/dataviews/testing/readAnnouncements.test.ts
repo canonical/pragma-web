@@ -44,6 +44,7 @@ describe("readAnnouncements", () => {
       document.body.innerHTML =
         '<div class="ds data-views-announcer"><p>Filtered</p></div>';
     });
+    // biome-ignore lint/style/noRestrictedGlobals: drives a faked clock
     setTimeout(spoken, COALESCE_DELAY_MS);
     await expect(readAnnouncements()).resolves.toEqual(["Filtered"]);
     expect(spoken).toHaveBeenCalledTimes(1);

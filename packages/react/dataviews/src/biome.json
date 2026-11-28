@@ -1,0 +1,59 @@
+{
+  "root": false,
+  "extends": "//",
+  "plugins": [
+    {
+      "path": "../biome/no-clock-waits.grit",
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx"],
+      "resolutionKind": "config"
+    }
+  ],
+  "overrides": [
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "setTimeout": "Wait on a state, never a duration.",
+                  "setInterval": "Wait on a state, never a duration.",
+                  "requestAnimationFrame": "Wait on a state, never a duration."
+                }
+              }
+            },
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "msw": {
+                    "importNames": ["delay"],
+                    "message": "Wait on a state, never a duration."
+                  },
+                  "node:timers/promises": {
+                    "importNames": ["setTimeout", "setInterval", "scheduler"],
+                    "message": "Wait on a state, never a duration."
+                  },
+                  "timers/promises": {
+                    "importNames": ["setTimeout", "setInterval", "scheduler"],
+                    "message": "Wait on a state, never a duration."
+                  },
+                  "node:timers": {
+                    "importNames": ["setTimeout", "setInterval"],
+                    "message": "Wait on a state, never a duration."
+                  },
+                  "timers": {
+                    "importNames": ["setTimeout", "setInterval"],
+                    "message": "Wait on a state, never a duration."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

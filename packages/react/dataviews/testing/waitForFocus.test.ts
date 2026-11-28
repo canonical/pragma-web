@@ -9,6 +9,7 @@ describe("waitForFocus", () => {
   it("settles once the element holds focus", async () => {
     const button = document.createElement("button");
     document.body.append(button);
+    // biome-ignore lint/style/noRestrictedGlobals: moves focus a frame later, as a menu does
     requestAnimationFrame(() => button.focus());
     await waitForFocus(button);
     expect(document.activeElement).toBe(button);

@@ -26,7 +26,9 @@ export default async function waitForFrames<TValue>(
       return value;
     }
     await act(async () => {
+      // biome-ignore lint/plugin/no-clock-waits: a frame-bounded poll
       const painted = new Promise<void>((resolve) => {
+        // biome-ignore lint/style/noRestrictedGlobals: a frame-bounded poll
         requestAnimationFrame(() => resolve());
       });
       // A faked clock drives a faked frame; a real frame comes on its own.

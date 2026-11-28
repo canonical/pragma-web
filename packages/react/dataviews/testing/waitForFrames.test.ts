@@ -21,6 +21,7 @@ describe("waitForFrames", () => {
   it("advances a faked clock frame by frame", async () => {
     installFakeClock("every");
     let frames = 0;
+    // biome-ignore lint/style/noRestrictedGlobals: drives a faked clock
     requestAnimationFrame(() => {
       frames += 1;
     });
