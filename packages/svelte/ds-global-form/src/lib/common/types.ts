@@ -68,8 +68,16 @@ export type WrapperProps = FieldChromeProps &
      * carry their own labels. The group references it with `aria-labelledby`.
      */
     mockLabel?: boolean;
-    /** Renders the control, receiving its identity and accessibility wiring. */
-    children: Snippet<[ControlProps]>;
+    /**
+     * Where the error renders: after the control in the payload (default), or
+     * inside the control, which receives it as the snippet's second argument.
+     */
+    errorSlot?: "payload" | "input";
+    /**
+     * Renders the control, receiving its identity and accessibility wiring,
+     * and the error to place when `errorSlot` is "input".
+     */
+    children: Snippet<[ControlProps, Snippet | undefined]>;
   };
 
 /**

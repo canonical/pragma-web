@@ -221,6 +221,35 @@ The presentational inputs work outside a form, for example in a filter bar:
 `PhoneInput` bind `value`; `CheckboxInput`, `SwitchInput` and `RadioInput` bind
 `checked`; `FileUploadInput` binds `files`.
 
+## File upload
+
+`inputType: "file"` (and `FileUploadInput`) binds `File[]`. An `upload`
+function makes it live: each valid file is sent as soon as it is chosen, with
+an abort signal and a progress callback, and closing a running upload removes
+the file. Upload state stays in the input; the bound value is always the
+chosen files.
+
+```svelte
+<script lang="ts">
+  import { Field, type UploadFunction } from "@canonical/svelte-ds-global-form";
+
+  const upload: UploadFunction = async (file, { signal }) => {
+    const response = await fetch("/api/files", { method: "POST", body: file, signal });
+    if (!response.ok) throw new Error(response.statusText);
+  };
+</script>
+
+<Field inputType="file" name="attachments" label="Attachments" multiple
+  accept=".pdf,image/*" maxSize={10 * 1024 * 1024} maxFiles={5} {upload} />
+```
+
+`accept`, `maxSize` and `validateFile` put a warning or an error under a file.
+`maxFiles`, a file with an error, and an upload still running or failed make
+the field invalid: the message is the file input's custom validity, so the
+browser holds the submit back, as for `required`. In a `novalidate` form the
+field stops the submit itself. `messages` replaces any text, and
+`onuploadstatuschange` reports the running and failed uploads.
+
 ## Phone
 
 `PhoneInput` (and `inputType: "phone"`) binds an E.164 string, or a structured
