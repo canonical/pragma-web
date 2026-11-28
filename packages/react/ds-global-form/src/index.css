@@ -21,6 +21,39 @@
  * wrapped. */
 @import url("./density.css");
 
+/* Every component's own stylesheet, so that linking this entry gives every
+ * component rule from the first paint. Each component module also imports its
+ * own sheet. The list is hand-written and
+ * `index.css.tests.ts` fails if it drifts from the sheets on disk. Add a
+ * component, add its line, alphabetically. */
+@import url("./lib/_work_in_progress/subcomponent/ColorInput/styles.css");
+@import url("./lib/_work_in_progress/subcomponent/ComboboxInput/common/List/styles.css");
+@import url("./lib/_work_in_progress/subcomponent/ComboboxInput/common/ResetButton/styles.css");
+@import url("./lib/_work_in_progress/subcomponent/ComboboxInput/styles.css");
+@import url("./lib/_work_in_progress/subcomponent/RatingInput/styles.css");
+@import url("./lib/common/Wrapper/ToggleWrapper.css");
+@import url("./lib/common/Wrapper/styles.css");
+@import url("./lib/component/ChoicesField/styles.css");
+@import url("./lib/component/RangeField/common/RangeControl/styles.css");
+@import url("./lib/component/RichChoicesField/styles.css");
+@import url("./lib/subcomponent/CheckboxInput/styles.css");
+@import url("./lib/subcomponent/DateInput/styles.css");
+@import url("./lib/subcomponent/DateTimeInput/styles.css");
+@import url("./lib/subcomponent/Field/Description/styles.css");
+@import url("./lib/subcomponent/Field/Error/styles.css");
+@import url("./lib/subcomponent/Field/Label/styles.css");
+@import url("./lib/subcomponent/FileUploadInput/styles.css");
+@import url("./lib/subcomponent/NumberInput/styles.css");
+@import url("./lib/subcomponent/PasswordInput/styles.css");
+@import url("./lib/subcomponent/PhoneInput/styles.css");
+@import url("./lib/subcomponent/RadioInput/styles.css");
+@import url("./lib/subcomponent/RangeInput/styles.css");
+@import url("./lib/subcomponent/SelectInput/styles.css");
+@import url("./lib/subcomponent/SwitchInput/styles.css");
+@import url("./lib/subcomponent/TextInput/styles.css");
+@import url("./lib/subcomponent/TextareaInput/styles.css");
+@import url("./lib/subcomponent/TimeInput/styles.css");
+
 @layer ds.components.global {
   :root {
     /* ── Form grid layout ───────────────────────────────────────────── */
@@ -293,7 +326,6 @@
 
     border-radius: var(--form-input-border-radius);
     background-color: var(--form-input-background);
-    color: var(--form-input-color);
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--form-input-font-size);
     line-height: var(--form-input-line-height);
@@ -337,6 +369,12 @@
       color: var(--form-input-color-disabled);
       cursor: not-allowed;
     }
+  }
+
+  /* Keep the shared text color below leaf rules in this layer, regardless of
+   * import order. Date and datetime inputs use a muted color when empty. */
+  :where(.ds).input.chrome {
+    color: var(--form-input-color);
   }
 
   /* ── Danger ──────────────────────────────────────────────────────────
