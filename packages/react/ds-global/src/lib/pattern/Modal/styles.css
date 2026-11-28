@@ -100,6 +100,17 @@
     border-radius: var(--modal-border-radius);
 
     /*
+      A modal <dialog> is centred only by the user-agent rule `margin: auto`,
+      which any author rule beats, such as the design system's own
+      `.content-flow > :last-child { margin-bottom: 0 }`. Declaring it here
+      keeps the dialog centred against margin resets from the layers below this
+      one, and from this layer when they are no more specific and load first. A
+      rule in the `app` layer, or outside any layer, still wins, so an
+      application that resets its children's margins must leave the dialog out.
+    */
+    margin: auto;
+
+    /*
       A closed <dialog> is `display: none` by user-agent rule. Declaring display
       unconditionally here would beat that and leave the modal permanently
       visible, so the stack layout is scoped to the open state.
