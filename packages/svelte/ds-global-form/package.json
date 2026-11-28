@@ -80,6 +80,7 @@
     "@vitest/browser-playwright": "^5.0.0",
     "@vitest/coverage-istanbul": "^5.0.0",
     "@vitest/coverage-v8": "^5.0.0",
+    "axe-core": "^4.11.1",
     "msw": "^3.0.0",
     "playwright": "^1.61.1",
     "storybook": "^10.6.0",
