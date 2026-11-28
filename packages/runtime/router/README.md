@@ -254,6 +254,8 @@ router.setSearchParams({ page: "2" }, { replace: true });
 
 Everything else that changes the address stays a navigation, including one that differs only in its search: `navigate()` to the same page with other search params, the browser's back and forward, and a redirect reached from a search update (which the reader did not ask for) all run the full [accessibility](#accessibility) effects. Only the caller knows that an address is the same page restated, so the distinction is made by the method called, not inferred from the address — `/?user=ana` and `/?user=bob` may well be two different pages.
 
+Consecutive `setSearchParams()` calls compose: each builds on the address the previous call scheduled, even when the earlier load has not committed yet, so two calls in the same tick (or a function-form updater reading the pending params) keep both updates. A navigation issued in between supersedes the pending update, so its target never carries the stale search params.
+
 ## Navigation blocking
 
 `router.block(isActive)` registers a blocker and returns a handle. While `isActive()` returns true, `navigate()` is intercepted and held until the handle decides it:

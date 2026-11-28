@@ -1581,6 +1581,123 @@ describe("createRouter", () => {
     });
   });
 
+  it("composes two setSearchParams calls made in the same tick", async () => {
+    const router = createRouter(
+      {
+        list: route({
+          url: "/list",
+          content: () => "list",
+        }),
+      },
+      { adapter: createMemoryAdapter("/list") },
+    );
+
+    await router.load("/list");
+    router.setSearchParams({ group: "status" }, { replace: true });
+    router.setSearchParams({ sort: "name" }, { replace: true });
+
+    await vi.waitFor(() => {
+      const searchParams = router.getState().location.searchParams;
+
+      expect(searchParams.get("group")).toBe("status");
+      expect(searchParams.get("sort")).toBe("name");
+    });
+  });
+
+  it("passes pending search params to the function-form updater", async () => {
+    const router = createRouter(
+      {
+        list: route({
+          url: "/list",
+          content: () => "list",
+        }),
+      },
+      { adapter: createMemoryAdapter("/list") },
+    );
+
+    await router.load("/list");
+    router.setSearchParams({ group: "status" });
+    router.setSearchParams((current) => ({ ...current, sort: "name" }));
+
+    await vi.waitFor(() => {
+      const searchParams = router.getState().location.searchParams;
+
+      expect(searchParams.get("group")).toBe("status");
+      expect(searchParams.get("sort")).toBe("name");
+    });
+  });
+
+  it("keeps push and replace history entries across composed updates", async () => {
+    const adapter = createMemoryAdapter("/list");
+    const writes: string[] = [];
+    const wrappedAdapter = {
+      ...adapter,
+      navigate(
+        url: string | URL,
+        navigationOptions?: { readonly replace?: boolean },
+      ) {
+        const nextUrl = new URL(String(url), adapter.getLocation());
+
+        writes.push(
+          `${navigationOptions?.replace ? "replace" : "push"}:${nextUrl.pathname}${nextUrl.search}`,
+        );
+        adapter.navigate(String(url), navigationOptions);
+      },
+    };
+    const router = createRouter(
+      {
+        list: route({
+          url: "/list",
+          content: () => "list",
+        }),
+      },
+      { adapter: wrappedAdapter },
+    );
+
+    await router.load("/list");
+    router.setSearchParams({ group: "status" }, { replace: true });
+    router.setSearchParams({ sort: "name" });
+
+    await vi.waitFor(() => {
+      expect(router.getState().location.searchParams.get("sort")).toBe("name");
+    });
+
+    expect(writes.slice(-2)).toEqual([
+      "replace:/list?group=status",
+      "push:/list?group=status&sort=name",
+    ]);
+  });
+
+  it("does not merge a pending search href into a navigate in between", async () => {
+    const router = createRouter(
+      {
+        list: route({
+          url: "/list",
+          content: () => "list",
+        }),
+        about: route({ url: "/about", content: () => "about" }),
+      },
+      { adapter: createMemoryAdapter("/list") },
+    );
+
+    await router.load("/list");
+    router.setSearchParams({ sort: "name" });
+    router.navigate("about");
+
+    await vi.waitFor(() => {
+      expect(router.getState().location.pathname).toBe("/about");
+    });
+
+    router.setSearchParams({ page: "2" });
+
+    await vi.waitFor(() => {
+      const searchParams = router.getState().location.searchParams;
+
+      expect(searchParams.get("page")).toBe("2");
+      expect(searchParams.get("sort")).toBeNull();
+    });
+  });
+
   it("follows runtime redirects thrown from warm during load", async () => {
     const router = createRouter(
       {
