@@ -206,6 +206,22 @@ const pick = (label: string) => {
   fireEvent.click(screen.getByRole("option", { name: label, hidden: true }));
 };
 
+describe("ComboboxInput (multiple) chips", () => {
+  it("removes a chip without submitting the form", () => {
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    const { container } = render(
+      <form onSubmit={onSubmit}>
+        <ComboboxInput isMultiple options={fruits} value={["apple"]} />
+      </form>,
+    );
+    const chip = container.querySelector(".selected-items .chip");
+    if (!chip) throw new Error("chip not rendered");
+    expect(chip).toHaveAttribute("type", "button");
+    fireEvent.click(chip);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
+
 describe("ComboboxInput posting without JavaScript", () => {
   it("posts the single value through a hidden input, not the visible one", () => {
     const { container } = render(

@@ -229,6 +229,7 @@ const MultipleCombobox = ({
         {selectedItems.map((selectedItem, index) => (
           <button
             key={String(selectedItem[valueKey])}
+            type="button"
             {...getSelectedItemProps({ selectedItem, index })}
             onClick={() => removeSelectedItem(selectedItem)}
             className="chip"
