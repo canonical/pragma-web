@@ -48,14 +48,21 @@ runs:
       # records the new versions on the first install and the new ranges only
       # on the second. With one install, the publish job's `git diff
       # --exit-code bun.lock` check rewrites the lockfile at the tag and fails.
-      # Still true of Bun 1.4.2; the upstream fix is proposed in
+      # Still true of the pinned Bun; the upstream fix is proposed in
       # https://github.com/oven-sh/bun/pull/41931. Drop the second install once
       # the pinned Bun includes it.
+      #
+      # The second install is not proof. A warm install can still leave a
+      # sibling range at the previous version and report "no changes" either
+      # way. verify-lockfile.sh proves the result in a clean worktree with no
+      # node_modules, the same state the publish job installs in, and fails the
+      # job if that install rewrites bun.lock.
     - name: Update lockfile
       shell: bash
       run: |
         bun install --ignore-scripts
         bun install --ignore-scripts
+        ${{ github.action_path }}/verify-lockfile.sh
 
       # Lerna may introduce slight formatting changes to the package.json files.
       # This can be removed once https://github.com/lerna/lerna/issues/4117 is closed.
