@@ -1,5 +1,5 @@
 import type React from "react";
-import type { RegisterOptions } from "react-hook-form";
+import type { FieldValues, RegisterOptions } from "react-hook-form";
 import type { RequiredIndicator } from "../subcomponent/Field/Label/types.js";
 import type { BaseProps } from "../subcomponent/types.js";
 
@@ -104,7 +104,22 @@ export type Middleware<ComponentProps> = (
   Component: React.ComponentType<ComponentProps>,
 ) => React.ComponentType<ComponentProps>;
 
-export type Condition = [string[], (depsValues: unknown[]) => boolean];
+/**
+ * Decides whether a field renders, from the current values of the whole form.
+ * Return `true` to render the field, `false` to hide it.
+ */
+export type Condition = (values: FieldValues) => boolean;
+
+/** The `condition` prop every built-in field accepts. */
+export type ConditionalDisplayProps = {
+  /**
+   * Renders the field only while this returns `true`. It receives every form
+   * value and runs again whenever one changes. A hidden field is not rendered,
+   * and unless `unregisterOnUnmount` is `false` its value is dropped, so it is
+   * not submitted.
+   */
+  condition?: Condition;
+};
 
 export type WrapperHOCAdditionalProps<
   ComponentProps extends BaseInputProps,
@@ -120,12 +135,7 @@ export type WrapperHOCAdditionalProps<
    * An optional wrapper component to render around the input.
    */
   WrapperComponent?: React.ComponentType<ComponentWrapperProps>;
-
-  /**
-   * A condition to determine whether to render the component or not.
-   */
-  condition?: Condition;
-};
+} & ConditionalDisplayProps;
 
 export type WrappedComponentProps<
   ComponentProps extends BaseInputProps,

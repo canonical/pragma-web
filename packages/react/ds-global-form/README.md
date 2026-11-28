@@ -260,14 +260,11 @@ Fields can conditionally render based on other field values:
   name="company"
   inputType="text"
   label="Company"
-  condition={[
-    ["accountType"],
-    ([type]) => type === "business",
-  ]}
+  condition={({ accountType }) => accountType === "business"}
 />
 ```
 
-The field only renders when the condition function returns true.
+`condition` receives every form value and runs again whenever one changes. The field renders only while it returns `true`; a hidden field is not rendered, and unless `unregisterOnUnmount` is `false` its value is dropped, so it is not submitted.
 
 ## Storybook
 

@@ -209,7 +209,7 @@ export const ConditionalField: Story = {
         name="company_name"
         inputType="text"
         label="Company name"
-        condition={[["role"], ([role]: unknown[]) => role === "company"]}
+        condition={({ role }) => role === "company"}
       />
       <Button type="submit">Continue</Button>
     </Form>
