@@ -10,6 +10,7 @@ import {
   openIndexedDBTab,
   type ScriptedPresentation as Scripted,
   settleCalls,
+  waitForState,
 } from "../../../testing/index.js";
 import { WRITE_DEADLINE, WRITE_DELAY } from "./constants.js";
 import createMemoryPresentationStore from "./createMemoryPresentationStore.js";
@@ -883,14 +884,11 @@ describe("createPresentation", () => {
       expect(readArrangement(presentation)).toEqual({
         "table.t.width.name": 300,
       });
-      await new Promise<void>((resolve) => {
-        const unsubscribe = presentation.state.subscribe(() => {
-          if (readArrangement(presentation)["table.t.width.name"] === 120) {
-            unsubscribe();
-            resolve();
-          }
-        });
-      });
+      await waitForState(
+        presentation.state.subscribe,
+        () => readArrangement(presentation)["table.t.width.name"] === 120,
+        "the restored width",
+      );
       expect(readArrangement(presentation)).toEqual({
         "table.t.width.name": 120,
       });
