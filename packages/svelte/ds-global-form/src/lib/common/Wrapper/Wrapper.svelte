@@ -24,6 +24,7 @@
     requiredIndicator,
     descriptionPosition = "leading",
     mockLabel = false,
+    errorSlot = "payload",
     condition,
     onhide,
     children,
@@ -45,6 +46,8 @@
   );
 </script>
 
+{#snippet fieldError()}<FieldError id={`${baseId}-error`}>{shownError}</FieldError>{/snippet}
+
 {#if display.isVisible}<div {id} {style} class={[componentCssClassName, className, isError && "danger"]} {@attach nativeValidity.follow}><Label
       {name}
       {isOptional}
@@ -55,14 +58,15 @@
     >{label || name}</Label
     ><div class="payload"
       >{#if descriptionPosition === "leading" && description}<Description id={`${baseId}-description`}>{description}</Description
-      >{/if}{@render children(controlProps)}{#if descriptionPosition === "trailing" && description}<Description id={`${baseId}-description`}>{description}</Description
-      >{/if}{#if isError}<FieldError id={`${baseId}-error`}>{shownError}</FieldError
-      >{/if}</div
+      >{/if}{@render children(controlProps, errorSlot === "input" && isError ? fieldError : undefined)}{#if descriptionPosition === "trailing" && description}<Description id={`${baseId}-description`}>{description}</Description
+      >{/if}{#if errorSlot === "payload" && isError}{@render fieldError()}{/if}</div
   ></div
 >{/if}
 
 <!-- @component
 The stacked field chrome: label, then a payload of description, control and
 error. The control is rendered by the `children` snippet, which receives its
-ID and accessibility wiring.
+ID and accessibility wiring. With `errorSlot` "input", the error is not
+rendered in the payload: the snippet receives it as a second argument, for the
+control to place.
 -->

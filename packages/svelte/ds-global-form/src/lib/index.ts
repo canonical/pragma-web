@@ -25,7 +25,10 @@ export type {
   CheckboxInputProps,
   DateInputProps,
   DateTimeInputProps,
+  FileMessage,
+  FileMessageLevel,
   FileUploadInputProps,
+  FileUploadMessages,
   HiddenInputProps,
   NumberInputProps,
   PasswordInputProps,
@@ -40,6 +43,9 @@ export type {
   TextInputProps,
   TextInputType,
   TimeInputProps,
+  UploadFunction,
+  UploadOptions,
+  UploadSummary,
 } from "./subcomponent/index.js";
 export {
   CheckboxInput,
