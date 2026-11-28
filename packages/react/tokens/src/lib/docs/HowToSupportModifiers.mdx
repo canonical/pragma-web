@@ -166,6 +166,10 @@ Complex components like cards may have a header with a background and a body wit
 
 > **Note**: `--color-text-on-foreground` does not have a modifier channel because it is always read on top of a foreground surface. Its value adapts via theme pairing, not modifier rebinding.
 
+### Supporting the `default` value
+
+Nothing extra to do: every colour modifier family ships a `.default` class that rebinds each channel to its base semantic token, so a component that reads the channels (as above) supports it automatically. When a component should render neutral inside a modifier-marked ancestor, pass `default` as the modifier prop value; when it should participate in the ancestor's context, pass nothing. See [The Modifier Contract](?path=/docs/foundation-design-tokens-understanding-modifier-contract--docs), "Opting out of an inherited modifier", for the mechanism and the acceptance behaviours.
+
 ## Troubleshooting
 
 ### Colors don't change inside `.error`
