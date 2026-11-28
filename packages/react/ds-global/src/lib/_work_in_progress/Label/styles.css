@@ -22,12 +22,22 @@
 
     /* Additional styling */
     line-height: var(--label-line-height, 1.2);
+    /* The label sits on the modifier's tinted fill, so it reads the on-fill
+     * text channel. `--modifier-color-text` is the standalone modifier colour,
+     * meant for the page background: on the modifier's solid fill
+     * (`--modifier-color-foreground-primary`) it is the same hue on the same
+     * hue, red on red for `error`. Families that publish no on-fill channel
+     * (anticipation, lifecycle) fall back to their standalone text colour,
+     * which reads on their tinted fill. */
     color: var(
-      --modifier-color-text,
-      var(--label-color, var(--color-text-secondary, inherit))
+      --modifier-color-text-on-foreground-secondary,
+      var(
+        --modifier-color-text,
+        var(--label-color, var(--color-text-secondary, inherit))
+      )
     );
     background-color: var(
-      --modifier-color-foreground-primary,
+      --modifier-color-foreground-secondary,
       var(--label-background, transparent)
     );
     padding-inline: var(--label-padding-inline, var(--spacing-xsmall, 0.25rem));
