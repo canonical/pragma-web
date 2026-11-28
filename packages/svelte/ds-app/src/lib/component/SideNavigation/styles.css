@@ -130,12 +130,9 @@
       inline-size: var(--sidenav-rail-inline-size-collapsed);
       justify-content: space-between;
 
+      /* Content holds the context switcher too: label-driven rows,
+         nothing survives icon-only degradation. */
       & > .ds.side-navigation-content {
-        display: none;
-      }
-
-      /* Label-driven rows — nothing survives icon-only degradation. */
-      & > .ds.side-navigation-context-switcher {
         display: none;
       }
 
