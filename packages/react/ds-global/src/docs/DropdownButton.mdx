@@ -1,0 +1,37 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "../lib/component/DropdownButton/DropdownButton.stories";
+
+<Meta title="Documentation/DropdownButton" />
+
+# DropdownButton
+
+A Button with a persistent chevron that opens a [ContextualMenu](?path=/docs/documentation-contextualmenu--docs).
+
+```tsx
+import { DropdownButton } from "@canonical/react-ds-global";
+
+<DropdownButton
+  importance="secondary"
+  items={[
+    { key: "rename", label: "Rename" },
+    { type: "separator", key: "s" },
+    { url: "/docs", label: "Docs" },
+  ]}
+  onSelect={(item) => run(item.key)}
+>
+  Actions
+</DropdownButton>;
+```
+
+<Canvas of={Stories.Default} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+With no visible children, give it an `aria-label` or `aria-labelledby`: it warns in development otherwise.
+
+## Keyboard
+
+<Canvas of={Stories.Keyboard} />
+

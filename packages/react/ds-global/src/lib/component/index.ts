@@ -6,6 +6,7 @@ export * from "./Button/index.js";
 export * from "./Card/index.js";
 export * from "./Chip/index.js";
 export * from "./ContextualMenu/index.js";
+export * from "./DropdownButton/index.js";
 export * from "./Icon/index.js";
 export * from "./InlineCode/index.js";
 export * from "./KeyboardKey/index.js";

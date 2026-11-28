@@ -1,0 +1,23 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DropdownButton styles
+   * @implements ds:global.component.dropdown_button
+   *
+   * The trigger is a Button, and the menu a ContextualMenu; this sheet only
+   * seats the persistent chevron that trails the Button's label.
+   */
+  .ds.dropdown-button {
+    /* Through Button's variable, the chevron sits closer to the edge, as a
+       leading icon does. */
+    --button-padding-inline-end: var(--space-100);
+    --dropdown-button-chevron-gap: var(--space-100);
+
+    & .chevron {
+      display: inline-flex;
+      vertical-align: middle;
+      margin-inline-start: var(--dropdown-button-chevron-gap);
+    }
+  }
+}
