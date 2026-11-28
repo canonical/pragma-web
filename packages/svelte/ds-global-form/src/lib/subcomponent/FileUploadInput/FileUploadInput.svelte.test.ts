@@ -350,6 +350,21 @@ describe("FileUploadInput (presentational)", () => {
       }
     });
 
+    it("has no preview where object URLs are unsupported", async () => {
+      const original = URL.createObjectURL;
+      // biome-ignore lint/suspicious/noExplicitAny: removes a browser API
+      (URL as any).createObjectURL = undefined;
+      try {
+        const page = await render(FileUploadInput, {
+          files: [file("photo.png", 10, "image/png")],
+        });
+        expect(page.container.querySelector(".thumbnail-preview")).toBeNull();
+        expect(document.querySelector(".file-upload-preview")).toBeNull();
+      } finally {
+        URL.createObjectURL = original;
+      }
+    });
+
     it("draws no thumbnail for a file that is not an image", async () => {
       const page = await render(FileUploadInput, { files: [file("a.txt")] });
       expect(page.container.querySelector(".thumbnail")).toBeNull();

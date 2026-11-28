@@ -121,12 +121,7 @@ export const svelteOnlyStories: Readonly<Record<string, readonly string[]>> = {
 
 /**
  * Stories a React file has that its Svelte counterpart does not mirror yet, by
- * React path. The image preview shows the whole image in a design-system
- * tooltip, which the Svelte global package does not have yet.
+ * React path.
  */
 export const pendingSvelteStories: Readonly<Record<string, readonly string[]>> =
-  {
-    "lib/subcomponent/FileUploadInput/FileUploadInput.stories.tsx": [
-      "Image Preview",
-    ],
-  };
+  {};
