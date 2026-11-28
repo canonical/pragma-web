@@ -14,8 +14,8 @@ bun install
 bun run dev:bun      # SSR dev server with HMR, on http://localhost:5174
 ```
 
-Edit anything under `src/` and the page hot-reloads. To check the production
-build before shipping, run `bun run preview:bun` instead.
+Edit anything under `src/` and the page hot-reloads. To test the compiled app
+locally, run `bun run preview:bun` instead.
 
 ## Running the app
 
@@ -31,9 +31,9 @@ across three targets (a client-only SPA, SSR on Bun, SSR on Node/Express):
 The naming is systematic: the bare name is the **SPA**, the `:bun` / `:express`
 suffix selects the **SSR runtime**, and the `dev` / `preview` prefix selects the
 **mode**. Reach for `dev:*` while building — it is the fast inner loop, with HMR
-and no build step — and for `preview:*` when verifying that the production bundle
-behaves before a deploy: `preview:*` builds the client and runs a compiled
-renderer over the built assets, the same artifact that deploys.
+and no build step — and for `preview:*` when testing optimized assets locally.
+The preview commands compile the client in `preview` mode, which allows the
+loopback GraphQL default. Build deployment artifacts separately.
 
 One asymmetry to expect in the **SPA** cells: this app is server-rendered, so
 its `index.html` carries no `<title>`. The renderer re-emits the shell's head
@@ -76,7 +76,7 @@ bun run test:e2e      # boots all six matrix servers and asserts each serves
 ```
 
 `test:e2e` is an end-to-end test *of the build*: it runs each of the six server
-scripts — including the production builds that `preview:*` performs — and asserts
+scripts — including the compiled builds that `preview:*` performs — and asserts
 that every server returns a rendered document and serves its client assets with
 the correct content type.
 
@@ -138,6 +138,20 @@ there; the address is decided in exactly one place
 that variable also tells the launcher an endpoint already exists, so it starts
 no graph of its own — which is how you point the app at a shared or remote
 one.
+
+**Production client builds require the endpoint.** The loopback default is for
+local use only: in a visitor's browser, `127.0.0.1` is the visitor's own machine.
+From this app directory, `bun run build`, `bun run build:client`, and
+`bun run build:release` refuse to compile without `VITE_GRAPHQL_URL`. Set it to
+a GraphQL address reachable from visitors' browsers, for example:
+
+```bash
+VITE_GRAPHQL_URL=https://graph.example.com/graphql bun run build:release
+```
+
+The repository-root `bun run build`, the CI `build:all` target, and the local
+`preview*` commands explicitly opt into preview mode so they can build without
+a deployed endpoint. Do not deploy their client artifacts.
 
 **Prerequisite:** the *default* provider compiles from the pragma CLI's refs
 cache, so `~/.cache/pragma/refs/@canonical` must be populated (`pragma sources

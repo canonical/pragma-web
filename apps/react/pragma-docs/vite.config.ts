@@ -5,6 +5,7 @@ import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 import relay from "vite-plugin-relay-lite";
+import { assertReleaseGraphqlUrl } from "./src/relay/graphqlBuild.js";
 
 // Path aliases are declared as Node subpath imports in package.json "imports",
 // resolved natively by Vite — no resolver plugin. There is one per domain and
@@ -20,9 +21,8 @@ const PORT = Number(process.env.PORT) || undefined;
 // renderers in a single pass. Each is a separate, individually-instantiated
 // Lego brick, so they are named Rollup inputs — the build emits
 // `dist/server/renderer.js` (the JSX app) + `dist/server/sitemap.js` (the XML
-// sitemap), which the preview servers import directly. Every other command
-// (`dev`, `build:client`, `preview`) uses the default mode and the SPA client
-// build (`--ssrManifest --outDir dist/client`).
+// sitemap), which the preview servers import directly. Client builds require an
+// explicit GraphQL endpoint unless they opt into `preview` mode for local use.
 export default defineConfig(({ mode }) => ({
   // Relay's `graphql\`...\`` tags must be rewritten into imports of the
   // compiler-generated artifacts. `@vitejs/plugin-react` v6 is OXC-based (no
@@ -35,7 +35,21 @@ export default defineConfig(({ mode }) => ({
   // backtick-quote a graphql file name in a comment. `codegen: false` because
   // artifacts are committed and regenerated explicitly via the `relay` /
   // `relay:watch` scripts.
-  plugins: [relay({ codegen: false }), react()],
+  plugins: [
+    {
+      name: "pragma-docs-client-graphql-url",
+      apply: "build",
+      configResolved(config) {
+        assertReleaseGraphqlUrl({
+          mode: config.mode,
+          ssr: Boolean(config.build.ssr),
+          url: config.env.VITE_GRAPHQL_URL,
+        });
+      },
+    },
+    relay({ codegen: false }),
+    react(),
+  ],
   // Honour the PORT env var for `dev` (SPA) and `preview` so all server scripts
   // — including the SSR ones, which already read PORT — respond to it uniformly.
   server: { port: PORT },
