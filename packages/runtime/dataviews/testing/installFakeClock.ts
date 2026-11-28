@@ -17,6 +17,7 @@ type FakedClock = NonNullable<
 export default function installFakeClock(
   toFake: FakedClock | "every" = ["setTimeout", "clearTimeout", "Date"],
 ): void {
+  // biome-ignore lint/plugin/no-clock-waits: the one place a clock is faked
   vi.useFakeTimers(toFake === "every" ? {} : { toFake });
   onTestFinished(() => {
     vi.useRealTimers();

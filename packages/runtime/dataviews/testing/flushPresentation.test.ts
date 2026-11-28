@@ -15,6 +15,7 @@ describe("flushPresentation", () => {
       .fn<PresentationStore["patchPresentation"]>()
       .mockReturnValue(answer.promise);
     let settled = false;
+    // biome-ignore lint/style/noRestrictedGlobals: drives a faked clock
     setTimeout(() => {
       void writes({ view: "a" }, {}).then(() => {
         settled = true;

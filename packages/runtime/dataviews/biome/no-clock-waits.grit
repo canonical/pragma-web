@@ -1,0 +1,122 @@
+language js
+
+or {
+  `$callee($args)` as $call where {
+    $callee <: or {
+      `waitFor`,
+      `$_.waitFor`,
+      `waitUntil`,
+      `$_.waitUntil`,
+      `$_.poll`,
+      `$_.waitForFunction`,
+      `$_.waitForSelector`,
+      `waitForElementToBeRemoved`,
+      r"^find(?:All)?By\w+$",
+      `$_.$find` where { $find <: r"^find(?:All)?By\w+$" },
+      `expect($_).$_`,
+      `expect($_).not.$_`,
+      `expect.$_($_).$_`,
+      `expect.$_($_).not.$_`
+    },
+    $args <: contains JsPropertyObjectMember(name=$name) where {
+      $name <: or {
+        `timeout`,
+        `interval`
+      }
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  `$test($name, $second, $third)` as $call where {
+    $test <: or {
+      `it`,
+      `test`,
+      `$_.it`,
+      `$_.test`,
+      `it.$_`,
+      `test.$_`,
+      `describe`,
+      `$_.describe`,
+      `describe.$_`,
+      `$_.each($_)`
+    },
+    or {
+      $third <: not or {
+        JsObjectExpression(),
+        JsArrowFunctionExpression(),
+        JsFunctionExpression()
+      },
+      $second <: JsObjectExpression() as $options where {
+        $options <: contains JsPropertyObjectMember(name=`timeout`)
+      },
+      $third <: JsObjectExpression() as $options where {
+        $options <: contains JsPropertyObjectMember(name=`timeout`)
+      }
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  or {
+    `vi.waitFor($_, $limit)`,
+    `vi.waitUntil($_, $limit)`
+  } as $call where {
+    $limit <: JsNumberLiteralExpression(),
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  `$hook($_, $_)` as $call where {
+    $hook <: or {
+      `beforeEach`,
+      `beforeAll`,
+      `afterEach`,
+      `afterAll`
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  `defineConfig($config)` as $call where {
+    $config <: contains JsPropertyObjectMember(name=$name) where {
+      $name <: r"^\w*[Tt]imeout$"
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  or {
+    `configure($config)`,
+    `$_.configure($config)`
+  } as $call where {
+    $config <: contains JsPropertyObjectMember(name=$name) where {
+      $name <: r"^\w*[Tt]imeout$"
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  `$_.asyncUtilTimeout = $_` as $raise where {
+    register_diagnostic(span=$raise, message="Wait on a state, never a duration.")
+  },
+  `vi.setConfig($config)` as $call where {
+    $config <: contains JsPropertyObjectMember(name=$name) where {
+      $name <: r"^(?:test|hook)?[Tt]imeout$"
+    },
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  or {
+    `$_.setDefaultTimeout($_)`,
+    `$_.setDefaultNavigationTimeout($_)`,
+    `$_.setTimeout($_)`,
+    `test.slow($_)`
+  } as $call where {
+    register_diagnostic(span=$call, message="Wait on a state, never a duration.")
+  },
+  `$_.waitForTimeout($_)` as $pause where {
+    register_diagnostic(span=$pause, message="Wait on a state, never a duration.")
+  },
+  or {
+    `new Promise($executor)`,
+    `new Promise<$_>($executor)`
+  } as $promise where {
+    $executor <: contains or {
+      `setTimeout`,
+      `requestAnimationFrame`,
+      `setInterval`
+    },
+    register_diagnostic(span=$promise, message="Wait on a state, never a duration.")
+  },
+  `vi.useFakeTimers($_)` as $fake where {
+    register_diagnostic(span=$fake, message="Fake the clock through installFakeClock.")
+  }
+}
