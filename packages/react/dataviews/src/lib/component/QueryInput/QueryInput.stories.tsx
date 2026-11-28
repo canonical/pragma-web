@@ -389,7 +389,12 @@ LeaveToThePage.play = async ({ canvasElement }) => {
   const leaveToThePage = async () => {
     (document.activeElement as HTMLElement | null)?.blur();
     await userEvent.pointer({ keys: "[MouseLeft]", target: document.body });
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    // The leave commits the edit or drops the draft: its field is gone.
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("combobox", { name: /^(Value|Operator) for / }),
+      ).toBeNull(),
+    );
     await expect(document.body).toHaveFocus();
   };
   await userEvent.click(canvas.getByRole("button", { name: "deployed" }));
