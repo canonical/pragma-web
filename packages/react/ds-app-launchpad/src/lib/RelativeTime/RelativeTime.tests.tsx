@@ -66,6 +66,24 @@ describe("RelativeTime", () => {
     expect(timeElement).toHaveAttribute("id", "time-id");
   });
 
+  it("forwards native props to the time root", () => {
+    const futureTime = mockNow.add({ minutes: 30 });
+    render(
+      <RelativeTime
+        time={futureTime}
+        data-testid="relative-time"
+        aria-label="Relative timestamp"
+        title="Custom title"
+      />,
+    );
+    const timeElement = screen.getByRole("time");
+    expect(timeElement).toBeInTheDocument();
+    expect(timeElement).toHaveAttribute("data-testid", "relative-time");
+    expect(timeElement).toHaveAttribute("aria-label", "Relative timestamp");
+    // The title is set from the locale string; a consumer-supplied one must lose.
+    expect(timeElement).not.toHaveAttribute("title", "Custom title");
+  });
+
   it("handles Date object input", () => {
     const dateObj = new Date(mockNow.epochMilliseconds + 3600000); // 1 hour in the future
     render(<RelativeTime time={dateObj} />);

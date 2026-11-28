@@ -243,7 +243,9 @@ const MarkdownEditor = forwardRef(
                 h2: ({ children }) => <h3>{children}</h3>,
               }}
             >
-              {textareaRef.current?.value || defaultValue || emptyInputMessage}
+              {textareaRef.current?.value ||
+                String(defaultValue ?? "") ||
+                emptyInputMessage}
             </ReactMarkdown>
           </div>
         )}

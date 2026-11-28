@@ -34,6 +34,23 @@ describe("GitDiffViewer component", () => {
     expect(container.firstChild).toHaveStyle({ color: "#333" });
   });
 
+  it("forwards native props to the wrapper root", () => {
+    const { container } = render(
+      <GitDiffViewer
+        diff={fixtures.diffExample}
+        data-testid="git-diff-viewer"
+        aria-label="Diff"
+      >
+        <GitDiffViewer.CodeDiffViewer />
+      </GitDiffViewer>,
+    );
+    expect(container.firstChild).toHaveAttribute(
+      "data-testid",
+      "git-diff-viewer",
+    );
+    expect(container.firstChild).toHaveAttribute("aria-label", "Diff");
+  });
+
   it("renders line decorations correctly", () => {
     const lineDecorations = {
       17: <div>Test</div>,

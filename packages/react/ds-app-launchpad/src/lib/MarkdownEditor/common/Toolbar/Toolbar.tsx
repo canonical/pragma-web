@@ -14,7 +14,7 @@ const componentCssClassName = "ds toolbar";
 /**
  * A horizontal container that groups related controls in a toolbar.
  */
-const Toolbar = (({ id, children, className, style, label }) => {
+const Toolbar = (({ children, className, label, ...props }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: We want to reapply tabindex when children change
@@ -57,9 +57,8 @@ const Toolbar = (({ id, children, className, style, label }) => {
 
   return (
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
       aria-label={label}
       role="toolbar"
       aria-orientation="horizontal"

@@ -90,4 +90,21 @@ describe("EditableBlock component", () => {
     const editIcon = screen.queryByRole("button");
     expect(editIcon).toBeNull();
   });
+
+  it("forwards native props and merges className on the div root", () => {
+    render(
+      <EditableBlock
+        title={"Hello world!"}
+        EditComponent={SampleEditComponent}
+        className="custom-class"
+        data-testid="editable-block"
+        aria-label="Editable"
+      />,
+    );
+    const root = screen.getByTestId("editable-block");
+    expect(root.tagName).toBe("DIV");
+    expect(root).toHaveClass("ds editable-block");
+    expect(root).toHaveClass("custom-class");
+    expect(root).toHaveAttribute("aria-label", "Editable");
+  });
 });

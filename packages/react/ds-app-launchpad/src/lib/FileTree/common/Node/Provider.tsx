@@ -17,14 +17,16 @@ const selectableCssClassName = "selectable";
 const selectedCssClassName = "selected";
 
 const Provider = ({
-  id,
   className,
-  style,
   children,
   name,
   marker,
-  ...nodeOptions
-}: ProviderProps): React.ReactElement | null => {
+  nodeType,
+  defaultOpen,
+  ...props
+}: ProviderProps & {
+  defaultOpen?: boolean;
+}): React.ReactElement | null => {
   const {
     expandable,
     searchQuery,
@@ -37,14 +39,14 @@ const Provider = ({
   const nodeRef = useRef<FileTreeData>({
     name,
     path: "",
-    type: nodeOptions.nodeType,
+    type: nodeType,
   });
 
   const { depth, path: parentPath, addChildNode } = useNode();
   const [childNodes, setChildNodes] = useState<FileTreeData[]>([]);
 
   const [isExpanded, setIsExpanded] = useState(
-    nodeOptions.nodeType === "folder" && nodeOptions.defaultOpen,
+    nodeType === "folder" && defaultOpen,
   );
   const path = useMemo(() => `${parentPath}/${name}`, [parentPath, name]);
   const isSelected = useMemo(
@@ -78,7 +80,7 @@ const Provider = ({
   }, [searchQuery, fileMatchesSearchQuery]);
   const handleClick: React.MouseEventHandler<HTMLLIElement> = useCallback(
     (_event) => {
-      switch (nodeOptions.nodeType) {
+      switch (nodeType) {
         case "folder":
           if (expandable) {
             setIsExpanded((prev) => !prev);
@@ -88,12 +90,12 @@ const Provider = ({
           onSelectFile?.({
             name,
             path,
-            type: nodeOptions.nodeType,
+            type: nodeType,
           });
           break;
       }
     },
-    [nodeOptions.nodeType, onSelectFile, name, path, expandable],
+    [nodeType, onSelectFile, name, path, expandable],
   );
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLLIElement> = (event) => {
@@ -105,7 +107,7 @@ const Provider = ({
     }
     switch (event.key) {
       case "ArrowRight":
-        if (!isExpanded && nodeOptions.nodeType === "folder" && expandable) {
+        if (!isExpanded && nodeType === "folder" && expandable) {
           setIsExpanded(true);
           event.preventDefault();
         } else {
@@ -114,7 +116,7 @@ const Provider = ({
         }
         break;
       case "ArrowLeft":
-        if (isExpanded && nodeOptions.nodeType === "folder" && expandable) {
+        if (isExpanded && nodeType === "folder" && expandable) {
           setIsExpanded(false);
           event.preventDefault();
         } else {
@@ -141,11 +143,11 @@ const Provider = ({
         break;
       case "Enter":
       case " ":
-        if (nodeOptions.nodeType === "file") {
+        if (nodeType === "file") {
           onSelectFile?.({
             name,
             path,
-            type: nodeOptions.nodeType,
+            type: nodeType,
           });
         }
         event.preventDefault();
@@ -182,8 +184,6 @@ const Provider = ({
     >
       {!shouldHideNode && (
         <li
-          id={id}
-          style={style}
           // used by the provider to handle accessibility
           {...{
             [dataPathHash]: hashNodeName(path),
@@ -191,23 +191,20 @@ const Provider = ({
           data-name={name}
           className={[
             componentCssClassName,
-            className,
-            nodeOptions.nodeType,
+            nodeType,
             isExpanded && expandedCssClassName,
-            nodeOptions.nodeType === "folder" &&
-              expandable &&
-              expandableCssClassName,
-            nodeOptions.nodeType === "file" &&
+            nodeType === "folder" && expandable && expandableCssClassName,
+            nodeType === "file" &&
               onSelectFile !== undefined &&
               selectableCssClassName,
             isSelected && selectedCssClassName,
+            className,
           ]
             .filter(Boolean)
             .join(" ")}
+          {...props}
           role="treeitem"
-          aria-expanded={
-            nodeOptions.nodeType === "folder" ? isExpanded : undefined
-          }
+          aria-expanded={nodeType === "folder" ? isExpanded : undefined}
           aria-selected={isSelected}
           tabIndex={-1}
           onClick={handleClick}
@@ -216,11 +213,7 @@ const Provider = ({
         >
           <IndentationBlock depth={depth} />
           <div
-            className={[
-              "icon",
-              nodeOptions.nodeType,
-              isExpanded && expandedCssClassName,
-            ]
+            className={["icon", nodeType, isExpanded && expandedCssClassName]
               .filter(Boolean)
               .join(" ")}
           />
@@ -228,7 +221,7 @@ const Provider = ({
           {marker && <div className="marker">{marker}</div>}
         </li>
       )}
-      {nodeOptions.nodeType === "folder" &&
+      {nodeType === "folder" &&
         (isExpanded || expandable === false) &&
         children}
     </Context.Provider>

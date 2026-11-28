@@ -7,18 +7,16 @@ import type { SimpleChangeMarkerProps } from "./types.js";
 const componentCssClassName = "ds simple-change-marker";
 
 const SimpleChangeMarker = ({
-  id,
-  className,
-  style,
   changeType,
+  className,
+  ...props
 }: SimpleChangeMarkerProps): React.ReactElement => {
   return (
     <div
-      id={id}
-      style={style}
-      className={[componentCssClassName, className, changeType]
+      className={[componentCssClassName, changeType, className]
         .filter(Boolean)
         .join(" ")}
+      {...props}
     >
       {changeType === "added" && icons.AddIcon}
       {changeType === "deleted" && icons.DeleteIcon}

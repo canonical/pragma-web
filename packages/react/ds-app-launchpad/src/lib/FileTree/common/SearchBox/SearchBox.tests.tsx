@@ -43,6 +43,24 @@ describe("SearchBox component", () => {
     expect(input).toHaveValue("initialValue");
   });
 
+  it("forwards native props to the form root", () => {
+    const onSearchMock = vi.fn();
+    const { container } = render(
+      <FileTree searchQuery="x" onSearch={onSearchMock}>
+        <FileTree.SearchBox
+          data-testid="search-form"
+          aria-label="Search files"
+        />
+      </FileTree>,
+    );
+    const form = container.querySelector("form");
+    expect(form).toBeDefined();
+    if (!form) return;
+    expect(form).toHaveAttribute("data-testid", "search-form");
+    expect(form).toHaveClass("ds search-box");
+    expect(form).toHaveAttribute("aria-label", "Search files");
+  });
+
   it("calls onSearch with the search query while typing", async () => {
     const onSearchMock = vi.fn();
     const ControlledSearchBox = () => {

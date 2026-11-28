@@ -9,18 +9,16 @@ const componentCssClassName = "ds toolbar-group";
  * A container for grouping related controls within a toolbar.
  */
 const ToolbarGroup = ({
-  id,
   children,
   className,
-  style,
   label,
+  ...props
 }: ToolbarGroupProps): React.ReactElement => {
   return (
     // biome-ignore lint/a11y/useSemanticElements: This element is a group of controls
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
       aria-label={label}
       role="group"
     >

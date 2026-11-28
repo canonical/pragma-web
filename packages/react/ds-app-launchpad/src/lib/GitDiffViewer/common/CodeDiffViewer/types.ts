@@ -1,5 +1,6 @@
 /* @canonical/generator-canonical-ds 0.0.1 */
 import type React from "react";
+import type { ComponentProps } from "react";
 
 export type CodeDiffViewerLineSelectOptions = {
   hunkLineNumber: number;
@@ -12,11 +13,7 @@ export type CodeDiffViewerAddComment = (
   } & CodeDiffViewerLineSelectOptions,
 ) => React.ReactNode;
 
-export type CodeDiffViewerProps = {
-  /** A unique identifier for the CodeDiffViewer */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
+type OwnProps = {
   /** Add comment element.
    * If provided, the code viewer will be in interactive mode.
    */
@@ -25,8 +22,6 @@ export type CodeDiffViewerProps = {
    * If provided, the code viewer will be in interactive mode.
    */
   onLineClick?: (options: CodeDiffViewerLineSelectOptions) => void;
-  /** Inline styles */
-  style?: React.CSSProperties;
 
   /**
    * Disable width calculation for the table (default: false).
@@ -38,3 +33,9 @@ export type CodeDiffViewerProps = {
    */
   disableWidthCalculation?: boolean;
 };
+
+// The native props are the wrapper `<div>`'s, the root element they are
+// spread onto. `ref` is excluded because the component forwards it to the
+// inner `<table>` instead.
+export type CodeDiffViewerProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "ref">;

@@ -1,5 +1,6 @@
 import type { AllOrNone } from "@canonical/ds-utils";
 import type React from "react";
+import type { ComponentProps } from "react";
 
 /**
  * When this is provided, the component will add support for collapsing the diff code section.
@@ -51,15 +52,15 @@ type ManagedContextOptions = {
 
 export type ContextOptions = UserContextOptions & ManagedContextOptions;
 
-export type ProviderOptions = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+type OwnProps = {
   /**
    * Consider using `GitDiffViewer.FileHeader`, and `GitDiffViewer.CodeDiff` components.
    */
   children?: React.ReactNode;
 } & UserContextOptions;
+
+export type ProviderOptions = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps>;
 
 export type Position = {
   start: number;

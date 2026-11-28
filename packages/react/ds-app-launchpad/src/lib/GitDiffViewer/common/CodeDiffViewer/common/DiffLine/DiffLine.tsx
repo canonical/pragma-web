@@ -13,35 +13,41 @@ const firstHunkLineCssClassName = "is-first-hunk";
  * @returns {React.ReactElement} - Rendered DiffLine
  */
 const DiffLine = ({
-  id,
-  className,
-  style,
   onLineClick,
+  className,
+  type,
+  content,
+  hunkHeader,
+  hunkIndex,
+  addLineNumber,
+  removeLineNumber,
   ...props
-}: DiffLineProps): React.ReactElement => {
+}: DiffLineProps & {
+  hunkHeader?: string;
+  hunkIndex?: number;
+  addLineNumber?: number;
+  removeLineNumber?: number;
+}): React.ReactElement => {
   const { wrapLines } = useGitDiffViewer();
-  const typeClass = `diff-line-${props.type}`;
+  const typeClass = `diff-line-${type}`;
   const isInteractive = Boolean(onLineClick);
 
   return (
     <tr
-      id={id}
-      style={style}
       className={[
         componentCssClassName,
         typeClass,
         isInteractive && "interactive",
         className,
-        props.type === "hunk" &&
-          props.hunkIndex === 0 &&
-          firstHunkLineCssClassName,
+        type === "hunk" && hunkIndex === 0 && firstHunkLineCssClassName,
       ]
         .filter(Boolean)
         .join(" ")}
+      {...props}
     >
       <td
-        className={`diff-gutter ${wrapLines ? "wrap" : ""} ${props.type}`}
-        tabIndex={isInteractive && props.type !== "hunk" ? 0 : undefined}
+        className={`diff-gutter ${wrapLines ? "wrap" : ""} ${type}`}
+        tabIndex={isInteractive && type !== "hunk" ? 0 : undefined}
         onClick={onLineClick}
         onKeyUp={(e) => {
           if (e.key === "Enter") {
@@ -50,7 +56,7 @@ const DiffLine = ({
         }}
         onKeyDown={undefined}
       >
-        {props.type === "hunk" ? (
+        {type === "hunk" ? (
           "\u00A0"
         ) : (
           <div className="diff-line-numbers">
@@ -69,22 +75,22 @@ const DiffLine = ({
               </span>
             )}
             <span className="line-num">
-              {props.type === "add" ? "+" : props.removeLineNumber}
+              {type === "add" ? "+" : removeLineNumber}
             </span>
             <span className="line-num">
-              {props.type === "remove" ? "-" : props.addLineNumber}
+              {type === "remove" ? "-" : addLineNumber}
             </span>
           </div>
         )}
       </td>
       <td className={`diff-content ${wrapLines ? "wrap" : ""}`}>
-        {props.type === "hunk" ? (
-          <pre>{props.hunkHeader}</pre>
+        {type === "hunk" ? (
+          <pre>{hunkHeader}</pre>
         ) : (
           <pre
             // biome-ignore lint/security/noDangerouslySetInnerHtml: syntax highlighting requires adding generated HTML
             dangerouslySetInnerHTML={{
-              __html: props.content ? props.content : "\u00A0",
+              __html: content ? content : "\u00A0",
             }}
           />
         )}

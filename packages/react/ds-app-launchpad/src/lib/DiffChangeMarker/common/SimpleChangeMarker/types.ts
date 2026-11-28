@@ -1,14 +1,12 @@
 /* @canonical/generator-ds 0.9.0-experimental.12 */
 
 import type { DiffChangeType } from "lib/DiffChangeMarker/types.js";
-import type React from "react";
+import type { ComponentProps } from "react";
 
-export interface SimpleChangeMarkerProps {
-  /* A unique identifier for the SimpleChangeMarker */
-  id?: string;
-  /* Additional CSS classes */
-  className?: string;
-  /* Inline styles */
-  style?: React.CSSProperties;
+type OwnProps = {
+  /** The type of change this marker represents. */
   changeType: DiffChangeType;
-}
+};
+
+export type SimpleChangeMarkerProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps>;

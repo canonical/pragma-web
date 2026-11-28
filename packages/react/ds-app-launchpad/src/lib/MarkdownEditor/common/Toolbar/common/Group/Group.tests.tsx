@@ -18,4 +18,15 @@ describe("ToolbarGroup component", () => {
     );
     expect(screen.getByText("ToolbarGroup")).toHaveClass("test-class");
   });
+
+  it("forwards native props to the div root", () => {
+    render(
+      <Component label="test" data-testid="toolbar-group">
+        ToolbarGroup
+      </Component>,
+    );
+    const group = screen.getByRole("group", { name: "test" });
+    expect(group).toHaveClass("ds toolbar-group");
+    expect(group).toHaveAttribute("data-testid", "toolbar-group");
+  });
 });

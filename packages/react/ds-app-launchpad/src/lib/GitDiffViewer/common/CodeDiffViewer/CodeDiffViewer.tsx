@@ -29,12 +29,11 @@ const componentCssClassName = "ds code-diff-viewer";
  */
 const CodeDiffViewer = (
   {
-    id,
     AddComment,
     onLineClick,
     className,
-    style,
     disableWidthCalculation = false,
+    ...props
   }: CodeDiffViewerProps,
   ref: React.Ref<HTMLTableElement>,
 ): React.ReactElement | null => {
@@ -79,9 +78,8 @@ const CodeDiffViewer = (
 
   return (
     <div
-      id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
     >
       <div className="diff-hunk">
         <table className="diff-table" ref={tableRef} tabIndex={-1}>

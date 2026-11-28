@@ -1,16 +1,8 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
 import type { Temporal } from "@js-temporal/polyfill";
-import type React from "react";
+import type { ComponentProps } from "react";
 
-export interface RelativeTimeProps {
-  /** A unique identifier for the RelativeTime */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-
-  /** Inline styles */
-  style?: React.CSSProperties;
-
+type OwnProps = {
   /**
    * The time to be displayed as a relative time (ISO string or Date object).
    */
@@ -41,4 +33,7 @@ export interface RelativeTimeProps {
    * The keyword to use when the given time is not a valid. (default: "invalid date")
    */
   invalidDateKeyword?: string;
-}
+};
+
+export type RelativeTimeProps = OwnProps &
+  Omit<ComponentProps<"time">, keyof OwnProps>;

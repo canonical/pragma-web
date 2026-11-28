@@ -1,22 +1,10 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
 import type React from "react";
+import type { ComponentProps } from "react";
 
 export type EditMode = "write" | "preview";
 
-export type MarkdownEditorProps = {
-  ref?: React.Ref<HTMLTextAreaElement>;
-  /** A unique identifier for the MarkdownEditor */
-  id?: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Child elements */
-  children?: React.ReactNode;
-  /** Inline styles */
-  style?: React.CSSProperties;
-  /** Placeholder for the textarea */
-  placeholder?: string;
-  /** Default value for the textarea (Markdown content) */
-  defaultValue?: string;
+type OwnProps = {
   /** Hide the toolbar */
   hideToolbar?: boolean;
   /** Hide the preview pane */
@@ -46,4 +34,12 @@ export type MarkdownEditorProps = {
   ToolbarLinkButtonLabelMessage?: string;
   ToolbarUnorderedListButtonLabelMessage?: string;
   ToolbarOrderedListButtonLabelMessage?: string;
-} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+};
+
+// The component's DOM root is a `<div>` wrapper, but its public surface is the
+// inner `<textarea>`: the `ref` and the remaining native textarea attributes
+// (`onChange`, `value`, `maxLength`, …) are forwarded to it. It therefore
+// extends the textarea's native props rather than the wrapper's. The wrapper
+// takes `id`, `className` and `style`.
+export type MarkdownEditorProps = OwnProps &
+  Omit<ComponentProps<"textarea">, keyof OwnProps>;

@@ -14,10 +14,10 @@ const tabs: EditMode[] = ["write", "preview"];
  */
 const ViewModeTabs = ({
   className,
-  style,
   editMode,
   onEditModeChange,
   ariaLabelMessage = "View Mode Tabs",
+  ...props
 }: ViewModeTabsProps): React.ReactElement => {
   const id = useId();
   const tabRefs = useRef<HTMLButtonElement[]>([]);
@@ -39,8 +39,8 @@ const ViewModeTabs = ({
   return (
     <div
       id={id}
-      style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      {...props}
       role="tablist"
       aria-label={ariaLabelMessage}
     >

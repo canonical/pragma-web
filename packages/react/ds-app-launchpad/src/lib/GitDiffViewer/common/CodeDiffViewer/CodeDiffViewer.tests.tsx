@@ -73,4 +73,15 @@ describe("CodeDiffViewer component", () => {
       diffLineNumber: 6,
     });
   });
+
+  it("forwards native props to the wrapper root", () => {
+    const { container } = render(
+      <Provider diff={fixtures.diffExample}>
+        <Component data-testid="code-diff" aria-label="Code diff" />
+      </Provider>,
+    );
+    const root = container.querySelector(".code-diff-viewer");
+    expect(root).toHaveAttribute("data-testid", "code-diff");
+    expect(root).toHaveAttribute("aria-label", "Code diff");
+  });
 });

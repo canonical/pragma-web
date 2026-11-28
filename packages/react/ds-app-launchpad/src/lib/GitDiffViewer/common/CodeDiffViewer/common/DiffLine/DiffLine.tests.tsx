@@ -56,6 +56,25 @@ describe("DiffLine component", () => {
     );
   });
 
+  it("forwards native props to the tr root", () => {
+    const { container } = render(
+      <GitDiffViewer diff={fixtures.diffExample}>
+        <table>
+          <tbody>
+            <Component {...ADD_LINE} data-testid="add-line-row" />
+          </tbody>
+        </table>
+      </GitDiffViewer>,
+    );
+    const row = container.querySelector("tr[data-testid='add-line-row']");
+    expect(row).toBeDefined();
+    expect(row?.tagName).toBe("TR");
+    expect(row).toHaveClass("ds diff-line");
+    // Data props must not leak to the DOM.
+    expect(row).not.toHaveAttribute("content");
+    expect(row).not.toHaveAttribute("addLineNumber");
+  });
+
   it("renders hunk header correctly", () => {
     render(
       <GitDiffViewer diff={fixtures.diffExample} wrapLines>

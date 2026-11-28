@@ -13,13 +13,12 @@ import "./styles.css";
  */
 
 const EditableBlock = <T extends EditElementProps>({
-  id,
   EditComponent,
   className: userClassName,
-  style,
   title,
   tag: TitleTag = "h3",
   isReadOnly = false,
+  ...props
 }: EditableBlockProps<T>): React.ReactElement => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const isFocusedRef = useRef<boolean>(false);
@@ -57,8 +56,7 @@ const EditableBlock = <T extends EditElementProps>({
         className={[componentCssClassName, userClassName]
           .filter(Boolean)
           .join(" ")}
-        style={style}
-        id={id}
+        {...props}
       >
         <header>
           <TitleTag className="title">{title}</TitleTag>

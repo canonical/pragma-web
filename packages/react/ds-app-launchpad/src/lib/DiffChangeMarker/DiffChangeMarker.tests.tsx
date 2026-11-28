@@ -99,4 +99,21 @@ describe("DiffChangeMarker component", () => {
     );
     expect(container.firstChild).toHaveAttribute("id", "test-id");
   });
+
+  it("forwards native props to the div root", () => {
+    const { container } = render(
+      <Component
+        additions={1}
+        deletions={0}
+        markerStyle="simple"
+        data-testid="marker"
+        aria-label="Additions"
+      />,
+    );
+    const element = container.firstChild;
+    expect(element).not.toHaveAttribute("type");
+    expect(element).not.toHaveAttribute("markerstyle");
+    expect(element).toHaveAttribute("data-testid", "marker");
+    expect(element).toHaveAttribute("aria-label", "Additions");
+  });
 });
