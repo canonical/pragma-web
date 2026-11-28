@@ -12,13 +12,14 @@ const SVELTE_PROP_NAMES: Record<string, string> = {
 
 /** Maps a golden case to the props of the Svelte Field. */
 function createSvelteProps(key: string) {
-  const { props, error } = goldenCases[key];
+  const { props, error, value } = goldenCases[key];
   return Object.fromEntries([
-    ...Object.entries(props).map(([name, value]) => [
+    ...Object.entries(props).map(([name, propValue]) => [
       SVELTE_PROP_NAMES[name] ?? name,
-      value,
+      propValue,
     ]),
     ...(error ? [["error", error]] : []),
+    ...(value === undefined ? [] : [["value", value]]),
   ]);
 }
 

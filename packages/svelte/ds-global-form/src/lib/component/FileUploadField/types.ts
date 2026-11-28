@@ -3,7 +3,10 @@ import type { FileUploadInputProps } from "../../subcomponent/FileUploadInput/ty
 
 /** Props for the FileUploadField: field chrome plus the FileUploadInput props. */
 export type FileUploadFieldProps = FieldChromeProps &
-  Omit<FileUploadInputProps, "id" | "class" | "style" | "name" | "files"> & {
+  Omit<
+    FileUploadInputProps,
+    "id" | "class" | "style" | "name" | "files" | "error"
+  > & {
     /** Where the description sits: above the control or below it. */
     descriptionPosition?: "leading" | "trailing";
     /** The selected files. Bindable. */

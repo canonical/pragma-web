@@ -121,26 +121,12 @@ export const svelteOnlyStories: Readonly<Record<string, readonly string[]>> = {
 
 /**
  * Stories a React file has that its Svelte counterpart does not mirror yet, by
- * React path. The file upload's live upload and per-file messages land in
- * React first; the Svelte port adds these stories and empties this list.
+ * React path. The image preview shows the whole image in a design-system
+ * tooltip, which the Svelte global package does not have yet.
  */
 export const pendingSvelteStories: Readonly<Record<string, readonly string[]>> =
   {
     "lib/subcomponent/FileUploadInput/FileUploadInput.stories.tsx": [
-      "With Files",
-      "Drag Over",
-      "Live",
-      "Uploading",
-      "Upload Failed",
-      "File Messages",
-      "Single File Chosen",
-      "Without Drop Area",
-      "Without File List",
       "Image Preview",
-    ],
-    "lib/component/FileUploadField/FileUploadField.stories.tsx": [
-      "Live",
-      "Upload Failed",
-      "File Messages",
     ],
   };

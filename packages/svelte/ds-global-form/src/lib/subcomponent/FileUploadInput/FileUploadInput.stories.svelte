@@ -1,8 +1,22 @@
 <script lang="ts" module>
   import { defineMeta } from "@storybook/addon-svelte-csf";
+  import { fireEvent } from "storybook/test";
+  import {
+    failOnceUpload,
+    longNamedIso,
+    reportPdf,
+    sampleFile,
+    sampleImage,
+    simulatedUpload,
+    stalledUpload,
+    warnOnLargeFiles,
+  } from "../../../storybook/fixtures.files.js";
   import Component from "./FileUploadInput.svelte";
 
-  // Presentational stories: the file upload holds its own selected files, no form.
+  // Presentational stories: the file upload holds its own chosen files, no
+  // form. Every story renders a fixed state on load, with no timers, so
+  // snapshots are stable; the Live story simulates uploads only once files are
+  // added.
   const { Story } = defineMeta({
     title: "subcomponents/FileUploadInput",
     component: Component,
@@ -29,4 +43,101 @@
   args={{ files: [], accept: ".pdf,.doc,.docx", multiple: false }}
 />
 
-<Story name="Disabled" args={{ files: [], disabled: true }} />
+<!-- A disabled input: the drop area and its button are disabled, and the file
+list is not drawn, even with a file chosen. -->
+<Story
+  name="Disabled"
+  args={{ files: [reportPdf()], disabled: true, multiple: true }}
+/>
+
+<!-- Chosen files without live upload: each tile shows the name, the size and,
+for an image, a thumbnail. A long name truncates with an ellipsis; its full
+text is the tile's tooltip. -->
+<Story
+  name="With Files"
+  args={{
+    files: [reportPdf(), sampleImage(), longNamedIso()],
+    multiple: true,
+  }}
+/>
+
+<!-- The drop area while a file is dragged over it. -->
+<Story
+  name="Drag Over"
+  args={{ files: [], multiple: true }}
+  play={({ canvasElement }) => {
+    const area = canvasElement.querySelector(".drop-area");
+    if (area) fireEvent.dragOver(area);
+  }}
+/>
+
+<!-- Live upload with a simulated server: add files to watch each upload's
+progress and the success icon that follows. A file whose name contains "fail"
+fails half-way: its status shows the progress reached and the error icon for a
+moment, and its retry button stays. Closing a running upload cancels it and
+removes the file. -->
+<Story
+  name="Live"
+  args={{ files: [], multiple: true, upload: simulatedUpload }}
+/>
+
+<!-- A live upload in progress, held at 45%. -->
+<Story
+  name="Uploading"
+  args={{ files: [reportPdf()], multiple: true, upload: stalledUpload(0.45) }}
+/>
+
+<!-- A failed live upload: the status shows the progress and the error icon for
+two seconds, then clears; the message under the tile and the retry button stay.
+Retrying succeeds. -->
+<Story
+  name="Upload Failed"
+  args={{ files: [reportPdf()], multiple: true, upload: failOnceUpload() }}
+/>
+
+<!-- Per-file messages: `accept` and `maxSize` violations are errors, and
+`validateFile` adds a warning for large files. Each message sits under its
+file's tile. -->
+<Story
+  name="File Messages"
+  args={{
+    files: [
+      sampleFile("notes.txt", 2048, "text/plain"),
+      sampleFile("scan.pdf", 12 * 1024 * 1024, "application/pdf"),
+      sampleFile("brochure.pdf", 3 * 1024 * 1024, "application/pdf"),
+    ],
+    multiple: true,
+    accept: ".pdf",
+    maxSize: 10 * 1024 * 1024,
+    validateFile: warnOnLargeFiles,
+  }}
+/>
+
+<!-- Single-file mode with a file chosen: the drop area hides, and returns when
+the file is removed. -->
+<Story
+  name="Single File Chosen"
+  args={{ files: [reportPdf()], multiple: false }}
+/>
+
+<!-- The drop area turned off: only the file list shows, and the field error,
+which sits under the drop area, hides with it. Files reach the input through
+`files`. -->
+<Story
+  name="Without Drop Area"
+  args={{
+    files: [reportPdf(), sampleImage()],
+    multiple: true,
+    showDropArea: false,
+  }}
+/>
+
+<!-- The file list turned off: the files are chosen but no tiles are drawn. -->
+<Story
+  name="Without File List"
+  args={{
+    files: [reportPdf(), sampleImage()],
+    multiple: true,
+    showFileList: false,
+  }}
+/>

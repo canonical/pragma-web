@@ -24,12 +24,15 @@ const { Field } = await import(
 function GoldenForm({
   props,
   error,
+  value,
 }: {
   props: Record<string, unknown>;
   error?: string;
+  value?: unknown;
 }) {
   const name = props.name as string;
   const methods = useForm({
+    defaultValues: value === undefined ? undefined : { [name]: value },
     errors: error ? { [name]: { type: "manual", message: error } } : undefined,
   });
   return createElement(
@@ -41,9 +44,9 @@ function GoldenForm({
 }
 
 const golden: Record<string, string> = {};
-for (const [key, { props, error }] of Object.entries(goldenCases)) {
+for (const [key, { props, error, value }] of Object.entries(goldenCases)) {
   golden[key] = renderToStaticMarkup(
-    createElement(GoldenForm, { props, error }),
+    createElement(GoldenForm, { props, error, value }),
   );
 }
 

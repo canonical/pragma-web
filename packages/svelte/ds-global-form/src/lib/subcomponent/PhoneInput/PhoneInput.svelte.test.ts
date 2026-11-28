@@ -192,7 +192,9 @@ describe("PhoneInput", () => {
     );
   });
 
-  it("shows the focus ring on the chrome while the number has focus", async () => {
+  it("shows the focus ring on the chrome while the number has focus", {
+    timeout: 20000,
+  }, async () => {
     const page = await render(PhoneInput, { countries });
     document.documentElement.style.setProperty(
       "--color-focus-ring",
@@ -207,16 +209,25 @@ describe("PhoneInput", () => {
     expect(getComputedStyle(chrome).boxShadow).not.toContain(
       "rgb(10, 70, 180)",
     );
-    // A real click, not element.focus(): WebKit matches :focus-within only
-    // while the test frame itself has focus, which a script call never gives.
-    // The style is polled: Firefox can report the focused style a frame after
-    // the click resolves.
-    await userEvent.click(numberInput(page.container));
+    // A real click, not element.focus(): :focus-within matches only while the
+    // test document itself has focus, which a script call never gives.
+    // Firefox shares one window focus between the pages of test files running
+    // in parallel, so another file's click can take it away: the number stays
+    // the active element, but :focus-within stops matching. Each poll clicks
+    // again whenever the document has lost focus, and reads the style only
+    // while it has it, right after the click that gave it.
+    const number = numberInput(page.container);
     await expect
-      .poll(() => document.activeElement)
-      .toBe(numberInput(page.container));
-    await expect
-      .poll(() => getComputedStyle(chrome).boxShadow)
+      .poll(
+        async () => {
+          if (!document.hasFocus() || document.activeElement !== number) {
+            await userEvent.click(number);
+          }
+          return document.hasFocus() ? getComputedStyle(chrome).boxShadow : "";
+        },
+        { timeout: 10000, interval: 10 },
+      )
       .toContain("rgb(10, 70, 180)");
+    expect(document.activeElement).toBe(number);
   });
 });
