@@ -28,7 +28,8 @@ const componentCssClassName = "ds form-combobox";
  * unnamed.
  *
  * The `id` and the ARIA props go to the text input; `aria-label` or
- * `aria-labelledby` names the list too.
+ * `aria-labelledby` names the list too. Removing the focused chip moves focus
+ * to the chip that takes its place, or to the input when no chip is left.
  *
  * @param {ComboboxInputProps} props - The component props
  * @returns {React.ReactElement} - Rendered MultipleCombobox component
@@ -45,6 +46,7 @@ const MultipleCombobox = ({
   onChange,
   disabled = false,
   placeholder,
+  openOnReset = false,
   valueKey = VALUE_KEY,
   convertItemToString = defaultConvertItemToString,
   convertValueToItem = defaultConvertValueToItem,
@@ -156,6 +158,7 @@ const MultipleCombobox = ({
     getDropdownProps,
     addSelectedItem,
     removeSelectedItem,
+    setActiveIndex,
   } = useMultipleSelection({
     selectedItems,
     onSelectedItemsChange: ({ selectedItems: newSelectedItems }) => {
@@ -191,6 +194,7 @@ const MultipleCombobox = ({
   // Downshift's useCombobox hook for combobox functionality
   const {
     isOpen,
+    openMenu,
     getMenuProps,
     getInputProps,
     getItemProps,
@@ -219,14 +223,41 @@ const MultipleCombobox = ({
     itemToString: convertItemToString,
   });
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // Reset function to clear selections and input. Emits [] (not undefined) so a
   // react-hook-form Controller with a defaultValue stores the cleared state
-  // rather than falling back to its default and repopulating the chips.
+  // rather than falling back to its default and repopulating the chips. Focus
+  // returns to the input, as in the single combobox.
   const resetSelection = useCallback(() => {
     setSelectedItems([]);
     setInputValue("");
     onChange?.([]);
-  }, [onChange, setInputValue]);
+    inputRef.current?.focus();
+    if (openOnReset) {
+      openMenu();
+    }
+  }, [onChange, setInputValue, openOnReset, openMenu]);
+
+  // A chip removed while it holds focus becomes the active chip first, so
+  // focus moves to the chip that takes its place, or to the input when none
+  // is left, instead of falling back to the page.
+  const removeChip = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    selectedItem: Option,
+    index: number,
+  ) => {
+    if (event.currentTarget === document.activeElement) {
+      // The last chip leaves the active index at -1 either way, so downshift
+      // would not move focus: move it to the input here.
+      if (selectedItems.length === 1) {
+        inputRef.current?.focus();
+      } else {
+        setActiveIndex(index);
+      }
+    }
+    removeSelectedItem(selectedItem);
+  };
 
   // Uncontrolled, the chips are the values to post.
   const postedValues = (
@@ -242,12 +273,15 @@ const MultipleCombobox = ({
       <div className="selected-items">
         {selectedItems.map((selectedItem, index) => (
           <button
-            key={String(selectedItem[valueKey])}
+            // Keyed by position, so the chip that takes a removed chip's place
+            // is the same element and keeps its focus.
+            // biome-ignore lint/suspicious/noArrayIndexKey: focus follows the position
+            key={index}
             type="button"
             {...getSelectedItemProps({ selectedItem, index })}
             aria-label={messages.remove(convertItemToString(selectedItem))}
             disabled={disabled}
-            onClick={() => removeSelectedItem(selectedItem)}
+            onClick={(event) => removeChip(event, selectedItem, index)}
             className="chip"
           >
             {convertItemToString(selectedItem)}
@@ -263,7 +297,7 @@ const MultipleCombobox = ({
         <input
           className="p"
           {...getInputProps({
-            ...getDropdownProps({ preventKeyAction: isOpen }),
+            ...getDropdownProps({ preventKeyAction: isOpen, ref: inputRef }),
             "aria-label": ariaLabel,
             "aria-describedby": ariaDescribedBy,
             "aria-errormessage": ariaErrorMessage,
