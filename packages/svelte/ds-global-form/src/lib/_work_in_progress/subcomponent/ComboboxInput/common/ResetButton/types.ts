@@ -14,6 +14,8 @@ export interface ResetButtonProps {
   style?: string;
   /** Custom messages. */
   messages?: ResetButtonMessages;
+  /** Whether the button is disabled, as its combobox is. */
+  disabled?: boolean;
   /** Clears the selection. */
   onclick: MouseEventHandler<HTMLButtonElement>;
 }

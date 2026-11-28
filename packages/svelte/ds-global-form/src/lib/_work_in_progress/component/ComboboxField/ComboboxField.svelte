@@ -9,12 +9,13 @@
   const { chrome, control } = $derived(splitChromeProps(props));
 </script>
 
-<Wrapper {...chrome} onhide={() => (value = undefined)}>{#snippet children(controlProps)}<ComboboxInput {...control} id={controlProps.id} name={chrome.name} bind:value />{/snippet}</Wrapper>
+<Wrapper {...chrome} onhide={() => (value = undefined)}>{#snippet children(controlProps)}<ComboboxInput {...control} id={controlProps.id} aria-labelledby={controlProps["aria-labelledby"]} aria-describedby={controlProps["aria-describedby"]} aria-errormessage={controlProps["aria-errormessage"]} aria-invalid={controlProps["aria-invalid"]} aria-required={controlProps["aria-required"]} name={chrome.name} bind:value />{/snippet}</Wrapper>
 
 <!-- @component
 ComboboxInput wrapped with field chrome. Bind `value` for two-way binding. The
 field `name` names the combobox's hidden input, so the value posts without
-JavaScript.
+JavaScript. The field's label, description and error are wired to the text
+input; `required` is not, since the visible text is not the value.
 
 `import { ComboboxField } from "@canonical/svelte-ds-global-form";`
 

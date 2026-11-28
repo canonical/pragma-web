@@ -17,7 +17,9 @@ describe("ComboboxInput hydration", () => {
       ...[...container.querySelectorAll("li")].map((item) => item.id),
     ];
     expect(input.value).toBe("Banana");
-    expect(ids[0]).toMatch(/^downshift-.+-input$/);
+    // The input carries the field's ID, so the label's `for` reaches it.
+    expect(ids[0]).toBe(container.querySelector("label")?.htmlFor);
+    expect(ids[1]).toMatch(/^downshift-.+-menu$/);
 
     const app = hydrate(HydrationCombobox, { target: container });
     flushSync();

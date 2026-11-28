@@ -10,6 +10,6 @@
   });
 </script>
 
-<Story name="Default" args={{ options: fixtures.fruits }} />
+<Story name="Default" args={{ "aria-label": "Fruit", options: fixtures.fruits }} />
 
-<Story name="Multiple" args={{ isMultiple: true, options: fixtures.fruits, value: [] }} />
+<Story name="Multiple" args={{ "aria-label": "Fruits", isMultiple: true, options: fixtures.fruits, value: [] }} />
