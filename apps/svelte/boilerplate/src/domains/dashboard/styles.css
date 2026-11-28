@@ -1,0 +1,98 @@
+/* The dashboard pages. Each page renders a ViewLayout carrying the
+ * `dashboard-view` class, and every rule here is scoped to it. The content
+ * column is a ContentLayout grid; each section spans its full width and lays
+ * out its own children, because the grid's breakpoints follow the viewport,
+ * not the narrower column beside the side navigation. */
+
+@layer app {
+  .dashboard-view {
+    & .titlebar {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--container-gap-default);
+    }
+
+    & .titlebar h1 {
+      display: flex;
+      align-items: center;
+      gap: var(--space-100);
+      margin: 0;
+    }
+
+    & .section {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: var(--container-gap-default);
+      align-content: start;
+    }
+
+    & .section.narrow {
+      max-inline-size: 48rem;
+    }
+
+    & .tiles,
+    & .cards {
+      display: grid;
+      gap: var(--container-gap-default);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    & .tiles {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+
+    & .cards {
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+
+    & .figure {
+      margin: 0;
+      font-size: var(--typography-heading-2-font-size);
+      line-height: var(--typography-heading-2-line-height);
+    }
+
+    & .muted {
+      color: var(--color-text-muted);
+    }
+
+    & .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-100);
+    }
+
+    & .panel {
+      inline-size: 20rem;
+    }
+
+    & .details {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: var(--space-100) var(--container-gap-default);
+      margin: 0;
+    }
+
+    & .details dd {
+      margin: 0;
+    }
+  }
+
+  /* Below this width the aside moves under the content. */
+  @media (width < 62rem) {
+    .dashboard-view {
+      grid-template-columns: 1fr;
+      /* Stacked, the view grows with its content and the page scrolls. */
+      block-size: auto;
+
+      & .panel {
+        inline-size: auto;
+      }
+    }
+  }
+}
