@@ -17,6 +17,7 @@ const List = ({
   fieldValue,
   valueKey,
   isOpen,
+  "aria-label": ariaLabel,
 }: ListProps): React.ReactElement => {
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -34,7 +35,16 @@ const List = ({
     }
   }, [isOpen]);
 
-  const { ref: menuRef, ...menuProps } = getMenuProps();
+  // In multiple mode the options are a multi-selectable listbox: each one's
+  // `aria-selected` says whether it is chosen, as the WAI-ARIA listbox pattern
+  // asks, and `aria-activedescendant` alone points at the highlight. A single
+  // combobox keeps downshift's `aria-selected`, which follows the highlight.
+  const isMultiple = Array.isArray(fieldValue);
+
+  const { ref: menuRef, ...menuProps } = getMenuProps({
+    "aria-label": ariaLabel,
+    "aria-multiselectable": isMultiple || undefined,
+  });
 
   return (
     <ul
@@ -58,7 +68,11 @@ const List = ({
         }
         return (
           <li
-            {...getItemProps({ item, index })}
+            {...getItemProps({
+              item,
+              index,
+              ...(isMultiple && { "aria-selected": isSelected }),
+            })}
             className={[
               "p",
               highlightedIndex === index && "highlighted",

@@ -6,6 +6,7 @@
   import { VALUE_KEY } from "./constants.js";
   import createCombobox from "./createCombobox.svelte.js";
   import createMultipleSelection from "./createMultipleSelection.svelte.js";
+  import messages from "./messages.js";
   import type { ComboboxInputProps } from "./types.js";
   import {
     convertItemToString as defaultConvertItemToString,
@@ -34,6 +35,12 @@
     convertValueToItem = defaultConvertValueToItem,
     filterItems = defaultFilterItems,
     onblur,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    "aria-errormessage": ariaErrorMessage,
+    "aria-invalid": ariaInvalid,
+    "aria-required": ariaRequired,
   }: Omit<ComboboxInputProps, "isMultiple" | "value"> & {
     value?: string[];
   } = $props();
@@ -90,6 +97,9 @@
 
   const combobox = createCombobox({
     id: `downshift-${uid}`,
+    getInputId: () => id,
+    getLabelId: () => ariaLabelledBy ?? undefined,
+    getAriaLabel: () => ariaLabel ?? undefined,
     getItems: () => items,
     convertItemToString: (item) => convertItemToString(item),
     // The selection lives in the chips. Pinning the combobox's own to `null`
@@ -184,6 +194,20 @@
     if (openOnReset) combobox.openMenu();
   };
 
+  /**
+   * Removes a chip. One removed while it holds focus becomes the active chip
+   * first, so focus moves to the chip that takes its place, or to the input
+   * when none is left, instead of falling back to the page.
+   */
+  const removeChip = (event: MouseEvent, item: Option, index: number) => {
+    if (event.currentTarget === document.activeElement) {
+      if (selectedItems.length === 1)
+        (inputElement as HTMLInputElement).focus();
+      else selection.activeIndex = index;
+    }
+    selection.removeSelectedItem(item);
+  };
+
   // The dropdown's handlers run before the combobox's, as downshift composes
   // `getDropdownProps` into `getInputProps`.
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -202,7 +226,7 @@
   };
 </script>
 
-<div {id} {style} class={[componentCssClassName, className]}><div class="selected-items">{#each selectedItems as item, index}<button type="button" {...selection.getSelectedItem(index)} onclick={() => selection.removeSelectedItem(item)} class="chip">{convertItemToString(item)}<span class="remove-icon">×</span></button>{/each}</div><div class="ds input combobox-input chrome"><input bind:this={inputElement} class="p" {...combobox.input} {...selection.dropdown} onkeydown={handleKeyDown} onclick={handleClick} {disabled} {placeholder} onblur={handleBlur} /><ResetButton onclick={resetSelection} /></div><List
+<div {style} class={[componentCssClassName, className]}><div class="selected-items">{#each selectedItems as item, index}<button type="button" {...selection.getSelectedItem(index)} aria-label={messages.remove(convertItemToString(item))} {disabled} onclick={(event) => removeChip(event, item, index)} class="chip">{convertItemToString(item)}<span class="remove-icon" aria-hidden="true">×</span></button>{/each}</div><div class="ds input combobox-input chrome"><input bind:this={inputElement} class="p" {...combobox.input} {...selection.dropdown} aria-describedby={ariaDescribedBy} aria-errormessage={ariaErrorMessage} aria-invalid={ariaInvalid} aria-required={ariaRequired} onkeydown={handleKeyDown} onclick={handleClick} {disabled} {placeholder} onblur={handleBlur} /><ResetButton {disabled} onclick={resetSelection} /></div><List
     menu={combobox.menu}
     getItem={(index) => combobox.getItem(index)}
     {items}
@@ -219,7 +243,10 @@ options are chips before a filterable text input over a listbox, with
 downshift's IDs and ARIA. Bind `value` for the selected values and
 `inputValue` for the typed text. ArrowLeft moves from an empty input to the
 chips, ArrowLeft and ArrowRight move between them, and Backspace or Delete
-removes one; clicking a chip removes it.
+removes one; clicking a chip removes it. Removing the focused chip moves focus
+to the chip that takes its place, or to the input when no chip is left. The
+`id` and the ARIA props go to the text input; `aria-label` or
+`aria-labelledby` names the list too.
 
 With a `name`, one hidden input per selected value carries the selection, so a
 native form post sends it without JavaScript. The visible text input stays

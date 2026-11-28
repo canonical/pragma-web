@@ -12,6 +12,18 @@ export type StateAccessor<T> = {
 export type ComboboxOptions = {
   /** Base of every element ID, as downshift's `downshift-<id>`. */
   id: string;
+  /** The ID of the text input, in place of the one built from `id`. */
+  getInputId?: () => string | undefined;
+  /**
+   * The ID of the element that labels the input and the list, in place of
+   * the one built from `id`.
+   */
+  getLabelId?: () => string | undefined;
+  /**
+   * The accessible name of the input and the list, when no element labels
+   * them. As downshift's, it drops their `aria-labelledby`.
+   */
+  getAriaLabel?: () => string | undefined;
   /** The items currently listed. Read on every use, so it can be derived. */
   getItems: () => readonly Option[];
   /** The text shown for an item, in the list and in the input once picked. */
@@ -118,7 +130,7 @@ export class Combobox {
   }
 
   get labelId(): string {
-    return `${this.#options.id}-label`;
+    return this.#options.getLabelId?.() ?? `${this.#options.id}-label`;
   }
 
   get menuId(): string {
@@ -126,7 +138,7 @@ export class Combobox {
   }
 
   get inputId(): string {
-    return `${this.#options.id}-input`;
+    return this.#options.getInputId?.() ?? `${this.#options.id}-input`;
   }
 
   get toggleButtonId(): string {
@@ -142,6 +154,14 @@ export class Combobox {
     return this.#options.getItems();
   }
 
+  /** The name of the input and the list: a label, else the element's ID. */
+  get #naming() {
+    const ariaLabel = this.#options.getAriaLabel?.();
+    return ariaLabel
+      ? { "aria-label": ariaLabel }
+      : { "aria-labelledby": this.labelId };
+  }
+
   /** Attributes for the text input. */
   get input() {
     return {
@@ -152,7 +172,7 @@ export class Combobox {
       "aria-autocomplete": "list" as const,
       "aria-controls": this.menuId,
       "aria-expanded": this.isOpen,
-      "aria-labelledby": this.labelId,
+      ...this.#naming,
       autocomplete: "off" as const,
       id: this.inputId,
       role: "combobox" as const,
@@ -170,7 +190,7 @@ export class Combobox {
     return {
       id: this.menuId,
       role: "listbox" as const,
-      "aria-labelledby": this.labelId,
+      ...this.#naming,
       onmouseleave: this.#handleMenuMouseLeave,
       [this.#menuKey]: this.#attachMenu,
     };
@@ -261,12 +281,14 @@ export class Combobox {
     return -1;
   }
 
-  #move(offset: number): void {
+  /** Moves the highlight; with `isCircular`, past either end to the other. */
+  #move(offset: number, isCircular: boolean): void {
     this.#apply({
       highlightedIndex: getHighlightedIndex(
         this.highlightedIndex,
         offset,
         this.#items.length,
+        isCircular,
       ),
     });
   }
@@ -313,7 +335,7 @@ export class Combobox {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        if (this.isOpen) this.#move(1);
+        if (this.isOpen) this.#move(1, true);
         else
           this.#apply({
             isOpen: true,
@@ -331,7 +353,7 @@ export class Combobox {
             highlightedIndex: this.#indexOnOpen(-1),
           });
         else if (event.altKey) this.#selectAt(this.highlightedIndex);
-        else this.#move(-1);
+        else this.#move(-1, true);
         return;
       case "Home":
       case "End":
@@ -348,7 +370,9 @@ export class Combobox {
       case "PageDown":
         if (!this.isOpen) return;
         event.preventDefault();
-        this.#move(event.key === "PageUp" ? -PAGE_SIZE : PAGE_SIZE);
+        // The WAI-ARIA listbox pattern stops a page move at the first or the
+        // last item, where downshift wraps it to the other end.
+        this.#move(event.key === "PageUp" ? -PAGE_SIZE : PAGE_SIZE, false);
         return;
       case "Enter":
         // While an input method composes text, Enter confirms the text.

@@ -190,6 +190,27 @@ describe("List and ResetButton", () => {
     expect(items[0].className).toBe("p selected");
     expect(items[1].className).toBe("p highlighted");
     expect(items[1].id).toBe("l-1");
+    // A multiple list says which options are chosen, not which is highlighted.
+    expect(list.getAttribute("aria-multiselectable")).toBe("true");
+    expect(items[0].getAttribute("aria-selected")).toBe("true");
+    expect(items[1].getAttribute("aria-selected")).toBe("false");
+  });
+
+  it("keeps the builder's aria-selected, the highlight, for a single list", async () => {
+    const page = await render(List, {
+      items: options,
+      menu,
+      getItem,
+      highlightedIndex: 1,
+      convertItemToString: (item) => item?.label ?? "",
+      fieldValue: "apple",
+      valueKey: "value",
+      isOpen: false,
+    });
+    const list = page.container.querySelector("ul") as HTMLElement;
+    expect(list.hasAttribute("aria-multiselectable")).toBe(false);
+    const items = list.querySelectorAll("li");
+    expect(items[0].getAttribute("aria-selected")).toBe("false");
     expect(items[1].getAttribute("aria-selected")).toBe("true");
   });
 

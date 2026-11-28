@@ -5,6 +5,7 @@ import type { Option } from "../../../../../subcomponent/types.js";
 export type MenuAttributes = {
   id: string;
   role: "listbox";
+  "aria-label"?: string;
   "aria-labelledby"?: string;
   onmouseleave?: (event: MouseEvent) => void;
   [key: string | symbol]: unknown;

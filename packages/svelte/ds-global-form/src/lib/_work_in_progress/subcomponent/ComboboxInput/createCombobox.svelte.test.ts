@@ -111,14 +111,14 @@ const behaviour: {
     expected: { isOpen: false, highlightedIndex: -1 },
   },
   {
-    name: "PageUp moves ten items up, wrapping",
-    keys: "{ArrowDown}{PageUp}",
-    expected: { highlightedIndex: 2 },
+    name: "PageUp moves ten items up, stopping at the first",
+    keys: "{ArrowUp}{PageUp}",
+    expected: { highlightedIndex: 0 },
   },
   {
-    name: "PageDown moves ten items down, wrapping",
-    keys: "{ArrowUp}{PageDown}",
-    expected: { highlightedIndex: 0 },
+    name: "PageDown moves ten items down, stopping at the last",
+    keys: "{ArrowDown}{PageDown}",
+    expected: { highlightedIndex: 2 },
   },
   {
     name: "PageUp and PageDown do nothing on a closed list",

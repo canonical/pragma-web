@@ -59,8 +59,27 @@ type CommonProps = {
   ) => ({ inputValue }: { inputValue: string }) => void;
 };
 
-/** Props for the presentational Combobox (controlled, no react-hook-form). */
+/**
+ * The accessibility wiring of the text input. The field tier supplies the
+ * label, description and error references; standalone, `aria-label` or
+ * `aria-labelledby` names the combobox. Its name also names the list.
+ */
+type InputAriaProps = Pick<
+  React.AriaAttributes,
+  | "aria-label"
+  | "aria-labelledby"
+  | "aria-describedby"
+  | "aria-errormessage"
+  | "aria-invalid"
+  | "aria-required"
+>;
+
+/**
+ * Props for the presentational Combobox (controlled, no react-hook-form). The
+ * `id` is the text input's, so a `<label for>` reaches it.
+ */
 export type ComboboxInputProps = BaseProps &
   OptionsProps &
   CommonProps &
-  ControlledProps;
+  ControlledProps &
+  InputAriaProps;

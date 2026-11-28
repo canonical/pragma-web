@@ -19,7 +19,7 @@ export const Default: Story = {
     const [value, setValue] = useState<string | string[] | undefined>();
     return <ComboboxInput {...args} value={value} onChange={setValue} />;
   },
-  args: { options: fixtures.fruits },
+  args: { "aria-label": "Fruit", options: fixtures.fruits },
 };
 
 export const Multiple: Story = {
@@ -27,5 +27,5 @@ export const Multiple: Story = {
     const [value, setValue] = useState<string | string[] | undefined>([]);
     return <ComboboxInput {...args} value={value} onChange={setValue} />;
   },
-  args: { isMultiple: true, options: fixtures.fruits },
+  args: { "aria-label": "Fruits", isMultiple: true, options: fixtures.fruits },
 };

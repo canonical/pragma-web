@@ -33,6 +33,12 @@
     convertValueToItem = defaultConvertValueToItem,
     filterItems = defaultFilterItems,
     onblur,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    "aria-errormessage": ariaErrorMessage,
+    "aria-invalid": ariaInvalid,
+    "aria-required": ariaRequired,
   }: Omit<ComboboxInputProps, "isMultiple" | "value"> & {
     value?: string;
   } = $props();
@@ -60,6 +66,9 @@
 
   const combobox = createCombobox({
     id: `downshift-${uid}`,
+    getInputId: () => id,
+    getLabelId: () => ariaLabelledBy ?? undefined,
+    getAriaLabel: () => ariaLabel ?? undefined,
     getItems: () => items,
     convertItemToString: (item) => convertItemToString(item),
     initialSelectedItem: isPromise(initialLookup) ? null : initialLookup,
@@ -124,7 +133,7 @@
   };
 </script>
 
-<div {id} {style} class={[componentCssClassName, className]}><div class="ds input combobox-input chrome"><input bind:this={inputElement} class="p" {...combobox.input} {disabled} {placeholder} onblur={handleBlur} /><ResetButton onclick={resetAndFocusInput} /></div><List
+<div {style} class={[componentCssClassName, className]}><div class="ds input combobox-input chrome"><input bind:this={inputElement} class="p" {...combobox.input} aria-describedby={ariaDescribedBy} aria-errormessage={ariaErrorMessage} aria-invalid={ariaInvalid} aria-required={ariaRequired} {disabled} {placeholder} onblur={handleBlur} /><ResetButton {disabled} onclick={resetAndFocusInput} /></div><List
     menu={combobox.menu}
     getItem={(index) => combobox.getItem(index)}
     {items}
@@ -138,7 +147,9 @@
 <!-- @component
 Single-selection combobox, after React's `SingleCombobox`: a filterable text
 input over a listbox, with downshift's IDs and ARIA. Bind `value` for the
-selected value and `inputValue` for the typed text.
+selected value and `inputValue` for the typed text. The `id` and the ARIA
+props go to the text input; `aria-label` or `aria-labelledby` names the list
+too.
 
 With a `name`, a hidden input carries the selected value, so a native form
 post sends it without JavaScript. The visible text input stays unnamed, so the

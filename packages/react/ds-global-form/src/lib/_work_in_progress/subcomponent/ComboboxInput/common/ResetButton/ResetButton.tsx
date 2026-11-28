@@ -18,6 +18,7 @@ const ResetButton = ({
   className,
   messages = defaultMessages,
   style,
+  disabled,
   onClick,
 }: ResetButtonProps): React.ReactElement => {
   return (
@@ -27,6 +28,7 @@ const ResetButton = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-label={messages.reset()}
       type="button"
+      disabled={disabled}
       onClick={onClick}
     >
       x

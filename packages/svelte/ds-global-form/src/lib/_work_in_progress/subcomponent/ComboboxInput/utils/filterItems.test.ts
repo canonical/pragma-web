@@ -24,21 +24,28 @@ describe("convertItemToString", () => {
 
 describe("getHighlightedIndex", () => {
   it("moves and wraps at both ends", () => {
-    expect(getHighlightedIndex(0, 1, 3)).toBe(1);
-    expect(getHighlightedIndex(2, 1, 3)).toBe(0);
-    expect(getHighlightedIndex(0, -1, 3)).toBe(2);
-    expect(getHighlightedIndex(1, 10, 3)).toBe(0);
+    expect(getHighlightedIndex(0, 1, 3, true)).toBe(1);
+    expect(getHighlightedIndex(2, 1, 3, true)).toBe(0);
+    expect(getHighlightedIndex(0, -1, 3, true)).toBe(2);
+    expect(getHighlightedIndex(1, 10, 3, true)).toBe(0);
+  });
+
+  it("stops at either end when it does not wrap", () => {
+    expect(getHighlightedIndex(1, 10, 3, false)).toBe(2);
+    expect(getHighlightedIndex(1, -10, 3, false)).toBe(0);
+    expect(getHighlightedIndex(-1, 10, 30, false)).toBe(9);
+    expect(getHighlightedIndex(-1, -10, 30, false)).toBe(20);
   });
 
   it("starts from the matching end when nothing, or a gone item, is highlighted", () => {
-    expect(getHighlightedIndex(-1, 1, 3)).toBe(0);
-    expect(getHighlightedIndex(-1, -1, 3)).toBe(2);
+    expect(getHighlightedIndex(-1, 1, 3, true)).toBe(0);
+    expect(getHighlightedIndex(-1, -1, 3, true)).toBe(2);
     // A list that shrank under the highlight.
-    expect(getHighlightedIndex(5, 1, 3)).toBe(0);
-    expect(getHighlightedIndex(5, -1, 3)).toBe(2);
+    expect(getHighlightedIndex(5, 1, 3, true)).toBe(0);
+    expect(getHighlightedIndex(5, -1, 3, true)).toBe(2);
   });
 
   it("highlights nothing in an empty list", () => {
-    expect(getHighlightedIndex(0, 1, 0)).toBe(-1);
+    expect(getHighlightedIndex(0, 1, 0, true)).toBe(-1);
   });
 });

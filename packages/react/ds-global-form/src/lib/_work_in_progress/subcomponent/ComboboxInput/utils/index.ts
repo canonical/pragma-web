@@ -3,3 +3,4 @@ export { default as convertValueToItem } from "./convertValueToItem.js";
 export { default as filterItems } from "./filterItems.js";
 export { default as isPromise } from "./isPromise.js";
 export { default as settleLookup } from "./settleLookup.js";
+export { default as stopPageMovesAtEnds } from "./stopPageMovesAtEnds.js";

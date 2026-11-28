@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Option } from "../../../subcomponent/types.js";
 import { List, ResetButton } from "./common/index.js";
 import { VALUE_KEY } from "./constants.js";
+import messages from "./messages.js";
 import type { ComboboxInputProps } from "./types.js";
 import {
   convertItemToString as defaultConvertItemToString,
@@ -11,6 +12,7 @@ import {
   filterItems as defaultFilterItems,
   isPromise,
   settleLookup,
+  stopPageMovesAtEnds,
 } from "./utils/index.js";
 import "./styles.css";
 
@@ -24,6 +26,10 @@ const componentCssClassName = "ds form-combobox";
  * With a `name`, one hidden input per selected value carries the selection, so
  * a native form post sends it without JavaScript. The visible text input stays
  * unnamed.
+ *
+ * The `id` and the ARIA props go to the text input; `aria-label` or
+ * `aria-labelledby` names the list too. Removing the focused chip moves focus
+ * to the chip that takes its place, or to the input when no chip is left.
  *
  * @param {ComboboxInputProps} props - The component props
  * @returns {React.ReactElement} - Rendered MultipleCombobox component
@@ -40,11 +46,18 @@ const MultipleCombobox = ({
   onChange,
   disabled = false,
   placeholder,
+  openOnReset = false,
   valueKey = VALUE_KEY,
   convertItemToString = defaultConvertItemToString,
   convertValueToItem = defaultConvertValueToItem,
   filterItems = defaultFilterItems,
   onInputValueChangeFactory,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  "aria-errormessage": ariaErrorMessage,
+  "aria-invalid": ariaInvalid,
+  "aria-required": ariaRequired,
 }: ComboboxInputProps): React.ReactElement => {
   const values = value as string[] | undefined;
 
@@ -145,6 +158,7 @@ const MultipleCombobox = ({
     getDropdownProps,
     addSelectedItem,
     removeSelectedItem,
+    setActiveIndex,
   } = useMultipleSelection({
     selectedItems,
     onSelectedItemsChange: ({ selectedItems: newSelectedItems }) => {
@@ -180,6 +194,7 @@ const MultipleCombobox = ({
   // Downshift's useCombobox hook for combobox functionality
   const {
     isOpen,
+    openMenu,
     getMenuProps,
     getInputProps,
     getItemProps,
@@ -187,6 +202,10 @@ const MultipleCombobox = ({
     setInputValue, // Function to set input value
   } = useCombobox({
     items,
+    inputId: id,
+    labelId: ariaLabelledBy,
+    stateReducer: (state, actionAndChanges) =>
+      stopPageMovesAtEnds(state, actionAndChanges, items.length),
     // The selection lives in useMultipleSelection, not here. Pinning this to
     // null stops useCombobox remembering the last pick: otherwise picking that
     // option again (after removing its chip) is not a change and is ignored.
@@ -204,14 +223,41 @@ const MultipleCombobox = ({
     itemToString: convertItemToString,
   });
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // Reset function to clear selections and input. Emits [] (not undefined) so a
   // react-hook-form Controller with a defaultValue stores the cleared state
-  // rather than falling back to its default and repopulating the chips.
+  // rather than falling back to its default and repopulating the chips. Focus
+  // returns to the input, as in the single combobox.
   const resetSelection = useCallback(() => {
     setSelectedItems([]);
     setInputValue("");
     onChange?.([]);
-  }, [onChange, setInputValue]);
+    inputRef.current?.focus();
+    if (openOnReset) {
+      openMenu();
+    }
+  }, [onChange, setInputValue, openOnReset, openMenu]);
+
+  // A chip removed while it holds focus becomes the active chip first, so
+  // focus moves to the chip that takes its place, or to the input when none
+  // is left, instead of falling back to the page.
+  const removeChip = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    selectedItem: Option,
+    index: number,
+  ) => {
+    if (event.currentTarget === document.activeElement) {
+      // The last chip leaves the active index at -1 either way, so downshift
+      // would not move focus: move it to the input here.
+      if (selectedItems.length === 1) {
+        inputRef.current?.focus();
+      } else {
+        setActiveIndex(index);
+      }
+    }
+    removeSelectedItem(selectedItem);
+  };
 
   // Uncontrolled, the chips are the values to post.
   const postedValues = (
@@ -220,7 +266,6 @@ const MultipleCombobox = ({
 
   return (
     <div
-      id={id}
       style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
@@ -228,14 +273,21 @@ const MultipleCombobox = ({
       <div className="selected-items">
         {selectedItems.map((selectedItem, index) => (
           <button
-            key={String(selectedItem[valueKey])}
+            // Keyed by position, so the chip that takes a removed chip's place
+            // is the same element and keeps its focus.
+            // biome-ignore lint/suspicious/noArrayIndexKey: focus follows the position
+            key={index}
             type="button"
             {...getSelectedItemProps({ selectedItem, index })}
-            onClick={() => removeSelectedItem(selectedItem)}
+            aria-label={messages.remove(convertItemToString(selectedItem))}
+            disabled={disabled}
+            onClick={(event) => removeChip(event, selectedItem, index)}
             className="chip"
           >
             {convertItemToString(selectedItem)}
-            <span className="remove-icon">×</span>
+            <span className="remove-icon" aria-hidden="true">
+              ×
+            </span>
           </button>
         ))}
       </div>
@@ -244,15 +296,23 @@ const MultipleCombobox = ({
       <div className="ds input combobox-input chrome">
         <input
           className="p"
-          {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+          {...getInputProps({
+            ...getDropdownProps({ preventKeyAction: isOpen, ref: inputRef }),
+            "aria-label": ariaLabel,
+            "aria-describedby": ariaDescribedBy,
+            "aria-errormessage": ariaErrorMessage,
+            "aria-invalid": ariaInvalid,
+            "aria-required": ariaRequired,
+          })}
           placeholder={placeholder}
           disabled={disabled}
         />
-        <ResetButton onClick={resetSelection} />
+        <ResetButton disabled={disabled} onClick={resetSelection} />
       </div>
 
       {/* Dropdown list of available options */}
       <List
+        aria-label={ariaLabel}
         isOpen={isOpen}
         getMenuProps={getMenuProps}
         getItemProps={getItemProps}

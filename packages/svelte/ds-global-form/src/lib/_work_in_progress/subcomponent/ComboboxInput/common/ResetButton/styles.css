@@ -7,6 +7,9 @@
     align-items: center;
     justify-content: center;
     padding-inline: var(--component-padding-inline);
+    /* The smallest pointer target WCAG 2.2 allows (2.5.8, AA). */
+    min-inline-size: 1.5rem;
+    min-block-size: 1.5rem;
     cursor: pointer;
     color: var(--color-text-muted);
     font-size: 1rem;
