@@ -15,6 +15,7 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import {
   buildPage,
   createManualSource,
+  installFakeClock,
 } from "@canonical/dataviews-core/testing";
 import {
   act,
@@ -809,13 +810,19 @@ describe("QueryBar", () => {
       );
       expect(findPart("Value for memory")).toHaveValue("1.46484375\u00a0GiB");
       const setPredicate = vi.spyOn(readProviderHost(provider), "setPredicate");
+      installFakeClock();
       press(findPart("Value for memory"), "Enter");
-      await waitFor(() => expect(queryPart("Value for memory")).toBeNull());
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      expect(queryPart("Value for memory")).toBeNull();
       expect(setPredicate).not.toHaveBeenCalled();
       expect(readFilter(provider)).toEqual([
         { field: "memory", operator: "gte", operands: [1500] },
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(readStatus()).not.toContain("Changed");
       vi.restoreAllMocks();
     });
@@ -2376,6 +2383,7 @@ describe("QueryBar", () => {
       expect(readFilter(provider)).toHaveLength(2);
       // A press on another chip's part opens that part, and its end leaves
       // the part open.
+      installFakeClock();
       fireEvent.click(screen.getByRole("button", { name: "deployed" }));
       const gpu = screen.getByRole("button", { name: "gpu" });
       fireEvent.pointerDown(gpu);
@@ -2383,7 +2391,9 @@ describe("QueryBar", () => {
       expect(queryPart("Value for status")).toBeInTheDocument();
       fireEvent.click(gpu);
       fireEvent.pointerUp(document);
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(queryPart("Value for status")).toBeNull();
       expect(findPart("Value for pool")).toBeInTheDocument();
     });
@@ -2394,31 +2404,46 @@ describe("QueryBar", () => {
       const value = await screen.findByRole("combobox", {
         name: "Value for status",
       });
+      installFakeClock();
       act(() => value.focus());
       fireEvent.pointerDown(screen.getByRole("button", { name: "status" }));
       act(() => value.blur());
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(queryPart("Value for status")).toBeInTheDocument();
       fireEvent.pointerUp(document);
-      await waitFor(() => expect(queryPart("Value for status")).toBeNull());
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      expect(queryPart("Value for status")).toBeNull();
       fireEvent.click(screen.getByRole("button", { name: "deployed" }));
       fireEvent.pointerDown(screen.getByRole("button", { name: "status" }));
       fireEvent.pointerCancel(document);
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       act(() => findPart("Value for status").focus());
       act(() => findPart("Value for status").blur());
-      await waitFor(() => expect(queryPart("Value for status")).toBeNull());
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      expect(queryPart("Value for status")).toBeNull();
       expect(readFilter(provider)).toHaveLength(1);
       // Focus moving within the bar commits nothing.
       fireEvent.click(screen.getByRole("button", { name: "deployed" }));
       fireEvent.blur(findPart("Value for status"), {
         relatedTarget: findEntry(),
       });
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       // Focus coming back before the task ends keeps the edit.
       fireEvent.blur(findPart("Value for status"));
       act(() => findPart("Value for status").focus());
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(queryPart("Value for status")).toBeInTheDocument();
     });
 
@@ -2434,12 +2459,18 @@ describe("QueryBar", () => {
     it("restores an edit that cannot commit when focus leaves, and leaves focus where it went", async () => {
       const { provider } = mount({ query: "memory__gte=65536" });
       fireEvent.click(await screen.findByRole("button", { name: /^64.GiB$/ }));
+      installFakeClock();
       const value = findPart("Value for memory");
       act(() => value.focus());
       type(value, "lots");
       act(() => value.blur());
-      await waitFor(() => expect(queryPart("Value for memory")).toBeNull());
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      expect(queryPart("Value for memory")).toBeNull();
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(document.body).toHaveFocus();
       expect(readFilter(provider)).toEqual([
         { field: "memory", operator: "gte", operands: [65_536] },
@@ -2576,9 +2607,12 @@ describe("QueryBar", () => {
 
     it("says nothing of no matches while a search is typed", async () => {
       mount();
+      installFakeClock();
       act(() => findEntry().focus());
       type(findEntry(), "node-1");
-      await new Promise((resolve) => setTimeout(resolve));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(
         document.querySelector('.ds.query-input [role="status"]'),
       ).toHaveTextContent("");
@@ -2630,11 +2664,17 @@ describe("QueryBar", () => {
       const poolValue = await screen.findByRole("combobox", {
         name: "Value for pool",
       });
+      installFakeClock();
       type(poolValue as HTMLInputElement, "gpu");
       press(poolValue, "Enter");
       press(findPart("Value for pool"), "Enter");
-      await waitFor(() => expect(queryPart("Value for pool")).toBeNull());
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
+      expect(queryPart("Value for pool")).toBeNull();
+      act(() => {
+        vi.runOnlyPendingTimers();
+      });
       expect(readStatus()).not.toContain("Added pool");
     });
   });

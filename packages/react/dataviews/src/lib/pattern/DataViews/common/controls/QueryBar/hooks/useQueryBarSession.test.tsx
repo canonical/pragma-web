@@ -5,6 +5,7 @@
  */
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { installFakeClock } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderInRoot } from "../../../../../../../../testing/index.js";
@@ -43,7 +44,6 @@ const mount = () => {
 };
 
 afterEach(() => {
-  vi.useRealTimers();
   document.body.innerHTML = "";
 });
 
@@ -200,7 +200,7 @@ describe("useQueryBarSession", () => {
   });
 
   it("focuses the edited Segment a task after the Entry closes", () => {
-    vi.useFakeTimers();
+    installFakeClock();
     const { hook, root } = mount();
     (root.querySelector("#outside-in-root") as HTMLElement).focus();
     act(() => {
@@ -219,7 +219,7 @@ describe("useQueryBarSession", () => {
   });
 
   it("leaves focus outside the bar where it went, and forgets the Segment", () => {
-    vi.useFakeTimers();
+    installFakeClock();
     const { hook } = mount();
     const elsewhere = document.createElement("button");
     document.body.append(elsewhere);
