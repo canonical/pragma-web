@@ -29,6 +29,7 @@
     "packages/semantics/*",
     "apps/*",
     "apps/react/*",
+    "apps/svelte/*",
     "apps/lit/*"
   ],
   "scripts": {
