@@ -18,6 +18,7 @@ import type { FileItemProps } from "./types.js";
 const FileItem = ({
   file,
   messageId,
+  fieldDescribedBy,
   validation,
   live,
   upload,
@@ -39,6 +40,8 @@ const FileItem = ({
   const message =
     validation?.level === "error" ? validation : (uploadMessage ?? validation);
   const describedBy = message ? messageId : undefined;
+  const actionDescribedBy =
+    [describedBy, fieldDescribedBy].filter(Boolean).join(" ") || undefined;
 
   // The status holds the progress and one glyph: the spinner while the file
   // uploads, then the result icon until the result stops showing.
@@ -105,7 +108,7 @@ const FileItem = ({
                   icon="change-version"
                   className="file-action"
                   aria-label={messages.retryUpload(file.name)}
-                  aria-describedby={describedBy}
+                  aria-describedby={actionDescribedBy}
                   onClick={() => onRetry(file)}
                 />
               )}
@@ -121,7 +124,7 @@ const FileItem = ({
                     ? messages.cancelUpload(file.name)
                     : messages.remove(file.name)
                 }
-                aria-describedby={describedBy}
+                aria-describedby={actionDescribedBy}
                 onClick={() => onRemove(file)}
               />
             </div>

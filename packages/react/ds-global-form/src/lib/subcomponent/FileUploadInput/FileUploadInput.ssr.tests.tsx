@@ -105,6 +105,20 @@ describe("FileUploadInput (SSR)", () => {
     );
   });
 
+  it("renders the field-level error alone in its group without the drop area", () => {
+    const html = renderToString(
+      <FileUploadInput
+        showDropArea={false}
+        value={[file("a.txt")]}
+        error={<p className="ds field-error">Too many files.</p>}
+      />,
+    );
+    expect(html).toContain(
+      '<div class="drop-area-group"><p class="ds field-error">Too many files.</p></div>',
+    );
+    expect(html).not.toContain('class="drop-area"');
+  });
+
   it("server-renders the thumbnail without its preview tooltip", () => {
     const html = renderToString(
       <FileUploadInput value={[file("photo.png", 10, "image/png")]} />,

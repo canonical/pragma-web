@@ -112,8 +112,14 @@ describe("FileUploadField", () => {
     await expect
       .poll(() => document.activeElement?.getAttribute("aria-label"))
       .toBe("Remove a.txt");
-    // With the drop area off, the field error hides with it.
-    expect(alertOf(page.container)).toBeNull();
+    // With the drop area off, the field error still shows, and describes the
+    // focused action.
+    await expect.poll(() => alertOf(page.container)).not.toBeNull();
+    const alert = alertOf(page.container) as HTMLElement;
+    expect(alert.textContent).toBe("Remove the files that have errors.");
+    expect(
+      document.activeElement?.getAttribute("aria-describedby")?.split(" "),
+    ).toContain(alert.id);
   });
 
   it("hides the file list with showFileList off", async () => {
@@ -264,9 +270,11 @@ describe("FileUploadField", () => {
     await expect
       .poll(() => document.activeElement?.getAttribute("aria-label"))
       .toBe("Remove a.txt");
-    // The drop area, and the field error with it, is hidden in single-file
-    // mode while a file is chosen; the tile carries the message.
-    expect(alertOf(page.container)).toBeNull();
+    // The drop area is hidden in single-file mode while a file is chosen; the
+    // field error still shows, and the tile carries its own message.
+    await expect
+      .poll(() => alertOf(page.container)?.textContent)
+      .toBe("Remove the files that have errors.");
     expect(page.container.querySelector(".message-text")?.textContent).toBe(
       "Not allowed.",
     );

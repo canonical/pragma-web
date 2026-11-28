@@ -398,8 +398,27 @@ export const goldenCases: Record<string, GoldenCase> = {
       multiple: true,
       showDropArea: false,
     },
+    value: [reportPdf(), sampleImage()],
+  },
+  "file-without-drop-area-error": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+      showDropArea: false,
+    },
     error: "Upload is required",
     value: [reportPdf(), sampleImage()],
+  },
+  "file-without-drop-area-empty-error": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      showDropArea: false,
+    },
+    error: "Upload is required",
   },
   "file-without-file-list": {
     props: {

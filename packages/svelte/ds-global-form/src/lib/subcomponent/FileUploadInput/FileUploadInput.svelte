@@ -137,18 +137,26 @@
   const fileListShown = $derived(
     showFileList && !disabled && selected.length > 0,
   );
-  // In single-file mode the drop area, and the field error with it, hides
-  // once a file is chosen and returns when the file is removed. It stays when
-  // the file list is not drawn, since nothing else could then remove the file.
+  // In single-file mode the drop area hides once a file is chosen and returns
+  // when the file is removed. It stays when the file list is not drawn, since
+  // nothing else could then remove the file.
   const dropAreaShown = $derived(
     showDropArea && (multiple || selected.length === 0 || !fileListShown),
+  );
+  // The group holds the drop area and the field error, and shows while either
+  // does: the error stays when the drop area is off or hidden.
+  const groupShown = $derived(dropAreaShown || Boolean(error));
+  // Without the Choose file button, the file actions carry the field's
+  // description and error, so the button that takes focus announces them.
+  const fieldDescribedBy = $derived(
+    dropAreaShown ? undefined : ariaDescribedBy,
   );
   const isInvalid = $derived(
     Boolean(error) || ariaInvalid === true || ariaInvalid === "true",
   );
 </script>
 
-<div {...rest} class={[componentCssClassName, disabled && "disabled", className]}>{#if dropAreaShown}<div class="drop-area-group"><!-- Drag and drop is a pointer shortcut: the button is the keyboard and assistive-technology path to the same file picker. --><!-- svelte-ignore a11y_no_static_element_interactions --><div class={["drop-area", isDragOver && "drag-over", isInvalid && "error"]} ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}><span class="drop-area-text">{messages.dropAreaText()}</span><!-- The field's invalid state and message reach the button, as in React. --><!-- svelte-ignore a11y_role_supports_aria_props_implicit --><button type="button" id={buttonId} class="ds button secondary" {disabled} onclick={() => fileInput?.click()} aria-labelledby={ariaLabelledBy ? `${ariaLabelledBy} ${buttonId}` : undefined} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} aria-errormessage={ariaErrorMessage}><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="ds icon" aria-hidden="true"><use href="/icons/upload.svg#upload"></use></svg></span><span class="label">{messages.chooseFile(multiple)}</span></button></div>{@render error?.()}</div>{/if}<input bind:this={fileInput} {@attach mirrorFiles} {id} type="file" {name} {required} {accept} {multiple} {disabled} onchange={handleInputChange} tabindex="-1" aria-hidden="true" />{#if fileListShown}<ul class="file-list">{#each entries as { file, key } (key)}<FileItem {file} messageId={`${baseId}-file-${key}-message`} validation={validationOf(file)} live={Boolean(upload)} upload={uploads.states.get(file)} {showFileSize} {messages} onremove={removeFile} onretry={uploads.retry} />{/each}</ul>{/if}</div>
+<div {...rest} class={[componentCssClassName, disabled && "disabled", className]}>{#if groupShown}<div class="drop-area-group">{#if dropAreaShown}<!-- Drag and drop is a pointer shortcut: the button is the keyboard and assistive-technology path to the same file picker. --><!-- svelte-ignore a11y_no_static_element_interactions --><div class={["drop-area", isDragOver && "drag-over", isInvalid && "error"]} ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}><span class="drop-area-text">{messages.dropAreaText()}</span><!-- The field's invalid state and message reach the button, as in React. --><!-- svelte-ignore a11y_role_supports_aria_props_implicit --><button type="button" id={buttonId} class="ds button secondary" {disabled} onclick={() => fileInput?.click()} aria-labelledby={ariaLabelledBy ? `${ariaLabelledBy} ${buttonId}` : undefined} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} aria-errormessage={ariaErrorMessage}><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="ds icon" aria-hidden="true"><use href="/icons/upload.svg#upload"></use></svg></span><span class="label">{messages.chooseFile(multiple)}</span></button></div>{/if}{@render error?.()}</div>{/if}<input bind:this={fileInput} {@attach mirrorFiles} {id} type="file" {name} {required} {accept} {multiple} {disabled} onchange={handleInputChange} tabindex="-1" aria-hidden="true" />{#if fileListShown}<ul class="file-list">{#each entries as { file, key } (key)}<FileItem {file} messageId={`${baseId}-file-${key}-message`} {fieldDescribedBy} validation={validationOf(file)} live={Boolean(upload)} upload={uploads.states.get(file)} {showFileSize} {messages} onremove={removeFile} onretry={uploads.retry} />{/each}</ul>{/if}</div>
 
 <!-- @component
 Presentational file upload input: a drop area, with a button that opens the
@@ -162,9 +170,11 @@ progress, then its result for a moment. Closing a running upload cancels it and
 removes the file; a failed upload can be retried. Without `upload` it only
 lists the files.
 
-`showDropArea` and `showFileList` turn the two halves off. While `error` is set
-or `aria-invalid` is true, the drop area carries the `error` Criticality class,
-so its border and fill read the error colours.
+`showDropArea` and `showFileList` turn the two halves off. The field-level
+`error` shows whether or not the drop area does. While `error` is set or
+`aria-invalid` is true, the drop area carries the `error` Criticality class, so
+its border and fill read the error colours. Without the drop area, the file
+actions carry the field's `aria-describedby`.
 
 The native file `<input>` sits beside the drop area, not inside it, and carries
 the `id`, `name` and `required`, so a `<label for>` reaches it and the

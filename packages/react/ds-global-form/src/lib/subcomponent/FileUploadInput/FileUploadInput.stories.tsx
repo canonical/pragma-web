@@ -12,6 +12,7 @@ import {
   stalledUpload,
   warnOnLargeFiles,
 } from "../../../storybook/fixtures.files.js";
+import { Error as FieldError } from "../Field/Error/index.js";
 import { FileUploadInput } from "./FileUploadInput.js";
 import type { FileUploadInputProps } from "./types.js";
 
@@ -145,13 +146,50 @@ export const SingleFileChosen: Story = {
 };
 
 /**
- * The drop area turned off: only the file list shows, and the field error,
- * which sits under the drop area, hides with it. Files reach the input
+ * Single-file mode with a file chosen and a field error: the drop area hides,
+ * and the field error still shows above the file list. The file's remove
+ * button is described by the error.
+ */
+export const SingleFileChosenError: Story = {
+  render: controlled(() => [reportPdf()]),
+  args: {
+    multiple: false,
+    "aria-invalid": true,
+    "aria-describedby": "single-file-chosen-error",
+    error: (
+      <FieldError id="single-file-chosen-error">
+        Remove the files that have errors.
+      </FieldError>
+    ),
+  },
+};
+
+/**
+ * The drop area turned off: only the file list shows. Files reach the input
  * through `value`.
  */
 export const WithoutDropArea: Story = {
   render: controlled(() => [reportPdf(), sampleImage()]),
   args: { multiple: true, showDropArea: false },
+};
+
+/**
+ * The drop area turned off with a field error: the error shows in the drop
+ * area's place, above the file list, and describes the file actions.
+ */
+export const WithoutDropAreaError: Story = {
+  render: controlled(() => [reportPdf(), sampleImage()]),
+  args: {
+    multiple: true,
+    showDropArea: false,
+    "aria-invalid": true,
+    "aria-describedby": "without-drop-area-error",
+    error: (
+      <FieldError id="without-drop-area-error">
+        You can upload at most 1 file.
+      </FieldError>
+    ),
+  },
 };
 
 /** The file list turned off: the files are chosen but no tiles are drawn. */

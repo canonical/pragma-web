@@ -11,6 +11,7 @@
     stalledUpload,
     warnOnLargeFiles,
   } from "../../../storybook/fixtures.files.js";
+  import { Error as FieldError } from "../Field/Error/index.js";
   import Component from "./FileUploadInput.svelte";
 
   // Presentational stories: the file upload holds its own chosen files, no
@@ -120,15 +121,46 @@ the file is removed. -->
   args={{ files: [reportPdf()], multiple: false }}
 />
 
-<!-- The drop area turned off: only the file list shows, and the field error,
-which sits under the drop area, hides with it. Files reach the input through
-`files`. -->
+{#snippet singleFileChosenError()}<FieldError id="single-file-chosen-error">Remove the files that have errors.</FieldError>{/snippet}
+
+<!-- Single-file mode with a file chosen and a field error: the drop area hides,
+and the field error still shows above the file list. The file's remove button
+is described by the error. -->
+<Story
+  name="Single File Chosen Error"
+  args={{
+    files: [reportPdf()],
+    multiple: false,
+    "aria-invalid": true,
+    "aria-describedby": "single-file-chosen-error",
+    error: singleFileChosenError,
+  }}
+/>
+
+<!-- The drop area turned off: only the file list shows. Files reach the input
+through `files`. -->
 <Story
   name="Without Drop Area"
   args={{
     files: [reportPdf(), sampleImage()],
     multiple: true,
     showDropArea: false,
+  }}
+/>
+
+{#snippet withoutDropAreaError()}<FieldError id="without-drop-area-error">You can upload at most 1 file.</FieldError>{/snippet}
+
+<!-- The drop area turned off with a field error: the error shows in the drop
+area's place, above the file list, and describes the file actions. -->
+<Story
+  name="Without Drop Area Error"
+  args={{
+    files: [reportPdf(), sampleImage()],
+    multiple: true,
+    showDropArea: false,
+    "aria-invalid": true,
+    "aria-describedby": "without-drop-area-error",
+    error: withoutDropAreaError,
   }}
 />
 

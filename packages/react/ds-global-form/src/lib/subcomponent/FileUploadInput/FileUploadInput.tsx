@@ -32,9 +32,11 @@ const EMPTY: File[] = [];
  * it and removes the file; a failed upload can be retried. Without `upload` it
  * only lists the files. An image's thumbnail shows the whole image on hover.
  *
- * `showDropArea` and `showFileList` turn the two halves off. While `error` is
- * set or `aria-invalid` is true, the drop area carries the `error`
- * Criticality class, so its border and fill read the error colours.
+ * `showDropArea` and `showFileList` turn the two halves off. The field-level
+ * `error` shows whether or not the drop area does. While `error` is set or
+ * `aria-invalid` is true, the drop area carries the `error` Criticality
+ * class, so its border and fill read the error colours. Without the drop
+ * area, the file actions carry the field's `aria-describedby`.
  *
  * The native file `<input>` sits beside the drop area, not inside it, and
  * carries the `id`, `name` and `required`, so a `<label for>` reaches it and
@@ -161,11 +163,17 @@ export const FileUploadInput = ({
 
   // A disabled input draws no file list.
   const fileListShown = showFileList && !disabled && files.length > 0;
-  // In single-file mode the drop area, and the field error with it, hides
-  // once a file is chosen and returns when the file is removed. It stays when
-  // the file list is not drawn, since nothing else could then remove the file.
+  // In single-file mode the drop area hides once a file is chosen and returns
+  // when the file is removed. It stays when the file list is not drawn, since
+  // nothing else could then remove the file.
   const dropAreaShown =
     showDropArea && (multiple || files.length === 0 || !fileListShown);
+  // The group holds the drop area and the field error, and shows while either
+  // does: the error stays when the drop area is off or hidden.
+  const groupShown = dropAreaShown || Boolean(error);
+  // Without the Choose file button, the file actions carry the field's
+  // description and error, so the button that takes focus announces them.
+  const fieldDescribedBy = dropAreaShown ? undefined : ariaDescribedBy;
   const isInvalid =
     Boolean(error) || ariaInvalid === true || ariaInvalid === "true";
 
@@ -176,41 +184,43 @@ export const FileUploadInput = ({
         .filter(Boolean)
         .join(" ")}
     >
-      {dropAreaShown && (
+      {groupShown && (
         <div className="drop-area-group">
-          {/* Drag and drop is a pointer shortcut: the button is the keyboard
-              and assistive-technology path to the same file picker. */}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: the drop target is a pointer-only shortcut for the button inside it */}
-          <div
-            className={[
-              "drop-area",
-              isDragOver && "drag-over",
-              isInvalid && "error",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <span className="drop-area-text">{messages.dropAreaText()}</span>
-            <Button
-              type="button"
-              id={buttonId}
-              importance="secondary"
-              icon="upload"
-              disabled={disabled}
-              onClick={() => inputRef.current?.click()}
-              aria-labelledby={
-                ariaLabelledBy ? `${ariaLabelledBy} ${buttonId}` : undefined
-              }
-              aria-describedby={ariaDescribedBy}
-              aria-invalid={ariaInvalid}
-              aria-errormessage={ariaErrorMessage}
+          {dropAreaShown && (
+            // Drag and drop is a pointer shortcut: the button is the keyboard
+            // and assistive-technology path to the same file picker.
+            // biome-ignore lint/a11y/noStaticElementInteractions: the drop target is a pointer-only shortcut for the button inside it
+            <div
+              className={[
+                "drop-area",
+                isDragOver && "drag-over",
+                isInvalid && "error",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
             >
-              {messages.chooseFile(multiple)}
-            </Button>
-          </div>
+              <span className="drop-area-text">{messages.dropAreaText()}</span>
+              <Button
+                type="button"
+                id={buttonId}
+                importance="secondary"
+                icon="upload"
+                disabled={disabled}
+                onClick={() => inputRef.current?.click()}
+                aria-labelledby={
+                  ariaLabelledBy ? `${ariaLabelledBy} ${buttonId}` : undefined
+                }
+                aria-describedby={ariaDescribedBy}
+                aria-invalid={ariaInvalid}
+                aria-errormessage={ariaErrorMessage}
+              >
+                {messages.chooseFile(multiple)}
+              </Button>
+            </div>
+          )}
           {error}
         </div>
       )}
@@ -236,6 +246,7 @@ export const FileUploadInput = ({
                 key={key}
                 file={file}
                 messageId={`${baseId}-file-${key}-message`}
+                fieldDescribedBy={fieldDescribedBy}
                 validation={validationOf(file)}
                 live={Boolean(upload)}
                 upload={uploads.states.get(file)}
