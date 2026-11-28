@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RESULT_DISPLAY_DURATION } from "./constants.js";
@@ -435,6 +442,117 @@ describe("FileUploadInput (presentational)", () => {
     ).toHaveTextContent("Too many files.");
   });
 
+  describe("the error state", () => {
+    const dropArea = (container: HTMLElement) =>
+      container.querySelector(".drop-area") as HTMLElement;
+
+    it("puts the error Criticality class on the drop area while invalid", () => {
+      const { container, rerender } = render(<FileUploadInput />);
+      expect(dropArea(container)).not.toHaveClass("error");
+
+      rerender(<FileUploadInput aria-invalid />);
+      expect(dropArea(container)).toHaveClass("error");
+
+      rerender(<FileUploadInput aria-invalid="true" />);
+      expect(dropArea(container)).toHaveClass("error");
+
+      rerender(<FileUploadInput aria-invalid="false" />);
+      expect(dropArea(container)).not.toHaveClass("error");
+
+      rerender(<FileUploadInput error={<p>Too many files.</p>} />);
+      expect(dropArea(container)).toHaveClass("error");
+    });
+
+    it("keeps the Criticality class off the Choose file button", () => {
+      render(<FileUploadInput aria-invalid />);
+      expect(chooseButton()).not.toHaveClass("error");
+    });
+  });
+
+  describe("turning the parts off", () => {
+    it("hides the drop area and its field error with showDropArea off", () => {
+      const { container } = render(
+        <FileUploadInput
+          showDropArea={false}
+          multiple
+          value={[file("a.txt")]}
+          error={<p className="field-error">Too many files.</p>}
+        />,
+      );
+      expect(container.querySelector(".drop-area-group")).toBeNull();
+      expect(screen.queryByText("Too many files.")).not.toBeInTheDocument();
+      // The native input stays, so the files still post, and the list shows.
+      expect(nativeInput(container)).toBeInTheDocument();
+      expect(screen.getByRole("listitem")).toHaveTextContent("a.txt");
+    });
+
+    it("hides the file list with showFileList off", () => {
+      const { container } = render(
+        <FileUploadInput
+          showFileList={false}
+          multiple
+          value={[file("a.txt")]}
+        />,
+      );
+      expect(container.querySelector(".file-list")).toBeNull();
+      expect(container.querySelector(".drop-area")).toBeInTheDocument();
+    });
+
+    it("keeps the single-file drop area while the file list is off", () => {
+      const { container } = render(
+        <FileUploadInput showFileList={false} value={[file("a.txt")]} />,
+      );
+      expect(container.querySelector(".drop-area")).toBeInTheDocument();
+    });
+  });
+
+  describe("the image preview", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    const stubObjectUrls = () => {
+      const createObjectURL = vi.fn(() => "blob:preview");
+      vi.stubGlobal("URL", {
+        ...URL,
+        createObjectURL,
+        revokeObjectURL: vi.fn(),
+      });
+      return createObjectURL;
+    };
+
+    it("shows the whole image in a tooltip on hover, from the same URL", async () => {
+      const createObjectURL = stubObjectUrls();
+      const { container } = render(
+        <FileUploadInput value={[file("photo.png", 10, "image/png")]} />,
+      );
+      const thumbnail = container.querySelector(".thumbnail") as HTMLElement;
+      fireEvent.pointerEnter(thumbnail);
+
+      await waitFor(() =>
+        expect(
+          document.querySelector(".ds.tooltip.file-upload-preview"),
+        ).toHaveAttribute("aria-hidden", "false"),
+      );
+      const preview = document.querySelector(
+        ".ds.tooltip.file-upload-preview img",
+      );
+      expect(preview).toHaveAttribute("src", "blob:preview");
+      expect(preview).toHaveAttribute("alt", "");
+      expect(createObjectURL).toHaveBeenCalledTimes(1);
+    });
+
+    it("has no preview where object URLs are unsupported", () => {
+      vi.stubGlobal("URL", { ...URL, createObjectURL: undefined });
+      const { container } = render(
+        <FileUploadInput value={[file("photo.png", 10, "image/png")]} />,
+      );
+      expect(container.querySelector(".thumbnail-preview")).toBeNull();
+      expect(document.querySelector(".file-upload-preview")).toBeNull();
+    });
+  });
+
   describe("mirroring the value into the file input", () => {
     afterEach(() => {
       vi.unstubAllGlobals();
@@ -522,7 +640,7 @@ describe("FileUploadInput (live upload)", () => {
     expect(status).toHaveTextContent("100%");
     expect(
       within(status).getByRole("img", { name: "a.txt uploaded" }),
-    ).toHaveClass("status-success");
+    ).toHaveClass("icon");
     expect(
       screen.getByRole("button", { name: "Remove a.txt" }),
     ).toBeInTheDocument();
@@ -544,13 +662,13 @@ describe("FileUploadInput (live upload)", () => {
     await act(async () => calls[0].resolve());
     expect(
       screen.getByRole("img", { name: "a.txt uploaded with a warning" }),
-    ).toHaveClass("status-warning");
+    ).toBeInTheDocument();
   });
 
   it("marks a failed upload with an error and retries it", async () => {
     const { upload, calls } = deferredUpload();
     const onUploadStatusChange = vi.fn();
-    render(
+    const { container } = render(
       <FileUploadInput
         upload={upload}
         value={[file("a.txt")]}
@@ -563,6 +681,7 @@ describe("FileUploadInput (live upload)", () => {
       failed: 0,
     });
 
+    act(() => calls[0].options.onProgress(0.3));
     await act(async () => calls[0].reject(new Error("Network down")));
     expect(onUploadStatusChange).toHaveBeenLastCalledWith({
       uploading: 0,
@@ -570,9 +689,17 @@ describe("FileUploadInput (live upload)", () => {
     });
     expect(screen.getByRole("listitem")).toHaveClass("error");
     expect(screen.getByText("File failed to upload.")).toBeInTheDocument();
+
+    // Like a success, the status shows the progress reached and the result
+    // icon for a moment, then clears; the message and the retry stay.
+    const status = container.querySelector(".file-status") as HTMLElement;
+    expect(status).toHaveTextContent("30%");
     expect(
-      screen.getByRole("img", { name: "a.txt failed to upload" }),
-    ).toHaveClass("status-error");
+      within(status).getByRole("img", { name: "a.txt failed to upload" }),
+    ).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(RESULT_DISPLAY_DURATION));
+    expect(status).toBeEmptyDOMElement();
+    expect(screen.getByText("File failed to upload.")).toBeInTheDocument();
 
     const retry = screen.getByRole("button", { name: "Retry upload of a.txt" });
     expect(retry).toHaveAccessibleDescription(/File failed to upload\./);
@@ -611,32 +738,51 @@ describe("FileUploadInput (live upload)", () => {
     expect(screen.getByText("File failed to upload.")).toBeInTheDocument();
   });
 
-  it("cancels a running upload, then removes the file", async () => {
+  it("cancels a running upload and removes the file in one click", async () => {
     const { upload, calls } = deferredUpload();
     const onChange = vi.fn();
+    render(<Controlled upload={upload} multiple onChange={onChange} />);
     const chosen = file("a.txt");
-    render(
-      <FileUploadInput upload={upload} value={[chosen]} onChange={onChange} />,
-    );
+    fireEvent.change(document.querySelector('input[type="file"]') as Element, {
+      target: { files: [chosen] },
+    });
     await settle();
 
     fireEvent.click(
       screen.getByRole("button", { name: "Cancel upload of a.txt" }),
     );
     expect(calls[0].options.signal.aborted).toBe(true);
-    expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByText("Upload cancelled.")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Retry upload of a.txt" }),
-    ).toBeInTheDocument();
+    expect(onChange).toHaveBeenLastCalledWith([]);
+    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
 
-    // The aborted upload's late settlement and progress change nothing.
-    act(() => calls[0].options.onProgress(0.5));
+    // The aborted upload's late settlement changes nothing.
     await act(async () => calls[0].reject(new DOMException("", "AbortError")));
-    expect(screen.getByText("Upload cancelled.")).toBeInTheDocument();
+    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole("button", { name: "Remove a.txt" }));
-    expect(onChange).toHaveBeenCalledWith([]);
+  it("offers a retry only after a failed upload", async () => {
+    const { upload, calls } = deferredUpload();
+    render(
+      <FileUploadInput
+        upload={upload}
+        multiple
+        value={[file("a.txt"), file("b.txt")]}
+      />,
+    );
+    await settle();
+    expect(
+      screen.queryByRole("button", { name: /Retry upload/ }),
+    ).not.toBeInTheDocument();
+
+    await act(async () => calls[0].resolve());
+    expect(
+      screen.queryByRole("button", { name: /Retry upload/ }),
+    ).not.toBeInTheDocument();
+
+    await act(async () => calls[1].reject(new Error("no")));
+    expect(screen.getAllByRole("button", { name: /Retry upload/ })).toEqual([
+      screen.getByRole("button", { name: "Retry upload of b.txt" }),
+    ]);
   });
 
   it("aborts the upload of a file that leaves the value", async () => {

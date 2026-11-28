@@ -11,7 +11,7 @@ export type FileMessage = {
 
 /** What the input hands an `upload` function for each file. */
 export type UploadOptions = {
-  /** Aborted when the user cancels the upload or removes the file. */
+  /** Aborted when the user cancels the upload, which removes the file. */
   signal: AbortSignal;
   /** Report the share of the file sent so far, from 0 to 1. */
   onProgress: (fraction: number) => void;
@@ -26,20 +26,26 @@ export type UploadFunction = (
   options: UploadOptions,
 ) => Promise<void>;
 
-/** Where one file's live upload stands. */
+/**
+ * Where one file's live upload stands. Once an upload ends, `showResult` is
+ * true while its progress and result icon show, then false.
+ */
 export type UploadState =
   | { status: "uploading"; progress: number }
-  /** The upload ended; the result icon shows briefly. */
-  | { status: "finished" }
-  | { status: "done" }
-  | { status: "failed"; reason: unknown }
-  | { status: "cancelled" };
+  | { status: "uploaded"; showResult: boolean }
+  | {
+      status: "failed";
+      reason: unknown;
+      /** The share sent before the upload failed, from 0 to 1. */
+      progress: number;
+      showResult: boolean;
+    };
 
 /** How many live uploads are running, and how many need a retry. */
 export type UploadSummary = {
   /** Files still uploading. */
   uploading: number;
-  /** Files whose upload failed or was cancelled, and that are still chosen. */
+  /** Files whose upload failed, and that are still chosen. */
   failed: number;
 };
 
@@ -66,7 +72,7 @@ export type FileUploadMessages = {
   statusFailed: (fileName: string) => string;
   /** The name of the button that removes a file. */
   remove: (fileName: string) => string;
-  /** The name of the button that cancels a running upload. */
+  /** The name of the button that cancels a running upload and removes the file. */
   cancelUpload: (fileName: string) => string;
   /** The name of the button that retries a failed upload. */
   retryUpload: (fileName: string) => string;
@@ -74,8 +80,6 @@ export type FileUploadMessages = {
   messageLevel: (level: FileMessageLevel) => string;
   /** The message under a file whose upload failed. */
   uploadFailed: (file: File, reason: unknown) => string;
-  /** The message under a file whose upload was cancelled. */
-  uploadCancelled: (file: File) => string;
   /** The message under a file larger than `maxSize`, given as a size text. */
   fileTooLarge: (maxSize: string) => string;
   /** The message under a file that `accept` does not allow. */
@@ -86,7 +90,7 @@ export type FileUploadMessages = {
   filesHaveErrors: () => string;
   /** The field error while a file is still uploading. */
   uploadsPending: () => string;
-  /** The field error while a file's upload failed or was cancelled. */
+  /** The field error while a file's upload failed. */
   uploadsFailed: () => string;
 };
 
@@ -131,7 +135,8 @@ type OwnProps = {
 
   /**
    * Allow multiple files. When `false`, the drop area hides once a file is
-   * chosen and returns when the file is removed.
+   * chosen and returns when the file is removed. It stays while `showFileList`
+   * is off, since the file list is then the only way to remove the file.
    */
   multiple?: boolean;
 
@@ -153,7 +158,20 @@ type OwnProps = {
   /** Show each file's size on its tile. */
   showFileSize?: boolean;
 
-  /** A field-level message rendered under the drop area. */
+  /**
+   * Show the drop area, with its Choose file button. When off, the field-level
+   * `error` under it hides with it, and the files can only be added by the
+   * consumer through `value`.
+   */
+  showDropArea?: boolean;
+
+  /** Show the list of chosen files, with their tiles and messages. */
+  showFileList?: boolean;
+
+  /**
+   * A field-level message rendered under the drop area. While it is set, the
+   * drop area takes the error colours.
+   */
   error?: ReactNode;
 
   /** Called when the number of running or failed uploads changes. */
@@ -168,7 +186,10 @@ type OwnProps = {
   /** Describes the button that opens the file picker. */
   "aria-describedby"?: string;
 
-  /** Marks the button that opens the file picker as invalid. */
+  /**
+   * Marks the button that opens the file picker as invalid, and gives the drop
+   * area the error colours.
+   */
   "aria-invalid"?: boolean | "true" | "false";
 
   /** Points the button that opens the file picker at the field error. */

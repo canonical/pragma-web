@@ -23,6 +23,19 @@ export const sampleImage = (name = "landscape.svg"): File =>
     { type: "image/svg+xml", lastModified: 0 },
   );
 
+/**
+ * A tall image, which the 5:3 thumbnail crops, so its preview shows more than
+ * the thumbnail does.
+ */
+export const portraitImage = (name = "portrait.svg"): File =>
+  new File(
+    [
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200"><rect width="120" height="200" fill="#77216f"/><rect y="0" width="120" height="50" fill="#e95420"/><rect y="150" width="120" height="50" fill="#e95420"/><circle cx="60" cy="100" r="30" fill="#fff"/></svg>',
+    ],
+    name,
+    { type: "image/svg+xml", lastModified: 0 },
+  );
+
 const MB = 1024 * 1024;
 
 export const reportPdf = (): File =>

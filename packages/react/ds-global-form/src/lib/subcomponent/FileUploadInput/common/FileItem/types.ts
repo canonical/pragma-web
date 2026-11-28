@@ -20,10 +20,8 @@ export type FileItemProps = {
   showFileSize: boolean;
   /** The texts the tile renders. */
   messages: FileUploadMessages;
-  /** Removes the file from the selection. */
+  /** Removes the file from the selection, aborting its running upload. */
   onRemove: (file: File) => void;
-  /** Aborts the file's running upload. */
-  onCancel: (file: File) => void;
   /** Sends the file again. */
   onRetry: (file: File) => void;
 };

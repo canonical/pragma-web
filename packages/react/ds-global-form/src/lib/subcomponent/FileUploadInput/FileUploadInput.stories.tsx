@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { fireEvent } from "storybook/test";
+import { fireEvent, userEvent, waitFor } from "storybook/test";
 import {
   failOnceUpload,
   longNamedIso,
+  portraitImage,
   reportPdf,
   sampleFile,
   sampleImage,
@@ -90,8 +91,9 @@ export const DragOver: Story = {
 /**
  * Live upload with a simulated server: add files to watch each upload's
  * progress and the success icon that follows. A file whose name contains
- * "fail" fails half-way; retry it, or cancel a running upload with its close
- * button.
+ * "fail" fails half-way: its status shows the progress reached and the error
+ * icon for a moment, and its retry button stays. Closing a running upload
+ * cancels it and removes the file.
  */
 export const Live: Story = {
   render: controlled(),
@@ -105,8 +107,9 @@ export const Uploading: Story = {
 };
 
 /**
- * A failed live upload: the tile shows the error status, the message under
- * it, and a retry button. Retrying succeeds.
+ * A failed live upload: the status shows the progress and the error icon for
+ * two seconds, then clears; the message under the tile and the retry button
+ * stay. Retrying succeeds.
  */
 export const UploadFailed: Story = {
   render: controlled(() => [reportPdf()]),
@@ -139,4 +142,40 @@ export const FileMessages: Story = {
 export const SingleFileChosen: Story = {
   render: controlled(() => [reportPdf()]),
   args: { multiple: false },
+};
+
+/**
+ * The drop area turned off: only the file list shows, and the field error,
+ * which sits under the drop area, hides with it. Files reach the input
+ * through `value`.
+ */
+export const WithoutDropArea: Story = {
+  render: controlled(() => [reportPdf(), sampleImage()]),
+  args: { multiple: true, showDropArea: false },
+};
+
+/** The file list turned off: the files are chosen but no tiles are drawn. */
+export const WithoutFileList: Story = {
+  render: controlled(() => [reportPdf(), sampleImage()]),
+  args: { multiple: true, showFileList: false },
+};
+
+/**
+ * Hovering an image's thumbnail shows the whole image, uncropped, in a
+ * tooltip: the thumbnail crops this tall image to its 5:3 box. The story
+ * hovers it on load.
+ */
+export const ImagePreview: Story = {
+  render: controlled(() => [portraitImage()]),
+  args: { multiple: true },
+  play: async ({ canvasElement }) => {
+    const thumbnail = await waitFor(() => {
+      const found = canvasElement.querySelector(
+        ".thumbnail-preview .thumbnail",
+      );
+      if (!found) throw new Error("The thumbnail has no preview yet.");
+      return found;
+    });
+    await userEvent.hover(thumbnail);
+  },
 };

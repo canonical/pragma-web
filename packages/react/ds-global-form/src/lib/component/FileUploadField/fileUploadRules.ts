@@ -19,7 +19,7 @@ const asFiles = (value: unknown): File[] =>
  * - `maxFiles` — more files than `maxFiles` are chosen;
  * - `files` — a chosen file has an `accept`, `maxSize` or `validateFile`
  *   error (a warning does not invalidate the field);
- * - `uploads` — a live upload is still running, or failed or was cancelled.
+ * - `uploads` — a live upload is still running, or failed.
  *
  * The per-file messages render under each file's tile; these rules only make
  * the field invalid and give it one field-level message, so a submit waits for

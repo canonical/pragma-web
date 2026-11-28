@@ -2,14 +2,8 @@ import { Button, Icon, Spinner } from "@canonical/react-ds-global";
 import type React from "react";
 import useObjectUrl from "../../hooks/useObjectUrl.js";
 import type { FileMessage } from "../../types.js";
+import { Thumbnail } from "../Thumbnail/index.js";
 import type { FileItemProps } from "./types.js";
-
-/** The image preview of a file, filling the 60×36 thumbnail box. */
-const Thumbnail = ({ file }: { file: File }): React.ReactElement => {
-  const url = useObjectUrl(file);
-  // Decorative: the file name beside it already names the file.
-  return <span className="thumbnail">{url && <img src={url} alt="" />}</span>;
-};
 
 /**
  * One chosen file: its tile (thumbnail, name, size, upload status, retry and
@@ -30,26 +24,24 @@ const FileItem = ({
   showFileSize,
   messages,
   onRemove,
-  onCancel,
   onRetry,
 }: FileItemProps): React.ReactElement => {
   const isUploading = upload?.status === "uploading";
-  const isRetryable =
-    upload?.status === "failed" || upload?.status === "cancelled";
+  const isFailed = upload?.status === "failed";
+  const isImage = file.type.startsWith("image/");
+  // Created here, not in the thumbnail, so the thumbnail and its preview share
+  // one URL.
+  const imageUrl = useObjectUrl(isImage ? file : undefined);
 
-  let uploadMessage: FileMessage | undefined;
-  if (upload?.status === "failed") {
-    uploadMessage = {
-      level: "error",
-      message: messages.uploadFailed(file, upload.reason),
-    };
-  } else if (upload?.status === "cancelled") {
-    uploadMessage = { level: "error", message: messages.uploadCancelled(file) };
-  }
+  const uploadMessage: FileMessage | undefined = isFailed
+    ? { level: "error", message: messages.uploadFailed(file, upload.reason) }
+    : undefined;
   const message =
     validation?.level === "error" ? validation : (uploadMessage ?? validation);
   const describedBy = message ? messageId : undefined;
 
+  // The status holds the progress and one glyph: the spinner while the file
+  // uploads, then the result icon until the result stops showing.
   let status: React.ReactNode = null;
   if (upload?.status === "uploading") {
     status = (
@@ -60,29 +52,23 @@ const FileItem = ({
         <Spinner aria-label={messages.statusUploading(file.name)} />
       </>
     );
-  } else if (upload?.status === "finished") {
-    const warned = message?.level === "warning";
+  } else if (upload?.showResult) {
+    let icon: "success-fill" | "warning-fill" | "error-fill" = "success-fill";
+    let label = messages.statusUploaded(file.name);
+    if (upload.status === "failed") {
+      icon = "error-fill";
+      label = messages.statusFailed(file.name);
+    } else if (message?.level === "warning") {
+      icon = "warning-fill";
+      label = messages.statusUploadedWithWarning(file.name);
+    }
     status = (
       <>
-        <span className="upload-progress">{messages.progress(1)}</span>
-        <Icon
-          icon={warned ? "warning-fill" : "success-fill"}
-          className={warned ? "status-warning" : "status-success"}
-          aria-label={
-            warned
-              ? messages.statusUploadedWithWarning(file.name)
-              : messages.statusUploaded(file.name)
-          }
-        />
+        <span className="upload-progress">
+          {messages.progress(upload.status === "failed" ? upload.progress : 1)}
+        </span>
+        <Icon icon={icon} aria-label={label} />
       </>
-    );
-  } else if (isRetryable) {
-    status = (
-      <Icon
-        icon="error-fill"
-        className="status-error"
-        aria-label={messages.statusFailed(file.name)}
-      />
     );
   }
 
@@ -92,7 +78,7 @@ const FileItem = ({
       aria-describedby={describedBy}
     >
       <div className="tile">
-        {file.type.startsWith("image/") && <Thumbnail file={file} />}
+        {isImage && <Thumbnail url={imageUrl} />}
         <div className="tile-details">
           <div className="file-info">
             <span className="file-name" title={file.name}>
@@ -112,7 +98,7 @@ const FileItem = ({
               </span>
             )}
             <div className="file-actions">
-              {isRetryable && (
+              {isFailed && (
                 <Button
                   type="button"
                   importance="tertiary"
@@ -123,6 +109,8 @@ const FileItem = ({
                   onClick={() => onRetry(file)}
                 />
               )}
+              {/* Cancelling a running upload removes the file: removing it
+                  from the value aborts the upload. */}
               <Button
                 type="button"
                 importance="tertiary"
@@ -134,7 +122,7 @@ const FileItem = ({
                     : messages.remove(file.name)
                 }
                 aria-describedby={describedBy}
-                onClick={() => (isUploading ? onCancel(file) : onRemove(file))}
+                onClick={() => onRemove(file)}
               />
             </div>
           </div>
