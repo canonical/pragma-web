@@ -11,7 +11,7 @@
  *   bun scripts/collect-implementations.ts --help       # Show help
  */
 
-import { readFile, writeFile, mkdir, access } from "node:fs/promises";
+import { readFile, writeFile, mkdir, access, rm } from "node:fs/promises";
 import { join, dirname, relative, resolve } from "node:path";
 import { glob } from "tinyglobby";
 
@@ -229,8 +229,14 @@ async function collectPackage(
 	const cwd = pkg.path;
 	const librarySlug = slugify(config.name);
 
-	// Scan for annotations
-	const annotations = await scanAnnotations(config.pattern, cwd);
+	// Scan for annotations. Story and test files may carry @implements
+	// annotations (Storybook CSF meta, test descriptions), but a story or a
+	// test is not an implementation. Skipping them keeps a stories-only
+	// folder from making the graph report a block as implemented.
+	const nonSource = /\.(stories|tests?)\.[a-z]+$/;
+	const annotations = (await scanAnnotations(config.pattern, cwd)).filter(
+		ann => !nonSource.test(ann.filePath),
+	);
 
 	// Filter to valid prefix
 	const validAnnotations = annotations.filter(
@@ -259,13 +265,15 @@ async function collectPackage(
 	const libraryPath = join(outputDir, "implementationLibrary.ttl");
 	await writeFile(libraryPath, libraryTtl, "utf-8");
 
-	// Generate objects TTL if we have annotations
-	if (validAnnotations.length > 0) {
-		const objectsTtl = await generateObjectsTurtle(config, validAnnotations, cwd);
-		if (objectsTtl) {
-			const objectsPath = join(outputDir, "implementationObjects.ttl");
-			await writeFile(objectsPath, objectsTtl, "utf-8");
-		}
+	const objectsPath = join(outputDir, "implementationObjects.ttl");
+	const objectsTtl = validAnnotations.length > 0
+		? await generateObjectsTurtle(config, validAnnotations, cwd)
+		: undefined;
+	if (objectsTtl) {
+		await writeFile(objectsPath, objectsTtl, "utf-8");
+	} else {
+		// The last source annotation can disappear between runs.
+		await rm(objectsPath, { force: true });
 	}
 
 	return {
