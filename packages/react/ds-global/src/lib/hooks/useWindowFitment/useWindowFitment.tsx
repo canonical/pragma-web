@@ -1,3 +1,4 @@
+import { debounce } from "@canonical/ds-utils";
 import {
   type CSSProperties,
   useCallback,
@@ -183,8 +184,15 @@ const useWindowFitment = <
   // Bumped when the anchored element's `dir` flips with no layout change, so the
   // logical→physical resolution re-runs (see the MutationObserver effect below).
   const [dirVersion, setDirVersion] = useState(0);
+  const [positionVersion, setPositionVersion] = useState(0);
+  const positioningActive = isOpen ?? true;
 
-  const windowDimensions = useWindowDimensions({ resizeDelay, scrollDelay });
+  const windowDimensions = useWindowDimensions({
+    resizeDelay,
+    scrollDelay,
+    enabled: positioningActive,
+    listenToScroll: false,
+  });
   const targetSize = useResizeObserver(targetElement);
   const popupSize = useResizeObserver(popupElement);
 
@@ -349,6 +357,12 @@ const useWindowFitment = <
       if (isServer) return;
       let fallbackPosition: BestPosition | undefined;
       let fallbackScore = Number.POSITIVE_INFINITY;
+      const targetOutsideBounds =
+        !!bounds &&
+        (targetRect.bottom <= bounds.top ||
+          targetRect.top >= bounds.bottom ||
+          targetRect.right <= bounds.left ||
+          targetRect.left >= bounds.right);
 
       if (!placements.length) {
         throw new Error("Preferred directions must not be empty.");
@@ -378,7 +392,7 @@ const useWindowFitment = <
         // only as the fallback when no side fits naturally.
         const absolutePosition = { ...naturalPosition };
         const autoFitOffset = { top: 0, left: 0 };
-        if (autoFit && bounds) {
+        if (autoFit && bounds && !targetOutsideBounds) {
           if (absolutePosition.top < bounds.top) {
             autoFitOffset.top = bounds.top - absolutePosition.top;
             absolutePosition.top = bounds.top;
@@ -444,7 +458,7 @@ const useWindowFitment = <
   );
 
   /** The best possible position for the popup. */
-  // biome-ignore lint/correctness/useExhaustiveDependencies: dirVersion and isOpen are deliberate re-resolution triggers — the memo reads document.documentElement.dir and live DOM rects (not tracked by React).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dirVersion, positionVersion and isOpen re-read document direction and live DOM rects, which React does not track.
   const bestPosition: BestPosition | undefined = useMemo(() => {
     if (
       !isServer &&
@@ -479,7 +493,27 @@ const useWindowFitment = <
     directionProp,
     dirVersion,
     isOpen,
+    positionVersion,
   ]);
+
+  // Element scroll does not bubble, but a capture listener on window observes
+  // scrolling ancestors. Respect the public scrollDelay contract while
+  // coalescing a burst of nested/window/visual viewport events.
+  useEffect(() => {
+    if (isServer || !positioningActive) return;
+    const schedulePositionUpdate = debounce(
+      () => setPositionVersion((version) => version + 1),
+      scrollDelay,
+    );
+    window.addEventListener("scroll", schedulePositionUpdate, true);
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("scroll", schedulePositionUpdate);
+    return () => {
+      window.removeEventListener("scroll", schedulePositionUpdate, true);
+      viewport?.removeEventListener("scroll", schedulePositionUpdate);
+      schedulePositionUpdate.cancel();
+    };
+  }, [isServer, positioningActive, scrollDelay]);
 
   // Re-resolve when the document's <html dir> flips (a language toggle) with no
   // size/scroll change. A single observer on the root — the one source of truth.
