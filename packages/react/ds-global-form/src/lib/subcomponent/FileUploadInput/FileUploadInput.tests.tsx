@@ -423,6 +423,23 @@ describe("FileUploadInput (presentational)", () => {
       expect(container.querySelector(".drop-area")).toBeInTheDocument();
     });
 
+    it("keeps the field error while a chosen file hides the drop area", () => {
+      const { container } = render(
+        <FileUploadInput
+          value={[file("a.txt")]}
+          aria-describedby="field-error"
+          error={<p id="field-error">Not allowed.</p>}
+        />,
+      );
+      expect(container.querySelector(".drop-area")).toBeNull();
+      expect(
+        container.querySelector(".drop-area-group > #field-error"),
+      ).toHaveTextContent("Not allowed.");
+      expect(
+        screen.getByRole("button", { name: "Remove a.txt" }),
+      ).toHaveAttribute("aria-describedby", "field-error");
+    });
+
     it("stays when multiple", () => {
       const { container } = render(
         <FileUploadInput multiple value={[file("a.txt")]} />,
@@ -470,7 +487,7 @@ describe("FileUploadInput (presentational)", () => {
   });
 
   describe("turning the parts off", () => {
-    it("hides the drop area and its field error with showDropArea off", () => {
+    it("hides the drop area but keeps the field error with showDropArea off", () => {
       const { container } = render(
         <FileUploadInput
           showDropArea={false}
@@ -479,11 +496,66 @@ describe("FileUploadInput (presentational)", () => {
           error={<p className="field-error">Too many files.</p>}
         />,
       );
-      expect(container.querySelector(".drop-area-group")).toBeNull();
-      expect(screen.queryByText("Too many files.")).not.toBeInTheDocument();
+      expect(container.querySelector(".drop-area")).toBeNull();
+      // The group stays, holding only the error.
+      expect(
+        container.querySelector(".drop-area-group > .field-error"),
+      ).toHaveTextContent("Too many files.");
+      expect(
+        container.querySelector(".drop-area-group")?.children,
+      ).toHaveLength(1);
       // The native input stays, so the files still post, and the list shows.
       expect(nativeInput(container)).toBeInTheDocument();
       expect(screen.getByRole("listitem")).toHaveTextContent("a.txt");
+    });
+
+    it("draws no group with showDropArea off and no error", () => {
+      const { container } = render(
+        <FileUploadInput
+          showDropArea={false}
+          multiple
+          value={[file("a.txt")]}
+        />,
+      );
+      expect(container.querySelector(".drop-area-group")).toBeNull();
+    });
+
+    it("moves the field's description to the file actions without the drop area", () => {
+      render(
+        <FileUploadInput
+          showDropArea={false}
+          multiple
+          value={[file("a.txt"), file("b.exe")]}
+          accept=".txt"
+          aria-describedby="field-error"
+          error={<p id="field-error">Too many files.</p>}
+        />,
+      );
+      expect(
+        screen.getByRole("button", { name: "Remove a.txt" }),
+      ).toHaveAttribute("aria-describedby", "field-error");
+      const removeB = screen.getByRole("button", { name: "Remove b.exe" });
+      const [own, field] = (
+        removeB.getAttribute("aria-describedby") ?? ""
+      ).split(" ");
+      expect(document.getElementById(own as string)).toHaveTextContent(
+        /not accepted|type/i,
+      );
+      expect(field).toBe("field-error");
+    });
+
+    it("leaves the file actions their own description while the drop area shows", () => {
+      render(
+        <FileUploadInput
+          multiple
+          value={[file("a.txt")]}
+          aria-describedby="field-error"
+        />,
+      );
+      expect(chooseButton()).toHaveAttribute("aria-describedby", "field-error");
+      expect(
+        screen.getByRole("button", { name: "Remove a.txt" }),
+      ).not.toHaveAttribute("aria-describedby");
     });
 
     it("hides the file list with showFileList off", () => {

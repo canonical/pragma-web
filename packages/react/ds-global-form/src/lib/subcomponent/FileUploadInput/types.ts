@@ -159,9 +159,9 @@ type OwnProps = {
   showFileSize?: boolean;
 
   /**
-   * Show the drop area, with its Choose file button. When off, the field-level
-   * `error` under it hides with it, and the files can only be added by the
-   * consumer through `value`.
+   * Show the drop area, with its Choose file button. When off, the files can
+   * only be added by the consumer through `value`; the field-level `error` still
+   * shows, and the file actions carry the field's `aria-describedby`.
    */
   showDropArea?: boolean;
 
@@ -169,8 +169,9 @@ type OwnProps = {
   showFileList?: boolean;
 
   /**
-   * A field-level message rendered under the drop area. While it is set, the
-   * drop area takes the error colours.
+   * A field-level message rendered under the drop area, or in its place when
+   * the drop area is not shown. While it is set, the drop area takes the error
+   * colours.
    */
   error?: ReactNode;
 

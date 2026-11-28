@@ -97,14 +97,17 @@ describe("FileUploadField", () => {
     );
     expect(container.querySelector(".drop-area")).toBeNull();
     submit();
-    // With the drop area off, the field error hides with it, and the ref
-    // focuses the tile's action.
+    // With the drop area off, the field error still shows, the ref focuses
+    // the tile's action, and the action is described by the error.
+    const remove = screen.getByRole("button", { name: "Remove a.txt" });
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Remove a.txt" }),
-      ).toHaveFocus();
+      expect(remove).toHaveFocus();
     });
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Remove the files that have errors.");
+    expect(remove.getAttribute("aria-describedby")?.split(" ")).toContain(
+      alert.id,
+    );
   });
 
   it("hides the file list with showFileList off", () => {
@@ -244,9 +247,11 @@ describe("FileUploadField", () => {
         screen.getByRole("button", { name: "Remove a.txt" }),
       ).toHaveFocus();
     });
-    // The drop area, and the field error with it, is hidden in single-file
-    // mode while a file is chosen; the tile carries the message.
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    // The drop area is hidden in single-file mode while a file is chosen; the
+    // field error still shows, and the tile carries its own message.
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Remove the files that have errors.",
+    );
     expect(screen.getByText("Not allowed.")).toBeInTheDocument();
   });
 
