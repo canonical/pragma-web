@@ -437,6 +437,22 @@ describe("FileUploadInput (presentational)", () => {
       await expect.poll(() => dropArea(page.container)).not.toBeNull();
     });
 
+    it("keeps the field error while a chosen file hides the drop area", async () => {
+      const page = await render(FileUploadInput, {
+        files: [file("a.txt")],
+        "aria-describedby": "field-error",
+        error: fieldError,
+      });
+      expect(dropArea(page.container)).toBeNull();
+      expect(
+        page.container.querySelector(".drop-area-group > .field-error")
+          ?.textContent,
+      ).toBe("Too many files.");
+      expect(
+        button(page.container, "Remove a.txt").getAttribute("aria-describedby"),
+      ).toBe("field-error");
+    });
+
     it("stays when multiple", async () => {
       const page = await render(FileUploadInput, {
         multiple: true,
@@ -479,18 +495,69 @@ describe("FileUploadInput (presentational)", () => {
   });
 
   describe("turning the parts off", () => {
-    it("hides the drop area and its field error with showDropArea off", async () => {
+    it("hides the drop area but keeps the field error with showDropArea off", async () => {
       const page = await render(FileUploadInput, {
         showDropArea: false,
         multiple: true,
         files: [file("a.txt")],
         error: fieldError,
       });
-      expect(page.container.querySelector(".drop-area-group")).toBeNull();
-      expect(page.container.textContent).not.toContain("Too many files.");
+      expect(dropArea(page.container)).toBeNull();
+      // The group stays, holding only the error.
+      const group = page.container.querySelector(".drop-area-group");
+      expect(group?.children).toHaveLength(1);
+      expect(group?.querySelector(":scope > .field-error")?.textContent).toBe(
+        "Too many files.",
+      );
       // The native input stays, so the files still post, and the list shows.
       expect(nativeInput(page.container)).not.toBeNull();
       expect(readNames(page.container)).toEqual(["a.txt"]);
+    });
+
+    it("draws no group with showDropArea off and no error", async () => {
+      const page = await render(FileUploadInput, {
+        showDropArea: false,
+        multiple: true,
+        files: [file("a.txt")],
+      });
+      expect(page.container.querySelector(".drop-area-group")).toBeNull();
+    });
+
+    it("moves the field's description to the file actions without the drop area", async () => {
+      const page = await render(FileUploadInput, {
+        showDropArea: false,
+        multiple: true,
+        files: [file("a.txt"), file("b.exe")],
+        accept: ".txt",
+        "aria-describedby": "field-error",
+        error: fieldError,
+      });
+      expect(
+        button(page.container, "Remove a.txt").getAttribute("aria-describedby"),
+      ).toBe("field-error");
+      const [own, field] = (
+        button(page.container, "Remove b.exe").getAttribute(
+          "aria-describedby",
+        ) ?? ""
+      ).split(" ");
+      expect(
+        page.container.querySelector(`[id="${own}"]`)?.textContent,
+      ).toContain("not accepted");
+      expect(field).toBe("field-error");
+    });
+
+    it("leaves the file actions their own description while the drop area shows", async () => {
+      const page = await render(FileUploadInput, {
+        multiple: true,
+        files: [file("a.txt")],
+        "aria-describedby": "field-error",
+      });
+      expect(
+        chooseButton(page.container).getAttribute("aria-describedby"),
+      ).toBe("field-error");
+      expect(
+        button(page.container, "Remove a.txt").hasAttribute("aria-describedby"),
+      ).toBe(false);
     });
 
     it("hides the file list with showFileList off", async () => {

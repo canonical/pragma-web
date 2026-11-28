@@ -10,6 +10,11 @@ export type FileItemProps = {
   file: File;
   /** The id of the message under the tile, which the tile references. */
   messageId: string;
+  /**
+   * The field's own `aria-describedby`, added to the tile's buttons while the
+   * drop area, and its Choose file button, is not shown.
+   */
+  fieldDescribedBy?: string;
   /** The `accept`, `maxSize` or `validateFile` message for the file. */
   validation?: FileMessage;
   /** Whether the input uploads files live, so the tile shows a status. */

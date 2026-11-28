@@ -109,6 +109,20 @@ describe("FileUploadInput (SSR)", () => {
     );
   });
 
+  it("renders the field-level error alone in its group without the drop area", () => {
+    const html = renderHtml({
+      showDropArea: false,
+      files: [file("a.txt")],
+      error: createRawSnippet(() => ({
+        render: () => '<p class="ds field-error">Too many files.</p>',
+      })),
+    });
+    expect(html).toContain(
+      '<div class="drop-area-group"><p class="ds field-error">Too many files.</p></div>',
+    );
+    expect(html).not.toContain('class="drop-area"');
+  });
+
   it("server-renders the thumbnail without a preview tooltip", () => {
     const html = renderHtml({ files: [file("photo.png", 10, "image/png")] });
     expect(html).not.toContain("tooltip");
