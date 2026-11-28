@@ -1,0 +1,13 @@
+// What @canonical/react-components 4.12 to 4.16 compile for PrefixedInput that
+// sizes text: Vanilla's form base inside the component's class, and Vanilla's
+// input placeholder extended for its input frame.
+@import "vanilla-framework-4.61";
+@include vf-b-placeholders;
+
+.p-prefixed-input {
+  @include vf-b-forms;
+
+  &__flex-container {
+    @extend %vf-input-elements;
+  }
+}

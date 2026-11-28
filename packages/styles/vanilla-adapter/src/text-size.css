@@ -1,0 +1,174 @@
+/* @canonical/styles-vanilla-adapter - Vanilla's text at pragma's text size
+ *
+ * Restates Vanilla's default-size text rules with pragma's token,
+ * `--typography-text-primary-font-size`, so Vanilla's running text follows the
+ * context class on the root: 14px under `app` and `docs`, and `1rem`,
+ * Vanilla's own value, under `site`. The fallback is the same `1rem`. The root
+ * size is not changed, so every `rem` on the page keeps its value.
+ *
+ * It is not an entry. adapter.css imports it into the `vanilla` layer:
+ *
+ *   @import url("./text-size.css") layer(vanilla);
+ *
+ * Each selector below is the selector of the Vanilla rule it restates, so it
+ * has the same specificity and wins by coming later in the same layer, which
+ * it does with Vanilla in `vanilla` and pragma's entry linked after Vanilla's
+ * stylesheet, as the README's installation sets them up. Vanilla rules with
+ * more specific selectors keep their sizes: `.p-text--small`, `.is-small`
+ * buttons and a paragraph carrying `.p-heading--5`. `boundary` reverts the
+ * `vanilla` layer inside pragma's islands, so nothing here reaches them.
+ *
+ * Not restated, and listed in tests/text-size.test.ts:
+ *   - `html`;
+ *   - Vanilla's `h5`, `h6`, `.p-heading--5` and `.p-heading--6` rules and the
+ *     selectors grouped with them, since pragma sizes headings with their own
+ *     tokens;
+ *   - the chip leads and the reduced navigation's logo title, which Vanilla
+ *     sets to `1rem` and then, later and at the same specificity, to
+ *     `0.875rem`;
+ *   - a base button inside a side-navigation expander, whose selector ties
+ *     with `.is-small.p-button--base` and would beat it by coming later. */
+
+body {
+  font-size: var(--typography-text-primary-font-size, 1rem);
+}
+
+/* Vanilla's own `1rem` text rules, by Vanilla rule, in Vanilla's order. */
+/* Running text, notification details, definition lists, labels. */
+.p-pull-quote--small .p-pull-quote__quote,
+.p-notification--information .p-notification__action,
+.p-notification--negative .p-notification__action,
+.p-notification--caution .p-notification__action,
+.p-notification--positive .p-notification__action,
+.p-notification .p-notification__action,
+.p-notification--information .p-notification__timestamp,
+.p-notification--negative .p-notification__timestamp,
+.p-notification--caution .p-notification__timestamp,
+.p-notification--positive .p-notification__timestamp,
+.p-notification .p-notification__timestamp,
+dt,
+dd,
+cite,
+.p-text--default,
+.p-in-page-navigation__heading,
+.p-muted-heading,
+.p-logo-section__title,
+.p-breadcrumbs__item,
+.p-text--small-caps,
+.p-text--x-small-capitalised,
+.p-table-of-contents__header,
+/* Paragraphs. */
+p,
+/* Buttons, tabs and pagination links. */
+.p-tabs__link,
+.p-side-navigation__toggle,
+.p-side-navigation__toggle--in-drawer,
+.p-pagination__link--previous,
+.p-pagination__link--next,
+.p-pagination__link,
+.p-button--base,
+.p-button--negative,
+.p-button--positive,
+.p-button--brand,
+.p-button,
+.p-article-pagination__link--next,
+.p-article-pagination__link--previous,
+button,
+/* Text inputs, text areas and selects. */
+textarea,
+[type="text"],
+[type="date"],
+[type="datetime"],
+[type="datetime-local"],
+[type="month"],
+[type="time"],
+[type="week"],
+[type="number"],
+[type="search"],
+[type="password"],
+[type="email"],
+[type="url"],
+[type="tel"],
+select,
+/* Article blocks. */
+.p-article-block__item:has(.p-article-block__title:not(:empty)),
+.p-article-block__item:has(.p-article-block__description:not(:empty)),
+.p-article-block__item:has(.article-author:not(:empty)),
+.p-article-block__item:has(.article-time:not(:empty)),
+.p-article-block__title,
+/* Notification titles. */
+.p-notification--information .p-notification__title,
+.p-notification--negative .p-notification__title,
+.p-notification--caution .p-notification__title,
+.p-notification--positive .p-notification__title,
+.p-notification .p-notification__title {
+  font-size: var(--typography-text-primary-font-size, 1rem);
+}
+
+/* @canonical/react-components. MultiSelect, CustomSelect and PrefixedInput
+ * compile Vanilla's form base inside their own class, so each carries a copy of
+ * Vanilla's `1rem` input rule, one class more specific than Vanilla's. The
+ * component's class is written twice here, which makes each restatement one
+ * class more specific again, so it wins wherever a bundler puts the
+ * components' CSS within the `vanilla` layer. No input in Vanilla is smaller
+ * than `1rem`, so the extra class overrides nothing else. */
+.multi-select.multi-select .multi-select__select-button,
+.multi-select.multi-select textarea,
+.multi-select.multi-select [type="text"],
+.multi-select.multi-select [type="date"],
+.multi-select.multi-select [type="datetime"],
+.multi-select.multi-select [type="datetime-local"],
+.multi-select.multi-select [type="month"],
+.multi-select.multi-select [type="time"],
+.multi-select.multi-select [type="week"],
+.multi-select.multi-select [type="number"],
+.multi-select.multi-select [type="search"],
+.multi-select.multi-select [type="password"],
+.multi-select.multi-select [type="email"],
+.multi-select.multi-select [type="url"],
+.multi-select.multi-select [type="tel"],
+.multi-select.multi-select select,
+.p-custom-select.p-custom-select .p-custom-select__toggle,
+.p-custom-select.p-custom-select textarea,
+.p-custom-select.p-custom-select [type="text"],
+.p-custom-select.p-custom-select [type="date"],
+.p-custom-select.p-custom-select [type="datetime"],
+.p-custom-select.p-custom-select [type="datetime-local"],
+.p-custom-select.p-custom-select [type="month"],
+.p-custom-select.p-custom-select [type="time"],
+.p-custom-select.p-custom-select [type="week"],
+.p-custom-select.p-custom-select [type="number"],
+.p-custom-select.p-custom-select [type="search"],
+.p-custom-select.p-custom-select [type="password"],
+.p-custom-select.p-custom-select [type="email"],
+.p-custom-select.p-custom-select [type="url"],
+.p-custom-select.p-custom-select [type="tel"],
+.p-custom-select.p-custom-select select,
+.p-prefixed-input.p-prefixed-input .p-prefixed-input__flex-container,
+.p-prefixed-input.p-prefixed-input textarea,
+.p-prefixed-input.p-prefixed-input [type="text"],
+.p-prefixed-input.p-prefixed-input [type="date"],
+.p-prefixed-input.p-prefixed-input [type="datetime"],
+.p-prefixed-input.p-prefixed-input [type="datetime-local"],
+.p-prefixed-input.p-prefixed-input [type="month"],
+.p-prefixed-input.p-prefixed-input [type="time"],
+.p-prefixed-input.p-prefixed-input [type="week"],
+.p-prefixed-input.p-prefixed-input [type="number"],
+.p-prefixed-input.p-prefixed-input [type="search"],
+.p-prefixed-input.p-prefixed-input [type="password"],
+.p-prefixed-input.p-prefixed-input [type="email"],
+.p-prefixed-input.p-prefixed-input [type="url"],
+.p-prefixed-input.p-prefixed-input [type="tel"],
+.p-prefixed-input.p-prefixed-input select {
+  font-size: var(--typography-text-primary-font-size, 1rem);
+}
+
+/* Vanilla content inside a permeable pragma root. The confined copy gives every
+ * island root `font-size: 1rem` (DESIGN.md, "The confined copy"), which a plain
+ * Vanilla child would otherwise inherit. Zero specificity, so any Vanilla rule
+ * for the child itself still wins. A pragma component among the children is an
+ * island root itself and takes its size from the confined copy, in a higher
+ * layer. */
+:where(.ds-permeable > *) {
+  font-size: var(--typography-text-primary-font-size, 1rem);
+}

@@ -1,0 +1,13 @@
+// What @canonical/react-components 4.12 to 4.16 compile for MultiSelect that
+// sizes text: Vanilla's form base inside the component's class, and Vanilla's
+// input placeholder extended for its toggle.
+@import "vanilla-framework-4.61";
+@include vf-b-placeholders;
+
+.multi-select {
+  @include vf-b-forms;
+}
+
+.multi-select__select-button {
+  @extend %vf-input-elements;
+}
