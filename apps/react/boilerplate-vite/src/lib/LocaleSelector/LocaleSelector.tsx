@@ -1,4 +1,5 @@
 import { useLocale, useTranslation } from "@canonical/i18n-react";
+import { Button } from "@canonical/react-ds-global";
 import { SelectInput } from "@canonical/react-ds-global-form";
 import type { ChangeEvent, ReactElement } from "react";
 
@@ -21,6 +22,10 @@ function endonymOf(tag: string): string {
  * the endonym in its own language. Built on the form package's standalone
  * `SelectInput`, so it wears the design system's input chrome; the picker
  * itself stays app-local, as the design-system tier ships no locale switcher.
+ *
+ * Without JavaScript, the form posts to `/language`, which stores the same
+ * cookie and sends the reader back; its Apply button is in `<noscript>`, so it
+ * never shows while JavaScript runs.
  */
 export default function LocaleSelector(): ReactElement {
   const { locale, locales, setLocale } = useLocale();
@@ -31,15 +36,23 @@ export default function LocaleSelector(): ReactElement {
   }
 
   return (
-    <SelectInput
-      aria-label={t("locale.label")}
-      onChange={handleChange}
-      options={locales.map((tag) => ({
-        value: tag,
-        label: endonymOf(tag),
-        lang: tag,
-      }))}
-      value={locale}
-    />
+    <form action="/language" method="post">
+      <SelectInput
+        aria-label={t("locale.label")}
+        name="locale"
+        onChange={handleChange}
+        options={locales.map((tag) => ({
+          value: tag,
+          label: endonymOf(tag),
+          lang: tag,
+        }))}
+        value={locale}
+      />
+      <noscript>
+        <Button importance="secondary" type="submit">
+          {t("preferences.apply")}
+        </Button>
+      </noscript>
+    </form>
   );
 }

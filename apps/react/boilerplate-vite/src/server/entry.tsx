@@ -17,6 +17,7 @@ import { Outlet, RouterProvider } from "@canonical/router-react";
 import { fetchQuery, RelayEnvironmentProvider } from "react-relay";
 import { catalogs, i18nConfig } from "#i18n/index.js";
 import LoadingMessage from "#lib/LoadingMessage/index.js";
+import { ServerThemeContext } from "#lib/ThemeSelector/index.js";
 import { createEnvironment } from "#relay/environment.js";
 import formatDocumentTitle from "../formatDocumentTitle.js";
 import {
@@ -289,9 +290,11 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
           <I18nProvider config={i18nConfig} catalogs={catalogs} locale={locale}>
             <HeadProvider titleTemplate={formatDocumentTitle}>
               <RelayEnvironmentProvider environment={relayEnvironment}>
-                <RouterProvider router={router}>
-                  <Outlet fallback={<LoadingMessage />} />
-                </RouterProvider>
+                <ServerThemeContext.Provider value={initialData.theme}>
+                  <RouterProvider router={router}>
+                    <Outlet fallback={<LoadingMessage />} />
+                  </RouterProvider>
+                </ServerThemeContext.Provider>
               </RelayEnvironmentProvider>
             </HeadProvider>
           </I18nProvider>

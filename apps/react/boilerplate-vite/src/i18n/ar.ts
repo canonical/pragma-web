@@ -20,6 +20,7 @@ const ar: Record<MessageKey, MessageValue> = {
   "theme.system": "النظام",
   "theme.light": "فاتح",
   "theme.dark": "داكن",
+  "preferences.apply": "تطبيق",
   "locale.label": "اللغة",
   "notFound.heading": "الصفحة غير موجودة",
   "notFound.body": "الصفحة التي تبحث عنها غير موجودة.",

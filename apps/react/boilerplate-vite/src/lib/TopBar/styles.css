@@ -28,12 +28,17 @@
 
     /* The theme and language selectors sit at the end of the bar at their
        own width; the input chrome otherwise fills its container, as a form
-       field does. */
-    & nav > .ds.input {
+       field does. Their forms take no box of their own, so each select (and
+       the Apply button without JavaScript) lays out as one of the bar's items. */
+    & nav > form {
+      display: contents;
+    }
+
+    & nav > form > .ds.input {
       width: auto;
     }
 
-    & nav > .ds.input:first-of-type {
+    & nav > form:first-of-type > .ds.input {
       margin-inline-start: auto;
     }
 
