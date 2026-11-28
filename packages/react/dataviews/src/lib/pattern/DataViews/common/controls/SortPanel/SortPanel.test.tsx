@@ -416,7 +416,7 @@ describe("DataViews.SortPanel", () => {
         provider={provider}
         messages={{
           sortPanel: "Tri",
-          sortTerm: (name) => `terme ${name}`,
+          sortTerm: ({ name }) => `terme ${name}`,
           removeSortTerm: "Retirer",
         }}
       >

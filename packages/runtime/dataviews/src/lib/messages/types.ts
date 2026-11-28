@@ -17,18 +17,6 @@ import type { Count } from "../result/index.js";
 import type { ViewCommand } from "../views/index.js";
 
 /**
- * One term of an ordering, as a message words it: its name and direction.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type SortTermWords = {
-  /** The name the term is shown by: its column's heading, or its field. */
-  readonly name: string;
-  readonly direction: SortDirection;
-};
-
-/**
  * A count a facet reports beside the value it counts: exact, or a lower
  * bound. A count of nothing is not worded, so the unknown kind is not here.
  *
@@ -59,56 +47,11 @@ export type RecordNoun = {
 };
 
 /**
- * Every user-facing string DataViews renders or announces. It ships in
- * English; an application replaces it whole or in part through the root's
- * `messages`, and a part that is its own root — a standalone `DataTable` or
- * `PaginationBar` — takes `messages` itself.
- *
- * Field and option labels are not here: they name the application's data,
- * not the library's words.
- *
- * Annotating a whole replacement with this type makes a missing message a
- * compile error; the root takes any part of it and keeps English for the
- * rest.
- *
- * **How a key is named.** A key is a message id, spelled the same whether
- * the message is text or a function of the facts it states:
- * - a place or a control the reader lands on is its subject as a noun —
- *   `search`, `pagination`, `tableSettings`, `columnOptions`;
- * - a command is the verb and what it acts on, which may be an adverb
- *   where the control has no object — `hideColumn`, `clearFilter`,
- *   `goToNextPage`, `removeSortTerm`, `sortAscending`, `matchAnyInstead`,
- *   `cancel`;
- * - the same command worded with the thing it names takes `Named` —
- *   `hideColumn` on a column's own menu, `hideNamedColumn` in a list of
- *   every column;
- * - a form's submit is `submit…` — `submitSearch`, `submitFilters`;
- * - a form or the question it asks is `…Form` — `renameForm`, `deleteForm`;
- * - an outcome or a state is its subject and its condition, whether that
- *   is what happened to it or what it stands at — `columnHidden`,
- *   `sortApplied`, `viewConflicted`, `statusFailed`, `sortAbsent`,
- *   `viewNone`, `statusNoResults`;
- * - a control whose label is a phrase is worded as the phrase reads —
- *   `filterFrom`, `filterInUnit`;
- * - a hint or a description names what it describes — `sortPrecedence`,
- *   `filterLowest`, `pageCount`.
- *
- * **How a message is handed its facts.** A new message takes one object of
- * named facts — `{ count, condition }`, `{ label }` — so a translation reads
- * each fact by its name and a fact added later breaks no locale. Older
- * messages take one fact per argument, the subject first and, where a
- * message is about a saved-view command, the command first, until they
- * move to named facts. A list of like facts is passed as an array. A name a
- * message is handed is placed where the message puts it and never altered,
- * since it may stand for a column heading drawn as more than text. Plurals
- * and ordinals are the message's own to word, as the English record words
- * them through the platform's English rules.
- *
- * Message keys are noun phrases rather than verbs: a message is named for
- * what it says, and the name must not change when a message stops being
- * text and becomes a function of one fact. The code standards' verb rule for
- * function names exempts every member of a word record, whatever its value;
- * that exemption is canonical/pragma-core#127.
+ * Every user-facing string DataViews renders or announces, in English; a
+ * root's `messages` replaces any part of it. A message of two or more
+ * facts takes them as one named object, as does every message added since
+ * the query bar's quick filters; an older message of one fact takes it as
+ * is.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -154,20 +97,26 @@ export type DataViewsMessages = {
    * What a sorted heading states of its column: its direction, and its
    * precedence once the ordering has more than one term.
    */
-  readonly sortPrecedence: (
-    direction: SortDirection,
-    position: number,
-    total: number,
-  ) => string;
+  readonly sortPrecedence: (facts: {
+    readonly direction: SortDirection;
+    readonly position: number;
+    readonly total: number;
+  }) => string;
   /**
    * Why an activation of a heading changed no ordering: every reason the
    * source gave, as `filterRefused` takes them.
    */
   readonly sortRefused: (reasons: readonly string[]) => string;
-  /** The ordering the reader now states, announced once it applies. */
-  readonly sortApplied: (terms: readonly SortTermWords[]) => string;
-  /** The source's own ordering, which orders the rows while the reader states none. */
-  readonly sortDefaulted: (terms: readonly SortTermWords[]) => string;
+  /**
+   * The ordering the reader now states, announced once it applies: each
+   * term as `sortTerm` words it.
+   */
+  readonly sortApplied: (terms: readonly string[]) => string;
+  /**
+   * The source's own ordering, which orders the rows while the reader states
+   * none: each term as `sortTerm` words it.
+   */
+  readonly sortDefaulted: (terms: readonly string[]) => string;
   /** No ordering stands, and the source documents none. */
   readonly sortAbsent: string;
 
@@ -195,24 +144,30 @@ export type DataViewsMessages = {
   // What a change to the columns announces.
   readonly columnHidden: (name: string) => string;
   /** A column shown again, with its place among however many columns show. */
-  readonly columnShown: (
-    name: string,
-    position: number,
-    total: number,
-  ) => string;
+  readonly columnShown: (facts: {
+    readonly name: string;
+    readonly position: number;
+    readonly total: number;
+  }) => string;
   /** A column moved, with its place among however many columns show. */
-  readonly columnMoved: (
-    name: string,
-    position: number,
-    total: number,
-  ) => string;
+  readonly columnMoved: (facts: {
+    readonly name: string;
+    readonly position: number;
+    readonly total: number;
+  }) => string;
   readonly tableSettingsReset: string;
 
   // The sort panel.
   /** The panel's name. */
   readonly sortPanel: string;
-  /** One term of the reader's ordering, by the name its field is shown by. */
-  readonly sortTerm: (name: string, direction: SortDirection) => string;
+  /**
+   * One term of an ordering, by the name its field is shown by: a sort
+   * panel's item, and each term the ordering messages are handed.
+   */
+  readonly sortTerm: (facts: {
+    readonly name: string;
+    readonly direction: SortDirection;
+  }) => string;
   readonly moveSortTermUp: string;
   readonly moveSortTermDown: string;
   readonly removeSortTerm: string;
@@ -229,7 +184,10 @@ export type DataViewsMessages = {
   /** A number or date field's upper bound, by the field's label. */
   readonly filterTo: (label: string) => string;
   /** A number bound's name with the base unit its value is read in. */
-  readonly filterInUnit: (name: string, symbol: string) => string;
+  readonly filterInUnit: (facts: {
+    readonly name: string;
+    readonly symbol: string;
+  }) => string;
   /** The least value a matching record holds, beside the lower bound. */
   readonly filterLowest: (value: string) => string;
   /** The greatest value a matching record holds, beside the upper bound. */
@@ -241,11 +199,17 @@ export type DataViewsMessages = {
    * after it: the control's phrase and the values the restriction holds.
    * What `clearFilter` names it by.
    */
-  readonly filterAlso: (phrase: string, values: readonly string[]) => string;
+  readonly filterAlso: (facts: {
+    readonly phrase: string;
+    readonly values: readonly string[];
+  }) => string;
   /** The list of a followed link's clauses that were refused, as a place. */
   readonly linkRefusals: string;
   /** One refused clause of a followed link, by its name, and why. */
-  readonly clauseRefused: (name: string, reason: string) => string;
+  readonly clauseRefused: (facts: {
+    readonly name: string;
+    readonly reason: string;
+  }) => string;
   /** A refused grouping's name, where the link names no field to group by. */
   readonly grouping: string;
   /** The control moving a none-of set to any-of. */
@@ -272,10 +236,10 @@ export type DataViewsMessages = {
    * schema's one reason, or every reason the source gave — and whether the
    * restriction this edit would have replaced is still in force.
    */
-  readonly filterRefused: (
-    reasons: readonly string[],
-    retained: boolean,
-  ) => string;
+  readonly filterRefused: (facts: {
+    readonly reasons: readonly string[];
+    readonly retained: boolean;
+  }) => string;
 
   // The search.
   /** The search input's label. */
@@ -288,10 +252,10 @@ export type DataViewsMessages = {
    * An operator as a chip shows it, by its operands: a symbol such as `:`
    * or `≥`, or words where it has no symbol. Symbols are not translated.
    */
-  readonly operatorShown: (
-    operator: PredicateOperator,
-    operands: readonly PredicateOperand[],
-  ) => string;
+  readonly operatorShown: (facts: {
+    readonly operator: PredicateOperator;
+    readonly operands: readonly PredicateOperand[];
+  }) => string;
   /**
    * An operator in words, by its operands, after the field's label when
    * one is given: "status is any of", or "is any of" alone. "is" for one
@@ -316,7 +280,10 @@ export type DataViewsMessages = {
   /** The query bar's control clearing every clause and the search. */
   readonly clearFiltersAndSearch: string;
   /** Every clause and the search cleared, with the result count after it. */
-  readonly queryCleared: (count: Count, noun: RecordNoun) => string;
+  readonly queryCleared: (facts: {
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /**
    * One clause as it is spoken: its field's label and operator as one
    * phrase, from `operatorPhrase`, and the values it holds, none for
@@ -356,19 +323,22 @@ export type DataViewsMessages = {
   /** The value part of a clause, by its field's label. */
   readonly clauseValue: (label: string) => string;
   /** How many matching records hold a value, beside it as a hint. */
-  readonly recordCount: (count: FacetCountWords, noun: RecordNoun) => string;
+  readonly recordCount: (facts: {
+    readonly count: FacetCountWords;
+    readonly noun: RecordNoun;
+  }) => string;
   /** A clause added, with the result count after it. */
-  readonly clauseAdded: (
-    clause: string,
-    count: Count,
-    noun: RecordNoun,
-  ) => string;
+  readonly clauseAdded: (facts: {
+    readonly clause: string;
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /** A clause changed, with the result count after it. */
-  readonly clauseChanged: (
-    clause: string,
-    count: Count,
-    noun: RecordNoun,
-  ) => string;
+  readonly clauseChanged: (facts: {
+    readonly clause: string;
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /**
    * The query bar's disclosure of the filters form before scripts run, by
    * how many filter chips the bar shows, a range counting once.
@@ -388,11 +358,11 @@ export type DataViewsMessages = {
     readonly noun: RecordNoun;
   }) => string;
   /** A clause removed, with the result count after it. */
-  readonly clauseRemoved: (
-    clause: string,
-    count: Count,
-    noun: RecordNoun,
-  ) => string;
+  readonly clauseRemoved: (facts: {
+    readonly clause: string;
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /** A typed `>` read as the bound it stops short of. */
   readonly readAsAtLeast: string;
   /** A typed `<` read as the bound it stops short of. */
@@ -501,7 +471,11 @@ export type DataViewsMessages = {
    * Which rows are on screen: the place of the first, how many show, and
    * how many the window pages over, as exactly as the source counts them.
    */
-  readonly rowsShown: (first: number, shown: number, total: Count) => string;
+  readonly rowsShown: (facts: {
+    readonly first: number;
+    readonly shown: number;
+    readonly total: Count;
+  }) => string;
   /** The page select's name. */
   readonly page: string;
   /** How many pages there are, beside the page select. */
@@ -533,7 +507,7 @@ export type DataViewsMessages = {
   readonly renameView: string;
   readonly deleteView: string;
   /** Ask the store for the views, or the arrangement, again. */
-  readonly retryViews: string;
+  readonly refreshViews: string;
   /** The form naming a new view. */
   readonly saveAsForm: string;
   readonly submitSaveAs: string;
@@ -552,7 +526,7 @@ export type DataViewsMessages = {
   /** How many stored views cannot be read. */
   readonly viewsUnreadable: (count: number) => string;
   /** The arrangement is not being saved, and why. */
-  readonly arrangementUnsaved: (reason: string) => string;
+  readonly presentationUnsaved: (reason: string) => string;
   /** A name the collection refused, and why. */
   readonly viewNameRefused: (reason: string) => string;
   /** A command in flight. */
@@ -562,26 +536,44 @@ export type DataViewsMessages = {
   readonly viewRenamed: (name: string) => string;
   readonly viewDeleted: string;
   /** A view asking for what the collection cannot show, and every reason. */
-  readonly viewRefused: (name: string, reasons: readonly string[]) => string;
+  readonly viewRefused: (facts: {
+    readonly name: string;
+    readonly reasons: readonly string[];
+  }) => string;
   /**
    * A command that met a view changed elsewhere, by the stored view's name;
    * a wording for `save-as` need not use the name, since the view under that
    * identity is not the one the reader was saving.
    */
-  readonly viewConflicted: (command: ViewCommand, name: string) => string;
+  readonly viewConflicted: (facts: {
+    readonly command: ViewCommand;
+    readonly name: string;
+  }) => string;
   readonly viewMissing: (command: ViewCommand) => string;
-  readonly viewUnreadable: (command: ViewCommand, reason: string) => string;
-  readonly viewFailed: (command: ViewCommand, reason: string) => string;
+  readonly viewUnreadable: (facts: {
+    readonly command: ViewCommand;
+    readonly reason: string;
+  }) => string;
+  readonly viewFailed: (facts: {
+    readonly command: ViewCommand;
+    readonly reason: string;
+  }) => string;
 
   // The action bar.
   /** The action bar's name. */
-  readonly selectionActions: string;
+  readonly actionBar: string;
   /** How many rows are selected, across pages. */
   readonly rowsSelected: (count: number) => string;
   /** The button clearing the selection, by how many rows it clears. */
-  readonly deselectRows: (count: number) => string;
+  readonly clearSelection: (count: number) => string;
 
   // The facet charts.
+  /** A chart's facet is on its way. */
+  readonly chartPending: string;
+  /** A chart's facet could not be loaded, and why. */
+  readonly chartFailed: (facts: { readonly reason: string }) => string;
+  /** A chart's facet could not be refreshed, and why; the drawing stays. */
+  readonly chartRefreshFailed: (facts: { readonly reason: string }) => string;
   /** The source answered a result, but counted nothing for the field drawn. */
   readonly facetCountsAbsent: string;
   /** The source answered a result, but measured no range for the field drawn. */
@@ -591,11 +583,11 @@ export type DataViewsMessages = {
   /** What a bar chart is named as, by the caption it is drawn under. */
   readonly barChartSummary: (label: string) => string;
   /** What a range chart is named as: its caption, and the ends it spans. */
-  readonly rangeChartSummary: (
-    label: string,
-    min: number,
-    max: number,
-  ) => string;
+  readonly rangeChartSummary: (facts: {
+    readonly label: string;
+    readonly min: number;
+    readonly max: number;
+  }) => string;
   /** The caption of the table carrying a drawing's own numbers. */
   readonly chartTable: (label: string) => string;
   /** The heading of a bar table's value column. */

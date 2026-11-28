@@ -90,10 +90,10 @@ export default function TypedInput({
       if (read.status !== "valid") {
         const message =
           read.status === "invalid"
-            ? messages.filterRefused(
-                [messages.clauseInvalid(read.reason)],
+            ? messages.filterRefused({
+                reasons: [messages.clauseInvalid(read.reason)],
                 retained,
-              )
+              })
             : messages.filterIncomplete(retained);
         setInvalid(message);
         // An input's description is not read again while it keeps focus,

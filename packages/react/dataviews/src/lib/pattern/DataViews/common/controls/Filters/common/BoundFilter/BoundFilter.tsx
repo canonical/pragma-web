@@ -73,7 +73,9 @@ export default function BoundFilter({
   const phrase = phraseOperator(messages, bound, label);
   // A number with units is read in its base unit, which the name says.
   const name =
-    units === undefined ? phrase : messages.filterInUnit(phrase, units.base);
+    units === undefined
+      ? phrase
+      : messages.filterInUnit({ name: phrase, symbol: units.base });
   // The schema's bounds, natively: an out-of-range value is refused by the
   // browser at baseline and by the schema once scripted. A number with units
   // is text, so a display unit can be typed after it — `16 GiB` — and the

@@ -194,7 +194,7 @@ export default function Sheet({
 
   /** Say why the source refused a command, and that what applied stands. */
   const announceRefusals = (reasons: readonly string[]): void => {
-    announce(messages.filterRefused(reasons, true));
+    announce(messages.filterRefused({ reasons, retained: true }));
   };
 
   /** Remove a chip's clause, and move focus on from where it stood. */
@@ -207,7 +207,11 @@ export default function Sheet({
       return;
     }
     announceOutcome((counted) =>
-      messages.clauseRemoved(spoken, counted, labels.recordNoun),
+      messages.clauseRemoved({
+        clause: spoken,
+        count: counted,
+        noun: labels.recordNoun,
+      }),
     );
     setFocusTarget({ kind: "removed", index });
   };

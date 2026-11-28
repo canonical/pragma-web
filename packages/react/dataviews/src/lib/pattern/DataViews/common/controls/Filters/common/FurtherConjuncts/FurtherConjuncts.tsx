@@ -31,7 +31,9 @@ export default function FurtherConjuncts({
   }
   const named = phraseOperator(messages, operator, label);
   const phrase =
-    unit === undefined ? named : messages.filterInUnit(named, unit);
+    unit === undefined
+      ? named
+      : messages.filterInUnit({ name: named, symbol: unit });
   return (
     <ul
       {...rest}

@@ -26,14 +26,14 @@ export default function describeFilterFeedback(
     case "incomplete":
       return messages.filterIncomplete(retained);
     case "invalid":
-      return messages.filterRefused(
-        [feedback.reason],
-        feedback.retainsPredicate,
-      );
+      return messages.filterRefused({
+        reasons: [feedback.reason],
+        retained: feedback.retainsPredicate,
+      });
     case "refused":
-      return messages.filterRefused(
-        feedback.refusals.map((refusal) => refusal.reason),
-        feedback.retainsPredicate,
-      );
+      return messages.filterRefused({
+        reasons: feedback.refusals.map((refusal) => refusal.reason),
+        retained: feedback.retainsPredicate,
+      });
   }
 }
