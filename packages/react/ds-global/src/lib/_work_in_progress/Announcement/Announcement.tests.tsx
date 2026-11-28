@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { Button } from "../../component/Button/index.js";
 import Announcement from "./Announcement.js";
 
 describe("Announcement", () => {
@@ -23,6 +24,51 @@ describe("Announcement", () => {
       <Announcement criticality="information">Body</Announcement>,
     );
     expect(container.querySelector(".heading")).toBeNull();
+  });
+
+  it("renders the slots in flow-content elements", () => {
+    const { container } = render(
+      <Announcement criticality="information" heading="Subject">
+        Body
+      </Announcement>,
+    );
+    expect(container.querySelector(".text")?.tagName).toBe("DIV");
+    expect(container.querySelector(".heading")?.tagName).toBe("DIV");
+    expect(container.querySelector(".content")?.tagName).toBe("DIV");
+  });
+
+  it("accepts a heading element in the heading slot", () => {
+    render(
+      <Announcement criticality="information" heading={<h2>Subject</h2>}>
+        Body
+      </Announcement>,
+    );
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+      "Subject",
+    );
+  });
+
+  it("accepts flow content in the content slot", () => {
+    render(
+      <Announcement criticality="information">
+        <p>Body</p>
+      </Announcement>,
+    );
+    expect(screen.getByText("Body").tagName).toBe("P");
+  });
+
+  it("renders a control nested in the content", () => {
+    render(
+      <Announcement criticality="error" heading="Something went wrong">
+        <p>Usage request failed (500)</p>
+        <Button type="button" importance="tertiary">
+          Try again
+        </Button>
+      </Announcement>,
+    );
+    expect(
+      screen.getByRole("button", { name: "Try again" }),
+    ).toBeInTheDocument();
   });
 
   it("applies the criticality modifier class", () => {

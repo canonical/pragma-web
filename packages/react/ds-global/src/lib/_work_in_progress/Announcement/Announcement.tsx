@@ -32,10 +32,10 @@ const Announcement = ({
         the type is also conveyed by the heading/content text, not by icon
         alone, so it is aria-hidden. */}
     <span className="icon" aria-hidden="true" />
-    <span className="text">
-      {heading != null && <span className="heading">{heading}</span>}
-      <span className="content">{children}</span>
-    </span>
+    <div className="text">
+      {heading != null && <div className="heading">{heading}</div>}
+      <div className="content">{children}</div>
+    </div>
   </div>
 );
 

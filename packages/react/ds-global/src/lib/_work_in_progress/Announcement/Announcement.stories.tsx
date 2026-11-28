@@ -1,6 +1,7 @@
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as decorators from "storybook/decorators.js";
+import { Button } from "../../component/Button/index.js";
 import Component from "./Announcement.js";
 
 const meta = {
@@ -64,6 +65,27 @@ export const LongMessage: Story = {
     heading: "Scheduled maintenance and service migration",
     children:
       "Over the coming weekend we will migrate several backend services to a new region to improve latency and resilience. During the migration window — Saturday 22:00 through Sunday 06:00 UTC — dashboards may load slowly, exports may be delayed, and some automated jobs will be queued rather than run immediately. No data will be lost, and any queued work will complete once the migration finishes. We recommend avoiding large bulk operations during this window. If you notice anything unexpected after the migration completes, please contact support with the details.",
+  },
+};
+
+/**
+ * A control nested in the body reads the neutral control colours, not the
+ * criticality's text colour.
+ */
+export const WithAction: Story = {
+  args: {
+    criticality: "error",
+    heading: "Something went wrong",
+    children: (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <p style={{ margin: 0 }}>Usage request failed (500).</p>
+        <div>
+          <Button type="button" importance="tertiary">
+            Try again
+          </Button>
+        </div>
+      </div>
+    ),
   },
 };
 
