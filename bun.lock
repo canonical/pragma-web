@@ -60,7 +60,7 @@
         "react-dom": "^19.2.4",
         "react-relay": "21.0.1",
         "relay-runtime": "21.0.1",
-        "relay-runtime-network": "0.1.0",
+        "relay-runtime-network": "0.1.2",
       },
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
@@ -147,7 +147,7 @@
         "react-dom": "^19.2.4",
         "react-relay": "^21.0.1",
         "relay-runtime": "^21.0.1",
-        "relay-runtime-network": "^0.1.0",
+        "relay-runtime-network": "^0.1.2",
       },
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
@@ -1617,7 +1617,6 @@
   },
   "patchedDependencies": {
     "relay-runtime@21.0.1": "patches/relay-runtime@21.0.1.patch",
-    "relay-runtime-network@0.1.0": "patches/relay-runtime-network@0.1.0.patch",
     "react-relay@21.0.1": "patches/react-relay@21.0.1.patch",
     "sigstore@5.0.1": "patches/sigstore@5.0.1.patch",
   },
@@ -3638,7 +3637,7 @@
 
     "relay-runtime": ["relay-runtime@21.0.1", "", { "dependencies": { "@babel/runtime": "^7.25.0", "fbjs": "^3.0.2", "invariant": "^2.2.4" } }, "sha512-OS+We56sp6gkGVEcce9VCNOeg/sMbxT9unEoerQPgNAICHowSWrXNc6LJxF2OqjypxYF7kaLDSPPiaPii2Pw1g=="],
 
-    "relay-runtime-network": ["relay-runtime-network@0.1.0", "", { "peerDependencies": { "relay-runtime": ">=16.0.0" } }, "sha512-TN7/X24Io1Ln7vl+ENAqVZoLLyLKgk9kQEi15I12Hi7P6xVTYV7g0cF8Pr1fRHK7UTs1qzAo0CYkvAYxl2FZ3w=="],
+    "relay-runtime-network": ["relay-runtime-network@0.1.2", "", { "peerDependencies": { "relay-runtime": ">=18.0.0 <22.0.0" } }, "sha512-zm6UObJEtFTKaHaAVBqRqvSTHTmvDSKO06dWW3ogSbkOCHO68YY6Xxb+ZSCE8zNK53GVM0/VwzQgFcdyb3XBQQ=="],
 
     "relay-test-utils": ["relay-test-utils@21.0.1", "", { "dependencies": { "@babel/runtime": "^7.25.0", "fbjs": "^3.0.2", "invariant": "^2.2.4", "relay-runtime": "21.0.1" } }, "sha512-Or9qrzdGpiNMMXCZ/eKbVeMiBNijILdyFIuf2/FYnV+7YvDkxFq+oE/g4/gZhYqd1G5/Cejjjavv/xqs86MrzA=="],
 
