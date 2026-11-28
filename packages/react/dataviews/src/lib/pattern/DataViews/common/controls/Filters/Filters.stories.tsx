@@ -9,21 +9,21 @@ import { renderToString } from "react-dom/server";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../../storybook/getHiddenButton.js";
-import createSourceWithoutCores from "../../../../../../storybook/machines/createSourceWithoutCores.js";
-import {
-  spareMachineCollection,
-  spareMachines,
-  storyMachines,
-} from "../../../../../../storybook/machines/fixtures.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineProviderConfig,
-} from "../../../../../../storybook/machines/types.js";
+} from "../../../../../../storybook/machines/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import "../../../../../../storybook/noScripts.css";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
+import {
+  createSourceWithoutCores,
+  showConsumerCode,
+  spareMachineCollection,
+  spareMachines,
+  storyMachines,
+  useMachineProvider,
+} from "../../../../../../storybook/machines/index.js";
 import DataViews from "../../../Provider.js";
 import {
   DataTable,

@@ -9,11 +9,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, type ReactNode, useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../../storybook/decorators/index.js";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
-import useStoryViewStore from "../../../../../../storybook/machines/hooks/useStoryViewStore.js";
-import QueryInTheLocation from "../../../../../../storybook/machines/QueryInTheLocation.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { MachineProvider } from "../../../../../../storybook/machines/types.js";
+import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
+import {
+  QueryInTheLocation,
+  showConsumerCode,
+  useMachineProvider,
+  useStoryViewStore,
+} from "../../../../../../storybook/machines/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import DataViews from "../../../Provider.js";

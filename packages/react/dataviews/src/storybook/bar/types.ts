@@ -1,7 +1,6 @@
 import type { DataViewsProvider } from "@canonical/dataviews-core";
 import type { DataViewsQueryBarProps } from "../../lib/pattern/DataViews/common/controls/QueryBar/types.js";
-import type { barMachineCollection } from "../machines/fixtures.js";
-import type { BarMachine } from "../machines/types.js";
+import type { BarMachine, barMachineCollection } from "../machines/index.js";
 import type { StoryWords } from "../types.js";
 
 /** A query bar story's args: the part's props, and the words its root speaks. */

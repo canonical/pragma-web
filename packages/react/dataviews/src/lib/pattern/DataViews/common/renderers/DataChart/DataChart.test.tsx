@@ -305,6 +305,22 @@ describe("DataChart", () => {
       expect(screen.queryByRole("table")).toBeNull();
     });
 
+    it("words its pending status with chartPending, not the rows' words", () => {
+      const { provider } = createFacetedManual();
+      const { container } = render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+          messages={{ chartPending: "Drawing…", statusPending: "Rows…" }}
+        />,
+      );
+      expect(
+        container.querySelector("[data-status='pending']"),
+      ).toHaveTextContent("Drawing…");
+    });
+
     it("never draws bars counted for an earlier query: a failure stands in their place", () => {
       const { provider, source } = createFacetedManual();
       render(
@@ -333,7 +349,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be loaded: offline.",
+        "This chart could not be loaded: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });
@@ -417,7 +433,7 @@ describe("DataChart", () => {
       );
     });
 
-    it("says a failure in place of the bars", () => {
+    it("says the chart, not the rows, could not be loaded", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -434,7 +450,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be loaded: offline.",
+        "This chart could not be loaded: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });
@@ -466,7 +482,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
@@ -501,7 +517,7 @@ describe("DataChart", () => {
       // while the facets still answer the same filter and search.
       expect(provider.state.get().result.status).toBe("stale");
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
@@ -550,7 +566,7 @@ describe("DataChart", () => {
         reason: "offline",
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });

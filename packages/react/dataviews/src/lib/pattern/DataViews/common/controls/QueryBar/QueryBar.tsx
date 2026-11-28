@@ -744,8 +744,8 @@ export default function QueryBar({
     const { recordNoun } = labels;
     announceOutcome((count) =>
       isNew
-        ? messages.clauseAdded(spoken, count, recordNoun)
-        : messages.clauseChanged(spoken, count, recordNoun),
+        ? messages.clauseAdded({ clause: spoken, count, noun: recordNoun })
+        : messages.clauseChanged({ clause: spoken, count, noun: recordNoun }),
     );
     if (isNew) {
       dispatch({ type: "close", item: ENTRY, focus: null });
@@ -769,20 +769,20 @@ export default function QueryBar({
     // Said as the line below the field shows it: for an edit, that what
     // applied before still does.
     announce(
-      messages.filterRefused(
-        [messages.clauseInvalid(reason)],
-        sessionRef.current.draft?.origin != null,
-      ),
+      messages.filterRefused({
+        reasons: [messages.clauseInvalid(reason)],
+        retained: sessionRef.current.draft?.origin != null,
+      }),
     );
   };
 
   /** Say why the source refused a command, and that what applied stands. */
   const announceRefusals = (refusals: readonly SourceRefusal[]): void => {
     announce(
-      messages.filterRefused(
-        refusals.map(({ reason }) => reason),
-        true,
-      ),
+      messages.filterRefused({
+        reasons: refusals.map(({ reason }) => reason),
+        retained: true,
+      }),
     );
   };
   // At one identity, so a quick filter's props stay the same.
@@ -819,10 +819,10 @@ export default function QueryBar({
       const noun = labels.recordNoun;
       announceOutcome((count) =>
         before.length === 0
-          ? messages.clauseAdded(speak(after), count, noun)
+          ? messages.clauseAdded({ clause: speak(after), count, noun })
           : after.length === 0
-            ? messages.clauseRemoved(speak(before), count, noun)
-            : messages.clauseChanged(speak(after), count, noun),
+            ? messages.clauseRemoved({ clause: speak(before), count, noun })
+            : messages.clauseChanged({ clause: speak(after), count, noun }),
       );
     },
   );
@@ -1111,7 +1111,11 @@ export default function QueryBar({
       }
       const spoken = speakClause(written, schema, labels, messages);
       announceOutcome((count) =>
-        messages.clauseChanged(spoken, count, labels.recordNoun),
+        messages.clauseChanged({
+          clause: spoken,
+          count,
+          noun: labels.recordNoun,
+        }),
       );
     }
     const standing = findStanding(other);
@@ -1173,7 +1177,11 @@ export default function QueryBar({
       }
       const spoken = messages.searchClause(applied);
       announceOutcome((count) =>
-        messages.clauseRemoved(spoken, count, labels.recordNoun),
+        messages.clauseRemoved({
+          clause: spoken,
+          count,
+          noun: labels.recordNoun,
+        }),
       );
       return;
     }
@@ -1204,8 +1212,16 @@ export default function QueryBar({
     const spoken = messages.searchClause(typedText);
     announceOutcome((count) =>
       isAdded
-        ? messages.clauseAdded(spoken, count, labels.recordNoun)
-        : messages.clauseChanged(spoken, count, labels.recordNoun),
+        ? messages.clauseAdded({
+            clause: spoken,
+            count,
+            noun: labels.recordNoun,
+          })
+        : messages.clauseChanged({
+            clause: spoken,
+            count,
+            noun: labels.recordNoun,
+          }),
     );
     dispatch({ type: "typeText", text: kept });
   };
@@ -1255,7 +1271,11 @@ export default function QueryBar({
     const rest = listStops();
     const next = rest.at(index) ?? rest.at(index - 1);
     announceOutcome((count) =>
-      messages.clauseRemoved(spoken, count, labels.recordNoun),
+      messages.clauseRemoved({
+        clause: spoken,
+        count,
+        noun: labels.recordNoun,
+      }),
     );
     dispatch({
       type: "close",
@@ -1593,7 +1613,7 @@ export default function QueryBar({
               return;
             }
             announceOutcome((count) =>
-              messages.queryCleared(count, labels.recordNoun),
+              messages.queryCleared({ count, noun: labels.recordNoun }),
             );
             dispatch({ type: "close", item: ENTRY, focus: null });
             dispatch({ type: "typeText", text: "" });
@@ -1647,10 +1667,10 @@ export default function QueryBar({
     ({ id, issue }): MessageLineEntry => ({
       id,
       criticality: "error",
-      text: messages.clauseRefused(
-        nameRefused(issue, labels, messages),
-        issue.reason,
-      ),
+      text: messages.clauseRefused({
+        name: nameRefused(issue, labels, messages),
+        reason: issue.reason,
+      }),
     }),
   );
 
@@ -1695,10 +1715,10 @@ export default function QueryBar({
           {
             id: "invalid",
             criticality: "error",
-            text: messages.filterRefused(
-              [messages.clauseInvalid(session.invalid)],
-              draft.origin !== null,
-            ),
+            text: messages.filterRefused({
+              reasons: [messages.clauseInvalid(session.invalid)],
+              retained: draft.origin !== null,
+            }),
           } as const,
         ]),
     ...refusedEntries,

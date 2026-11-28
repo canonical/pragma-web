@@ -5,8 +5,8 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { MachineProvider } from "../../../../../../storybook/machines/types.js";
+import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
+import { showConsumerCode } from "../../../../../../storybook/machines/index.js";
 import DataViews from "../../../Provider.js";
 import type { DataTableColumn } from "../../renderers/DataTable/index.js";
 import Component from "./SortPanel.js";

@@ -147,22 +147,17 @@ const fr: DataViewsMessages = {
   columnEndPlacement: (name) =>
     `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
-  sortPrecedence: (direction, position, terms) =>
-    terms === 1
+  sortPrecedence: ({ direction, position, total }) =>
+    total === 1
       ? DIRECTIONS[direction]
-      : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} critère sur ${count(terms)}`,
+      : `${DIRECTIONS[direction]}, ${spellOrdinal(position)} critère sur ${count(total)}`,
   sortRefused: (reasons) =>
     reasons.length === 0
       ? "Tri inchangé."
       : `Tri inchangé : ${reasons.map(trimClause).join(" ; ")}.`,
-  sortApplied: (terms) =>
-    `Trié par ${terms
-      .map(({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`)
-      .join(" ; puis ")}.`,
+  sortApplied: (terms) => `Trié par ${terms.join(" ; puis ")}.`,
   sortDefaulted: (terms) =>
-    `Trié selon l’ordre de la source : ${terms
-      .map(({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`)
-      .join(" ; ")}.`,
+    `Trié selon l’ordre de la source : ${terms.join(" ; ")}.`,
   sortAbsent: "Non trié : la source ne documente aucun ordre.",
 
   columnOptions: (name) => `Options de la colonne ${name}`,
@@ -182,14 +177,14 @@ const fr: DataViewsMessages = {
   resetTableSettings: "Réinitialiser les paramètres du tableau",
 
   columnHidden: (name) => `${name} masquée`,
-  columnShown: (name, position, shown) =>
-    `${name} affichée, position ${count(position)} sur ${count(shown)}`,
-  columnMoved: (name, position, shown) =>
-    `${name} déplacée en position ${count(position)} sur ${count(shown)}`,
+  columnShown: ({ name, position, total }) =>
+    `${name} affichée, position ${count(position)} sur ${count(total)}`,
+  columnMoved: ({ name, position, total }) =>
+    `${name} déplacée en position ${count(position)} sur ${count(total)}`,
   tableSettingsReset: "Paramètres du tableau réinitialisés",
 
   sortPanel: "Tri",
-  sortTerm: (name, direction) => `${name}, ${DIRECTIONS[direction]}`,
+  sortTerm: ({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`,
   moveSortTermUp: "Monter",
   moveSortTermDown: "Descendre",
   removeSortTerm: "Retirer",
@@ -199,13 +194,13 @@ const fr: DataViewsMessages = {
   submitFilters: "Appliquer les filtres",
   filterFrom: (label) => `${label} à partir de`,
   filterTo: (label) => `${label} jusqu’à`,
-  filterInUnit: (name, symbol) => `${name} (${symbol})`,
+  filterInUnit: ({ name, symbol }) => `${name} (${symbol})`,
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
-  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
+  filterAlso: ({ phrase, values }) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Non appliqué depuis le lien",
-  clauseRefused: (name, reason) => `${name} : ${trimClause(reason)}.`,
+  clauseRefused: ({ name, reason }) => `${name} : ${trimClause(reason)}.`,
   grouping: "Regroupement",
   matchAnyInstead: "Correspondre plutôt à l’une d’elles",
   matchNoneInstead: "Correspondre plutôt à aucune d’elles",
@@ -218,7 +213,7 @@ const fr: DataViewsMessages = {
     retained
       ? "Saisissez une valeur pour modifier cette restriction. La restriction précédente s’applique toujours."
       : "Saisissez une valeur pour appliquer cette restriction.",
-  filterRefused: (reasons, retained) => {
+  filterRefused: ({ reasons, retained }) => {
     const refused = reasons.map((reason) => `${trimClause(reason)}.`).join(" ");
     return retained
       ? `${refused} La restriction précédente s’applique toujours.`
@@ -228,7 +223,8 @@ const fr: DataViewsMessages = {
   search: "Rechercher",
   submitSearch: "Rechercher",
 
-  operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
+  operatorShown: ({ operator, operands }) =>
+    OPERATORS_SHOWN[operator](operands),
   operatorPhrase: ({ operator, operands, label }) => {
     const words = OPERATORS_SPOKEN[operator](operands);
     return label === undefined ? words : `${label} ${words}`;
@@ -240,7 +236,7 @@ const fr: DataViewsMessages = {
   queryBarPlaceholder: "Rechercher ou filtrer",
   appliedFilters: "Filtres appliqués",
   clearFiltersAndSearch: "Effacer les filtres et la recherche",
-  queryCleared: (counted, noun) =>
+  queryCleared: ({ count: counted, noun }) =>
     outcome("Filtres et recherche effacés.", counted, noun),
   queryClause: ({ phrase, values }) =>
     values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
@@ -255,12 +251,12 @@ const fr: DataViewsMessages = {
   clauseField: "Champ",
   clauseOperator: (label) => `Opérateur de ${label}`,
   clauseValue: (label) => `Valeur de ${label}`,
-  recordCount: (counted, noun) =>
+  recordCount: ({ count: counted, noun }) =>
     `${spellTotal(counted)} ${countedNoun(counted.value, noun)}`,
-  clauseAdded: (spoken, counted, noun) =>
-    outcome(`${spoken} ajouté.`, counted, noun),
-  clauseChanged: (spoken, counted, noun) =>
-    outcome(`Remplacé par ${spoken}.`, counted, noun),
+  clauseAdded: ({ clause, count: counted, noun }) =>
+    outcome(`${clause} ajouté.`, counted, noun),
+  clauseChanged: ({ clause, count: counted, noun }) =>
+    outcome(`Remplacé par ${clause}.`, counted, noun),
   filtersDisclosure: ({ applied }) =>
     applied === 0 ? "Filtres" : `Filtres (${count(applied)})`,
   queryContradiction: ({ label }) =>
@@ -268,8 +264,8 @@ const fr: DataViewsMessages = {
   mergeClauses: ({ label }) => `Fusionner les filtres ${label}`,
   clausesMerged: ({ label, count: counted, noun }) =>
     outcome(`Filtres ${label} fusionnés.`, counted, noun),
-  clauseRemoved: (spoken, counted, noun) =>
-    outcome(`${spoken} retiré.`, counted, noun),
+  clauseRemoved: ({ clause, count: counted, noun }) =>
+    outcome(`${clause} retiré.`, counted, noun),
   readAsAtLeast: "Lu comme au moins",
   readAsAtMost: "Lu comme au plus",
   valuePicked: (spoken) => `${spoken}. Entrée à nouveau pour l’appliquer.`,
@@ -323,7 +319,7 @@ const fr: DataViewsMessages = {
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",
   submitPageSize: "Appliquer la taille de page",
-  rowsShown: (first, shown, counted) => {
+  rowsShown: ({ first, shown, total: counted }) => {
     const range =
       shown === 0 ? "0" : `${count(first)}–${count(first + shown - 1)}`;
     if (counted.kind === "unknown") {
@@ -357,7 +353,7 @@ const fr: DataViewsMessages = {
   saveViewAs: "Enregistrer sous…",
   renameView: "Renommer…",
   deleteView: "Supprimer…",
-  retryViews: "Réessayer",
+  refreshViews: "Réessayer",
   saveAsForm: "Enregistrer comme nouvelle vue",
   submitSaveAs: "Enregistrer la vue",
   renameForm: (name) => `Renommer « ${name} »`,
@@ -371,7 +367,7 @@ const fr: DataViewsMessages = {
     `Les vues enregistrées sont indisponibles : ${trimClause(reason)}.`,
   viewsUnreadable: (views) =>
     `${count(views)} ${choosePlural(views, "vue enregistrée est illisible", "vues enregistrées sont illisibles")}.`,
-  arrangementUnsaved: (reason) =>
+  presentationUnsaved: (reason) =>
     `La disposition n’est pas enregistrée : ${trimClause(reason)}.`,
   viewNameRefused: (reason) => `${trimClause(reason)}.`,
   viewPending: (command) => PENDING[command],
@@ -379,32 +375,41 @@ const fr: DataViewsMessages = {
   viewSaved: (name) => `« ${name} » enregistrée.`,
   viewRenamed: (name) => `Renommée en « ${name} ».`,
   viewDeleted: "Vue supprimée.",
-  viewRefused: (name, reasons) =>
+  viewRefused: ({ name, reasons }) =>
     `Non ouverte : « ${name} » demande ce que cette collection ne peut pas afficher — ${reasons
       .map(trimClause)
       .join(" ; ")}. La requête est inchangée.`,
-  viewConflicted: (command, name) =>
+  viewConflicted: ({ command, name }) =>
     command === "save-as"
       ? "Non enregistrée : une autre vue est stockée sous la même identité. Réessayez."
       : `${NOT_DONE[command]} : « ${name} » a été modifiée ailleurs.`,
   viewMissing: (command) => `${NOT_DONE[command]} : la vue n’existe plus.`,
-  viewUnreadable: (command, reason) =>
+  viewUnreadable: ({ command, reason }) =>
     `${NOT_DONE[command]} : la vue stockée est illisible (${trimClause(reason)}).`,
-  viewFailed: (command, reason) =>
+  viewFailed: ({ command, reason }) =>
     `${NOT_DONE[command]} : ${trimClause(reason)}.`,
 
-  selectionActions: "Actions sur la sélection",
+  actionBar: "Actions sur la sélection",
   rowsSelected: (rows) =>
     `${count(rows)} ${choosePlural(rows, "sélectionnée", "sélectionnées")}`,
-  deselectRows: (rows) =>
+  clearSelection: (rows) =>
     `Désélectionner ${count(rows)} ${choosePlural(rows, "ligne", "lignes")}`,
 
+  chartPending: "Chargement…",
+  chartFailed: ({ reason }) =>
+    trimClause(reason) === ""
+      ? "Ce graphique n’a pas pu être chargé."
+      : `Ce graphique n’a pas pu être chargé : ${trimClause(reason)}.`,
+  chartRefreshFailed: ({ reason }) =>
+    trimClause(reason) === ""
+      ? "Ce graphique n’a pas pu être actualisé."
+      : `Ce graphique n’a pas pu être actualisé : ${trimClause(reason)}.`,
   facetCountsAbsent: "La source n’a fourni aucun décompte pour ce champ.",
   facetRangeAbsent: "La source n’a fourni aucune plage pour ce champ.",
   facetValuesNone: "Aucun enregistrement correspondant n’a de valeur.",
   barChartSummary: (label) =>
     `${label} : un diagramme en barres du nombre d’enregistrements par valeur`,
-  rangeChartSummary: (label, min, max) =>
+  rangeChartSummary: ({ label, min, max }) =>
     `${label} : une plage de ${count(min)} à ${count(max)}`,
   chartTable: (label) => `${label}, sous forme de tableau`,
   chartValue: "Valeur",

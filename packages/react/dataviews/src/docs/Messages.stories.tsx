@@ -10,7 +10,7 @@ import Component from "../lib/pattern/DataViews/Provider.js";
 import { PaginationBar } from "../lib/subcomponent/PaginationBar/index.js";
 import { withAppScope } from "../storybook/decorators/index.js";
 import fr from "../storybook/locales/fr.js";
-import useMachineProvider from "../storybook/machines/hooks/useMachineProvider.js";
+import { useMachineProvider } from "../storybook/machines/index.js";
 
 const meta = {
   title: "Documentation/Messages and internationalization",

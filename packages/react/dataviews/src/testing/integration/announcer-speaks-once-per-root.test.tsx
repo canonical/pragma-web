@@ -287,8 +287,8 @@ describe("the announcer speaks once per root", () => {
       <DataViews
         provider={provider}
         messages={{
-          sortApplied: (terms) =>
-            `Trié par ${terms.map((term) => term.name).join(", ")}`,
+          sortTerm: ({ name }) => name,
+          sortApplied: (terms) => `Trié par ${terms.join(", ")}`,
         }}
       >
         <DataViews.DataTable columns={columns} label="Machines" />

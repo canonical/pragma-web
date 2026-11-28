@@ -21,8 +21,10 @@ import {
   createGraphQLHandlers,
   createRestHandlers,
 } from "../../storybook/machines/api/index.js";
-import { SERVER_BACKED_PARTS } from "../../storybook/machines/constants.js";
-import readPaginationSummary from "../../storybook/machines/readPaginationSummary.js";
+import {
+  readPaginationSummary,
+  SERVER_BACKED_PARTS,
+} from "../../storybook/machines/index.js";
 
 // The package's own preview, as Storybook applies it. Setting it also brings
 // Storybook's core annotations, which bind each play function's `canvas`.

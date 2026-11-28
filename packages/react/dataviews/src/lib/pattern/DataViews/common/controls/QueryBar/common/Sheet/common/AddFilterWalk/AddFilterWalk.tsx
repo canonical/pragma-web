@@ -202,10 +202,10 @@ export default function AddFilterWalk({
       const refusals = group.addPredicate(predicate);
       if (refusals.length > 0) {
         markInvalid(
-          messages.filterRefused(
-            refusals.map(({ reason }) => reason),
-            false,
-          ),
+          messages.filterRefused({
+            reasons: refusals.map(({ reason }) => reason),
+            retained: false,
+          }),
         );
         return;
       }
@@ -216,7 +216,11 @@ export default function AddFilterWalk({
         messages,
       );
       announceOutcome((count) =>
-        messages.clauseAdded(spoken, count, labels.recordNoun),
+        messages.clauseAdded({
+          clause: spoken,
+          count,
+          noun: labels.recordNoun,
+        }),
       );
     }
     dispatch({ type: "leave" });

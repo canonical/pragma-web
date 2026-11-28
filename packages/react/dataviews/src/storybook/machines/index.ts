@@ -19,19 +19,32 @@ export { default as createOneTermSource } from "./createOneTermSource.js";
 export { default as createPendingSource } from "./createPendingSource.js";
 export { default as createSourceWithoutCores } from "./createSourceWithoutCores.js";
 export { default as createUncountedSource } from "./createUncountedSource.js";
-export { machineCollection, storyMachines } from "./fixtures.js";
+export {
+  barMachineCollection,
+  barMachines,
+  machineCollection,
+  pooledMachineCollection,
+  pooledMachines,
+  spareMachineCollection,
+  spareMachines,
+  storyMachines,
+} from "./fixtures.js";
 export { useMachineProvider, useStoryViewStore } from "./hooks/index.js";
+export { default as QueryInTheLocation } from "./QueryInTheLocation.js";
 export { default as readHostName } from "./readHostName.js";
 export { default as readPaginationSummary } from "./readPaginationSummary.js";
 export { default as ServerBackedMachines } from "./ServerBackedMachines.js";
 export { default as showConsumerCode } from "./showConsumerCode.js";
 export type {
+  BarMachine,
   Machine,
   MachineFields,
   MachineProvider,
   MachineProviderConfig,
   MachineSourceConfig,
+  PooledMachine,
   SortableField,
+  SpareMachine,
   StoryViewStore,
   StoryViewStoreConfig,
 } from "./types.js";

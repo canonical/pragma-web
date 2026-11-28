@@ -7,16 +7,18 @@ import {
   withScrollingFrame,
 } from "../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../storybook/getHiddenButton.js";
-import createPendingSource from "../../../storybook/machines/createPendingSource.js";
-import createUncountedSource from "../../../storybook/machines/createUncountedSource.js";
-import useMachineProvider from "../../../storybook/machines/hooks/useMachineProvider.js";
-import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineFields,
   MachineProvider,
   MachineProviderConfig,
-} from "../../../storybook/machines/types.js";
+} from "../../../storybook/machines/index.js";
+import {
+  createPendingSource,
+  createUncountedSource,
+  showConsumerCode,
+  useMachineProvider,
+} from "../../../storybook/machines/index.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import {
   DataTable,

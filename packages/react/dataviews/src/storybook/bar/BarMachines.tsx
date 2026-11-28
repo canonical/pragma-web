@@ -10,13 +10,13 @@ import { ActionBar } from "../../lib/pattern/DataViews/common/controls/ActionBar
 import QueryBar from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../lib/pattern/DataViews/Provider.js";
+import type { BarMachine, PooledMachine } from "../machines/index.js";
 import {
   barMachineCollection,
   barMachines,
   pooledMachineCollection,
   pooledMachines,
-} from "../machines/fixtures.js";
-import type { BarMachine, PooledMachine } from "../machines/types.js";
+} from "../machines/index.js";
 import pickStoryWords from "../pickStoryWords.js";
 import { BAR_COLUMNS, WINDOW_PLATFORM } from "./constants.js";
 import startFrameAt from "./startFrameAt.js";

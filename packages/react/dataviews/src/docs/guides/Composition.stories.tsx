@@ -8,11 +8,13 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import Component from "../../lib/pattern/DataViews/Provider.js";
 import { withAppScope } from "../../storybook/decorators/index.js";
-import useMachineProvider from "../../storybook/machines/hooks/useMachineProvider.js";
-import useStoryViewStore from "../../storybook/machines/hooks/useStoryViewStore.js";
-import QueryInTheLocation from "../../storybook/machines/QueryInTheLocation.js";
-import showConsumerCode from "../../storybook/machines/showConsumerCode.js";
-import type { MachineProvider } from "../../storybook/machines/types.js";
+import type { MachineProvider } from "../../storybook/machines/index.js";
+import {
+  QueryInTheLocation,
+  showConsumerCode,
+  useMachineProvider,
+  useStoryViewStore,
+} from "../../storybook/machines/index.js";
 import pickStoryWords from "../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../storybook/types.js";
 

@@ -6,11 +6,13 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
-import readPaginationSummary from "../../../../../../storybook/machines/readPaginationSummary.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { MachineProviderConfig } from "../../../../../../storybook/machines/types.js";
+import type { MachineProviderConfig } from "../../../../../../storybook/machines/index.js";
+import {
+  createPendingSource,
+  readPaginationSummary,
+  showConsumerCode,
+  useMachineProvider,
+} from "../../../../../../storybook/machines/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import { DataViews } from "../../../index.js";

@@ -40,7 +40,9 @@ const describeSummary = (
   { page, size, shown, total }: DisplayPagination,
   messages: DataViewsMessages,
 ): string =>
-  shown === null ? "" : messages.rowsShown((page - 1) * size + 1, shown, total);
+  shown === null
+    ? ""
+    : messages.rowsShown({ first: (page - 1) * size + 1, shown, total });
 
 const listSizeOptions = (values: readonly number[]) =>
   values.map((value) => ({ value: String(value), label: String(value) }));

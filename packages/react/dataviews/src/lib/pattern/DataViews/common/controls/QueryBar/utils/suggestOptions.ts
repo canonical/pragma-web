@@ -140,7 +140,7 @@ const suggestValues = (
         hint:
           count === undefined || count.kind === "unknown"
             ? undefined
-            : messages.recordCount(count, labels.recordNoun),
+            : messages.recordCount({ count, noun: labels.recordNoun }),
         current: held.has(text),
         choice: { kind: "value", operand },
       };
