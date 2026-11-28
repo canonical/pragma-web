@@ -25,7 +25,7 @@ const routes = {
   // optional property types; the map is what the router runs on regardless.
 } as const satisfies Record<string, unknown>;
 
-const harness = () => {
+const createHarness = () => {
   const adapter = createMemoryAdapter();
   // Land on the route before the router's initial load so the fixture's
   // writes run against the matched /machines route, not the router's base.
@@ -40,7 +40,7 @@ const harness = () => {
  * already does, otherwise on the first state the router publishes that does.
  */
 const until = (
-  router: Pick<ReturnType<typeof harness>["router"], "subscribe">,
+  router: Pick<ReturnType<typeof createHarness>["router"], "subscribe">,
   check: () => boolean,
 ): Promise<void> =>
   new Promise((resolve) => {
@@ -58,14 +58,14 @@ const until = (
 
 describe("query transport through the router", () => {
   it("runs against the matched /machines route", async () => {
-    const { router } = harness();
+    const { router } = createHarness();
     await until(router, () => router.getState().match?.kind === "route");
     expect(router.getState().match?.kind).toBe("route");
     expect(router.getState().location.pathname).toBe("/machines");
   });
 
   it("lets the router see adapter-driven writes through its own state", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
     await until(
       router,
@@ -80,7 +80,7 @@ describe("query transport through the router", () => {
 
 describe("the router's scalar search helpers", () => {
   it("collapses repeated values on read — the documented lossy path", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
     await until(
       router,
@@ -91,7 +91,7 @@ describe("the router's scalar search helpers", () => {
     expect(typed).toBe("failed");
   });
   it("collapses repeated values through setSearchParams — the documented lossy write", async () => {
-    const { router, location } = harness();
+    const { router, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
     // The adapter's own state is synchronous; the router's store settles
     // through its async load pipeline.
