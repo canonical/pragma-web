@@ -4,12 +4,48 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Content from "./Content.js";
 
+const contextSwitcher = {
+  currentContext: { key: "acme", name: "Acme Corp", description: "Main" },
+  contexts: [{ key: "acme", name: "Acme Corp", description: "Main" }],
+};
+
 describe("Content", () => {
-  it("applies custom className", () => {
-    render(<Content className="custom-class" />);
-    const element = screen.getByRole("navigation");
-    expect(element.className).toContain("ds side-navigation-content");
-    expect(element.className).toContain("custom-class");
+  it("applies custom className to the region, not the landmark", () => {
+    const { container } = render(<Content className="custom-class" />);
+    const region = container.firstElementChild as HTMLElement;
+    expect(region.tagName).toBe("DIV");
+    expect(region.className).toContain("ds side-navigation-content");
+    expect(region.className).toContain("custom-class");
+    expect(screen.getByRole("navigation")).not.toHaveAttribute("class");
+  });
+
+  it("names the nav landmark with aria-label and keeps the id on the region", () => {
+    const { container } = render(
+      <Content id="content" aria-label="Main navigation" />,
+    );
+    const region = container.firstElementChild as HTMLElement;
+    expect(region).toHaveAttribute("id", "content");
+    expect(region).not.toHaveAttribute("aria-label");
+    expect(screen.getByRole("navigation", { name: "Main navigation" })).toBe(
+      region.firstElementChild,
+    );
+  });
+
+  it("renders the context switcher before the nav, outside the landmark", () => {
+    const { container } = render(<Content contextSwitcher={contextSwitcher} />);
+    const region = container.firstElementChild as HTMLElement;
+    const [switcher, nav] = Array.from(region.children);
+    expect(switcher).toHaveClass("side-navigation-context-switcher");
+    expect(nav).toBe(screen.getByRole("navigation"));
+    expect(nav).not.toContainElement(switcher as HTMLElement);
+  });
+
+  it("renders no context switcher when the prop is omitted", () => {
+    const { container } = render(<Content />);
+    expect(
+      container.querySelector(".side-navigation-context-switcher"),
+    ).toBeNull();
+    expect(container.firstElementChild?.children).toHaveLength(1);
   });
 
   it("passes through additional props", () => {

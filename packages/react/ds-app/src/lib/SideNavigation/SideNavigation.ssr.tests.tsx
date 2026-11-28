@@ -15,4 +15,14 @@ describe("SideNavigation SSR", () => {
     expect(html).toContain("Machines");
     expect(html).toContain("ds side-navigation");
   });
+
+  it("renders Content as a region around the nav, and an empty footer", () => {
+    const html = renderToString(<SideNavigation root={root} />);
+    expect(html).toMatch(
+      /<div class="ds side-navigation-content" id="[^"]+"><nav aria-label="Main navigation">/,
+    );
+    expect(html).toMatch(
+      /<\/nav><\/div><footer class="ds side-navigation-footer"><\/footer><\/div>$/,
+    );
+  });
 });

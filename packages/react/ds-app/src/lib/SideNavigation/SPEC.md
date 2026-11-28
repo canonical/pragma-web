@@ -19,7 +19,7 @@
 
 ## 1. Anatomy
 
-The `SideNavigation` is a full-height container that partitions its vertical space among three subcomponents. Header and Footer are optional; Content is required and grows to fill the remaining space.
+The `SideNavigation` is a full-height container that partitions its vertical space among three subcomponents: Header, Content and Footer, each rendered exactly once. Content grows to fill the remaining space and holds the optional ContextSwitcher before its `<nav>`; the Footer renders even when empty.
 
 The component's root element is a plain `<div>` layout container — it is
 **not** a landmark. The component's single *navigation* landmark is
@@ -43,17 +43,20 @@ the rail.
 │  └─────────────┘         └────────────┘ │  │
 │  flex-start                  flex-end   │  │
 ├─────────────────────────────────────────┤ ─┤
-│  SideNavigation.ContextSwitcher <div>   │  │ optional · NOT a landmark
-├─────────────────────────────────────────┤ ─┤
-│  SideNavigation.Content   <nav>         │  │ required · flex: 1 · overflow: auto
+│  SideNavigation.Content   <div>         │  │ required · flex: 1 · overflow: auto
 │  ┌─────────────────────────────────────┐│  │
-│  │ nav item list                       ││  │
-│  │  ├─ side-navigation-item            ││  │
-│  │  ├─ side-navigation-item            ││  │
-│  │  └─ ...                             ││  │
+│  │ ContextSwitcher <div>               ││  │ optional · NOT a landmark
+│  └─────────────────────────────────────┘│  │
+│  ┌─────────────────────────────────────┐│  │
+│  │ <nav>                               ││  │
+│  │  ├─ group (first: no divider)       ││  │
+│  │  │   └─ side-navigation-item ...    ││  │
+│  │  └─ group                           ││  │
+│  │      ├─ hr.divider                  ││  │
+│  │      └─ side-navigation-item ...    ││  │
 │  └─────────────────────────────────────┘│  │
 ├─────────────────────────────────────────┤ ─┤
-│  SideNavigation.Footer                  │  │ optional
+│  SideNavigation.Footer                  │  │ required · may be empty
 │  ┌─────────────────────────────────────┐│  │
 │  │ nav item list                       ││  │
 │  │  ├─ side-navigation-item            ││  │
@@ -70,8 +73,9 @@ deliberate and enforced by the component API:
 | Region  | Element    | Vocabulary                                                                 | Explicitly excluded |
 |---------|------------|-----------------------------------------------------------------------------|---------------------|
 | Header  | `<header>` | brand, application name, `CollapseToggle`                                   | navigation rows     |
-| ContextSwitcher | plain `<div>` (not a landmark) | `ContextSwitcherProps` — title, contexts, callbacks | navigation rows; rendered content inside the `<nav>` |
-| Content | `<nav>`    | `Item` (link or plain label), `ItemExpandable`, `Group`, `GroupHeader` | `<button>`-based rows — actions are Footer's job |
+| Content | `<div>` region holding the ContextSwitcher, then the `<nav>` | — | — |
+| ContextSwitcher | plain `<div>` inside Content, before the `<nav>` (not a landmark) | `ContextSwitcherProps` — title, contexts, callbacks | navigation rows; rendered content inside the `<nav>` |
+| Content's `<nav>` | `<nav>`    | `Item` (link or plain label), `ItemExpandable`, `Group` (with its `hr.divider` and `GroupHeader`) | `<button>`-based rows — actions are Footer's job |
 | Footer  | `<footer>` | `Item` (link), `ItemButton`, free-form `footerRoot` (leaves + depth-1 expandables, buttons via `control`) | expandables deeper than one level |
 
 **Strict Content vocabulary.** Content rows are links (rendered through
@@ -82,15 +86,20 @@ prevents screen-reader users from conflating them inside the navigation
 landmark. A toggle-style row is composed with `ItemButton` whose `slot`
 renders the control.
 
-**The ContextSwitcher is its own region.** The switcher is a select-like
-widget (`role="menu"` popup), not navigation — so it renders in its own
-plain-`<div>` region **between Header and Content, outside the `<nav>`
-landmark**. Screen readers traversing "Main navigation" never encounter a
+**Every group but the first starts with a divider.** Each `Group` after
+the first opens with an `hr.divider`, per SideNavigation.ItemGroup. The
+anatomy gives the divider no styles, so it has none; empty groups render
+nothing and do not count.
+
+**The ContextSwitcher sits in Content, before the `<nav>`.** The switcher
+is a select-like widget (`role="menu"` popup), not navigation — so it
+renders in its own plain `<div>` **inside Content, before the `<nav>`
+landmark, not inside it**, and scrolls with the navigation. Screen readers traversing "Main navigation" never encounter a
 menu widget mid-nav. Its rows keep the APG menu pattern (`role="menuitem"`
 divs), which is why a context entry carries its `url` as **data** that
 rides through `onContextChange` for the consumer's router — there is no
-render target for a `LinkComponent` inside a `role="menu"`. The region
-hides when the rail collapses (its rows are label-driven and unviable
+render target for a `LinkComponent` inside a `role="menu"`. It hides with
+Content when the rail collapses (its rows are label-driven and unviable
 icon-only).
 
 ### Subcomponents
@@ -211,7 +220,7 @@ stories.
 
 One blessed way to consume a `SideNavigation`: **data-driven**. Pass props
 on the component itself (`brand`, `root`, `contextSwitcher`, `footerRoot`,
-…) and it builds all four regions in DOM order. There are no
+…) and it builds all three regions in DOM order. There are no
 dot-static exports — every subcomponent is private (§1) — so region- or
 row-level composition by hand is not part of the API.
 
@@ -226,10 +235,10 @@ all.
 | Prop | Type | Default | Notes |
 |------|------|---------|-------|
 | `root` | `NavRoot` | — | WD405 root; its direct children (groups) render as the item list. |
-| `contextSwitcher` | `ContextSwitcherProps` | — | Typed props for the switcher region, rendered between Header and Content (outside the `<nav>` landmark). Omitted renders no region. |
+| `contextSwitcher` | `ContextSwitcherProps` | — | Typed props for the switcher, rendered inside Content before the `<nav>` landmark (outside it). Omitted renders none. |
 | `brand` | `ReactNode` | — | Logo/wordmark in the Header. |
 | `applicationName` | `ReactNode` | — | Application name shown beside the brand. |
-| `footerRoot` | `FooterRoot` | — | The footer's only data surface: free-form leaves + depth-1 expandables, rendered as the footer's rows. Empty/omitted hides the Footer. |
+| `footerRoot` | `FooterRoot` | — | The footer's only data surface: free-form leaves + depth-1 expandables, rendered as the footer's rows. Empty/omitted renders an empty `<footer>`. |
 | `LinkComponent` | `ComponentType<LinkComponentProps> \| "a"` | `"a"` | Renders navigable items; pass a router `Link` for client-side navigation. |
 | `currentUrl` | `string` | — | Live location; resolves the active item (`aria-current="page"`) and expands its branch. |
 | `defaultExpanded` | `boolean` | `true` | Initial rail state; see §4. |
@@ -290,7 +299,7 @@ router adapter).
 | `key` | `string` | Required — list identity and selection matching. |
 | `name` | `string` | Required — shown in the dropdown field when current. |
 | `url` | `string` | Rides through `onContextChange`; the consumer routes. Omitted, the context stays a pure action. |
-| `description` | `string` | Supporting text under the name in the list. |
+| `description` | `string` | Required — supporting text under the name in the list. |
 | `badge` | `ReactNode` | Trailing badge (dynamic/actionable information). |
 
 ---
@@ -413,8 +422,8 @@ Enter.
 
 ### Focus order
 
-Focus moves skip link → header (brand → collapse toggle) → content items
-top-to-bottom → footer items top-to-bottom, matching DOM order.
+Focus moves skip link → header (brand → collapse toggle) → context
+switcher → content items top-to-bottom → footer items top-to-bottom, matching DOM order.
 
 ---
 

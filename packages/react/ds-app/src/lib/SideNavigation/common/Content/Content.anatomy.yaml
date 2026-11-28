@@ -1,10 +1,11 @@
 ---
-# SideNavigation.Content — required main navigation region. Grows to fill the
-# space between Header and Footer. Renders the direct children of its `root` Item
-# (the root itself is a non-rendered container) as content entries — each entry
-# is a group (optional header + its navigation items). Data-only: the context
-# switcher is NOT a content entry — it is the shell's own region between Header
-# and Content, outside this landmark.
+# SideNavigation.Content — required scrolling region. Grows to fill the space
+# between Header and Footer. Holds the optional context switcher and then the
+# <nav> landmark; the switcher is a role="menu" widget, so it sits outside the
+# landmark. The <nav> renders the direct children of its `root` Item (the root
+# itself is a non-rendered container) as content entries — each entry is a
+# group (divider on every group but the first, optional header, then its
+# navigation items).
 #
 # The shell grows past the viewport (min-height), so the page scrolls rather than
 # this region: overflow is vertical-only as a safety valve, never horizontal.
@@ -19,34 +20,51 @@ node:
     size.width: fill
   edges:
     - node:
-        role: content entry
-        switch:
-          "on": kind
-          cases:
-            # A group: optional header, plus its navigation items. One of the
-            # groups MUST be the mandatory collapsible "Help" item (an
-            # ItemExpandable containing at least one external link).
-            - node:
-                uri: apps.subcomponent.side_navigation-item_group
-                edges:
-                  - node:
-                      uri: apps.subcomponent.side_navigation-group_header
-                    relation:
-                      cardinality: "0..1"
-                      slotName: header
-                  - node:
-                      role: navigation item
-                      switch:
-                        "on": override
-                        cases:
-                          # Links, plain labels and expandable disclosures
-                          # only — interactive action rows are Footer's job.
-                          - uri: apps.subcomponent.side_navigation-item
-                          - uri: apps.subcomponent.side_navigation-item_expandable
-                          - uri: $custom
-                    relation:
-                      cardinality: "0..*"
-                      slotName: default
+        uri: apps.subcomponent.side_navigation-context_switcher
       relation:
-        cardinality: "0..*"
+        cardinality: "0..1"
+        slotName: context-switcher
+    - node:
+        role: nav
+        edges:
+          - node:
+              role: content entry
+              switch:
+                "on": kind
+                cases:
+                  # A group: a divider (all but the first), an optional header,
+                  # then its navigation items. One of the groups MUST be the
+                  # mandatory collapsible "Help" item (an ItemExpandable
+                  # containing at least one external link).
+                  - node:
+                      uri: apps.subcomponent.side_navigation-item_group
+                      edges:
+                        # Absent on the first group of the <nav>.
+                        - node:
+                            role: divider
+                          relation:
+                            cardinality: "0..1"
+                        - node:
+                            uri: apps.subcomponent.side_navigation-group_header
+                          relation:
+                            cardinality: "0..1"
+                            slotName: header
+                        - node:
+                            role: navigation item
+                            switch:
+                              "on": override
+                              cases:
+                                # Links, plain labels and expandable disclosures
+                                # only — interactive action rows are Footer's job.
+                                - uri: apps.subcomponent.side_navigation-item
+                                - uri: apps.subcomponent.side_navigation-item_expandable
+                                - uri: $custom
+                          relation:
+                            cardinality: "0..*"
+                            slotName: default
+            relation:
+              cardinality: "0..*"
+              slotName: default
+      relation:
+        cardinality: "1"
         slotName: default

@@ -20,6 +20,23 @@ describe("Content SSR", () => {
 
   it("renders an empty landmark with no root", () => {
     const html = renderToString(<Content />);
-    expect(html).toContain("ds side-navigation-content");
+    expect(html).toBe(
+      '<div class="ds side-navigation-content"><nav></nav></div>',
+    );
+  });
+
+  it("renders the context switcher before the nav", () => {
+    const html = renderToString(
+      <Content
+        aria-label="Main navigation"
+        contextSwitcher={{
+          currentContext: { key: "a", name: "A", description: "First" },
+          contexts: [{ key: "a", name: "A", description: "First" }],
+        }}
+      />,
+    );
+    expect(html).toMatch(
+      /^<div class="ds side-navigation-content"><div class="ds side-navigation-context-switcher">.*<\/div><nav aria-label="Main navigation"><\/nav><\/div>$/,
+    );
   });
 });

@@ -1,6 +1,6 @@
 import type React from "react";
 import { useCallback, useEffect, useId, useState } from "react";
-import { Content, ContextSwitcher, Footer, Header } from "./common/index.js";
+import { Content, Footer, Header } from "./common/index.js";
 import { DEFAULT_MESSAGES } from "./constants.js";
 import { useCollapseShortcut } from "./hooks/useCollapseShortcut/index.js";
 import type { SideNavigationProps } from "./types.js";
@@ -14,17 +14,18 @@ const componentCssClassName = "ds side-navigation";
  * `defaultExpanded` — and wires the header's collapse toggle to the content
  * region it controls.
  *
- * Four regions: Header (branding, collapse toggle), the optional
- * ContextSwitcher (a `role="menu"` select-like widget — not navigation,
- * so it sits outside the landmark between Header and Content; hidden
- * when collapsed, where labels are unviable),
- * Content (the main `<nav>` landmark) and Footer (user profile, settings
- * and non-navigational actions). The root element is a plain `<div>` and
- * the component's single *navigation* landmark is Content's `<nav>`, so
- * screen readers announce exactly one navigation region; the regions
- * themselves are `<header>`/`<footer>` elements, which additionally
- * expose banner/contentinfo landmarks. `aria-label` is forwarded to the
- * `<nav>` and defaults to `"Main navigation"`.
+ * Three regions: Header (branding, collapse toggle), Content (the
+ * optional ContextSwitcher, then the main `<nav>` landmark) and Footer
+ * (user profile, settings and non-navigational actions). The context
+ * switcher is a `role="menu"` select-like widget — not navigation — so it
+ * sits before the landmark, not inside it, and hides with Content when
+ * collapsed. The root element is a plain `<div>` and the component's
+ * single *navigation* landmark is Content's `<nav>`, so screen readers
+ * announce exactly one navigation region; the regions themselves are
+ * `<header>`/`<footer>` elements, which additionally expose
+ * banner/contentinfo landmarks. The footer always renders, empty without
+ * `footerRoot`. `aria-label` is forwarded to the `<nav>` and defaults to
+ * `"Main navigation"`.
  *
  * A visually hidden "Skip to main content" link is the first element in the
  * component's DOM order, so keyboard users can bypass the navigation block;
@@ -34,7 +35,7 @@ const componentCssClassName = "ds side-navigation";
  * pass a router `Link` to integrate client-side navigation. The active item is
  * resolved from `currentUrl`.
  *
- * Consumption pattern: data-driven only. Pass props and all four regions
+ * Consumption pattern: data-driven only. Pass props and all three regions
  * build; row-level and region components are private
  * (`cs:react.component.subcomponent_export_api` — no dot-static exports),
  * and render exclusively from data.
@@ -101,26 +102,19 @@ const SideNavigation = ({
         collapseControls={contentId}
         collapseToggleMessages={messages}
       />
-      {contextSwitcher ? (
-        // Own region between Header and Content — a select-like widget is
-        // not navigation, so it sits outside the <nav> landmark. The root's
-        // collapsed CSS hides it: label-driven rows are unviable icon-only.
-        <ContextSwitcher {...contextSwitcher} />
-      ) : null}
       <Content
         id={contentId}
         root={root}
+        contextSwitcher={contextSwitcher}
         LinkComponent={LinkComponent}
         currentUrl={currentUrl}
         aria-label={ariaLabel ?? messages.navigation()}
       />
-      {footerRoot ? (
-        <Footer
-          root={footerRoot}
-          LinkComponent={LinkComponent}
-          currentUrl={currentUrl}
-        />
-      ) : null}
+      <Footer
+        root={footerRoot}
+        LinkComponent={LinkComponent}
+        currentUrl={currentUrl}
+      />
     </div>
   );
 };

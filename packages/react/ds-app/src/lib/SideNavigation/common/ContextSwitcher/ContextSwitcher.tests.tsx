@@ -4,7 +4,7 @@ import ContextSwitcher from "./ContextSwitcher.js";
 import type { ContextSwitcherItem } from "./types.js";
 
 const contexts: ContextSwitcherItem[] = [
-  { key: "acme", name: "Acme Corp" },
+  { key: "acme", name: "Acme Corp", description: "Main account" },
   { key: "globex", name: "Globex", description: "Secondary account" },
 ];
 
@@ -31,6 +31,17 @@ describe("ContextSwitcher", () => {
     expect(screen.getByRole("menu")).toHaveAttribute("aria-hidden", "false");
     expect(screen.getByText("Globex")).toBeInTheDocument();
     expect(screen.getByText("Secondary account")).toBeInTheDocument();
+  });
+
+  it("always renders the description (required by the anatomy)", () => {
+    render(
+      <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
+    );
+    open();
+    const descriptions = Array.from(
+      document.querySelectorAll(".content > .description"),
+    ).map((element) => element.textContent);
+    expect(descriptions).toEqual(["Main account", "Secondary account"]);
   });
 
   it("renders each context as a menuitem", () => {
@@ -120,7 +131,7 @@ describe("ContextSwitcher", () => {
   it("renders a badge when a context has one", () => {
     const withBadge: ContextSwitcherItem[] = [
       ...contexts,
-      { key: "beta", name: "Beta", badge: <span>2</span> },
+      { key: "beta", name: "Beta", description: "Beta", badge: <span>2</span> },
     ];
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={withBadge} />,

@@ -143,8 +143,8 @@ export const Mobile: Story = {
  * A practical context-switcher demo — what neither the MAAS nor LXD
  * fixtures exercise, in one screen:
  *
- * - The ContextSwitcher region (typed props slot, outside the `<nav>`
- *   landmark) with LXD's real project list: url'd contexts ride through
+ * - The ContextSwitcher (typed props slot, inside Content before the
+ *   `<nav>` landmark) with LXD's real project list: url'd contexts ride through
  *   `onContextChange` (selecting one navigates the hash router), plus a
  *   "create context" action.
  * - A plain-label content row and both `ItemExpandable` flavors: url
