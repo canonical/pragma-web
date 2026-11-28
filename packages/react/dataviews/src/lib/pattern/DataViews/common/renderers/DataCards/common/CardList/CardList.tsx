@@ -28,6 +28,7 @@ const CARD_SPAN = 4;
  */
 const CardList = <TRow extends object>({
   provider,
+  readApplicability,
   records,
   readRow,
   title,
@@ -47,6 +48,7 @@ const CardList = <TRow extends object>({
           <CardItem
             key={entry.id}
             provider={provider}
+            readApplicability={readApplicability}
             channels={readRow(entry.rowId)}
             title={title}
             details={details}

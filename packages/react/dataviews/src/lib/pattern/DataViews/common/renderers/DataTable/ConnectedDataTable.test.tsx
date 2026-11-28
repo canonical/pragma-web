@@ -9,10 +9,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  machines,
 } from "../../../../../../../testing/index.js";
 import DataViews from "../../../Provider.js";
 import DataTable from "./ConnectedDataTable.js";
-import type { DataTableColumn } from "./index.js";
+import { createColumns, type DataTableColumn } from "./index.js";
 
 const columns: readonly DataTableColumn[] = [{ id: "name", header: "Name" }];
 
@@ -45,6 +46,28 @@ describe("DataViews.DataTable", () => {
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table).toHaveClass("ds", "data-table", "rows");
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
+  });
+
+  it("names each row from a record typed by its columns", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m1", "alpha")],
+    });
+    render(
+      <DataViews provider={provider}>
+        <DataTable
+          columns={createColumns({
+            collection: machines,
+            columns: [{ field: "name", header: "Name" }],
+          })}
+          label="Machines"
+          selectable
+          getRowLabel={(row) => `${row.name}, ${row.cores} cores`}
+        />
+      </DataViews>,
+    );
+    expect(
+      screen.getByRole("checkbox", { name: "Select alpha, 4 cores" }),
+    ).toBeInTheDocument();
   });
 
   it("shows a source's synchronous answer on the render after its effect", () => {

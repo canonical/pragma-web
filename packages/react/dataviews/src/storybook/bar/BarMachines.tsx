@@ -1,4 +1,5 @@
 import {
+  type ArraySource,
   createArraySource,
   createDataViewsProvider,
   createMemoryLocation,
@@ -10,7 +11,7 @@ import { ActionBar } from "../../lib/pattern/DataViews/common/controls/ActionBar
 import QueryBar from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import DataViews from "../../lib/pattern/DataViews/Provider.js";
-import type { BarMachine, PooledMachine } from "../machines/index.js";
+import type { BarMachine } from "../machines/index.js";
 import {
   barMachineCollection,
   barMachines,
@@ -18,7 +19,7 @@ import {
   pooledMachines,
 } from "../machines/index.js";
 import pickStoryWords from "../pickStoryWords.js";
-import { BAR_COLUMNS, WINDOW_PLATFORM } from "./constants.js";
+import { BAR_COLUMNS, POOLED_COLUMNS, WINDOW_PLATFORM } from "./fixtures.js";
 import startFrameAt from "./startFrameAt.js";
 import type { BarConfig, BarProvider, BarStoryArgs } from "./types.js";
 
@@ -42,7 +43,7 @@ export default function BarMachines({
     const data = (withPools
       ? {
           collection: pooledMachineCollection,
-          source: createArraySource<PooledMachine>({
+          source: createArraySource({
             rows: pooledMachines,
             collection: pooledMachineCollection,
             searchFields: ["hostname"],
@@ -51,7 +52,7 @@ export default function BarMachines({
         }
       : {
           collection: barMachineCollection,
-          source: createArraySource<BarMachine>({
+          source: createArraySource({
             rows: barMachines,
             collection: barMachineCollection,
             searchFields: ["hostname"],
@@ -59,7 +60,7 @@ export default function BarMachines({
           facets: ["status", "tags"],
         }) as unknown as {
       readonly collection: typeof barMachineCollection;
-      readonly source: ReturnType<typeof createArraySource<BarMachine>>;
+      readonly source: ArraySource<BarMachine>;
       readonly facets: readonly ("status" | "tags")[];
     };
     const built = createDataViewsProvider({
@@ -105,7 +106,12 @@ export default function BarMachines({
       </div>
       <DataTable
         provider={provider}
-        columns={BAR_COLUMNS}
+        // The pooled columns name the bar's fields, over the pooled collection.
+        columns={
+          withPools
+            ? (POOLED_COLUMNS as unknown as typeof BAR_COLUMNS)
+            : BAR_COLUMNS
+        }
         label="Machines"
         {...words}
         selectable={selected !== undefined}

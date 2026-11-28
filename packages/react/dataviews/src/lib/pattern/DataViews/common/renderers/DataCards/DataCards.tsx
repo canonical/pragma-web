@@ -8,6 +8,7 @@ import {
   areListsEqual,
   isDataViewsProvider,
   listDisplayEntries,
+  readProviderHost,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
@@ -20,6 +21,7 @@ import {
 } from "../../../../../hooks/index.js";
 import {
   areDisplayFieldsEqual,
+  assertColumnsOver,
   describeStatus,
   readFieldName,
 } from "../../../../../utils/index.js";
@@ -91,6 +93,7 @@ export default function DataCards<
       "DataCards requires a provider created by createDataViewsProvider",
     );
   }
+  assertColumnsOver(fields, provider.collection, "DataCards");
   const words = useMessages({ messages });
   const declared = useStableValue(fields, areDisplayFieldsEqual);
   // Looked up in the held list, which holds the ids the caller's list holds:
@@ -108,6 +111,7 @@ export default function DataCards<
   );
   const names = useStableValue(declared.map(readFieldName), areNamesEqual);
   const scopes = useRowScopes(provider, names);
+  const { readApplicability } = readProviderHost(provider);
   const state = useDataViewsValue(provider.state);
   const status = useStableValue(
     resolveDisplayStatus(state),
@@ -152,6 +156,7 @@ export default function DataCards<
         )}
         <CardList
           provider={provider}
+          readApplicability={readApplicability}
           records={records}
           readRow={scopes.readRow}
           title={heading}

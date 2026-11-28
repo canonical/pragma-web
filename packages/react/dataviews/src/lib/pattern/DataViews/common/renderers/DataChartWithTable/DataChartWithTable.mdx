@@ -16,17 +16,20 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import type { DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.
 import { DataChartWithTable } from "./DataChartWithTable.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
 export function Machines() {
   const [provider] = useState(() =>

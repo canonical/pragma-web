@@ -57,6 +57,7 @@ const isActivationKey = (event: KeyboardEvent<HTMLButtonElement>): boolean =>
 export default function HeaderCell({
   column,
   sortable,
+  scope,
   precedence,
   primary,
   destination,
@@ -115,7 +116,14 @@ export default function HeaderCell({
     }
   }, [reason, drawsReason]);
   const descriptionId = `${labelId}-sort`;
-  const describedBy = precedence === null ? undefined : descriptionId;
+  const scopeId = `${labelId}-scope`;
+  const describedBy =
+    [
+      precedence === null ? null : descriptionId,
+      scope === null ? null : scopeId,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
   const indicator =
     precedence === null ? null : (
       <>
@@ -218,6 +226,11 @@ export default function HeaderCell({
             position: precedence.position,
             total: precedence.count,
           })}
+        </span>
+      )}
+      {scope === null ? null : (
+        <span id={scopeId} hidden>
+          {messages.columnAppliesTo({ types: scope })}
         </span>
       )}
       {drawsReason ? (

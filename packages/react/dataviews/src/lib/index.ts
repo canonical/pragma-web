@@ -45,12 +45,14 @@ export type {
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
+  DeclaredColumns,
   UseDataViewsFilterProps,
   UseDataViewsFilterResult,
   UseDataViewsProps,
   UseDataViewsResult,
 } from "./pattern/index.js";
 export {
+  createColumns,
   DataTable,
   DataViews,
   useDataViews,

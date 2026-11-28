@@ -4,6 +4,7 @@
  */
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
+import buildMachine from "./buildMachine.js";
 import {
   COUNTED_EXACTLY,
   FACET_CASES,
@@ -13,13 +14,35 @@ import {
   MESSAGE_SAMPLES,
   OPERATOR_CASES,
   OPERATOR_RECORDS,
+  RACK_COLLECTION,
+  RACKED_MACHINE_COLLECTION,
   SERVER_RENDER_HREF,
+  WORKLOAD_RECORDS,
+  WORKLOAD_RETYPED,
 } from "./fixtures.js";
+import { machines } from "./machines.js";
 
 describe("fixtures", () => {
   describe("COUNTED_EXACTLY", () => {
     it("counts exactly", () => {
       expect(COUNTED_EXACTLY.matched).toBe("exact");
+    });
+  });
+
+  describe("RACK_COLLECTION", () => {
+    it("declares racks by zone", () => {
+      expect(RACK_COLLECTION.schema.fieldNames).toEqual(["zone"]);
+      expect(RACK_COLLECTION.identify({ id: "r-1" })).toBe("r-1");
+    });
+  });
+
+  describe("RACKED_MACHINE_COLLECTION", () => {
+    it("declares the machine records by name, apart from the machines", () => {
+      expect(RACKED_MACHINE_COLLECTION.schema.fieldNames).toEqual(["name"]);
+      expect(RACKED_MACHINE_COLLECTION).not.toBe(machines);
+      expect(
+        RACKED_MACHINE_COLLECTION.identify(buildMachine("m-1", "alpha")),
+      ).toBe("m-1");
     });
   });
 
@@ -63,6 +86,21 @@ describe("fixtures", () => {
 
     it("marks what a message is handed with a character no message says", () => {
       expect(JSON.stringify(ENGLISH)).not.toContain(MESSAGE_MARK);
+    });
+  });
+
+  describe("WORKLOAD_RECORDS", () => {
+    it("lists one workload of each type", () => {
+      expect(WORKLOAD_RECORDS.map(({ type }) => type)).toEqual([
+        "container",
+        "vm",
+      ]);
+    });
+  });
+
+  describe("WORKLOAD_RETYPED", () => {
+    it("is the first workload's id on a virtual machine", () => {
+      expect(WORKLOAD_RETYPED).toMatchObject({ id: "w-1", type: "vm" });
     });
   });
 });

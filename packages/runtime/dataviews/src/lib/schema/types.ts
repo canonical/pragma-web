@@ -22,6 +22,7 @@ import type {
  * name may change or move before the first release.
  */
 export type ChoicesField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "choices";
   /**
@@ -74,6 +75,7 @@ export type NumberUnits = {
  * name may change or move before the first release.
  */
 export type NumberField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "number";
   readonly min?: number;
@@ -91,6 +93,7 @@ export type NumberField = {
  * name may change or move before the first release.
  */
 export type PresenceField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "presence";
 };
@@ -108,6 +111,7 @@ export type PresenceField = {
  * name may change or move before the first release.
  */
 export type DateField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "date";
 };
@@ -127,6 +131,7 @@ export type DateField = {
  * before the first release.
  */
 export type TextField = {
+  /** The record's own key, or a dot path through own keys: `config.region`. */
   readonly field: string;
   readonly kind: "text";
 };
@@ -159,6 +164,17 @@ type TypeScoped = {
  */
 export type SchemaFieldDefinition = TypeScoped &
   (ChoicesField | NumberField | PresenceField | DateField | TextField);
+
+/**
+ * The names a schema's fields are declared under. A column, a sort term and
+ * a capability declaration name fields through it, so a misspelt name does
+ * not compile.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type FieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
+  TFields[number]["field"];
 
 /**
  * Result of validating one text input against a field's kind: the operands

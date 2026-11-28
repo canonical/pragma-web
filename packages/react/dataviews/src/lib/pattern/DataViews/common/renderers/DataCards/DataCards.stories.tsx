@@ -32,11 +32,8 @@ import type {
   DisplayFieldCellProps,
 } from "../../../../../common/index.js";
 import { RendererSwitch } from "../../../../../common/RendererSwitch/index.js";
-import {
-  useDataViewsCell,
-  useDataViewsValue,
-} from "../../../../../hooks/index.js";
 import { DataViews } from "../../../index.js";
+import { createColumns } from "../DataTable/index.js";
 import Component from "./DataCards.js";
 import { ConnectedDataCards as ConnectedCards } from "./index.js";
 import type { DataCardsProps } from "./types.js";
@@ -73,21 +70,27 @@ type StoryCardsProps = Omit<
   "provider" | "fields" | "getRowLabel"
 >;
 
-const fields: readonly DisplayField[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const fields = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "region", header: "Region" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const fieldsCode = `const fields: readonly DisplayField[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const fieldsCode = `const fields = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "region", header: "Region" },
+    { field: "cores", header: "Cores" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 /** The import every story's code shows for a part not yet on the root. */
 const spikeImports = `import { machineCollection, machines } from "./machines.js";
@@ -100,7 +103,7 @@ function MachineCards({
   options,
   ...args
 }: StoryCardsProps & {
-  readonly cardFields?: readonly DisplayField[] | undefined;
+  readonly cardFields?: readonly DisplayField<Machine>[] | undefined;
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
   const provider = useMachineProvider(options);
@@ -122,7 +125,7 @@ function MachineCards({
 export const Default: Story = {
   render: (args) => <MachineCards {...args} />,
   parameters: showConsumerCode({
-    parts: ["type DisplayField"],
+    parts: ["createColumns"],
     imports: spikeImports,
     declarations: fieldsCode,
     render: `<DataCards provider={provider} fields={fields} title="name" label="Machines" />`,
@@ -142,7 +145,7 @@ export const Selectable: Story = {
   args: { selectable: true },
   render: (args) => <MachineCards {...args} />,
   parameters: showConsumerCode({
-    parts: ["type DisplayField"],
+    parts: ["createColumns"],
     imports: `import { type Machine, machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
 import { DataCards } from "./DataCards.js";`,
@@ -171,52 +174,52 @@ const nameMachine = (machine: Machine) => machine.name;`,
   },
 };
 
-/** A status field drawn by its own cell, reading the record through its scope. */
-function StatusCell({ value }: DisplayFieldCellProps): ReactElement {
-  const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, {
-    select: (record) => record.note,
-  });
-  return <span title={note}>{String(value).toUpperCase()}</span>;
+/** A status field drawn by its own cell, handed its typed record. */
+function StatusCell({
+  value,
+  record,
+}: DisplayFieldCellProps<Machine["status"], Machine>): ReactElement {
+  return <span title={record.note}>{value.toUpperCase()}</span>;
 }
 
+const customFields = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status", cell: StatusCell },
+    { field: "cores", header: "Cores" },
+  ],
+});
+
 /**
- * A field's own cell: the status is drawn by a cell of its own, which reads
- * the record through the same scope a table cell installs, so one cell works
- * in a table and on a card.
+ * A field's own cell: the status is drawn by a cell of its own, handed its
+ * typed value and record, as a table hands them, so one cell works in a
+ * table and on a card.
  */
 export const CustomCell: Story = {
   name: "Custom cell",
-  render: (args) => (
-    <MachineCards
-      {...args}
-      cardFields={[
-        { id: "name", header: "Host" },
-        { id: "status", header: "Status", cell: StatusCell },
-        { id: "cores", header: "Cores" },
-      ]}
-    />
-  ),
+  render: (args) => <MachineCards {...args} cardFields={customFields} />,
   parameters: showConsumerCode({
-    parts: [
-      "useDataViewsCell",
-      "useDataViewsValue",
-      "type DisplayFieldCellProps",
-    ],
-    imports: spikeImports,
-    declarations: `function StatusCell({ value }: DisplayFieldCellProps) {
-  const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, {
-    select: (record) => record.note,
-  });
-  return <span title={note}>{String(value).toUpperCase()}</span>;
+    parts: ["createColumns", "type DisplayFieldCellProps"],
+    imports: spikeImports.replace(
+      "{ machineCollection",
+      "{ type Machine, machineCollection",
+    ),
+    declarations: `function StatusCell({
+  value,
+  record,
+}: DisplayFieldCellProps<Machine["status"], Machine>) {
+  return <span title={record.note}>{value.toUpperCase()}</span>;
 }
 
-const fields: readonly DisplayField[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status", cell: StatusCell },
-  { id: "cores", header: "Cores" },
-];`,
+const fields = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status", cell: StatusCell },
+    { field: "cores", header: "Cores" },
+  ],
+});`,
     render: `<DataCards provider={provider} fields={fields} title="name" label="Machines" />`,
   }),
   play: async ({ canvas }) => {
@@ -276,7 +279,7 @@ function SortedAndPagedMachines({
         title="name"
         label={label}
         selectable
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>
@@ -293,7 +296,7 @@ export const SortedAndPaged: Story = {
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label }) => <SortedAndPagedMachines label={label} />,
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DisplayField"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
 import { DataCards } from "./DataViews/DataCards.js";`,
@@ -339,7 +342,7 @@ function TableOrCardsMachines({
                 columns={fields}
                 label={label}
                 selectable
-                getRowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => row.name}
               />
             ),
           },
@@ -352,7 +355,7 @@ function TableOrCardsMachines({
                 title="name"
                 label={label}
                 selectable
-                getRowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => row.name}
               />
             ),
           },
@@ -376,7 +379,7 @@ export const TableOrCards: Story = {
     <TableOrCardsMachines label={label} {...pickStoryWords({ messages })} />
   ),
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DisplayField"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // Internal to the package and not exported: shown for their shape.
 import { DataCards } from "./DataViews/DataCards.js";
@@ -434,7 +437,7 @@ function RestBackedMachines({
         fields={fields}
         title="name"
         label={label}
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>

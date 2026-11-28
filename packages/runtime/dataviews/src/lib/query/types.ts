@@ -114,12 +114,14 @@ export type SortDirection = "asc" | "desc";
 
 /**
  * One sort term; term order carries sort precedence and is never reordered.
+ * Where an author writes one, `TName` is the collection's field names, so a
+ * misspelt field does not compile. A term read from a URL keeps the default.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type SortTerm = {
-  readonly field: string;
+export type SortTerm<TName extends string = string> = {
+  readonly field: TName;
   readonly direction: SortDirection;
 };
 

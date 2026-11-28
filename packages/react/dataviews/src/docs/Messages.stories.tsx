@@ -1,16 +1,20 @@
-import type { DataViewsMessages, RowRecord } from "@canonical/dataviews-core";
+import type { DataViewsMessages } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
 import {
+  createColumns,
   DataTable,
-  type DataTableColumn,
 } from "../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import Component from "../lib/pattern/DataViews/Provider.js";
 import { PaginationBar } from "../lib/subcomponent/PaginationBar/index.js";
 import { withAppScope } from "../storybook/decorators/index.js";
 import fr from "../storybook/locales/fr.js";
-import { useMachineProvider } from "../storybook/machines/index.js";
+import {
+  machineCollection,
+  readHostName,
+  useMachineProvider,
+} from "../storybook/machines/index.js";
 
 const meta = {
   title: "Documentation/Messages and internationalization",
@@ -37,20 +41,24 @@ const OWN_WORDS: Partial<DataViewsMessages> = {
   pageCount: (pages) => `of ${pages} ${pages === 1 ? "screen" : "screens"}`,
 };
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
-
-const nameMachine = (row: RowRecord) => String(row["name"]);
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sortable: true },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
 /** The same columns, headed in French: headings are the application's data. */
-const frenchColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Hôte", sortable: true },
-  { id: "status", header: "État" },
-  { id: "cores", header: "Cœurs" },
-];
+const frenchColumns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Hôte", sortable: true },
+    { field: "status", header: "État" },
+    { field: "cores", header: "Cœurs" },
+  ],
+});
 
 /** A partial set: three messages reworded, every other one in English. */
 export const PartialOverride: Story = {
@@ -94,7 +102,7 @@ export const FrenchLocale: Story = {
             columns={frenchColumns}
             label="Machines"
             selectable
-            getRowLabel={nameMachine}
+            getRowLabel={readHostName}
           />
           <Component.ActionBar />
           <Component.Pagination sizes={[5, 10]} />

@@ -1,4 +1,5 @@
 import type {
+  FieldNameOf,
   RowRecord,
   SchemaFieldDefinition,
   SortDirection,
@@ -19,10 +20,14 @@ import type { ScopedRecordListProps } from "./types.js";
 /** The row scopes observe no single field: each item reads its whole record. */
 const NO_FIELDS: readonly string[] = [];
 
+const componentCssClassName = "ds record-list";
+
 /**
  * The list over a scope it is handed: the status, a checkbox per record, and
  * a sort the source can run. It does not observe; whoever hands it the scope
  * does — the standalone list, or the DataViews root.
+ *
+ * @implements ds:apps.subcomponent.record_list
  *
  * @experimental Pre-release: a tutorial example, not exported from the
  * package.
@@ -37,6 +42,8 @@ export default function ScopedRecordList<
   selectable = false,
   sortBy,
   messages,
+  className,
+  ...rest
 }: ScopedRecordListProps<TFields, TRow>): ReactElement {
   const words = useMemo(() => resolveMessages(messages), [messages]);
   const scripted = useIsScripted();
@@ -59,34 +66,42 @@ export default function ScopedRecordList<
   // Why the last sort changed nothing, in the source's words.
   const [refused, setRefused] = useState<readonly string[] | null>(null);
   // Offer only what the source declares it can sort by.
-  const sortable =
-    sortBy !== undefined &&
-    scope.capabilities.sort.fields.includes(sortBy.field);
+  const sortable = scope.capabilities.sort.fields.find(
+    (field) => field === sortBy?.field,
+  );
   const applied = state.slice.sort.find(
-    (term) => term.field === sortBy?.field,
+    (term) => term.field === sortable,
   )?.direction;
-  const sort = (field: string, direction: SortDirection): void => {
+  const sort = (
+    field: FieldNameOf<TFields>,
+    direction: SortDirection,
+  ): void => {
     const refusals = scope.setSort([{ field, direction }]);
     setRefused(
       refusals.length === 0 ? null : refusals.map(({ reason }) => reason),
     );
   };
   return (
-    <section aria-label={label} aria-busy={state.pendingRequestId !== null}>
-      {scripted && sortable ? (
+    <section
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      aria-label={label}
+      aria-busy={state.pendingRequestId !== null}
+    >
+      {scripted && sortBy !== undefined && sortable !== undefined ? (
         <fieldset>
           <legend>{sortBy.label}</legend>
           <button
             type="button"
             aria-pressed={applied === "asc"}
-            onClick={() => sort(sortBy.field, "asc")}
+            onClick={() => sort(sortable, "asc")}
           >
             {words.sortAscending}
           </button>
           <button
             type="button"
             aria-pressed={applied === "desc"}
-            onClick={() => sort(sortBy.field, "desc")}
+            onClick={() => sort(sortable, "desc")}
           >
             {words.sortDescending}
           </button>

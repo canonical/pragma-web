@@ -9,6 +9,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { useEffect, useMemo } from "react";
 import { useAnnouncer, useMessages } from "../../../hooks/index.js";
+import { widenRootProvider } from "../common/utils/index.js";
 import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
 
 /**
@@ -36,9 +37,7 @@ export default function useProviderState<
       "DataViews requires a provider created by createDataViewsProvider",
     );
   }
-  // The context stores the widest provider shape, schema and record type
-  // alike; the hooks narrow it back after checking the collection.
-  const widest = provider as UseProviderStateResult["provider"];
+  const widest = widenRootProvider(provider);
   const inputs = useMemo(
     () => createFilterInputs({ host: readProviderHost(widest) }),
     [widest],

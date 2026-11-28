@@ -9,7 +9,9 @@
  */
 
 import { createCollection } from "@canonical/dataviews-core";
+import { createColumns } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import buildBarMachines from "./buildBarMachines.js";
+import { SERVER_BACKED_DECLARATIONS } from "./constants.js";
 import type {
   BarMachine,
   Machine,
@@ -276,4 +278,10 @@ export const pooledMachineCollection = createCollection({
     ...barMachineCollection.schema.fields,
     { field: "pool", kind: "choices", options: POOLS },
   ],
+});
+
+/** The server-backed machine columns, over the machine collection. */
+export const SERVER_BACKED_COLUMNS = createColumns({
+  collection: machineCollection,
+  columns: SERVER_BACKED_DECLARATIONS,
 });

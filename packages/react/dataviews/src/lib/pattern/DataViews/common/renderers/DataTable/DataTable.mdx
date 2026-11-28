@@ -1,4 +1,5 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Mixed from "./DataTable.mixed.stories";
 import * as Stories from "./DataTable.stories";
 
 <Meta of={Stories} name="Recipes" />
@@ -19,7 +20,7 @@ import {
   createCollection,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { type Machine, machines } from "./machines.js";
 
@@ -31,14 +32,18 @@ export const machineCollection = createCollection({
     { field: "cores", kind: "number", min: 1 },
     { field: "name", kind: "text" },
     { field: "owner", kind: "text" },
+    { field: "region", kind: "text" },
   ],
 });
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 export function Machines() {
   // Built once: the table observes it, which starts its source.
@@ -56,7 +61,7 @@ export function Machines() {
 }
 ```
 
-Every column shows the record field its id names; `field` names a different one. Primitive values render as text, and anything else needs a cell renderer.
+Every column names the field it shows; its id defaults to that field. Primitive values render as text, and anything else needs a cell renderer.
 
 <Canvas of={Stories.Default} sourceState="none" />
 
@@ -67,15 +72,19 @@ The recipes from here on keep the provider built above and change only the colum
 A column is `fixed` — it keeps exactly its width — or `flex`: it takes at least its `minPx`, at most its `maxPx`, and a share of whatever is left by `weight`. The solver reserves every fixed width and every minimum first, then shares the rest; a column that reaches its maximum hands its excess back to the others. When even the reservations do not fit, nothing is squeezed: the table scrolls, and with nothing tabbable inside it is itself a Tab stop, so a keyboard scrolls it. A flexible last column takes whatever width the columns before it leave, up to its own maximum; the space past a capped or fixed last column is the table's, and stays empty rather than stretching a column past what it declares.
 
 ```tsx
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 } },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
+    { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+    { field: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 } },
+    { field: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+    { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
+  ],
+});
 
 <DataTable provider={provider} columns={columns} label="Machines" />;
 ```
@@ -84,20 +93,24 @@ const columns: readonly DataTableColumn[] = [
 
 ## Sorting
 
-Mark a column `sortable` and the table offers the order, but only when the source declares that field sortable: the provider carries the source's declaration, and a `sortable` column on a field outside it offers nothing, because a heading offering a sort the source would refuse would be a control that does nothing. Activating a heading sorts by that column alone and cycles ascending, descending, then back to the source's own order. Shift with a click, Enter or Space adds the column as a further term instead, turns an ascending term descending where it stands, and removes a descending one; a term past what the source orders by changes nothing, and the heading says why, politely. Focus stays on the heading throughout.
+Mark a column `sortable` and the table offers the order, but only when the source declares that field sortable: the provider carries the source's declaration, and a `sortable` column on a field outside it is a plain heading. Nothing throws, and no control is offered that the source would refuse. Activating a heading sorts by that column alone and cycles ascending, descending, then back to the source's own order. Shift with a click, Enter or Space adds the column as a further term instead, turns an ascending term descending where it stands, and removes a descending one; a term past what the source orders by changes nothing, and the heading says why, politely. Focus stays on the heading throughout.
 
 The headings show the ordering in force — the reader's own terms, or the source's documented default when there are none — so rows a source orders are never shown as unsorted. Each heading the ordering names shows a chevron, up for ascending and down for descending, and from two terms a numeral for its place; its control is described by both, as "descending, 2nd of 3". Exactly one heading, the first term's, carries `aria-sort`. Once scripts run, a menu beside each heading sorts it ascending or descending — in place when the column is already ordered, as a further term while the source has room, and alone once it has none — or removes it from the reader's ordering, where the column offers sorting; it also hides the column, unless it is declared `hideable: false` or is the last one shown, and moves it left or right past the column beside it. Choosing an item returns focus to its button, or to the heading now standing where a hidden column stood, and the table announces a hide or a move with the column's new position. Without scripting each sortable heading is a real link to the next ordering, from the first page, where the provider has a location to lead to.
 
 ```tsx
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "region", header: "Region" },
+    { field: "cores", header: "Cores", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 <DataTable provider={provider} columns={columns} label="Machines" />;
 ```
@@ -115,14 +128,17 @@ To open on an order, issue it once the provider is built, before anything observ
 `selectable` adds a leading 32px column of the design system's `CheckboxInput`, backed by the provider's selection; the column's width is the stylesheet's, and the data columns share what it leaves. Name each record with `getRowLabel`, so a checkbox says which machine it selects rather than which position it holds — the row is typed as the collection's record, so its fields need no cast. The header checkbox acts on the rows the reader can see, and leaves a selection made on another page alone.
 
 ```tsx
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
-import type { Machine } from "./machines.js";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
+import { type Machine, machineCollection } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 const nameMachine = (machine: Machine) => machine.name;
 
@@ -144,14 +160,18 @@ const nameMachine = (machine: Machine) => machine.name;
 The last column never gets a control, even when it is declared `resizable`: its trailing edge is the table's own edge, with nothing beyond it to resize against. Where it is flexible, it takes whatever width the others leave instead, up to its maximum. A table with an `id` keeps its widths, column order and hidden columns in the provider's presentation under that id, so saved views and links carry them; two tables with different ids keep their own. A table without an `id` keeps them for the mount. A column may declare `hideable: false` to stay in every arrangement.
 
 ```tsx
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
-  { id: "region", header: "Region", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 } },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
+    { field: "region", header: "Region", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 } },
+    { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+    { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
+  ],
+});
 
 <DataTable provider={provider} columns={columns} label="Machines" />;
 ```
@@ -160,24 +180,23 @@ const columns: readonly DataTableColumn[] = [
 
 <Canvas of={Stories.ResizePastTheContainer} sourceState="none" />
 
-## A cell that reads its own scope
+## A cell handed its record
 
-A column's `cell` renderer runs inside its cell's scope, so it can read the row's channels with `useDataViewsCell` — the whole record, another field, or the row's selection — without the table handing every cell a copy of the record. The hook takes the collection as its witness: it checks, at runtime, that the table's provider was built over that very collection, and in return the record arrives typed as the collection's record, with no cast at the call site. Because the collection lives at module scope, so does the cell; it is declared once, for every table over the collection. It re-renders when its channels change, and nothing else does.
+A column's `cell` is handed its field's value, the whole record and whether the field applies to it, typed by the columns `createColumns` declared: here `value` is a string and `record` a machine, with no cast. It draws again whenever a field of its record moves. It also runs inside its cell's scope, so `useDataViewsCell` reads the row's selection; the hook takes the collection as its witness and checks it at runtime. Because the collection lives at module scope, so does the cell; it is declared once, for every table over the collection.
 
 ```tsx
 import {
+  createColumns,
   DataTable,
   type DisplayFieldCellProps,
-  type DataTableColumn,
   useDataViewsCell,
   useDataViewsValue,
 } from "@canonical/dataviews-react";
 import { type Machine, machineCollection } from "./machines.js";
 
-function HostCell({ value }: DisplayFieldCellProps) {
-  // The collection is the witness: the record is typed as a machine.
-  const { record, selected } = useDataViewsCell(machineCollection);
-  const { owner } = useDataViewsValue(record);
+function HostCell({ value, record }: DisplayFieldCellProps<string, Machine>) {
+  // The collection is the witness for the row's selection.
+  const { selected } = useDataViewsCell(machineCollection);
   const isSelected = useDataViewsValue(selected);
   return (
     <span
@@ -187,16 +206,19 @@ function HostCell({ value }: DisplayFieldCellProps) {
           : undefined,
       }}
     >
-      {String(value)}
-      <span style={{ color: "var(--color-text-muted)" }}> ({owner})</span>
+      {value}
+      <span style={{ color: "var(--color-text-muted)" }}> ({record.owner})</span>
     </span>
   );
 }
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", cell: HostCell },
-  { id: "status", header: "Status" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", cell: HostCell },
+    { field: "status", header: "Status" },
+  ],
+});
 
 const nameMachine = (machine: Machine) => machine.name;
 
@@ -209,7 +231,37 @@ const nameMachine = (machine: Machine) => machine.name;
 />;
 ```
 
-<Canvas of={Stories.CellReadingItsScope} sourceState="none" />
+<Canvas of={Stories.CellHandedItsRecord} sourceState="none" />
+
+## Records of several types
+
+A collection may hold records of several types, discriminated by one field. A field scoped with `appliesTo` belongs to those types only: where it does not apply, a cell draws a dash read as "Not applicable", and the column's heading is described by the types it applies to. A column's own `cell` is handed the record at the union of its types, and narrows on the discriminator to read a field one type carries. A nested field is named by its dot path, `host.region`.
+
+```tsx
+import { createColumns } from "@canonical/dataviews-react";
+import { workloadCollection } from "./workloads.js";
+
+const columns = createColumns({
+  collection: workloadCollection,
+  columns: [
+    { field: "name", header: "Name" },
+    { field: "type", header: "Type" },
+    { field: "image", header: "Image" },
+    { field: "cores", header: "Cores" },
+    { field: "host.region", header: "Region" },
+    {
+      id: "runs",
+      header: "Runs",
+      cell: ({ record }) =>
+        record.type === "container"
+          ? `from ${record.image}`
+          : `on ${record.cores} cores`,
+    },
+  ],
+});
+```
+
+<Canvas of={Mixed.MixedRecords} sourceState="none" />
 
 ## The outcomes
 
@@ -219,12 +271,16 @@ Two more are said *above* rows rather than in place of them, because a table tha
 
 ```tsx
 import type { DisplayStatus } from "@canonical/dataviews-core";
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+  ],
+});
 
 const statusText = (status: DisplayStatus): string => {
   switch (status.status) {
@@ -268,7 +324,7 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataTable } from "@canonical/dataviews-react";
 import { virtualizeRows } from "@canonical/dataviews-react/virtualization";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
@@ -277,11 +333,14 @@ import { machineCollection, machines } from "./machines.js";
 // viewport, measurements and focus.
 const virtualization = virtualizeRows({ estimatedRowHeight: 24 });
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host", sortable: true },
+    { field: "status", header: "Status", sortable: true },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 export function Machines() {
   const [provider] = useState(() =>

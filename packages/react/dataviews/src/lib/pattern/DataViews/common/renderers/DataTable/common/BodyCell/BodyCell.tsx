@@ -1,10 +1,9 @@
 import { memo, type ReactElement, useMemo } from "react";
+import { FieldContent } from "../../../../../../../common/FieldContent/index.js";
 import {
   CellContext,
   type CellContextValue,
 } from "../../../../../../../common/index.js";
-import { useDataViewsValue } from "../../../../../../../hooks/index.js";
-import { spellPrimitiveValue } from "../../../../../../../utils/index.js";
 import type { BodyCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-body-cell";
@@ -21,8 +20,8 @@ const componentCssClassName = "ds data-table-body-cell";
  * pinning, the body cell is responsible for presenting data values and
  * providing row-level interactions such as inline editing and row actions.
  *
- * Covers the text cell and a column's renderer; no inline editing or row
- * actions.
+ * Covers the text cell, the dash of a field that does not apply to the
+ * record's type, and a column's renderer; no inline editing or row actions.
  *
  * @implements ds:apps.subcomponent.data_table-body_cell
  */
@@ -31,14 +30,10 @@ const BodyCell = <TRow extends object>({
   channels,
   column,
   field,
+  readApplicability,
+  className,
+  ...rest
 }: BodyCellProps<TRow>): ReactElement => {
-  const channel = channels.fields[field];
-  if (channel === undefined) {
-    // The scopes observe every field the columns read, so a cell without
-    // its channel is a table built against another column list.
-    throw new Error(`no channel observes the field "${field}"`);
-  }
-  const value = useDataViewsValue(channel);
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,
@@ -50,15 +45,19 @@ const BodyCell = <TRow extends object>({
     }),
     [provider, channels, column.id],
   );
-  const Content = column.cell;
   return (
     <CellContext value={cell}>
-      <td className={componentCssClassName}>
-        {Content === undefined ? (
-          spellPrimitiveValue(value)
-        ) : (
-          <Content value={value} rowId={channels.id} columnId={column.id} />
-        )}
+      <td
+        {...rest}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      >
+        <FieldContent
+          channels={channels}
+          field={field}
+          columnId={column.id}
+          cell={column.cell}
+          readApplicability={readApplicability}
+        />
       </td>
     </CellContext>
   );

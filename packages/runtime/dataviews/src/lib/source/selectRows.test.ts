@@ -104,6 +104,38 @@ describe("selectRows", () => {
     ]);
   });
 
+  it("filters on a nested field by its dot path", () => {
+    const schema = createSchema([{ field: "config.region", kind: "choices" }]);
+    const rows = [
+      { id: "a", config: { region: "eu" } },
+      { id: "b", config: { region: "us" } },
+    ];
+    const slice: Slice = {
+      ...EMPTY_SLICE,
+      filter: [{ field: "config.region", operator: "isAny", operands: ["us"] }],
+    };
+    expect(selectRows(rows, slice, { schema }, null).map(readId)).toEqual([
+      "b",
+    ]);
+  });
+
+  it("searches a nested field by its dot path", () => {
+    const schema = createSchema([{ field: "config.region", kind: "text" }]);
+    const rows = [
+      { id: "a", config: { region: "eu" } },
+      { id: "b", config: { region: "us" } },
+    ];
+    const slice: Slice = { ...EMPTY_SLICE, search: "us" };
+    expect(
+      selectRows(
+        rows,
+        slice,
+        { schema, searchFields: ["config.region"] },
+        null,
+      ).map(readId),
+    ).toEqual(["b"]);
+  });
+
   it("selects a range through the field's kind", () => {
     expect(
       selectIds([{ field: "cpu", operator: "gte", operands: [16] }]),

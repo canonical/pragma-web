@@ -16,18 +16,21 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import type { DisplayField } from "@canonical/dataviews-react";
+import { createColumns } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
 import { DataCards } from "./DataCards.js";
 
-const fields: readonly DisplayField[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-];
+const fields = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "region", header: "Region" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
 export function Machines() {
   const [provider] = useState(() =>
@@ -44,7 +47,7 @@ export function Machines() {
 
 <Canvas of={Stories.Default} sourceState="none" />
 
-A field's own `cell` renders on a card exactly as it renders in a table cell, inside the same cell scope, so it can read the record through `useDataViewsCell`.
+A field's own `cell` renders on a card as in a table cell, handed its typed value and record.
 
 <Canvas of={Stories.CustomCell} sourceState="none" />
 

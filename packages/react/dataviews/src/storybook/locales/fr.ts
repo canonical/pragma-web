@@ -147,6 +147,9 @@ const fr: DataViewsMessages = {
   columnEndPlacement: (name) =>
     `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
+  cellNotApplicable: "Sans objet",
+  columnAppliesTo: ({ types }) => `S’applique à ${types.join(", ")}`,
+
   sortPrecedence: ({ direction, position, total }) =>
     total === 1
       ? DIRECTIONS[direction]

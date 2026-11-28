@@ -6,7 +6,7 @@ import {
   rankOperand,
   type Slice,
 } from "../query/index.js";
-import { readField } from "../rows/index.js";
+import { compileFieldReader } from "../rows/index.js";
 import {
   resolveFieldKind,
   type SchemaFieldDefinition,
@@ -62,7 +62,8 @@ const compileApplicability = (
     return null;
   }
   const scope = new Set<unknown>(definition.appliesTo);
-  return (row) => scope.has(readField(row, types.field));
+  const read = compileFieldReader(types.field);
+  return (row) => scope.has(read(row));
 };
 
 /**
@@ -177,10 +178,10 @@ const compilePredicate = (
 const matchesSearch = (
   row: object,
   needle: string,
-  fields: readonly string[],
+  reads: readonly ((row: object) => unknown)[],
 ): boolean => {
-  for (const field of fields) {
-    const value = readField(row, field);
+  for (const read of reads) {
+    const value = read(row);
     if (typeof value !== "string" && typeof value !== "number") {
       continue;
     }
@@ -206,7 +207,7 @@ export default function selectRows<TRow extends object>(
     Partial<Pick<ExecuteSliceConfig, "types">>,
   lifted: string | null,
 ): readonly TRow[] {
-  const searchFields = config.searchFields ?? [];
+  const searched = (config.searchFields ?? []).map(compileFieldReader);
   const types = config.types ?? null;
   const query = canonicalizeSlice(slice);
   const needle = query.search === null ? null : foldText(query.search);
@@ -216,18 +217,19 @@ export default function selectRows<TRow extends object>(
       const definition = config.schema.findField(predicate.field);
       return {
         compiled: compilePredicate(predicate, definition),
+        read: compileFieldReader(predicate.field),
         applies: compileApplicability(definition, types),
       };
     });
   return rows.filter((row) => {
-    for (const { compiled, applies } of predicates) {
+    for (const { compiled, read, applies } of predicates) {
       if (applies !== null && !applies(row)) {
         return false;
       }
-      if (!compiled.test(readField(row, compiled.field))) {
+      if (!compiled.test(read(row))) {
         return false;
       }
     }
-    return needle === null || matchesSearch(row, needle, searchFields);
+    return needle === null || matchesSearch(row, needle, searched);
   });
 }

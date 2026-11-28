@@ -2,7 +2,7 @@ import type { Source, SourceRefusal } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, within } from "storybook/test";
-import type { DataTableColumn } from "../../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import { createColumns } from "../../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../../lib/pattern/DataViews/index.js";
 import {
   withAppScope,
@@ -175,10 +175,13 @@ export const SortRefused: Story = {
   },
 };
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+  ],
+});
 
 // The twin takes its words itself, as the standalone list does.
 function ConnectedMachines(words: StoryWords): ReactElement {
@@ -196,7 +199,7 @@ function ConnectedMachines(words: StoryWords): ReactElement {
         columns={columns}
         label="Machine table"
         selectable
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>

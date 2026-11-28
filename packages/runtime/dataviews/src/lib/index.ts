@@ -110,6 +110,7 @@ export type {
   SourceRefusalPart,
 } from "./result/index.js";
 export type {
+  Applicability,
   RowEntry,
   RowIdentifier,
   RowModel,
@@ -122,6 +123,7 @@ export type {
   EmptyOr,
   FieldKind,
   FieldKindOperators,
+  FieldNameOf,
   FieldValidation,
   NumberField,
   NumberUnits,

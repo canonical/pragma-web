@@ -17,14 +17,14 @@ import type {
  * hidden. Held at one reference while the visible columns are the same,
  * so a width change alone re-renders no header and re-mints no layout.
  */
-export default function useColumnArrangement(
-  ...[table, presentation, columns]: UseColumnArrangementProps
-): UseColumnArrangementResult {
+export default function useColumnArrangement<TRow extends object>(
+  ...[table, presentation, columns]: UseColumnArrangementProps<TRow>
+): UseColumnArrangementResult<TRow> {
   // Rebuilt only with the declared columns, so it runs once per
   // publication of the presentation, and once per render that passes new
   // columns.
   const selectVisible = useCallback(
-    (shown: PresentationState): readonly DataTableColumn[] =>
+    (shown: PresentationState): readonly DataTableColumn<TRow>[] =>
       resolveColumnArrangement(table, columns, shown.presentation)
         .filter(({ hidden }) => !hidden)
         .map(({ column }) => column),

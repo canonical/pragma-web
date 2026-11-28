@@ -35,7 +35,11 @@ export {
   OPERATOR_RECORDS,
   quickHostCollection,
   quickHosts,
+  RACK_COLLECTION,
+  RACKED_MACHINE_COLLECTION,
   SERVER_RENDER_HREF,
+  WORKLOAD_RECORDS,
+  WORKLOAD_RETYPED,
 } from "./fixtures.js";
 export { default as installPopoverStandIn } from "./installPopoverStandIn.js";
 export { default as installResizeObserverStandIn } from "./installResizeObserverStandIn.js";
@@ -46,6 +50,7 @@ export {
   MACHINE_DECLARATION,
   machines,
 } from "./machines.js";
+export { default as observeWorkloadRows } from "./observeWorkloadRows.js";
 export { default as openMenuFrom } from "./openMenuFrom.js";
 export { default as readAnnouncements } from "./readAnnouncements.js";
 export { default as readFailureReason } from "./readFailureReason.js";

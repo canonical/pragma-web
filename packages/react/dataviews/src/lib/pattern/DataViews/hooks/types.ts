@@ -42,7 +42,7 @@ export type UseDataViewsRootResult = ContextOptions;
 
 /** What the applied-search hook takes: the provider whose search it reads. */
 export type UseAppliedSearchProps = readonly [
-  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+  provider: Pick<DataViewsProvider<readonly SchemaFieldDefinition[]>, "state">,
 ];
 
 /** What the applied-search hook returns: the applied search, empty for none. */
@@ -50,7 +50,7 @@ export type UseAppliedSearchResult = string;
 
 /** What the applied-sort hook takes: the provider whose ordering it reads. */
 export type UseAppliedSortProps = readonly [
-  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+  provider: Pick<DataViewsProvider<readonly SchemaFieldDefinition[]>, "state">,
 ];
 
 /**
@@ -61,7 +61,7 @@ export type UseAppliedSortResult = readonly SortTerm[];
 
 /** What the restricted-fields hook takes: the provider whose query it reads. */
 export type UseRestrictedFieldsProps = readonly [
-  provider: DataViewsProvider<readonly SchemaFieldDefinition[]>,
+  provider: Pick<DataViewsProvider<readonly SchemaFieldDefinition[]>, "state">,
 ];
 
 /**

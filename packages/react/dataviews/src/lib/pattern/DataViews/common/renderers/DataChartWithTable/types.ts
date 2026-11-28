@@ -5,8 +5,9 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
+import type { ConnectedColumns } from "../../../types.js";
 import type { DataChartProps } from "../DataChart/index.js";
-import type { DataTableProps } from "../DataTable/index.js";
+import type { DataTableColumn, DataTableProps } from "../DataTable/index.js";
 
 type OwnProps<
   TFields extends readonly SchemaFieldDefinition[],
@@ -51,14 +52,25 @@ export type DataChartWithTableProps<
     | "aria-labelledby"
   >;
 
+type Standalone<TRow extends object> = DataChartWithTableProps<
+  readonly SchemaFieldDefinition[],
+  NoInfer<TRow>
+>;
+
 /**
  * Props of the connected chart with its table: the standalone's own, less
- * the provider and the words, which come from the enclosing root.
+ * the provider and the words, which come from the enclosing root. The
+ * table's columns from `createColumns` type `TRow`; plain columns read
+ * `RowRecord`.
  *
  * @experimental Pre-release: a work-in-progress prototype, not admitted to
  * the package root; its shape may change or it may be withdrawn.
  */
-export type DataViewsDataChartWithTableProps = Omit<
-  DataChartWithTableProps<readonly SchemaFieldDefinition[]>,
-  "provider" | "messages"
->;
+export type DataViewsDataChartWithTableProps<TRow extends object = RowRecord> =
+  Omit<Standalone<TRow>, "provider" | "messages" | "tableProps"> & {
+    /** The table's own props, less the provider and the words. */
+    readonly tableProps: Omit<Standalone<TRow>["tableProps"], "columns"> & {
+      /** The table's columns, in declared order. */
+      readonly columns: ConnectedColumns<TRow, DataTableColumn<NoInfer<TRow>>>;
+    };
+  };

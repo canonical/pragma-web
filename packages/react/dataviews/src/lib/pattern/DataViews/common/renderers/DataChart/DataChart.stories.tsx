@@ -17,6 +17,7 @@ import type {
 import {
   createMachineSource,
   createPendingSource,
+  machineCollection,
   readPaginationSummary,
   SERVER_BACKED_FACETS,
   showConsumerCode,
@@ -26,7 +27,7 @@ import { createRestMachineSource } from "../../../../../../storybook/machines/so
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import { DataViews } from "../../../index.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { createColumns } from "../DataTable/index.js";
 import Component from "./DataChart.js";
 import { ConnectedDataChart as ConnectedChart } from "./index.js";
 import type { DataChartType } from "./types.js";
@@ -56,11 +57,14 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** The table beside the chart. */
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
 /** The import every story's code shows for a part not yet on the root. */
 const prototypeImports = `import { machineCollection, machines } from "./machines.js";
@@ -175,7 +179,7 @@ function CountsBesideFiltersMachines({
       <DataViews.DataTable
         columns={columns}
         label="Machines"
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => row.name}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>
@@ -195,15 +199,18 @@ export const CountsBesideFilters: Story = {
   ],
   render: ({ label }) => <CountsBesideFiltersMachines label={label} />,
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     imports: connectedImports,
     query: "page=1&size=5",
     facets: ["status", "cores"],
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];`,
+    declarations: `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});`,
     render: `<DataViews provider={provider}>
   <DataViews.Filters />
   <DataChart type="bar" field="status" label="Machines by status" />

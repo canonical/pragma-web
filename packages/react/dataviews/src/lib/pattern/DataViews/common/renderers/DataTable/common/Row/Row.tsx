@@ -22,9 +22,13 @@ const Row = <TRow extends object>({
   columns,
   selectable,
   getRowLabel,
+  readApplicability,
   position,
   gap,
   ref,
+  className,
+  style,
+  ...rest
 }: RowProps<TRow>): ReactElement => {
   const selected = useDataViewsValue(channels.selected);
   const hydrated = useIsHydrated();
@@ -33,11 +37,12 @@ const Row = <TRow extends object>({
     // It agrees with the row's checkbox, as both read this one channel, and
     // the stylesheet tints the row by it.
     <tr
+      {...rest}
       ref={ref}
-      className={componentCssClassName}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-selected={selectable && hydrated ? selected : undefined}
       aria-rowindex={position}
-      style={gap === undefined ? undefined : { marginBlockStart: gap }}
+      style={gap === undefined ? style : { ...style, marginBlockStart: gap }}
     >
       {selectable ? (
         <SelectionCell
@@ -54,6 +59,7 @@ const Row = <TRow extends object>({
           channels={channels}
           column={column}
           field={readFieldName(column)}
+          readApplicability={readApplicability}
         />
       ))}
     </tr>

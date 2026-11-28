@@ -93,8 +93,10 @@ const makeProvider = (
     source: createManualSource<Row>({ capabilities }).source,
   });
 
-const mount = (
-  provider: DataViewsProvider<Fields, Row>,
+// Generic in the record: it reads none, and the facet cases build their
+// provider over records that carry more than the identity.
+const mount = <TRow extends Row>(
+  provider: DataViewsProvider<Fields, TRow>,
   props: Parameters<typeof Filters>[0] = {},
 ) =>
   render(
@@ -104,8 +106,8 @@ const mount = (
   );
 
 /** Move the query under the root, as a location or a saved view would. */
-const adopt = (
-  provider: DataViewsProvider<Fields, Row>,
+const adopt = <TRow extends Row>(
+  provider: DataViewsProvider<Fields, TRow>,
   filter: Slice["filter"],
 ): void => {
   const query: Query = {
@@ -818,10 +820,10 @@ describe("DataViews.Filters", () => {
     ];
 
     /** A provider over the array source, asking for the status and cpu facets. */
-    const createFacetedProvider = (): DataViewsProvider<Fields, Row> =>
+    const createFacetedProvider = () =>
       createDataViewsProvider({
         collection,
-        source: createArraySource<Row>({ rows: records, collection }),
+        source: createArraySource({ rows: records, collection }),
         facets: ["status", "cpu"],
       });
 
@@ -955,7 +957,7 @@ describe("DataViews.Filters", () => {
       });
       const provider = createDataViewsProvider({
         collection: places,
-        source: createArraySource<PlacedRecord>({
+        source: createArraySource({
           rows: [
             { id: "a", region: "eu" },
             { id: "b", region: "us" },
@@ -1256,7 +1258,7 @@ describe("DataViews.Filters", () => {
       mount(
         createDataViewsProvider({
           collection,
-          source: createArraySource<Row>({ rows: records, collection }),
+          source: createArraySource({ rows: records, collection }),
           facets: ["status", "cpu"],
           location: recorded.location,
         }),
@@ -1744,7 +1746,7 @@ describe("DataViews.Filters", () => {
         <DataViews
           provider={createDataViewsProvider({
             collection: places,
-            source: createArraySource<RegionRecord>({
+            source: createArraySource({
               rows: [
                 { id: "a", region: "eu" },
                 { id: "b", region: "us" },

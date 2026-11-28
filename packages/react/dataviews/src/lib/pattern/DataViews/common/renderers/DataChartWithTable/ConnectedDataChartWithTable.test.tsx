@@ -1,10 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   createFacetedFleet,
+  machines,
   silenceRenderErrors,
 } from "../../../../../../../testing/index.js";
 import DataViews from "../../../Provider.js";
+import { createColumns } from "../DataTable/index.js";
 import DataChartWithTable from "./ConnectedDataChartWithTable.js";
 
 const chartProps = {
@@ -29,6 +31,29 @@ describe("DataViews DataChartWithTable", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Table", pressed: false }),
+    ).toBeInTheDocument();
+  });
+
+  it("names each table row from a record typed by its columns", () => {
+    render(
+      <DataViews provider={createFacetedFleet({ count: 1 })}>
+        <DataChartWithTable
+          chartProps={chartProps}
+          tableProps={{
+            columns: createColumns({
+              collection: machines,
+              columns: [{ field: "name", header: "Name" }],
+            }),
+            label: "Machines",
+            selectable: true,
+            getRowLabel: (row) => `${row.name}, ${row.cores} cores`,
+          }}
+        />
+      </DataViews>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Table" }));
+    expect(
+      screen.getByRole("checkbox", { name: /^Select \S+, \d+ cores$/ }),
     ).toBeInTheDocument();
   });
 

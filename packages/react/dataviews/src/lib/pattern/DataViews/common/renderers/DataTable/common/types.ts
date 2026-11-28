@@ -4,6 +4,7 @@
  * declared column as the arrangement in force places it.
  */
 
+import type { RowRecord } from "@canonical/dataviews-core";
 import type { ColumnSizing } from "@canonical/dataviews-core/bindings";
 import type { DisplayField } from "../../../../../../common/index.js";
 
@@ -14,19 +15,29 @@ import type { DisplayField } from "../../../../../../common/index.js";
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type DataTableColumn = DisplayField & {
-  /** Declared sizing; defaults to flexible with a 96px minimum. */
-  readonly sizing?: ColumnSizing;
-  /** Whether the viewer may hide the column; defaults to true. */
-  readonly hideable?: boolean;
-  /** Offers sorting from the header, where the source can sort the field. */
-  readonly sortable?: boolean;
-  /**
-   * Offers resizing from the trailing edge, within its sizing bounds; never on
-   * the last column.
-   */
-  readonly resizable?: boolean;
-};
+export type DataTableColumn<TRow extends object = RowRecord> =
+  DisplayField<TRow> & {
+    /** Declared sizing; defaults to flexible with a 96px minimum. */
+    readonly sizing?: ColumnSizing;
+    /** Whether the viewer may hide the column; defaults to true. */
+    readonly hideable?: boolean;
+    /**
+     * Offers sorting from the header where the source can sort the field;
+     * elsewhere the heading is plain.
+     */
+    readonly sortable?: boolean;
+    /**
+     * Offers resizing from the trailing edge, within its sizing bounds; never on
+     * the last column.
+     */
+    readonly resizable?: boolean;
+  };
+
+/**
+ * A column over any record type: what the parts that never draw a cell
+ * take, since a column's cell accepts its own record type and no wider.
+ */
+export type AnyDataTableColumn = DataTableColumn<never>;
 
 /** One change to one column that the table's menus offer. */
 export type ColumnChange = "hide" | "show" | "move-left" | "move-right";
@@ -42,7 +53,7 @@ export type HeaderColumnOffers = Readonly<Record<HeaderColumnChange, boolean>>;
 
 /** One declared column as the settings menu offers it. */
 export type ColumnSetting = {
-  readonly column: DataTableColumn;
+  readonly column: AnyDataTableColumn;
   /** Whether the arrangement in force hides the column. */
   readonly hidden: boolean;
   /**

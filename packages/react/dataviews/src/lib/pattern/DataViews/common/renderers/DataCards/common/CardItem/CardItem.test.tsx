@@ -2,13 +2,16 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import { createRowScopes } from "@canonical/dataviews-core/bindings";
+import {
+  createRowScopes,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
-  createWorkloadProvider,
+  observeWorkloadRows,
   silenceRenderErrors,
 } from "../../../../../../../../../testing/index.js";
 import CardItem from "./CardItem.js";
@@ -25,13 +28,16 @@ const createAlpha = () =>
  *
  * @note Impure: observes the provider and its row scopes.
  */
-const observeRow = <TRow extends object>({
+const observeRow = <
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+>({
   fields,
   provider,
   rowId = "m-1",
 }: {
   readonly fields: readonly string[];
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  readonly provider: DataViewsProvider<TFields, TRow>;
   readonly rowId?: string;
 }) => {
   const releaseProvider = provider.observe();
@@ -58,6 +64,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[{ id: "status", header: "Status" }]}
@@ -82,6 +89,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -111,6 +119,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -123,26 +132,21 @@ describe("CardItem", () => {
   });
 
   it("names a card by its identity where its title does not apply", () => {
-    const { provider, channels } = observeRow({
-      fields: ["host"],
-      provider: createWorkloadProvider([
-        { id: "w-1", type: "vm", host: "kept" },
-      ]),
-      rowId: "w-1",
-    });
+    const { provider, scopes, readApplicability } = observeWorkloadRows();
     render(
       <ul>
         <CardItem
           provider={provider}
-          channels={channels}
-          title={{ id: "host", header: "Host" }}
+          readApplicability={readApplicability}
+          channels={scopes.readRow("w-2")}
+          title={{ id: "image", header: "Image" }}
           details={[]}
           selectable={false}
           nameRecord={() => null}
         />
       </ul>,
     );
-    expect(screen.getByRole("listitem", { name: "w-1" })).toBeInTheDocument();
+    expect(screen.getByRole("listitem", { name: "w-2" })).toBeInTheDocument();
   });
 
   it("throws when its title's field is not observed", () => {
@@ -155,6 +159,7 @@ describe("CardItem", () => {
       render(
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}
@@ -174,6 +179,7 @@ describe("CardItem", () => {
       <ul>
         <CardItem
           provider={provider}
+          readApplicability={readProviderHost(provider).readApplicability}
           channels={channels}
           title={{ id: "name", header: "Name" }}
           details={[]}

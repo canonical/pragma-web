@@ -3,7 +3,7 @@ import {
   areSizingsEqual,
 } from "@canonical/dataviews-core/bindings";
 import { readFieldName } from "../../../../../../../utils/index.js";
-import type { DataTableColumn } from "../types.js";
+import type { AnyDataTableColumn } from "../types.js";
 import readSizing from "./readSizing.js";
 
 /**
@@ -15,8 +15,8 @@ import readSizing from "./readSizing.js";
  * user-resized width, so the table keys on this reading of the content.
  */
 export default function areColumnModelsEqual(
-  a: readonly DataTableColumn[],
-  b: readonly DataTableColumn[],
+  a: readonly AnyDataTableColumn[],
+  b: readonly AnyDataTableColumn[],
 ): boolean {
   return areListsEqual(
     a,

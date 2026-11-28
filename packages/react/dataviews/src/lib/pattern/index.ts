@@ -3,8 +3,12 @@
 export type {
   DataTableColumn,
   DataTableProps,
+  DeclaredColumns,
 } from "./DataViews/common/renderers/DataTable/index.js";
-export { DataTable } from "./DataViews/common/renderers/DataTable/index.js";
+export {
+  createColumns,
+  DataTable,
+} from "./DataViews/common/renderers/DataTable/index.js";
 export type {
   DataViewsActionBarProps,
   DataViewsDataTableProps,

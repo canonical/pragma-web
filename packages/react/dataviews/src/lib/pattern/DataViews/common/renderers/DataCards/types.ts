@@ -7,6 +7,7 @@ import type {
 } from "@canonical/dataviews-core";
 import type { ComponentProps, ReactNode } from "react";
 import type { DisplayField } from "../../../../../common/index.js";
+import type { ConnectedColumns } from "../../../types.js";
 
 type OwnProps<
   TFields extends readonly SchemaFieldDefinition[],
@@ -18,7 +19,7 @@ type OwnProps<
    * The fields each card shows, in order. The one `title` names heads the
    * card; the rest are listed beneath it, each under its heading.
    */
-  readonly fields: readonly DisplayField[];
+  readonly fields: readonly DisplayField<NoInfer<TRow>>[];
   /**
    * The id of the field that heads each card and names it: the card, and its
    * selection checkbox, are named for this field's value. It must be one of
@@ -76,14 +77,16 @@ export type DataCardsProps<
 
 /**
  * Props of the connected cards: the cards' own, less the provider and the
- * words, which come from the enclosing root. The records are the widest shape, since the
- * root's provider may have been built over any collection; a custom cell
- * narrows them through `useDataViewsCell(collection)`.
+ * words, which come from the enclosing root. Fields from `createColumns`
+ * type `TRow`; plain fields read `RowRecord`.
  *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export type DataViewsDataCardsProps = Omit<
-  DataCardsProps<readonly SchemaFieldDefinition[]>,
-  "provider" | "messages"
->;
+export type DataViewsDataCardsProps<TRow extends object = RowRecord> = Omit<
+  DataCardsProps<readonly SchemaFieldDefinition[], NoInfer<TRow>>,
+  "provider" | "messages" | "fields"
+> & {
+  /** The fields each card shows, in order. */
+  readonly fields: ConnectedColumns<TRow, DisplayField<NoInfer<TRow>>>;
+};

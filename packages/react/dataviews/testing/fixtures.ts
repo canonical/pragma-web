@@ -14,18 +14,36 @@ import type {
   DataViewsMessages,
 } from "@canonical/dataviews-core";
 import { createCollection } from "@canonical/dataviews-core";
+import elementAt from "./elementAt.js";
 import type {
   FacetCase,
   FacetRecord,
+  Machine,
   OperatorCase,
   OperatorRecord,
   QuickHost,
+  Workload,
 } from "./types.js";
 
 /** Both counts answered exactly, as complete local input answers them. */
 export const COUNTED_EXACTLY: CountCapabilities = Object.freeze({
   pageable: "exact",
   matched: "exact",
+});
+
+/** Racks: a collection no machine provider is built over. */
+export const RACK_COLLECTION = createCollection({
+  identify: (rack: { readonly id: string }) => rack.id,
+  fields: [{ field: "zone", kind: "choices", options: ["a", "b"] }],
+});
+
+/**
+ * Another collection of the machine records: the record types agree, the
+ * collections do not.
+ */
+export const RACKED_MACHINE_COLLECTION = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [{ field: "name", kind: "text" }],
 });
 
 /**
@@ -664,6 +682,11 @@ export const MESSAGE_SAMPLES: {
   selectRow: [[MESSAGE_MARK]],
   columnWidth: [[1], [7]],
   columnEndPlacement: [[MESSAGE_MARK]],
+  cellNotApplicable: null,
+  columnAppliesTo: [
+    [{ types: [MESSAGE_MARK] }],
+    [{ types: [MESSAGE_MARK, MESSAGE_MARK] }],
+  ],
   sortPrecedence: [
     [{ direction: "asc", position: 1, total: 1 }],
     [{ direction: "desc", position: 2, total: 3 }],
@@ -1075,3 +1098,21 @@ export const quickHosts: readonly QuickHost[] = Array.from(
     return index % 3 === 0 ? { ...host, owner: "ex:ana" } : host;
   },
 );
+
+/** One container and one virtual machine. */
+export const WORKLOAD_RECORDS: readonly Workload[] = [
+  {
+    id: "w-1",
+    name: "web",
+    type: "container",
+    image: "ubuntu/24.04",
+    host: { region: "eu-west" },
+  },
+  { id: "w-2", name: "db", type: "vm", cores: 4, host: { region: "eu-west" } },
+];
+
+/** The container `w-1` returning under its id as the virtual machine. */
+export const WORKLOAD_RETYPED: Workload = {
+  ...elementAt(WORKLOAD_RECORDS, 1),
+  id: "w-1",
+};

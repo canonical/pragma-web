@@ -33,7 +33,7 @@ import type {
   RowModel,
   RowRecord,
 } from "../rows/index.js";
-import type { SchemaFieldDefinition } from "../schema/index.js";
+import type { FieldNameOf, SchemaFieldDefinition } from "../schema/index.js";
 import type { Selection } from "../selection/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
 import type {
@@ -122,7 +122,10 @@ export type DataViewsProvider<
   readonly navigateWindow: (
     window: WindowNavigation,
   ) => readonly SourceRefusal[];
-  readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
+  /** Replace the ordering; each term names one of the collection's fields. */
+  readonly setSort: (
+    sort: readonly SortTerm<FieldNameOf<TFields>>[],
+  ) => readonly SourceRefusal[];
   readonly setSearch: (search: string) => readonly SourceRefusal[];
   /**
    * Empty the named parts of the query, and their refused clauses, in one

@@ -176,6 +176,26 @@ describe("readFacets", () => {
     });
   });
 
+  it("facets a nested field by its dot path", () => {
+    const schema = createSchema([{ field: "config.region", kind: "choices" }]);
+    const rows = [
+      { id: "a", config: { region: "us" } },
+      { id: "b", config: { region: "eu" } },
+      { id: "c", config: { region: "us" } },
+    ];
+    expect(
+      readFacets(rows, EMPTY_SLICE, schema.fields, { schema }, rows),
+    ).toEqual({
+      "config.region": {
+        kind: "values",
+        values: [
+          { value: "eu", count: countExactly(1) },
+          { value: "us", count: countExactly(2) },
+        ],
+      },
+    });
+  });
+
   it("refuses a text field, which has no facet", () => {
     expect(() => readFacetsOver(EMPTY_SLICE, "name")).toThrow(
       'text field "name" has no facet',

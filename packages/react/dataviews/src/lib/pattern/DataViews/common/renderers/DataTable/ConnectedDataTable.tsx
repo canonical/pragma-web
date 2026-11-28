@@ -1,5 +1,7 @@
+import type { RowRecord } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useDataViewsRoot } from "../../../hooks/index.js";
+import { narrowRootRecords } from "../../utils/index.js";
 import DataTable from "./DataTable.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 import type { DataViewsDataTableProps } from "./types.js";
@@ -13,8 +15,8 @@ import type { DataViewsDataTableProps } from "./types.js";
  * this part reads the root it is placed in, and throws outside one, rather
  * than taking a provider or messages of its own, and says what its
  * activations did through the root's one announcer rather than one of its
- * own. Its records are the widest shape: a custom cell types them through
- * `useDataViewsCell(collection)`, with the collection as its witness.
+ * own. Columns from `createColumns` type its records; columns from
+ * `createColumns` over another collection throw at mount.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
@@ -23,14 +25,14 @@ import type { DataViewsDataTableProps } from "./types.js";
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function ConnectedDataTable(
-  props: DataViewsDataTableProps,
+export default function ConnectedDataTable<TRow extends object = RowRecord>(
+  props: DataViewsDataTableProps<TRow>,
 ): ReactElement {
   const { provider, messages, announce } = useDataViewsRoot("DataTable");
   return (
     <ScopedDataTable
       {...props}
-      provider={provider}
+      provider={narrowRootRecords(provider, props.columns, "DataTable")}
       messages={messages}
       announce={announce}
       settingsMenu={DataTable.SettingsMenu}

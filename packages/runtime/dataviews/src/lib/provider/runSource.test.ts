@@ -82,7 +82,7 @@ const localCollection = createCollection({
 });
 
 const createLocal = () =>
-  createArraySource<RowRecord>({
+  createArraySource({
     rows,
     collection: localCollection,
     searchFields: ["name"],
@@ -682,7 +682,7 @@ describe("runSource", () => {
       }));
       // The source holds no cpu field, so it cannot order by one.
       const { host, release } = startRun(
-        createArraySource<RowRecord>({
+        createArraySource({
           rows: fleet,
           collection: createCollection({
             identify: readId,

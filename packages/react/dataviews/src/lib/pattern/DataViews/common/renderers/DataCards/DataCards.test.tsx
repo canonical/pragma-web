@@ -17,6 +17,7 @@ import {
   type MachineFields,
   machines,
   type MachineProvider as Provider,
+  RACKED_MACHINE_COLLECTION,
   silenceRenderErrors,
 } from "../../../../../../../testing/index.js";
 import type {
@@ -27,7 +28,7 @@ import {
   useDataViewsCell,
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
-import { DataTable } from "../DataTable/index.js";
+import { createColumns, DataTable } from "../DataTable/index.js";
 import DataCards from "./DataCards.js";
 import type { DataCardsProps } from "./types.js";
 
@@ -100,6 +101,25 @@ describe("DataCards", () => {
         />,
       ),
     ).toThrow('DataCards names no field "owner" as its title');
+  });
+
+  it("throws at mount for fields declared over another collection", () => {
+    silenceRenderErrors();
+    const { provider } = createMachineProvider({ rows });
+    const racked = createColumns({
+      collection: RACKED_MACHINE_COLLECTION,
+      columns: [{ field: "name", header: "Name" }],
+    });
+    expect(() =>
+      render(
+        <DataCards
+          provider={provider}
+          fields={racked}
+          title="name"
+          label="Machines"
+        />,
+      ),
+    ).toThrow("DataCards was given columns declared over another collection");
   });
 
   it("renders the design system's cards as a list, one item per record, each named by its title", () => {

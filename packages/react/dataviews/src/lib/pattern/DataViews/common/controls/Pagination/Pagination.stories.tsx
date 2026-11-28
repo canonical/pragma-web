@@ -5,9 +5,12 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
-import { showConsumerCode } from "../../../../../../storybook/machines/index.js";
+import {
+  machineCollection,
+  showConsumerCode,
+} from "../../../../../../storybook/machines/index.js";
 import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
+import { createColumns } from "../../renderers/DataTable/index.js";
 import Component from "./Pagination.js";
 import type { DataViewsPaginationProps } from "./types.js";
 
@@ -24,17 +27,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 const composition = `<DataViews provider={provider}>
   <DataTable provider={provider} columns={columns} label="Machines" />
@@ -62,7 +71,7 @@ const onlyFailed = "status=failed&page=1&size=5";
 export const InAComposition: Story = {
   name: "In a composition",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     declarations: columnsCode,
     query: "page=1&size=5",
     render: composition,
@@ -87,7 +96,7 @@ export const InAComposition: Story = {
 export const AFilteredTotal: Story = {
   name: "A filtered total",
   parameters: showConsumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     declarations: columnsCode,
     query: onlyFailed,
     render: composition,

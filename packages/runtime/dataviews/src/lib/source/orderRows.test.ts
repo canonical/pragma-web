@@ -318,6 +318,17 @@ describe("orderRows", () => {
     ]);
   });
 
+  it("orders by a nested field by its dot path", () => {
+    const nested = createSchema([{ field: "config.cores", kind: "number" }]);
+    const rows = [
+      { id: "b", config: { cores: 12 } },
+      { id: "a", config: { cores: 4 } },
+    ];
+    expect(
+      order(rows, [buildAscTerm("config.cores")], { schema: nested }),
+    ).toEqual(["a", "b"]);
+  });
+
   it("orders every empty value last, in both directions", () => {
     const rows = [
       { id: "absent" },

@@ -9,16 +9,14 @@ import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../../storybook/getHiddenButton.js";
 import type { MachineProviderConfig } from "../../../../../../storybook/machines/index.js";
 import {
+  machineCollection,
   showConsumerCode,
   useMachineProvider,
 } from "../../../../../../storybook/machines/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import DataViews from "../../../Provider.js";
-import {
-  DataTable,
-  type DataTableColumn,
-} from "../../renderers/DataTable/index.js";
+import { createColumns, DataTable } from "../../renderers/DataTable/index.js";
 import Component from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
 
@@ -38,24 +36,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<StoryArgs>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});`;
 
 const composition = `<DataViews provider={provider}>
   <DataViews.Search label="Search machines" />
   <DataTable provider={provider} columns={columns} label="Machines" />
 </DataViews>`;
 
-const parts = ["DataTable", "DataViews", "type DataTableColumn"];
+const parts = ["DataTable", "DataViews", "createColumns"];
 
 /** The query the location carries, shown the way an address bar would. */
 function QueryInTheLocation({

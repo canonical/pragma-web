@@ -7,7 +7,7 @@ export default function createMachineSource({
   rows = storyMachines,
   defaultSort,
 }: MachineSourceConfig = {}): Source<Machine> {
-  return createArraySource<Machine>({
+  return createArraySource({
     rows,
     collection: machineCollection,
     searchFields: ["name", "owner"],

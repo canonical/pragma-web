@@ -16,6 +16,7 @@ import type {
   Search,
   SortPanel,
 } from "./common/index.js";
+import type { DeclaredColumns } from "./common/renderers/DataTable/index.js";
 
 type OwnProps<
   TFields extends readonly SchemaFieldDefinition[],
@@ -150,3 +151,11 @@ export type DataViewsComponent = (<
    */
   readonly SortPanel: typeof SortPanel;
 };
+
+/**
+ * The columns a connected part narrows its records by: a list from
+ * `createColumns`, or plain columns over `RowRecord`.
+ */
+export type ConnectedColumns<TRow extends object, TColumn> =
+  | DeclaredColumns<TRow>
+  | (RowRecord extends TRow ? readonly TColumn[] : never);

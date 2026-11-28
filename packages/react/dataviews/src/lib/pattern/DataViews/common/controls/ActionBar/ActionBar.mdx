@@ -21,9 +21,9 @@ import {
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
 import {
+  createColumns,
   DataTable,
   DataViews,
-  type DataTableColumn,
   useDataViews,
 } from "@canonical/dataviews-react";
 import { Button, type ButtonProps } from "@canonical/react-ds-global";
@@ -35,11 +35,14 @@ import {
   machines,
 } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "owner", header: "Owner" },
+  ],
+});
 
 const nameMachine = (machine: Machine) => machine.name;
 
@@ -125,6 +128,13 @@ When an action succeeds for every target, the targets leave the selection, and w
 `indicator` replaces the count; `null` shows none. A replacement reads the selection itself, through `useDataViews(collection)`, and owns its own announcement: the default count is a polite status, so give yours `role="status"` if it stands in for it, and the class `indicator` to take the default's inset. When the persistent selection panel ships, its trigger takes this place.
 
 ```tsx
+import {
+  DataViews,
+  useDataViews,
+  useDataViewsValue,
+} from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
+
 function MachinesSelected() {
   const { selection } = useDataViews(machineCollection);
   const count = useDataViewsValue(selection.state, {

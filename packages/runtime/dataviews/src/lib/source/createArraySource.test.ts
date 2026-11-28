@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { readId } from "../../../testing/index.js";
-import { createCollection } from "../collection/index.js";
+import { type Collection, createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, type Slice, type SortTerm } from "../query/index.js";
 import type { SourceDelivery } from "../result/index.js";
-import type { RowRecord } from "../rows/index.js";
+import type { SchemaFieldDefinition } from "../schema/index.js";
 import { ROOT_NUMERIC_COLLATION } from "./constants.js";
 import createArraySource from "./createArraySource.js";
 import type { SourceActionRunner, SourceRequest } from "./types.js";
@@ -38,7 +38,7 @@ const collection = createCollection({
 });
 
 const createSource = () =>
-  createArraySource<RowRecord>({
+  createArraySource({
     rows,
     collection,
     searchFields: ["name"],
@@ -124,10 +124,13 @@ describe("createArraySource", () => {
   });
 
   it("refuses a default ordering naming a field the schema does not define", () => {
+    // Read widely, as from JavaScript: a narrowed collection would not
+    // compile the misspelt term this refuses.
+    const unchecked: Collection<readonly SchemaFieldDefinition[]> = collection;
     expect(() =>
       createArraySource({
         rows,
-        collection,
+        collection: unchecked,
         defaultSort: [{ field: "zone", direction: "asc" }],
       }),
     ).toThrow('the default ordering names "zone", which is not sortable');
@@ -210,7 +213,9 @@ describe("createArraySource", () => {
   });
 
   it("freezes its declaration against the caller's arrays", () => {
-    const defaultSort: SortTerm[] = [{ field: "id", direction: "asc" }];
+    const defaultSort: SortTerm<"id" | "cpu">[] = [
+      { field: "id", direction: "asc" },
+    ];
     const searchFields = ["name"];
     const { capabilities } = createArraySource({
       rows,
@@ -427,10 +432,10 @@ describe("createArraySource", () => {
 
   it("copies the replacement records too", () => {
     const live = createSource();
-    const replacement = [{ id: "z" }];
+    const replacement = [{ id: "z", name: "Zeta", cpu: 1 }];
     live.setRows(replacement);
     // The push is only observable through a delivery made after it.
-    replacement.push({ id: "y" });
+    replacement.push({ id: "y", name: "Upsilon", cpu: 2 });
     const later = createDeliverySpy();
     live.execute(buildRequest({ requestId: "i1:r9" }), later);
     expect(readIds(readDeliveredAt(later, 0))).toEqual(["z"]);

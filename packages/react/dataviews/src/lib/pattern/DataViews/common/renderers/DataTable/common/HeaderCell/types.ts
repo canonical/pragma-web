@@ -11,7 +11,7 @@ import type {
 } from "@canonical/dataviews-core/bindings";
 import type { ComponentProps, ReactNode } from "react";
 import type {
-  DataTableColumn,
+  AnyDataTableColumn,
   HeaderColumnChange,
   HeaderColumnOffers,
 } from "../types.js";
@@ -27,13 +27,18 @@ export type SortPrecedence = {
 
 type OwnProps = {
   /** The column this header names, sorts and resizes. */
-  readonly column: DataTableColumn;
+  readonly column: AnyDataTableColumn;
   /**
    * Whether this header offers sorting: the column asks for it and the
    * provider's capabilities declare its field sortable and allow at least
    * one sort term.
    */
   readonly sortable: boolean;
+  /**
+   * The record types the column's field applies to, read with the heading,
+   * or null where it applies to every record.
+   */
+  readonly scope: readonly string[] | null;
   /**
    * Where this column's field stands in the ordering in force — the query's
    * own terms, or the source's default when it states none — or null when

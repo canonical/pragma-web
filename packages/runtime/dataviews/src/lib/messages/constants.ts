@@ -155,6 +155,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   columnEndPlacement: (name) =>
     `Click or tap in the header row where the ${name} column should end. Press the edge again or Escape to cancel.`,
 
+  cellNotApplicable: "Not applicable",
+  columnAppliesTo: ({ types }) => `Applies to ${types.join(", ")}`,
+
   sortPrecedence: ({ direction, position, total }) =>
     total === 1
       ? DIRECTIONS[direction]

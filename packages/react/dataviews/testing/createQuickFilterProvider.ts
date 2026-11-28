@@ -3,7 +3,7 @@ import {
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
 import { quickHostCollection, quickHosts } from "./fixtures.js";
-import type { QuickFilterProviderConfig, QuickHost } from "./types.js";
+import type { QuickFilterProviderConfig } from "./types.js";
 
 /**
  * A provider over the twelve hosts, answered at once by an array source,
@@ -20,7 +20,7 @@ export default function createQuickFilterProvider({
 }: QuickFilterProviderConfig = {}) {
   return createDataViewsProvider({
     collection: quickHostCollection,
-    source: createArraySource<QuickHost>({
+    source: createArraySource({
       rows: quickHosts,
       collection: quickHostCollection,
       searchFields: ["name"],

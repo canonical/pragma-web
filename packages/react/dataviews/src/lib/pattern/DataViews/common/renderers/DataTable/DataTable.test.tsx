@@ -63,11 +63,13 @@ import {
   installPopoverStandIn,
   MACHINE_CAPABILITIES,
   type Machine,
+  type MachineFieldName,
   type MachineFields,
   machines,
   type OddRecord,
   openMenuFrom,
   type MachineProvider as Provider,
+  RACKED_MACHINE_COLLECTION,
   readAnnouncements,
   silenceRenderErrors,
   waitForFocus,
@@ -78,6 +80,7 @@ import {
   useDataViewsValue,
 } from "../../../../../hooks/index.js";
 import { DataViews } from "../../../index.js";
+import createColumns from "./createColumns.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -191,6 +194,32 @@ describe("DataTable", () => {
     ).toThrow(
       "DataTable requires a provider created by createDataViewsProvider",
     );
+  });
+
+  it("throws at mount for columns declared over another collection, naming them", () => {
+    silenceRenderErrors();
+    const { provider } = createMachineProvider();
+    const racked = createColumns({
+      collection: RACKED_MACHINE_COLLECTION,
+      columns: [{ field: "name", header: "Name" }],
+    });
+    expect(() =>
+      render(<DataTable provider={provider} columns={racked} label="Fleet" />),
+    ).toThrow(
+      'DataTable was given columns declared over another collection, of fields "name"',
+    );
+  });
+
+  it("draws columns declared over its own collection", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const own = createColumns({
+      collection: machines,
+      columns: [{ field: "name", header: "Name" }],
+    });
+    render(<DataTable provider={provider} columns={own} label="Fleet" />);
+    expect(screen.getByRole("cell")).toHaveTextContent("alpha");
   });
 
   it("renders the table as native elements over grid geometry", () => {
@@ -504,7 +533,7 @@ describe("DataTable", () => {
   /** Three sortable columns over a source ordering by all three. */
   const renderOrderingTable = (
     terms: number | null,
-    defaultSort: readonly SortTerm[] = [],
+    defaultSort: readonly SortTerm<MachineFieldName>[] = [],
     columnsInView: readonly DataTableColumn[] = [
       { id: "name", header: "Name", sortable: true },
       { id: "status", header: "Status", sortable: true },
@@ -765,10 +794,13 @@ describe("DataTable", () => {
 
   /** Every ordering of distinct fields drawn from `fields`, the empty one included. */
   const listOrderings = (
-    fields: readonly string[],
-  ): readonly (readonly SortTerm[])[] => {
-    const orderings: (readonly SortTerm[])[] = [[]];
-    const extend = (prefix: readonly SortTerm[], left: readonly string[]) => {
+    fields: readonly MachineFieldName[],
+  ): readonly (readonly SortTerm<MachineFieldName>[])[] => {
+    const orderings: (readonly SortTerm<MachineFieldName>[])[] = [[]];
+    const extend = (
+      prefix: readonly SortTerm<MachineFieldName>[],
+      left: readonly MachineFieldName[],
+    ) => {
       for (const field of left) {
         for (const direction of ["asc", "desc"] as const) {
           const next = [...prefix, { field, direction }];
@@ -1948,7 +1980,7 @@ describe("DataTable", () => {
     expect(renders).toEqual(["m-2"]);
   });
 
-  it("notifies only the cells whose field values changed", () => {
+  it("draws again only the content of a record whose fields moved", () => {
     const renders: string[] = [];
     const Probe = ({ rowId, columnId }: DisplayFieldCellProps) => {
       renders.push(`${rowId}/${columnId}`);
@@ -1969,7 +2001,8 @@ describe("DataTable", () => {
       buildMachine("m-1", "alpha", "failed"),
       buildMachine("m-2", "beta"),
     ]);
-    expect(renders).toEqual(["m-1/status"]);
+    // A column's own content reads its whole record, so both of m-1's draw.
+    expect(renders).toEqual(["m-1/name", "m-1/status"]);
   });
 
   it("mints one scope per row, shared by its cells and stable across renders", () => {

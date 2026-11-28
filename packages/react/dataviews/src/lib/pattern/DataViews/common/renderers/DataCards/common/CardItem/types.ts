@@ -2,19 +2,30 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { RowChannels } from "@canonical/dataviews-core/bindings";
+import type {
+  ProviderHost,
+  RowChannels,
+} from "@canonical/dataviews-core/bindings";
 import type { ComponentProps } from "react";
 import type { DisplayField } from "../../../../../../../common/index.js";
 
 type OwnProps<TRow extends object> = {
-  /** The provider whose selection the card's checkbox toggles. */
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /** The provider's collection and selection, all the card reads. */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection" | "selection"
+  >;
+  /** Whether a field applies to a record, from the provider's host. */
+  readonly readApplicability: ProviderHost<
+    readonly SchemaFieldDefinition[],
+    TRow
+  >["readApplicability"];
   /** The record's row channels, from the cards' row scopes. */
   readonly channels: RowChannels<TRow>;
   /** The field heading the card and naming it. */
-  readonly title: DisplayField;
+  readonly title: DisplayField<TRow>;
   /** The fields listed beneath the title, in order. */
-  readonly details: readonly DisplayField[];
+  readonly details: readonly DisplayField<TRow>[];
   /** Offer the card's selection checkbox. */
   readonly selectable: boolean;
   /**

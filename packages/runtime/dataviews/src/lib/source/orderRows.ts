@@ -1,7 +1,7 @@
 import { assertInvariant } from "../assertion/index.js";
 import type { RecordTypes } from "../collection/index.js";
 import { collapseSortTerms } from "../query/index.js";
-import { readField } from "../rows/index.js";
+import { compileFieldReader } from "../rows/index.js";
 import {
   compareByCodeUnit,
   type KindOrder,
@@ -67,7 +67,8 @@ const getCachedTextComparison = (
 
 /** One term of the effective ordering, compiled against the schema. */
 type CompiledTerm = {
-  readonly field: string;
+  /** The term's field, read from a row. */
+  readonly read: (row: object) => unknown;
   readonly descending: boolean;
   /** Whether this field's empty values order before its values. */
   readonly emptiesFirst: boolean;
@@ -142,7 +143,8 @@ const compileApplicability = (
     return null;
   }
   const scope = new Set<unknown>(definition.appliesTo);
-  return (row) => scope.has(readField(row, types.field));
+  const read = compileFieldReader(types.field);
+  return (row) => scope.has(read(row));
 };
 
 /**
@@ -165,7 +167,7 @@ const compileTerms = (config: OrderRowsConfig): readonly CompiledTerm[] => {
       ? []
       : [
           {
-            field: term.field,
+            read: compileFieldReader(term.field),
             descending: term.direction === "desc",
             // Own keys only: a field named for an `Object.prototype`
             // member is placed only where the source placed it.
@@ -217,7 +219,7 @@ export default function orderRows<TRow extends object>(
     row,
     keys: terms.map((term) =>
       term.applies === null || term.applies(row)
-        ? (term.order.readKey(readField(row, term.field)) ?? undefined)
+        ? (term.order.readKey(term.read(row)) ?? undefined)
         : undefined,
     ),
   }));

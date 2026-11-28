@@ -9,6 +9,7 @@ import {
 import type { MachineProviderConfig } from "../../../../../../storybook/machines/index.js";
 import {
   createPendingSource,
+  machineCollection,
   readPaginationSummary,
   showConsumerCode,
   useMachineProvider,
@@ -17,7 +18,7 @@ import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import { DataViews } from "../../../index.js";
 import type { DataChartProps } from "../DataChart/index.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { createColumns } from "../DataTable/index.js";
 import Component from "./DataChartWithTable.js";
 import { ConnectedDataChartWithTable as ConnectedChartWithTable } from "./index.js";
 
@@ -38,11 +39,14 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** The table's columns, in every story. */
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});
 
 /** What a story chooses of the chart: its type, its field and its caption. */
 type ChartProps = Pick<
@@ -63,11 +67,14 @@ const prototypeImports = `import { machineCollection, machines } from "./machine
 import { DataChartWithTable } from "./DataChartWithTable.js";`;
 
 /** The columns every story's code declares. */
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];`;
+const columnsCode = `const columns = createColumns({
+  collection: machineCollection,
+  columns: [
+    { field: "name", header: "Host" },
+    { field: "status", header: "Status" },
+    { field: "cores", header: "Cores" },
+  ],
+});`;
 
 /**
  * The chart and its table over a provider bound to the story's own source,
@@ -93,7 +100,7 @@ function MachineChartWithTable({
       tableProps={{
         columns,
         label: "Machines",
-        getRowLabel: (row) => String(row["name"]),
+        getRowLabel: (row) => row.name,
       }}
     />
   );
@@ -109,7 +116,7 @@ export const Default: Story = {
     <MachineChartWithTable {...pickStoryWords(args)} chart={statusCounts} />
   ),
   parameters: showConsumerCode({
-    parts: ["type DataTableColumn"],
+    parts: ["createColumns"],
     imports: prototypeImports,
     facets: ["status", "cores"],
     declarations: columnsCode,
@@ -152,7 +159,7 @@ export const RangeOrTable: Story = {
     />
   ),
   parameters: showConsumerCode({
-    parts: ["type DataTableColumn"],
+    parts: ["createColumns"],
     imports: prototypeImports,
     facets: ["status", "cores"],
     declarations: columnsCode,
@@ -181,7 +188,7 @@ function BesideFiltersMachines(): ReactElement {
         tableProps={{
           columns,
           label: "Machines",
-          getRowLabel: (row) => String(row["name"]),
+          getRowLabel: (row) => row.name,
         }}
       />
       <DataViews.Pagination sizes={[5, 10]} />
@@ -204,7 +211,7 @@ export const BesideFilters: Story = {
   ],
   render: () => <BesideFiltersMachines />,
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.
 import { DataChartWithTable } from "./DataViews/DataChartWithTable.js";`,

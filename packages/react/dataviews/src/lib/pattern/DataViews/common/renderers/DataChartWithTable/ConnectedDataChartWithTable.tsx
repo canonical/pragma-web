@@ -1,5 +1,7 @@
+import type { RowRecord } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useDataViewsRoot } from "../../../hooks/index.js";
+import { narrowRootRecords } from "../../utils/index.js";
 import Standalone from "./DataChartWithTable.js";
 import type { DataViewsDataChartWithTableProps } from "./types.js";
 
@@ -18,11 +20,21 @@ import type { DataViewsDataChartWithTableProps } from "./types.js";
  * @experimental Pre-release: a work-in-progress prototype, not admitted to
  * the package root; its shape may change or it may be withdrawn.
  */
-export default function ConnectedDataChartWithTable(
-  props: DataViewsDataChartWithTableProps,
-): ReactElement {
+export default function ConnectedDataChartWithTable<
+  TRow extends object = RowRecord,
+>(props: DataViewsDataChartWithTableProps<TRow>): ReactElement {
   const { provider, messages } = useDataViewsRoot("DataChartWithTable");
-  return <Standalone {...props} provider={provider} messages={messages} />;
+  return (
+    <Standalone
+      {...props}
+      provider={narrowRootRecords(
+        provider,
+        props.tableProps.columns,
+        "DataTable",
+      )}
+      messages={messages}
+    />
+  );
 }
 
 ConnectedDataChartWithTable.displayName = "DataViews.DataChartWithTable";

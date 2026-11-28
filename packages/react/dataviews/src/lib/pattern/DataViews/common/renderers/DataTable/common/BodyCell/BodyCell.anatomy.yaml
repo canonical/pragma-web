@@ -25,8 +25,11 @@
 # The row takes its height as a minimum from the density line, so a second
 # line of content grows the row rather than clipping.
 #
-# States: none. Selection and hover belong to the row; the graph's editing
-# states (`highlighted`, `validation-state`) arrive with inline editing.
+# States: `not-applicable`, where the field does not apply to the record's
+# type: a dash, hidden from readers, beside a clipped "Not applicable"
+# (DOM `ds data-views-not-applicable`). Selection and hover belong to the
+# row; the graph's editing states (`highlighted`, `validation-state`)
+# arrive with inline editing.
 #
 # Inline padding reads the `@canonical/styles` density channel
 # (`--density-padding-inline`), not a design token; the DSL cannot name a
