@@ -11,6 +11,15 @@ export type GoldenCase = {
   value?: unknown;
 };
 
+import {
+  longNamedIso,
+  reportPdf,
+  sampleFile,
+  sampleImage,
+  stalledUpload,
+  warnOnLargeFiles,
+} from "../storybook/fixtures.files.js";
+
 const options = [
   { value: "apple", label: "Apple" },
   { value: "banana", label: "Banana" },
@@ -325,6 +334,82 @@ export const goldenCases: Record<string, GoldenCase> = {
       isOptional: true,
       description: "PDF only",
     },
+  },
+  "file-error": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      description: "PDF only",
+      multiple: true,
+    },
+    error: "You can upload at most 2 files.",
+  },
+  "file-with-files": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+    },
+    value: [reportPdf(), sampleImage(), longNamedIso()],
+  },
+  "file-messages": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+      accept: ".pdf",
+      maxSize: 10 * 1024 * 1024,
+      validateFile: warnOnLargeFiles,
+    },
+    value: [
+      sampleFile("notes.txt", 2048, "text/plain"),
+      sampleFile("scan.pdf", 12 * 1024 * 1024, "application/pdf"),
+      sampleFile("brochure.pdf", 3 * 1024 * 1024, "application/pdf"),
+    ],
+  },
+  "file-single-chosen": {
+    props: { inputType: "file", name: "upload", label: "Upload" },
+    value: [reportPdf()],
+  },
+  "file-single-chosen-error": {
+    props: { inputType: "file", name: "upload", label: "Upload" },
+    error: "Upload is required",
+    value: [reportPdf()],
+  },
+  "file-live": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+      upload: stalledUpload(0.45),
+      showFileSize: false,
+    },
+    value: [reportPdf()],
+  },
+  "file-without-drop-area": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+      showDropArea: false,
+    },
+    error: "Upload is required",
+    value: [reportPdf(), sampleImage()],
+  },
+  "file-without-file-list": {
+    props: {
+      inputType: "file",
+      name: "upload",
+      label: "Upload",
+      multiple: true,
+      showFileList: false,
+    },
+    value: [reportPdf(), sampleImage()],
   },
   hidden: { props: { inputType: "hidden", name: "token" } },
   "hidden-error": {

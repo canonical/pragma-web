@@ -1,0 +1,30 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The field frame: the label and its description sit 4px apart, and the
+     input 16px below them (16px below the label when there is no
+     description). */
+  .ds.field:has(> .payload > .ds.input.file-upload) {
+    row-gap: var(--dimension-200);
+
+    &:has(> .payload > .ds.field-description:first-child) {
+      row-gap: var(--dimension-050);
+    }
+
+    & > .payload {
+      row-gap: var(--dimension-200);
+    }
+
+    /* The disabled state belongs to the field; the label and description dim
+       with it. */
+    &:has(> .payload > .ds.input.file-upload.disabled) {
+      & > .ds.field-label {
+        color: var(--color-text-disabled);
+      }
+
+      & > .payload > .ds.field-description {
+        color: var(--color-text-muted-disabled);
+      }
+    }
+  }
+}

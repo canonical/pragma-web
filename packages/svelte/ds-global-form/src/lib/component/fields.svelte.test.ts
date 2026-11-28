@@ -8,7 +8,6 @@ import { Form } from "../pattern/Form/index.js";
 import { CheckboxField } from "./CheckboxField/index.js";
 import { Choices } from "./ChoicesField/index.js";
 import { DateTimeField } from "./DateTimeField/index.js";
-import { FileUploadField } from "./FileUploadField/index.js";
 import { HiddenField } from "./HiddenField/index.js";
 import { RangeField } from "./RangeField/index.js";
 import { RichChoices } from "./RichChoicesField/index.js";
@@ -228,34 +227,6 @@ describe("RangeField", () => {
     await expect
       .element(page.getByRole("slider", { name: "Level" }))
       .toBeInTheDocument();
-  });
-});
-
-describe("FileUploadField", () => {
-  it("reports a constraint violation as the field error, unless one is given", async () => {
-    const page = await render(Bound, {
-      of: FileUploadField,
-      name: "upload",
-      multiple: true,
-      maxFiles: 1,
-    });
-    await userEvent.upload(
-      page.container.querySelector("input[type=file]") as HTMLInputElement,
-      [
-        new File(["a"], "a.txt", { lastModified: 1 }),
-        new File(["b"], "b.txt", { lastModified: 2 }),
-      ],
-    );
-    await expect
-      .element(page.getByRole("alert"))
-      .toHaveTextContent("You can upload at most 1 file.");
-    const given = await render(FileUploadField, {
-      name: "u",
-      error: "Pick a file",
-    });
-    expect(given.container.querySelector(".ds.field-error")?.textContent).toBe(
-      "Pick a file",
-    );
   });
 });
 

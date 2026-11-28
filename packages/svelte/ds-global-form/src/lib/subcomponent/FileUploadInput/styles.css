@@ -1,146 +1,305 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The whole image in the thumbnail's tooltip, uncropped. It fills the
+     tooltip's own maximum width, since the tooltip sizes to its content and an
+     image without an intrinsic size (an SVG with only a viewBox) would
+     otherwise collapse. A tall image is held to half the viewport and
+     letterboxed. */
+  .ds.tooltip.file-upload-preview img {
+    --file-upload-preview-inset: calc(2 * var(--tooltip-padding-horizontal));
+
+    display: block;
+    inline-size: calc(
+      var(--tooltip-max-width) -
+      var(--file-upload-preview-inset)
+    );
+    block-size: auto;
+    max-block-size: 50vh;
+    object-fit: contain;
+  }
+
   .ds.input.file-upload {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--form-group-gap);
+    /* 16px between the drop area and message group and the file list. */
+    gap: var(--dimension-200);
 
-    & > .drop-zone {
+    /* ── Drop area and its field-level message ─────────────────────── */
+    & > .drop-area-group {
       display: flex;
+      flex-direction: column;
+      gap: var(--dimension-100);
+    }
+
+    /* The border and fill read the Criticality channels; the drop area takes
+       the `error` class while the field is invalid. Their hover, active and
+       disabled values have no channel, so those states name the neutral
+       tokens. */
+    & > .drop-area-group > .drop-area {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      min-height: calc(var(--dimension-400) * 4); /* 128px */
-      /* Compensate padding for border so total stays on baseline grid */
-      padding: calc(
-          var(--form-input-padding-block) -
-          var(--form-input-border-width)
-        )
-        var(--form-input-padding-inline);
-      border: var(--form-input-border-width) dashed
-        var(--form-input-border-color);
-      border-radius: var(--form-input-border-radius);
-      background-color: var(--form-input-background);
-      color: var(--color-text-muted);
-      cursor: pointer;
-      transition:
-        border-color var(--motion-duration-fast) ease,
-        background-color var(--motion-duration-fast) ease;
+      /* 112px; no dimension token declares it. */
+      min-block-size: calc(var(--dimension-200) * 7);
+      padding: var(--dimension-200);
+      gap: var(--dimension-100);
+      border: var(--dimension-stroke-thickness-medium) dashed
+        var(--modifier-color-border, var(--color-border));
+      background-color: var(
+        --modifier-color-foreground-input,
+        var(--color-foreground-input)
+      );
+      transition: background-color var(--motion-duration-fast) ease;
 
-      &:hover:not(:disabled) {
-        background-color: var(
-          --hover--color-foreground-input,
-          var(--color-foreground-input-hover)
-        );
-      }
-
-      &:focus-visible {
-        outline: none;
-        border-color: var(--form-input-border-color-focus);
-        box-shadow: 0 0 0 1px var(--form-focus-ring-color);
-      }
-
+      /* A file dragged over the area takes the hover fill. */
+      &:hover:not(:has(> .ds.button:disabled)),
       &.drag-over {
-        border-color: var(--form-input-border-color-focus);
-        background-color: var(
-          --hover--color-foreground-input,
-          var(--color-foreground-input-hover)
-        );
+        background-color: var(--color-foreground-input-hover);
       }
 
-      &:disabled {
-        background-color: var(--form-input-background-disabled);
-        color: var(--form-input-color-disabled);
-        cursor: not-allowed;
+      /* Pressing the Choose file button makes the whole area active. */
+      &:has(> .ds.button:active:not(:disabled)) {
+        background-color: var(--color-foreground-input-active);
       }
+
+      &:has(> .ds.button:disabled) {
+        border-color: var(--color-border-disabled);
+        background-color: var(--color-foreground-input-disabled);
+      }
+
+      /* The Choose file button stays neutral in the error state. The
+         Criticality class on the drop area sets these channels for the area's
+         own border and fill, but they inherit, and the button would read them
+         for its border, icon and focus ring. `initial` unsets each one, so the
+         button falls back to its own colours. */
+      & > .ds.button {
+        --modifier-color-border: initial;
+        --modifier-color-icon: initial;
+        --modifier-color-focus-ring: initial;
+      }
+    }
+
+    & > .drop-area-group > .drop-area > .drop-area-text {
+      font-family: var(--typography-text-primary-font-family);
+      font-size: var(--typography-text-primary-font-size);
+      font-weight: var(--typography-text-primary-font-weight);
+      color: var(--color-text);
+    }
+
+    &.disabled > .drop-area-group > .drop-area > .drop-area-text {
+      color: var(--color-text-disabled);
     }
 
     /* The native file input stays in the document (it carries the name and
-       `required`, and the drop zone opens it) but is visually hidden. */
+       `required`, and the button opens it) but is visually hidden. */
     & > input[type="file"] {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      inline-size: 1px;
+      block-size: 1px;
       overflow: hidden;
-      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
       white-space: nowrap;
       border: 0;
+      padding: 0;
     }
 
+    /* ── File list ─────────────────────────────────────────────────── */
     & > .file-list {
       list-style: none;
       margin: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: var(--form-group-gap);
+      gap: var(--dimension-200);
+    }
+  }
+
+  .ds.input.file-upload > .file-list > .file-item {
+    /* Hover and active fills of the tile's actions. The Criticality family has
+       no hover or active channel yet, so each criticality is named here. */
+    --file-upload-tile-hover: var(--color-foreground-input-hover);
+    --file-upload-tile-active: var(--color-foreground-input-active);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--dimension-100);
+    margin: 0;
+
+    &.warning {
+      --file-upload-tile-hover: var(--color-foreground-input-warning-hover);
+      --file-upload-tile-active: var(--color-foreground-input-warning-active);
     }
 
-    & > .file-list > .file-item {
+    &.error {
+      --file-upload-tile-hover: var(--color-foreground-input-error-hover);
+      --file-upload-tile-active: var(--color-foreground-input-error-active);
+    }
+
+    /* The warning or error message under the tile. */
+    & > .file-message {
       display: flex;
-      align-items: baseline;
-      gap: var(--form-field-inline-gap);
-      box-sizing: border-box;
-      height: var(--form-input-height);
-      padding-block: 0;
-      padding-inline: var(--form-input-padding-inline);
-      border: var(--form-input-border-width) solid
-        var(--form-input-border-color);
-      border-radius: var(--form-input-border-radius);
-      background-color: var(--form-input-background);
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--dimension-050);
+      margin: 0;
+
+      & > .ds.icon {
+        flex-shrink: 0;
+        margin-block: var(--dimension-025);
+        color: var(--modifier-color-icon, var(--color-icon));
+      }
+
+      & > .message-text {
+        flex-grow: 1;
+        font-family: var(--typography-text-secondary-font-family);
+        font-size: var(--typography-text-secondary-font-size);
+        font-weight: var(--typography-text-secondary-font-weight);
+        line-height: var(--typography-text-secondary-line-height);
+        color: var(--modifier-color-text, var(--color-text-destructive));
+      }
     }
 
-    & > .file-list > .file-item > .file-preview {
-      width: var(--dimension-400); /* 32px */
-      height: var(--dimension-400); /* 32px */
-      object-fit: cover;
-      border-radius: var(--form-input-border-radius);
+    & > .tile {
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* With a preview, the tooltip's wrapper is the tile's flex item and the
+       thumbnail sits inside it. */
+    & > .tile > .thumbnail-preview {
+      display: flex;
       flex-shrink: 0;
+
+      & > .target {
+        display: block;
+      }
     }
 
-    & > .file-list > .file-item > .file-name {
-      flex: 1;
-      min-width: 0;
+    /* 60×36 (5:3). The image fills the box edge to edge; the height matches
+       the tile's. */
+    & > .tile > .thumbnail,
+    & > .tile > .thumbnail-preview > .target > .thumbnail {
+      display: block;
+      flex-shrink: 0;
+      inline-size: 60px;
+      block-size: 36px;
+      overflow: hidden;
+
+      & > img {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+      }
+    }
+
+    /* No border: the fill alone draws the tile. */
+    & > .tile > .tile-details {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-grow: 1;
+      min-inline-size: 0;
+      gap: var(--dimension-100);
+      padding-block: var(--dimension-050);
+      padding-inline: var(--dimension-150) var(--dimension-050);
+      background-color: var(
+        --modifier-color-foreground-input,
+        var(--color-foreground-input)
+      );
+    }
+
+    & > .tile > .tile-details > .file-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-grow: 1;
+      min-inline-size: 0;
+      gap: var(--dimension-100);
+    }
+
+    & > .tile > .tile-details > .file-info > .file-name {
+      flex-shrink: 1;
+      min-inline-size: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-family: var(--typography-text-primary-font-family);
+      font-size: var(--typography-text-primary-font-size);
+      font-weight: var(--typography-text-primary-font-weight);
+      color: var(
+        --modifier-color-text-onForegroundSecondary,
+        var(--color-text-onForegroundSecondary)
+      );
     }
 
-    & > .file-list > .file-item > .file-size {
-      color: var(--color-text-muted);
+    & > .tile > .tile-details > .file-info > .file-size,
+    & > .tile > .tile-details > .status-and-actions .upload-progress {
       white-space: nowrap;
+      font-family: var(--typography-text-secondary-font-family);
+      font-size: var(--typography-text-secondary-font-size);
+      font-weight: var(--typography-text-secondary-font-weight);
     }
 
-    & > .file-list > .file-item > .file-remove {
-      appearance: none;
-      border: none;
-      background: none;
-      color: var(--color-text-muted);
-      cursor: pointer;
-      padding: 0 0.25rem;
+    & > .tile > .tile-details > .file-info > .file-size {
+      color: var(--modifier-color-text, var(--color-text-muted));
+    }
 
-      &:hover {
-        color: var(--color-text);
+    & > .tile > .tile-details > .status-and-actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      /* 6px; no dimension token declares this step. */
+      gap: 6px;
+    }
+
+    & > .tile > .tile-details > .status-and-actions > .file-status {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--dimension-100);
+
+      &:empty {
+        display: none;
       }
 
-      /* biome-ignore lint/style/noDescendingSpecificity: :disabled follows :hover by
-         interaction-state order; both target the same element and reordering would
-         change the cascade for no visual gain. */
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
+      & > .upload-progress {
+        color: var(--color-text-muted);
       }
     }
-  }
 
-  /* Danger state */
-  .danger > .payload .ds.input.file-upload > .drop-zone {
-    border-color: var(--form-input-border-color-error);
-  }
+    & > .tile > .tile-details > .status-and-actions > .file-actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
 
-  .danger > .payload .ds.input.file-upload > .drop-zone:focus-visible {
-    border-color: var(--form-focus-ring-color-error);
-    box-shadow: 0 0 0 1px var(--form-focus-ring-color-error);
+    /* Icon buttons, 28×28. Their colours come from the tile: the icon reads
+       the tile's Criticality icon channel, and the hover and active fills are
+       the tile's own. */
+    &
+      > .tile
+      > .tile-details
+      > .status-and-actions
+      > .file-actions
+      > .ds.button.file-action {
+      --modifier-surface: transparent;
+      --modifier-surface-hover: var(--file-upload-tile-hover);
+      --modifier-surface-active: var(--file-upload-tile-active);
+      --modifier-outline: 0;
+      --modifier-color-text: var(--modifier-color-icon, var(--color-icon));
+
+      box-sizing: border-box;
+      inline-size: calc(var(--dimension-050) * 7);
+      block-size: calc(var(--dimension-050) * 7);
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
   }
 }
