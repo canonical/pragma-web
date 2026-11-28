@@ -10,6 +10,11 @@ ds:implementation.library.ds-types
     rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/ds-types/implementationLibrary.ttl>;
     ds:implementationCount 8.
 
+ds:implementation.library.react-ds-app
+    a ds:ImplementationLibrary;
+    rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/react-ds-app/implementationLibrary.ttl>;
+    ds:implementationCount 18.
+
 ds:implementation.library.react-ds-global
     a ds:ImplementationLibrary;
     rdfs:seeAlso <https://github.com/canonical/pragma-web/blob/main/data/react-ds-global/implementationLibrary.ttl>;
