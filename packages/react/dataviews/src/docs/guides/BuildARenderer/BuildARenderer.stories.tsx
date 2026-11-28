@@ -8,13 +8,15 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../storybook/decorators/index.js";
-import createEmptySource from "../../../storybook/machines/createEmptySource.js";
-import createFailingSource from "../../../storybook/machines/createFailingSource.js";
-import createMachineSource from "../../../storybook/machines/createMachineSource.js";
-import createPendingSource from "../../../storybook/machines/createPendingSource.js";
-import { machineCollection } from "../../../storybook/machines/fixtures.js";
-import useMachineProvider from "../../../storybook/machines/hooks/useMachineProvider.js";
-import type { Machine } from "../../../storybook/machines/types.js";
+import type { Machine } from "../../../storybook/machines/index.js";
+import {
+  createEmptySource,
+  createFailingSource,
+  createMachineSource,
+  createPendingSource,
+  machineCollection,
+  useMachineProvider,
+} from "../../../storybook/machines/index.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../storybook/types.js";
 import { ConnectedRecordList, PlainList, StatusList } from "./common/index.js";

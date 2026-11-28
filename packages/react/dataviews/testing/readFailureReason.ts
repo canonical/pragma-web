@@ -5,7 +5,7 @@ import {
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { vi } from "vitest";
-import type { Machine } from "../src/storybook/machines/types.js";
+import type { Machine } from "../src/storybook/machines/index.js";
 import { DELIVERY_WAIT } from "./constants.js";
 
 /**

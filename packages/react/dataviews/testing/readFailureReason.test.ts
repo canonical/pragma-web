@@ -1,8 +1,10 @@
 import type { Source } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
-import createFailingSource from "../src/storybook/machines/createFailingSource.js";
-import createMachineSource from "../src/storybook/machines/createMachineSource.js";
-import type { Machine } from "../src/storybook/machines/types.js";
+import type { Machine } from "../src/storybook/machines/index.js";
+import {
+  createFailingSource,
+  createMachineSource,
+} from "../src/storybook/machines/index.js";
 import readFailureReason from "./readFailureReason.js";
 
 describe("readFailureReason", () => {

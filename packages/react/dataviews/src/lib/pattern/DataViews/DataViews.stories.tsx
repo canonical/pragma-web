@@ -5,8 +5,10 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../storybook/decorators/index.js";
-import { machineCollection } from "../../../storybook/machines/fixtures.js";
-import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
+import {
+  machineCollection,
+  showConsumerCode,
+} from "../../../storybook/machines/index.js";
 import { useDataViewsValue } from "../../hooks/index.js";
 import type { DataTableColumn } from "./common/renderers/DataTable/index.js";
 import { useDataViews } from "./hooks/index.js";

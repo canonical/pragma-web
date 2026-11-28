@@ -9,13 +9,13 @@ import {
   createGraphQLHandlers,
 } from "../../storybook/machines/api/index.js";
 import {
+  readPaginationSummary,
   SERVER_BACKED_COLUMNS_CODE,
   SERVER_BACKED_FACETS,
   SERVER_BACKED_RENDER_CODE,
-} from "../../storybook/machines/constants.js";
-import readPaginationSummary from "../../storybook/machines/readPaginationSummary.js";
-import ServerBackedMachines from "../../storybook/machines/ServerBackedMachines.js";
-import showConsumerCode from "../../storybook/machines/showConsumerCode.js";
+  ServerBackedMachines,
+  showConsumerCode,
+} from "../../storybook/machines/index.js";
 import { createGraphQLMachineSource } from "../../storybook/machines/sources/index.js";
 import pickStoryWords from "../../storybook/pickStoryWords.js";
 

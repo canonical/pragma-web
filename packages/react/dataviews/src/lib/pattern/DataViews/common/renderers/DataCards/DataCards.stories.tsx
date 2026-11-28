@@ -6,20 +6,22 @@ import {
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../../../../storybook/machines/api/index.js";
-import createEmptySource from "../../../../../../storybook/machines/createEmptySource.js";
-import createFailingSource from "../../../../../../storybook/machines/createFailingSource.js";
-import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
-import { machineCollection } from "../../../../../../storybook/machines/fixtures.js";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
-import readHostName from "../../../../../../storybook/machines/readHostName.js";
-import readPaginationSummary from "../../../../../../storybook/machines/readPaginationSummary.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import { createRestMachineSource } from "../../../../../../storybook/machines/sources/index.js";
 import type {
   Machine,
   MachineFields,
   MachineProviderConfig,
-} from "../../../../../../storybook/machines/types.js";
+} from "../../../../../../storybook/machines/index.js";
+import {
+  createEmptySource,
+  createFailingSource,
+  createPendingSource,
+  machineCollection,
+  readHostName,
+  readPaginationSummary,
+  showConsumerCode,
+  useMachineProvider,
+} from "../../../../../../storybook/machines/index.js";
+import { createRestMachineSource } from "../../../../../../storybook/machines/sources/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import type {

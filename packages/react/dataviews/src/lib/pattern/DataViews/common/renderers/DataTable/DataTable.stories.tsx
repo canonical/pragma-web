@@ -6,24 +6,26 @@ import {
   withAppScope,
   withFrame,
 } from "../../../../../../storybook/decorators/index.js";
-import buildMachines from "../../../../../../storybook/machines/buildMachines.js";
-import createEmptySource from "../../../../../../storybook/machines/createEmptySource.js";
-import createFailingSource from "../../../../../../storybook/machines/createFailingSource.js";
-import createForbiddingSource from "../../../../../../storybook/machines/createForbiddingSource.js";
-import createMachineSource from "../../../../../../storybook/machines/createMachineSource.js";
-import createOneTermSource from "../../../../../../storybook/machines/createOneTermSource.js";
-import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
-import { machineCollection } from "../../../../../../storybook/machines/fixtures.js";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
-import readHostName from "../../../../../../storybook/machines/readHostName.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineFields,
   MachineProvider,
   MachineProviderConfig,
   SortableField,
-} from "../../../../../../storybook/machines/types.js";
+} from "../../../../../../storybook/machines/index.js";
+import {
+  buildMachines,
+  createEmptySource,
+  createFailingSource,
+  createForbiddingSource,
+  createMachineSource,
+  createOneTermSource,
+  createPendingSource,
+  machineCollection,
+  readHostName,
+  showConsumerCode,
+  useMachineProvider,
+} from "../../../../../../storybook/machines/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import {
   useDataViewsCell,

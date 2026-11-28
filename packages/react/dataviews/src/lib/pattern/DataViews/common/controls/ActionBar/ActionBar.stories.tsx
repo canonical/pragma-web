@@ -11,12 +11,12 @@ import {
   withAppScope,
   withMachineRoot,
 } from "../../../../../../storybook/decorators/index.js";
+import type { Machine } from "../../../../../../storybook/machines/index.js";
 import {
   machineCollection,
+  showConsumerCode,
   storyMachines,
-} from "../../../../../../storybook/machines/fixtures.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { Machine } from "../../../../../../storybook/machines/types.js";
+} from "../../../../../../storybook/machines/index.js";
 import { useDataViewsValue } from "../../../../../hooks/index.js";
 import { useDataViews } from "../../../hooks/index.js";
 import DataViews from "../../../Provider.js";

@@ -7,9 +7,11 @@ import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { withAppScope } from "../../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../../storybook/getHiddenButton.js";
-import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
-import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { MachineProviderConfig } from "../../../../../../storybook/machines/types.js";
+import type { MachineProviderConfig } from "../../../../../../storybook/machines/index.js";
+import {
+  showConsumerCode,
+  useMachineProvider,
+} from "../../../../../../storybook/machines/index.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import DataViews from "../../../Provider.js";
