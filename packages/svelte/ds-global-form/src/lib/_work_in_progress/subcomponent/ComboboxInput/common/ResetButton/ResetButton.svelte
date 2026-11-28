@@ -14,8 +14,9 @@
   }: ResetButtonProps = $props();
 </script>
 
-<button {id} {style} class={[componentCssClassName, className]} aria-label={messages.reset()} type="button" {onclick}>x</button>
+<button {id} {style} class={["ds button primary", componentCssClassName, className]} aria-label={messages.reset()} type="button" {onclick}><span class="label">x</span></button>
 
 <!-- @component
-The button that clears a combobox selection.
+The button that clears a combobox selection. Its markup is the primary
+`Button` of the design system, as React renders it.
 -->

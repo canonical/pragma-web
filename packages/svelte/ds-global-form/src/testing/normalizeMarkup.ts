@@ -5,6 +5,7 @@ const ID_ATTRIBUTES = new Set([
   "aria-describedby",
   "aria-errormessage",
   "aria-controls",
+  "aria-activedescendant",
 ]);
 
 /** Rewrites a style declaration list into one canonical spelling. */

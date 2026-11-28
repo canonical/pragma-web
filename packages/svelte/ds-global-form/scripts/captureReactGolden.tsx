@@ -6,12 +6,16 @@
  *
  * Run from this package after building the React form package:
  * `bun scripts/captureReactGolden.tsx`. React and react-hook-form are resolved
- * from the React package, so both sides share one copy of each.
+ * from the React package, so both sides share one copy of each. Set
+ * `REACT_FORM_PACKAGE` to the directory of another React form package checkout
+ * (for example a worktree of an unmerged React change) to capture from it.
  */
 import { writeFileSync } from "node:fs";
 import { goldenCases } from "../src/testing/fixtures.goldenCases.ts";
 
-const reactPackage = new URL("../../../react/ds-global-form/", import.meta.url);
+const reactPackage = process.env.REACT_FORM_PACKAGE
+  ? new URL(`file://${process.env.REACT_FORM_PACKAGE.replace(/\/?$/, "/")}`)
+  : new URL("../../../react/ds-global-form/", import.meta.url);
 const resolve = (specifier: string) =>
   Bun.resolveSync(specifier, reactPackage.pathname);
 const { createElement } = await import(resolve("react"));
@@ -24,12 +28,15 @@ const { Field } = await import(
 function GoldenForm({
   props,
   error,
+  value,
 }: {
   props: Record<string, unknown>;
   error?: string;
+  value?: unknown;
 }) {
   const name = props.name as string;
   const methods = useForm({
+    defaultValues: value === undefined ? undefined : { [name]: value },
     errors: error ? { [name]: { type: "manual", message: error } } : undefined,
   });
   return createElement(
@@ -41,9 +48,9 @@ function GoldenForm({
 }
 
 const golden: Record<string, string> = {};
-for (const [key, { props, error }] of Object.entries(goldenCases)) {
+for (const [key, { props, error, value }] of Object.entries(goldenCases)) {
   golden[key] = renderToStaticMarkup(
-    createElement(GoldenForm, { props, error }),
+    createElement(GoldenForm, { props, error, value }),
   );
 }
 

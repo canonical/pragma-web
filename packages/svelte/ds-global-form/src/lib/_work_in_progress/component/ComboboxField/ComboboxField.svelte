@@ -9,10 +9,12 @@
   const { chrome, control } = $derived(splitChromeProps(props));
 </script>
 
-<Wrapper {...chrome} onhide={() => (value = undefined)}>{#snippet children(controlProps)}<ComboboxInput {...control} id={controlProps.id} bind:value />{/snippet}</Wrapper>
+<Wrapper {...chrome} onhide={() => (value = undefined)}>{#snippet children(controlProps)}<ComboboxInput {...control} id={controlProps.id} name={chrome.name} bind:value />{/snippet}</Wrapper>
 
 <!-- @component
-ComboboxInput wrapped with field chrome. Bind `value` for two-way binding.
+ComboboxInput wrapped with field chrome. Bind `value` for two-way binding. The
+field `name` names the combobox's hidden input, so the value posts without
+JavaScript.
 
 `import { ComboboxField } from "@canonical/svelte-ds-global-form";`
 

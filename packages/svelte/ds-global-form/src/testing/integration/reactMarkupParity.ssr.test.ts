@@ -12,22 +12,25 @@ const SVELTE_PROP_NAMES: Record<string, string> = {
 
 /** Maps a golden case to the props of the Svelte Field. */
 function createSvelteProps(key: string) {
-  const { props, error } = goldenCases[key];
+  const { props, error, value } = goldenCases[key];
   return Object.fromEntries([
     ...Object.entries(props).map(([name, value]) => [
       SVELTE_PROP_NAMES[name] ?? name,
       value,
     ]),
     ...(error ? [["error", error]] : []),
+    ...(value === undefined ? [] : [["value", value]]),
   ]);
 }
+
+const caseKeys = Object.keys(goldenCases);
 
 describe("React markup parity", () => {
   const { window } = render(Field, {
     props: { inputType: "text", name: "probe" },
   });
 
-  it.each(Object.keys(goldenCases))("renders the %s markup", (key) => {
+  it.each(caseKeys)("renders the %s markup", (key) => {
     const svelte = render(Field, {
       // biome-ignore lint/suspicious/noExplicitAny: golden props are data
       props: createSvelteProps(key) as any,
@@ -46,6 +49,7 @@ describe("React markup parity", () => {
         "checkbox",
         "choices",
         "color",
+        "combobox",
         "date",
         "datetime",
         "email",
