@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /**
-   * The label text content
+   * The tag text content
    */
   children?: ReactNode;
   /**
@@ -39,9 +39,9 @@ type OwnProps = {
 };
 
 /**
- * Props for the Label component
+ * Props for the Tag component
  *
- * @implements ds:global.component.label
+ * @implements ds:global.component.tag
  *
  * Anatomy (from DSL):
  * - layout.display: inline
@@ -53,5 +53,4 @@ type OwnProps = {
  * - importance: primary, secondary, tertiary
  * - criticality: success, error, warning, information
  */
-export type LabelProps = OwnProps &
-  Omit<ComponentProps<"span">, keyof OwnProps>;
+export type TagProps = OwnProps & Omit<ComponentProps<"span">, keyof OwnProps>;
