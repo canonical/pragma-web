@@ -33,7 +33,7 @@ describe("Modal SSR", () => {
   it("renders closed", () => {
     // showModal() is what makes a dialog modal, and it only runs on the
     // client: a server-rendered `open` attribute would paint a non-modal
-    // dialog with no backdrop and no focus trap.
+    // dialog with no backdrop and an interactive page behind it.
     const html = renderToString(
       <Component ref={createRef<HTMLDialogElement>()}>
         <Component.Content>Placeholder content</Component.Content>

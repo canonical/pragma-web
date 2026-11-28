@@ -43,9 +43,10 @@ type OwnProps = {
  * @implements ds:global.pattern.modal
  *
  * `open` is omitted because a `<dialog>` carrying the `open` attribute is
- * *non-modal*: no top layer, no backdrop, no focus trap. The modal is only
- * ever opened through `showModal()`, so the open state lives in the DOM
- * element and not in a prop. Use the `ref` to open or close it.
+ * *non-modal*: no top layer, no backdrop, and the page behind it stays
+ * interactive. The modal is only ever opened through `showModal()`, so the
+ * open state lives in the DOM element and not in a prop. Use the `ref` to
+ * open or close it.
  *
  * `onClose` is *not* omitted: the native `close` event is how a consumer hears
  * that the modal is gone, whichever way out the user took, and it replaces the
