@@ -92,9 +92,9 @@ function Collection({
         label="Machines"
         selectable
         getRowLabel={(row) => row.name}
+        footer={<Component.Pagination sizes={[5, 10, 25]} />}
       />
       <Component.ActionBar />
-      <Component.Pagination sizes={[5, 10, 25]} />
     </Component>
   );
 }
@@ -141,9 +141,9 @@ ${nameMachineCode}`,
     label="Machines"
     selectable
     getRowLabel={nameMachine}
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
   />
   <DataViews.ActionBar />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
   render: function RenderConnectedParts(args) {
@@ -197,9 +197,9 @@ ${nameMachineCode}`,
     label="Machines"
     selectable
     getRowLabel={nameMachine}
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
   />
   <DataViews.ActionBar />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
 });
 

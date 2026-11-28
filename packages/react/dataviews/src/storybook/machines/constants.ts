@@ -65,6 +65,6 @@ ${Object.entries(SERVER_BACKED_PARTS.labels)
     columns={columns}
     label=${JSON.stringify(SERVER_BACKED_PARTS.tableLabel)}
     getRowLabel={nameMachine}
+    footer={<DataViews.Pagination sizes={[${SERVER_BACKED_PARTS.sizes.join(", ")}]} />}
   />
-  <DataViews.Pagination sizes={[${SERVER_BACKED_PARTS.sizes.join(", ")}]} />
 </DataViews>`;

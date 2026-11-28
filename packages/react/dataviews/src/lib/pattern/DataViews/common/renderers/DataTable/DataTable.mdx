@@ -8,7 +8,7 @@ import * as Stories from "./DataTable.stories";
 
 `DataTable` renders the rows of one collection and nothing else: it does not fetch, own the URL or decide where views persist. A provider owns the collection's query, result and selection and drives the source that answers it; the table observes the provider and shows what it holds. Each recipe below is the smallest complete code for one job, followed by the live story that shows it.
 
-The table is dense wherever it sits: its root carries the design system's `.dense` class, and its rows and cells take their height and padding from the density channel of `@canonical/styles`, so load that stylesheet on the page. Its sort chevrons and checkbox marks are `@canonical/ds-assets` icons, which the page serves at `/icons`, as for every other design-system icon.
+The table sits in `div.ds.data-table-frame`, which draws the border and is its parent's layout item; `className`, `style` and `ref` reach the `<table>`. It is dense wherever it sits: it carries the design system's `.dense` class, and its rows and cells take their height and padding from the density channel of `@canonical/styles`, so load that stylesheet on the page. Its sort chevrons and checkbox marks are `@canonical/ds-assets` icons, which the page serves at `/icons`, as for every other design-system icon.
 
 ## A table over a provider
 
@@ -122,6 +122,23 @@ To open on an order, issue it once the provider is built, before anything observ
 <Canvas of={Stories.SortedByTwoTerms} sourceState="none" />
 
 <Canvas of={Stories.DefaultOrdering} sourceState="none" />
+
+## A footer
+
+Pass the pagination bar as `footer`: it sits beneath the rows inside the table's border, sticks to the bottom of whatever scrolls it, and loses its own border, margin and radius so it joins flush. Without content it draws nothing.
+
+```tsx
+import { DataTable, PaginationBar } from "@canonical/dataviews-react";
+
+<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+/>;
+```
+
+<Canvas of={Stories.WithPaginationFooter} sourceState="none" />
 
 ## Selection
 

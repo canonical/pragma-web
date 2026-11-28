@@ -200,8 +200,8 @@ function ConnectedMachines(words: StoryWords): ReactElement {
         label="Machine table"
         selectable
         getRowLabel={(row) => row.name}
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
       />
-      <DataViews.Pagination sizes={[5, 10]} />
     </>
   );
 }

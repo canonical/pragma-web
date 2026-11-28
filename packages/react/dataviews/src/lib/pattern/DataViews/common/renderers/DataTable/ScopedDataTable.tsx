@@ -19,6 +19,7 @@ import {
   type CSSProperties,
   isValidElement,
   type ReactElement,
+  type ReactNode,
   useCallback,
   useEffect,
   useId,
@@ -59,6 +60,7 @@ import { areColumnModelsEqual, readSizing } from "./common/utils/index.js";
 import {
   useColumnArrangement,
   useColumnManagement,
+  useFooterReserve,
   useHeaderSort,
   useTableArrangement,
   useTableGeometry,
@@ -73,6 +75,16 @@ import "./styles.css";
  * wherever it sits.
  */
 const componentCssClassName = "ds data-table dense";
+
+/** The border around the table and its footer; it takes no caller props. */
+const frameCssClassName = "ds data-table-frame";
+
+/** Whether a footer node draws anything: `cond && <X />` leaves it out. */
+const isDrawn = (node: ReactNode): boolean =>
+  node !== undefined &&
+  node !== null &&
+  !(typeof node === "string" && node.trim() === "") &&
+  typeof node !== "boolean";
 
 /** One identity for a source that orders by nothing. */
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
@@ -94,12 +106,20 @@ const renderVirtualizedBody = (
 };
 
 /**
- * The table, given its words and announcer rather than resolving them.
+ * The data table presents structured data in rows and columns, with sorting,
+ * row selection, inline editing, column management and grouping. It suits
+ * application products where users work with medium to large datasets, and it
+ * adapts across viewport sizes. Use it for machine inventories, user lists and
+ * job histories, where users compare records attribute by attribute. Each of
+ * its parts is documented as a separate subcomponent.
+ *
+ * This implementation draws the table in its frame, given its words and
+ * announcer rather than resolving them.
  *
  * @implements ds:apps.pattern.datatable
  *
- * @note Impure: observes the provider and the grid interaction while
- * mounted.
+ * @note Impure: observes the provider, the grid interaction and the
+ * footer's size while mounted.
  */
 export default function ScopedDataTable<
   TFields extends readonly SchemaFieldDefinition[],
@@ -113,8 +133,10 @@ export default function ScopedDataTable<
   renderStatus,
   virtualization,
   settings,
+  footer,
   messages,
   announce,
+  announcer,
   settingsMenu,
   id,
   className,
@@ -234,6 +256,11 @@ export default function ScopedDataTable<
   // and every change to them is announced. The header row takes the focus a
   // hidden column's own controls leave.
   const headerRow = useRef<HTMLTableRowElement>(null);
+  // The frame and its footer, whose measured height the frame keeps clear.
+  const frame = useRef<HTMLDivElement>(null);
+  const footerBox = useRef<HTMLDivElement>(null);
+  const footerDrawn = isDrawn(footer);
+  useFooterReserve(frame, footerBox, footerDrawn);
   const {
     settings: columnSettings,
     readOffers,
@@ -358,105 +385,113 @@ export default function ScopedDataTable<
 
   return (
     <MessagesContext value={messages}>
-      {/* A native table, drawn on one shared track list: its stylesheet
-          lays rows out as grids, so no row sizes itself by its content. */}
-      <table
-        tabIndex={tabIndex}
-        id={id}
-        {...rest}
-        ref={attach}
-        className={[
-          componentCssClassName,
-          // A virtualized table is its own bounded scroll viewport.
-          virtualization === undefined ? null : "bounded",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={geometryStyle}
-        aria-label={label}
-        aria-busy={busy}
-        // Every logical row, the header's included, so a row a virtualized
-        // table has not mounted is still counted.
-        aria-rowcount={
-          virtualization === undefined ? undefined : entries.length + 1
-        }
-      >
-        <thead className="header">
-          <tr
-            ref={headerRow}
-            className="row"
-            aria-rowindex={virtualization === undefined ? undefined : 1}
-          >
-            {selectable ? (
-              <SelectAllCell
-                selection={provider.selection}
-                ids={scopes.ids}
-                reserve={geometry.reserve}
-              />
-            ) : null}
-            {rendered.map((column, position) => {
-              const field = readFieldName(column);
-              const sortable = isSortable(column);
-              return (
-                <HeaderCell
-                  key={column.id}
-                  column={column}
-                  sortable={sortable}
-                  scope={readScope(field)}
-                  precedence={headerSort.precedences.get(field) ?? null}
-                  primary={column.id === headerSort.primaryColumnId}
-                  // Spelled only while it is rendered: once scripts take over
-                  // the header is a button, and nothing reads a destination.
-                  destination={
-                    sortable && !hydrated
-                      ? headerSort.spellDestination(column.id)
-                      : null
-                  }
-                  hydrated={hydrated}
-                  reason={headerSort.readReason(column.id)}
-                  onClearRefusal={headerSort.clearRefusal}
-                  onSort={headerSort.sortColumn}
-                  removable={headerSort.stated.has(field)}
-                  onPlace={headerSort.placeColumn}
-                  onRemoveFromSort={headerSort.removeFromSort}
-                  offers={readOffers(column.id)}
-                  columnsReason={reason}
-                  onChangeColumn={changeColumn}
-                  interaction={interaction}
-                  resizable={isResizable(column, position)}
-                  bounds={readSizingBounds(layout.readDeclared(column.id))}
-                  // Solved for every rendered column, in the same order.
-                  width={assertInvariant(
-                    geometry.widths.at(position),
-                    "a solved width for every rendered column",
-                  )}
-                  labelId={`${baseId}-${column.id}`}
-                  announce={announce}
+      <div ref={frame} className={frameCssClassName}>
+        {/* A native table, drawn on one shared track list: its stylesheet
+            lays rows out as grids, so no row sizes itself by its content. */}
+        <table
+          tabIndex={tabIndex}
+          id={id}
+          {...rest}
+          ref={attach}
+          className={[
+            componentCssClassName,
+            // A virtualized table is its own bounded scroll viewport.
+            virtualization === undefined ? null : "bounded",
+            className,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          style={geometryStyle}
+          aria-label={label}
+          aria-busy={busy}
+          // Every logical row, the header's included, so a row a virtualized
+          // table has not mounted is still counted.
+          aria-rowcount={
+            virtualization === undefined ? undefined : entries.length + 1
+          }
+        >
+          <thead className="header">
+            <tr
+              ref={headerRow}
+              className="row"
+              aria-rowindex={virtualization === undefined ? undefined : 1}
+            >
+              {selectable ? (
+                <SelectAllCell
+                  selection={provider.selection}
+                  ids={scopes.ids}
+                  reserve={geometry.reserve}
                 />
-              );
-            })}
-            {hasSettings ? (
-              <SettingsCell
-                settings={settings}
-                settingsMenu={settingsMenu}
-                menu={menu}
-                reserve={geometry.reserve}
-              />
-            ) : null}
-          </tr>
-        </thead>
-        {virtualization === undefined ? (
-          <TableBody entries={entries} renderEntry={renderEntry} />
-        ) : (
-          renderVirtualizedBody(virtualization, {
-            entries,
-            renderEntry,
-            rows: provider.rows,
-            tracks: geometry.template,
-          })
-        )}
-      </table>
+              ) : null}
+              {rendered.map((column, position) => {
+                const field = readFieldName(column);
+                const sortable = isSortable(column);
+                return (
+                  <HeaderCell
+                    key={column.id}
+                    column={column}
+                    sortable={sortable}
+                    scope={readScope(field)}
+                    precedence={headerSort.precedences.get(field) ?? null}
+                    primary={column.id === headerSort.primaryColumnId}
+                    // Spelled only while it is rendered: once scripts take over
+                    // the header is a button, and nothing reads a destination.
+                    destination={
+                      sortable && !hydrated
+                        ? headerSort.spellDestination(column.id)
+                        : null
+                    }
+                    hydrated={hydrated}
+                    reason={headerSort.readReason(column.id)}
+                    onClearRefusal={headerSort.clearRefusal}
+                    onSort={headerSort.sortColumn}
+                    removable={headerSort.stated.has(field)}
+                    onPlace={headerSort.placeColumn}
+                    onRemoveFromSort={headerSort.removeFromSort}
+                    offers={readOffers(column.id)}
+                    columnsReason={reason}
+                    onChangeColumn={changeColumn}
+                    interaction={interaction}
+                    resizable={isResizable(column, position)}
+                    bounds={readSizingBounds(layout.readDeclared(column.id))}
+                    // Solved for every rendered column, in the same order.
+                    width={assertInvariant(
+                      geometry.widths.at(position),
+                      "a solved width for every rendered column",
+                    )}
+                    labelId={`${baseId}-${column.id}`}
+                    announce={announce}
+                  />
+                );
+              })}
+              {hasSettings ? (
+                <SettingsCell
+                  settings={settings}
+                  settingsMenu={settingsMenu}
+                  menu={menu}
+                  reserve={geometry.reserve}
+                />
+              ) : null}
+            </tr>
+          </thead>
+          {virtualization === undefined ? (
+            <TableBody entries={entries} renderEntry={renderEntry} />
+          ) : (
+            renderVirtualizedBody(virtualization, {
+              entries,
+              renderEntry,
+              rows: provider.rows,
+              tracks: geometry.template,
+            })
+          )}
+        </table>
+        {footerDrawn ? (
+          <div ref={footerBox} className="footer">
+            {footer}
+          </div>
+        ) : null}
+        {announcer}
+      </div>
     </MessagesContext>
   );
 }

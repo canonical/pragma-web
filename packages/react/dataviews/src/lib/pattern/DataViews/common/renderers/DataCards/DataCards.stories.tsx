@@ -289,7 +289,7 @@ function SortedAndPagedMachines({
 /**
  * Sorted and paged: the cards show nothing of the ordering or the paging
  * themselves. The sort panel orders them and the pagination bar pages them,
- * both placed beside the cards in one root, as they are beside a table.
+ * both placed beside the cards in one root.
  */
 export const SortedAndPaged: Story = {
   name: "Sorted and paged",

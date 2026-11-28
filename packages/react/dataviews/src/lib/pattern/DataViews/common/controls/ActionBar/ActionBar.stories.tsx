@@ -121,6 +121,7 @@ function ManagedMachines({
         label="Machines"
         selectable
         getRowLabel={(row) => row.name}
+        footer={<Pagination sizes={[5, 10]} />}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -132,7 +133,6 @@ function ManagedMachines({
           Delete
         </SelectionAction>
       </Component>
-      <Pagination sizes={[5, 10]} />
     </>
   );
 }
@@ -211,6 +211,7 @@ ${declarations}`,
     label="Machines"
     selectable
     getRowLabel={nameMachine}
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
   />
   <DataViews.ActionBar${indicator}>
     <SelectionAction action="archive">Archive</SelectionAction>
@@ -218,7 +219,6 @@ ${declarations}`,
       Delete
     </SelectionAction>
   </DataViews.ActionBar>
-  <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
   });
 

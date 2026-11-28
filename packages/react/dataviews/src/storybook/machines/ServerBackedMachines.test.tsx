@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { SERVER_BACKED_PARTS } from "./constants.js";
 import createMachineSource from "./createMachineSource.js";
@@ -17,6 +17,12 @@ describe("ServerBackedMachines", () => {
     // The first page of five, from the source given.
     expect(await screen.findAllByRole("row")).toHaveLength(6);
     expect(table).toHaveAttribute("aria-busy", "false");
+    const footer = table.nextElementSibling;
+    if (!(footer instanceof HTMLElement)) {
+      throw new Error("expected a footer after the table");
+    }
+    expect(footer).toHaveClass("footer");
+    expect(within(footer).getByRole("navigation")).toBeInTheDocument();
   });
 
   it("speaks the messages given", () => {

@@ -267,8 +267,12 @@ export type RegionRecord = { readonly id: string; readonly region: string };
 
 /** What the stand-in hands a test: a way to resize, and to remove it. */
 export type ResizeObserverStandIn = {
-  /** Report a new content inline size for an element to its observers. */
-  readonly resize: (element: Element, inlineSize: number) => void;
+  /** Report an element's new size to its observers; block size 0 by default. */
+  readonly resize: (
+    element: Element,
+    inlineSize: number,
+    blockSize?: number,
+  ) => void;
   /** How many observers observe an element. */
   readonly observing: (element: Element) => number;
   /** Remove the stand-in and restore the observer it replaced. */

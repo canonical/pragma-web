@@ -105,9 +105,9 @@ export function MachinesPage({ rows }: { rows: readonly Machine[] }) {
         label="Machines"
         selectable
         getRowLabel={nameMachine}
+        footer={<DataViews.Pagination label="Machines pagination" />}
       />
       <ExportNames />
-      <DataViews.Pagination label="Machines pagination" />
     </DataViews>
   );
 }
@@ -151,7 +151,7 @@ Each component imports its own stylesheet, so a page that renders one has the ru
 @import url("@canonical/dataviews-react/index.css");
 ```
 
-The table assumes the `.app` context of `@canonical/styles`, which the page loads: render it inside an element carrying the `.app` class, where the design system's primary text takes its application sizes. It is dense wherever it sits — its root carries the design system's `.dense` class — and its rows and cells take their height and padding from the density channel that class sets; it defines no density rule of its own. The pagination bar is dense the same way; the saved views' controls follow the density scope of the page around them. Its sort chevrons and checkbox marks are `@canonical/ds-assets` icons, served at `/icons` like every other design-system icon.
+The table assumes the `.app` context of `@canonical/styles`, which the page loads: render it inside an element carrying the `.app` class, where the design system's primary text takes its application sizes. It sits in `div.ds.data-table-frame`, which draws the border and is its parent's layout item; `className`, `style` and `ref` reach the `<table>`. It is dense wherever it sits — the table carries the design system's `.dense` class — and its rows and cells take their height and padding from the density channel that class sets; it defines no density rule of its own. The pagination bar is dense the same way; the saved views' controls follow the density scope of the page around them. Its sort chevrons and checkbox marks are `@canonical/ds-assets` icons, served at `/icons` like every other design-system icon.
 
 The sheet is in the `ds.components.global` cascade layer and reads its colours, spacing, borders and type from `@canonical/design-tokens`. The one thing it cannot carry is the column track list: the solver derives that per render from the measured container, and the table publishes the data columns' tracks on itself as `--data-table-columns` (nothing at all when it has no columns), which every row consumes after the selection column's own track. That property is the table's own channel, not a customisation hook: the table writes it after any `style` it is given.
 
@@ -164,6 +164,7 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **A table over a provider** — build the provider once, over the collection and its source, and mount: the table observes it.
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.
 - **Sorting** — `sortable` takes effect where the source's declaration, read by the provider, names the field sortable; on any other field the heading is plain, and nothing throws.
+- **A footer** — `footer={<PaginationBar provider={provider} />}`.
 - **Selection** — the design system's checkboxes in a 32px column, named by `getRowLabel`; select-all acts on the displayed rows.
 - **Resizing and its limits** — held to the declared bounds; no control on the last column; two tables with one id on one provider agree on every width, and nothing is passed between them.
 - **A cell handed its record** — a module-scope renderer handed its typed value and record, reading the row's selection through `useDataViewsCell(collection)`.

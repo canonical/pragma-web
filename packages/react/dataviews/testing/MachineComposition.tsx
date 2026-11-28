@@ -24,8 +24,12 @@ export default function MachineComposition({
     <DataViews provider={provider}>
       <DataViews.Search label="Search machines" />
       <DataViews.Filters />
-      <DataViews.DataTable id="t" columns={columns} label="Machines" />
-      <DataViews.Pagination sizes={[25, 50, 100]} />
+      <DataViews.DataTable
+        id="t"
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination sizes={[25, 50, 100]} />}
+      />
     </DataViews>
   );
 }

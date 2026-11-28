@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "./buildMachine.js";
 import createMachineProvider from "./createMachineProvider.js";
@@ -14,11 +14,15 @@ describe("MachineComposition", () => {
       screen.getByRole("searchbox", { name: "Search machines" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Filters" })).toBeInTheDocument();
-    expect(screen.getByRole("table", { name: "Machines" })).toHaveTextContent(
-      "alpha",
-    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    expect(table).toHaveTextContent("alpha");
+    const footer = table.nextElementSibling;
+    if (!(footer instanceof HTMLElement)) {
+      throw new Error("expected a footer after the table");
+    }
+    expect(footer).toHaveClass("footer");
     expect(
-      screen.getByRole("navigation", { name: "Pagination" }),
+      within(footer).getByRole("navigation", { name: "Pagination" }),
     ).toBeInTheDocument();
   });
 });

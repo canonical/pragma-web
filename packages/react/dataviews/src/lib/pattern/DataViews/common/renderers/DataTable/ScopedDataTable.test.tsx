@@ -13,6 +13,7 @@ import {
   buildMachine,
   createMachineProvider,
   installPopoverStandIn,
+  installResizeObserverStandIn,
   openMenuFrom,
 } from "../../../../../../../testing/index.js";
 
@@ -278,7 +279,65 @@ describe("ScopedDataTable", () => {
     );
   });
 
-  it("takes the native props of its root, merging the class name, style and ref", () => {
+  it("frames the table, then the footer, then the announcer it is handed", () => {
+    const { provider } = createMachineProvider({ rows: [] });
+    const { container } = render(
+      <ScopedDataTable
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+        footer="1 of 1"
+        announcer={<output>said</output>}
+      />,
+    );
+    const frame = container.firstElementChild;
+    if (!(frame instanceof HTMLElement)) {
+      throw new Error("expected the frame");
+    }
+    expect(frame).toHaveClass("ds", "data-table-frame");
+    expect(Array.from(frame.children, (part) => part.tagName)).toEqual([
+      "TABLE",
+      "DIV",
+      "OUTPUT",
+    ]);
+    expect(frame.children.item(1)).toHaveTextContent("1 of 1");
+  });
+
+  it("writes its footer's measured height on the frame while it has one", () => {
+    const standIn = installResizeObserverStandIn();
+    onTestFinished(standIn.uninstall);
+    const { provider } = createMachineProvider({ rows: [] });
+    const draw = (footer: string | null) => (
+      <ScopedDataTable
+        settingsMenu={Menu}
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+        footer={footer}
+      />
+    );
+    const { container, rerender } = render(draw("1 of 1"));
+    const frame = container.firstElementChild;
+    const footer = frame?.querySelector(":scope > .footer");
+    if (!(frame instanceof HTMLElement) || !(footer instanceof HTMLElement)) {
+      throw new Error("expected the frame and its footer");
+    }
+    act(() => standIn.resize(footer, 320, 41));
+    expect(
+      frame.style.getPropertyValue("--data-table-frame-footer-reserve"),
+    ).toBe("41px");
+    rerender(draw(null));
+    expect(
+      frame.style.getPropertyValue("--data-table-frame-footer-reserve"),
+    ).toBe("");
+  });
+
+  it("takes the native props of its table, merging the class name, style and ref", () => {
     const { provider } = createMachineProvider({ rows: [] });
     const ref = createRef<HTMLTableElement>();
     render(

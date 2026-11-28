@@ -50,8 +50,12 @@ const refuseInComposition = async (): Promise<{
     <DataViews provider={provider}>
       <DataViews.Filters />
       <DataViews.SavedViews />
-      <DataViews.DataTable id="t" columns={columns} label="Machines" />
-      <DataViews.Pagination />
+      <DataViews.DataTable
+        id="t"
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination />}
+      />
     </DataViews>,
   );
   const table = within(screen.getByRole("table", { name: "Machines" }));

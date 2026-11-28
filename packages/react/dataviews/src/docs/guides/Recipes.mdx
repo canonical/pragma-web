@@ -5,7 +5,7 @@ import * as Stories from "./Composition.stories";
 
 # DataViews composition recipes
 
-A `DataViews` root mounts one provider for the parts inside it. The parts read the root: they take presentation choices — a name, visible field labels, the page sizes to offer — and never a second copy of the query, the window or the selection the provider already owns. Ordinary wrappers and your own components sit between them; moving pagination means moving an element, not asking for a slot.
+A `DataViews` root mounts one provider for the parts inside it. The parts read the root: they take presentation choices — a name, visible field labels, the page sizes to offer — and never a second copy of the query, the window or the selection the provider already owns. Ordinary wrappers and your own components sit between them. The table's slots are `settings` and `footer`.
 
 ## A whole screen
 
@@ -77,9 +77,9 @@ export function Machines() {
         label="Machines"
         selectable
         getRowLabel={nameMachine}
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
       />
       <DataViews.ActionBar />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );
 }
@@ -116,6 +116,34 @@ export const machineCollection = createCollection({
 The filters and the table's sortable columns offer nothing the source did not declare it can execute — the provider reads the source's capabilities once, a `sortable` column on a field the source cannot order is a plain heading, and a command outside them is refused at the boundary and moves nothing. Leave `location` out and the query lives in the provider alone; leave `views` out and the collection has no saved views; leave `presentation` out and the arrangement — column widths, order and visibility — lives in memory for the session.
 
 <Canvas of={Stories.ConnectedParts} sourceState="none" />
+
+## Every table's footer
+
+Wrap the part to set `settings` and `footer` once:
+
+```tsx
+import {
+  DataTable,
+  DataViews,
+  type DataViewsDataTableProps,
+} from "@canonical/dataviews-react";
+import type { ReactElement } from "react";
+
+/** Every table in the app: column settings in its header, pages in its footer. */
+export default function AppTable<TRow extends object>(
+  props: Omit<DataViewsDataTableProps<TRow>, "settings" | "footer" | "id"> & {
+    readonly id: string;
+  },
+): ReactElement {
+  return (
+    <DataViews.DataTable
+      {...props}
+      settings={<DataTable.SettingsMenu />}
+      footer={<DataViews.Pagination sizes={[25, 50, 100]} />}
+    />
+  );
+}
+```
 
 ## Your own words
 
@@ -233,8 +261,11 @@ export function MachinesPage({
     <DataViews provider={provider}>
       <DataViews.Search label="Search machines" />
       <DataViews.Filters labels={{ status: "Status", cores: "Cores" }} />
-      <DataViews.DataTable columns={columns} label="Machines" />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+      />
     </DataViews>
   );
 }

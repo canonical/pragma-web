@@ -23,6 +23,7 @@ import {
   machines,
 } from "../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
+import { PaginationBar } from "../../../../../subcomponent/PaginationBar/index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -78,6 +79,21 @@ describe("DataTable SSR", () => {
     expect(html).not.toContain('role="separator"');
     expect(html).toContain('aria-label="Select all displayed rows"');
     expect(html).toContain("alpha");
+  });
+
+  it("sends the frame: the table, then the footer, then the announcer", () => {
+    const { provider } = createMachineProvider();
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        columns={columns}
+        footer={<PaginationBar provider={provider} />}
+      />,
+    );
+    expect(html).toMatch(
+      /^<div class="ds data-table-frame"><table[^>]*>.*<\/table><div class="footer"><nav[^>]*class="ds data-table-pagination-bar[^"]*".*<\/nav><\/div><div class="ds data-views-announcer"[^>]*><\/div><\/div>$/s,
+    );
   });
 
   it("draws the selection column disabled and unselected until scripts run", () => {

@@ -88,8 +88,8 @@ const Composition = ({
       label="Machines"
       selectable
       settings={<DataTable.SettingsMenu />}
+      footer={<DataViews.Pagination />}
     />
-    <DataViews.Pagination />
   </DataViews>
 );
 

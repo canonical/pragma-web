@@ -58,10 +58,12 @@ export function Machines() {
     }),
   );
   return (
-    <>
-      <DataTable provider={provider} columns={columns} label="Machines" />
-      <PaginationBar provider={provider} sizes={[5, 10, 25]} />
-    </>
+    <DataTable
+      provider={provider}
+      columns={columns}
+      label="Machines"
+      footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+    />
   );
 }
 ```
@@ -96,6 +98,6 @@ The bar holds two regions, named by what they do: `.sizing` holds the page size 
 
 ## Sticky at the bottom
 
-The bar holds to the bottom edge of whatever scrolls it and paints the surface it sits on, so the rows scrolling beneath it never show through. A sticky element cannot leave its parent's box, so make the bar a direct child of the scrolling container, beside the table — not the only child of a wrapper its own height.
+The bar holds to the bottom edge of whatever scrolls it and paints the surface it sits on, so the rows scrolling beneath it never show through. As a table's `footer` it sticks with the footer; anywhere else, make it a direct child of the scrolling container, not the only child of a wrapper its own height.
 
 <Canvas of={Stories.StickyInAScrollingFrame} sourceState="none" />

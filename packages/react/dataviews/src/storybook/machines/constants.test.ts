@@ -37,8 +37,8 @@ describe("constants", () => {
     columns={columns}
     label="Machines"
     getRowLabel={nameMachine}
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
   />
-  <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`);
     });
   });
