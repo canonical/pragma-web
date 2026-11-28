@@ -1,0 +1,40 @@
+// Ported from @canonical/react-ds-app SideNavigation
+
+import type { ExpandableNavItem } from "./types.js";
+
+/**
+ * Builds the content's one mandatory item: a collapsible "Help" item
+ * containing at least one external link to legal information.
+ *
+ * A thin data-construction helper, not a component — the mandatory item is
+ * an ordinary `ExpandableNavItem`; this removes the
+ * chance of authoring it slightly wrong every time a consumer wires it
+ * into their `root`.
+ *
+ * @param legalUrl The external URL to legal information.
+ * @param options.label Label for the Help item itself. Defaults to `"Help"`.
+ * @param options.legalLabel Label for the legal link. Defaults to `"Legal information"`.
+ * @param options.additionalItems Further leaf items under "Help", after the
+ * legal link (e.g. a documentation or support link).
+ */
+export const createHelpItem = (
+  legalUrl: string,
+  options: {
+    label?: string;
+    legalLabel?: string;
+    additionalItems?: ExpandableNavItem["items"];
+  } = {},
+): ExpandableNavItem => ({
+  key: "help",
+  label: options.label ?? "Help",
+  icon: "help",
+  items: [
+    {
+      key: "help-legal",
+      url: legalUrl,
+      label: options.legalLabel ?? "Legal information",
+      icon: "external-link",
+    },
+    ...(options.additionalItems ?? []),
+  ],
+});
