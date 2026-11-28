@@ -48,15 +48,9 @@ bun run check
 bun run test
 ```
 
-To run the full test suite (temporary workaround until Playwright is supported in Pragma):
-
-```bash
-bun run test:client && bun run test:ssr && bun run test:server
-```
-
 ### Testing
 
-Tests use **Vitest browser mode**, which requires **Playwright**. This setup is currently **experimental in Pragma**.
+`bun run test` runs the full client, SSR, and server test suite. Client tests use **Vitest browser mode** with **Playwright** to run headlessly in Chromium, Firefox, and WebKit.
 
 One-time setup (install Playwright browsers):
 
