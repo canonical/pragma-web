@@ -1,10 +1,10 @@
 # SideNavigation — Svelte port
 
 A port of `@canonical/react-ds-app` SideNavigation. Markup, classes, ARIA,
-IDs and behaviour match React, except where the design-system anatomy says
-otherwise (see [Differences from React](#differences-from-react)). The
-stylesheets are React's, unchanged apart from their header comment and one
-rule the anatomy needs.
+IDs and behaviour match React, and both follow the design-system anatomy;
+the remaining gaps are listed under
+[Differences from React](#differences-from-react). The stylesheets are
+React's, unchanged apart from their header comment.
 
 ## Anatomy
 
@@ -92,26 +92,14 @@ the small-viewport collapsed start need JavaScript.
 
 ## Differences from React
 
-1. **The context switcher is inside Content.** The anatomy puts it in
-   SideNavigation.Content, before the Nav. Content is now a `<div>` region
-   (it keeps the `ds side-navigation-content` class, the scrolling and the
-   collapse toggle's `aria-controls` id) holding the switcher and then the
-   `<nav>`. The switcher stays outside the landmark, and now scrolls with the
-   navigation. One rule is added to Content's stylesheet so the `<nav>` lays
-   out its groups as the region did.
-2. **Groups after the first start with a divider** (`hr.divider`), per
-   SideNavigation.ItemGroup. The anatomy gives it no styles, so it has none.
-3. **The footer always renders**, per the anatomy's footer cardinality of 1.
-   Without `footerRoot` it is an empty `<footer>`.
-4. **A context needs a `description`**, which the anatomy marks required.
-5. **The collapse toggle has no tooltip.** It keeps the Tooltip's wrapper
+1. **The collapse toggle has no tooltip.** It keeps the Tooltip's wrapper
    markup, and a hidden element gives the button the tooltip's text as its
    description.
-6. **The context switcher uses a stand-in menu** with ContextualMenu's
+2. **The context switcher uses a stand-in menu** with ContextualMenu's
    markup and the keyboard basics above, without viewport fitment, the
    portal, type-ahead or hover highlighting. Its `preferredDirections`,
    `distance`, `gutter` and `autoFit` props are not ported.
-7. **Icons** render React's Icon markup through a private component that
+3. **Icons** render React's Icon markup through a private component that
    carries the Icon stylesheet.
 
 ## Gaps

@@ -1,5 +1,5 @@
 import { tick } from "svelte";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
@@ -19,7 +19,15 @@ const press = (key: string) => userEvent.keyboard(`{${key}}`);
 const renderMenu = (props: Record<string, unknown> = {}) =>
   render(ContextualMenuStandIn, { items, row, children: trigger, ...props });
 
+/** Lets the surface's open or close transition finish before the next test. */
+const settle = () =>
+  Promise.allSettled(
+    document.getAnimations().map((animation) => animation.finished),
+  );
+
 describe("ContextualMenuStandIn", () => {
+  afterEach(settle);
+
   it("renders React ContextualMenu's markup, closed", async () => {
     const page = await renderMenu();
     const button = triggerOf(page);
@@ -42,7 +50,7 @@ describe("ContextualMenuStandIn", () => {
     await userEvent.click(triggerOf(page));
     await expect.element(surface(page)).toHaveAttribute("aria-hidden", "false");
     expect(triggerOf(page).getAttribute("aria-expanded")).toBe("true");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     expect(rows(page)[0].tabIndex).toBe(0);
   });
 
@@ -57,42 +65,42 @@ describe("ContextualMenuStandIn", () => {
     const page = await renderMenu();
     triggerOf(page).focus();
     await press("ArrowDown");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
   });
 
   it("moves focus with ArrowUp/ArrowDown, wrapping, and Home/End", async () => {
     const page = await renderMenu();
     await userEvent.click(triggerOf(page));
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
 
     await press("ArrowDown");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[1]);
+    await expect.element(rows(page)[1]).toHaveFocus();
     await press("ArrowDown");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[2]);
+    await expect.element(rows(page)[2]).toHaveFocus();
     await press("ArrowDown");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("ArrowUp");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[2]);
+    await expect.element(rows(page)[2]).toHaveFocus();
     await press("Home");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("End");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[2]);
+    await expect.element(rows(page)[2]).toHaveFocus();
   });
 
   it("selects with Enter and with Space, then closes and refocuses the trigger", async () => {
     const onselect = vi.fn();
     const page = await renderMenu({ onselect });
     await userEvent.click(triggerOf(page));
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("Enter");
     expect(onselect).toHaveBeenLastCalledWith("one");
     await expect.element(surface(page)).toHaveAttribute("aria-hidden", "true");
     expect(document.activeElement).toBe(triggerOf(page));
 
     await userEvent.click(triggerOf(page));
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("ArrowDown");
-    await expect.poll(() => document.activeElement).toBe(rows(page)[1]);
+    await expect.element(rows(page)[1]).toHaveFocus();
     await press(" ");
     expect(onselect).toHaveBeenLastCalledWith("two");
   });
@@ -109,7 +117,7 @@ describe("ContextualMenuStandIn", () => {
   it("closes on Escape and refocuses the trigger", async () => {
     const page = await renderMenu();
     await userEvent.click(triggerOf(page));
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("Escape");
     await expect.element(surface(page)).toHaveAttribute("aria-hidden", "true");
     expect(document.activeElement).toBe(triggerOf(page));
@@ -118,7 +126,7 @@ describe("ContextualMenuStandIn", () => {
   it("closes on Tab", async () => {
     const page = await renderMenu();
     await userEvent.click(triggerOf(page));
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("Tab");
     await expect.element(surface(page)).toHaveAttribute("aria-hidden", "true");
   });
@@ -148,7 +156,7 @@ describe("ContextualMenuStandIn", () => {
     const page = await renderMenu({ onopenchange });
     await userEvent.click(triggerOf(page));
     expect(onopenchange).toHaveBeenLastCalledWith(true);
-    await expect.poll(() => document.activeElement).toBe(rows(page)[0]);
+    await expect.element(rows(page)[0]).toHaveFocus();
     await press("Escape");
     expect(onopenchange).toHaveBeenLastCalledWith(false);
     expect(onopenchange).toHaveBeenCalledTimes(2);

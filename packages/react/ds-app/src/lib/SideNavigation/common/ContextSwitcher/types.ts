@@ -15,8 +15,8 @@ export interface ContextSwitcherItem {
    * Omitted, the context stays a pure action.
    */
   url?: string;
-  /** Optional supporting text shown under the name in the list. */
-  description?: string;
+  /** Supporting text shown under the name in the list. Required by the anatomy. */
+  description: string;
   /** Optional badge for dynamic/actionable information. */
   badge?: ReactNode;
 }

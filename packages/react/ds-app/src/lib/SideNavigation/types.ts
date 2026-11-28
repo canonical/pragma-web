@@ -174,7 +174,8 @@ type OwnProps = {
   /**
    * The footer's only data surface: free-form leaves (`LeafFooterItem`) and
    * depth-1 expandables (`ExpandableFooterItem`), rendered as the footer's
-   * rows in the order given. Omit (or pass empty) to hide the footer.
+   * rows in the order given. The footer region always renders: omitted (or
+   * empty), it is an empty `<footer>`.
    */
   footerRoot?: FooterRoot;
 
@@ -198,10 +199,9 @@ type OwnProps = {
    */
   keyboardShortcut?: boolean;
   /**
-   * The context-switcher region's props (typed slot), rendered as its own
-   * region between the Header and Content in a plain `<div>` — a
-   * `role="menu"` select-like widget is not navigation, so it sits outside
-   * the `<nav>` landmark. Omitted renders no region. See
+   * The context switcher's props (typed slot), rendered inside Content,
+   * before the `<nav>` landmark — a `role="menu"` select-like widget is not
+   * navigation, so it sits outside the landmark. Omitted renders none. See
    * `ContextSwitcherProps`.
    */
   contextSwitcher?: ContextSwitcherProps;
@@ -214,15 +214,15 @@ type OwnProps = {
 };
 
 /**
- * SideNavigation's root is a plain `<div>` layout container — Header, the
- * optional ContextSwitcher region, the `<nav>` landmark (rendered by
- * `Content`), and Footer. The navigation landmark belongs to `Content`
+ * SideNavigation's root is a plain `<div>` layout container — Header,
+ * Content (the optional ContextSwitcher, then the `<nav>` landmark), and
+ * Footer. The navigation landmark belongs to `Content`
  * alone (branding, the context switcher, and the footer's actions are not
  * navigation); `aria-label` is forwarded there and defaults to
  * `"Main navigation"`. Native attribute pass-through follows the root
  * element (`ComponentProps<"div">`).
  *
- * Consumption pattern: data-driven only — pass props and all four regions
+ * Consumption pattern: data-driven only — pass props and all three regions
  * build. Every subcomponent is private
  * (`cs:react.component.subcomponent_export_api`): nothing is dot-static
  * exported, and subcomponents render exclusively from data.

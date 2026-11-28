@@ -207,8 +207,9 @@ describe("NavTree", () => {
       .toHaveAttribute("aria-current", "page");
   });
 
-  it("draws a divider before every group but the first, skipping empty groups", async () => {
-    // Difference from React: anatomy SideNavigation.ItemGroup.
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("draws a divider before every group but the first, skipping empty groups", async () => {
+    // Anatomy: SideNavigation.ItemGroup.
     const root: NavRoot = {
       key: "root",
       items: [

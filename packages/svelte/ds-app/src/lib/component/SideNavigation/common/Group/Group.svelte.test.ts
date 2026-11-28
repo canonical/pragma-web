@@ -35,9 +35,10 @@ describe("Group", () => {
     await expect.element(element).toHaveClass("custom-class");
   });
 
-  it("starts with a divider when divider is set, before the header", async () => {
-    // Difference from React: the anatomy (SideNavigation.ItemGroup) draws a
-    // divider before every group except the first.
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("starts with a divider when divider is set, before the header", async () => {
+    // The anatomy (SideNavigation.ItemGroup) draws a divider before every
+    // group except the first.
     const page = await render(Group, {
       label: "Hardware",
       divider: true,

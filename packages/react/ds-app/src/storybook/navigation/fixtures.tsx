@@ -313,6 +313,7 @@ export const lxdProjectContexts: ContextSwitcherItem[] = [
     key: "sandbox",
     name: "sandbox",
     url: "/ui/project/sandbox/instances",
+    description: "Experiments",
   },
 ];
 

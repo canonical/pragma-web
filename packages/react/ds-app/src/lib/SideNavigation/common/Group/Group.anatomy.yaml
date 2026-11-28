@@ -12,6 +12,12 @@ node:
     size.width: fill
     spacing.padding.vertical: dimension/100 dimension/200
   edges:
+    # An unstyled hr.divider, absent on the first group; the parent laying
+    # the groups out decides.
+    - node:
+        role: divider
+      relation:
+        cardinality: "0..1"
     - node:
         uri: apps.subcomponent.side_navigation-group_header
       relation:

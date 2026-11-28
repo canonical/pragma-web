@@ -309,15 +309,19 @@ describe("SideNavigation", () => {
     ]);
   });
 
-  it("renders the ContextSwitcher between Header and Content, outside the nav landmark", () => {
+  it("renders the ContextSwitcher inside Content, before the nav landmark", () => {
     render(
       <SideNavigation
         root={root}
         contextSwitcher={{
-          currentContext: { key: "default", name: "default" },
+          currentContext: {
+            key: "default",
+            name: "default",
+            description: "Default",
+          },
           contexts: [
-            { key: "default", name: "default" },
-            { key: "staging", name: "staging" },
+            { key: "default", name: "default", description: "Default" },
+            { key: "staging", name: "staging", description: "Staging" },
           ],
         }}
       />,
@@ -325,27 +329,38 @@ describe("SideNavigation", () => {
     const switcher = document.querySelector(
       ".ds.side-navigation-context-switcher",
     );
-    expect(switcher).toBeInTheDocument();
-    // Skip link, header, switcher, nav — and outside the <nav>
-    // landmark (a select-like widget is not navigation).
-    const root_ = document.querySelector(".ds.side-navigation");
-    expect(root_?.children).toHaveLength(4);
+    const content = document.querySelector(".ds.side-navigation-content");
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    // Content is the region: the switcher, then the <nav> — and the switcher
+    // stays outside the landmark (a select-like widget is not navigation).
+    expect(content?.tagName).toBe("DIV");
+    expect(Array.from(content?.children ?? [])).toEqual([switcher, nav]);
     expect(nav).not.toContainElement(switcher as HTMLElement);
+    // The collapse toggle still controls the whole region.
+    expect(
+      screen
+        .getByRole("button", { name: "Collapse navigation" })
+        .getAttribute("aria-controls"),
+    ).toBe(content?.id);
   });
 
-  it("hides the ContextSwitcher when collapsed", () => {
-    // CSS hides the switcher when collapsed via the ROOT's data-expanded (it
-    // carries no state of its own); this asserts the DOM contract the
-    // collapsed stylesheet keys on — the switcher is a direct child of a
-    // data-expanded="false" root, and the root alone flips.
+  it("hides the ContextSwitcher with Content when collapsed", () => {
+    // CSS hides Content when collapsed via the ROOT's data-expanded; the
+    // switcher carries no state of its own and lives inside Content, so it
+    // hides with it.
     const { container } = render(
       <SideNavigation
         root={root}
         defaultExpanded={false}
         contextSwitcher={{
-          currentContext: { key: "default", name: "default" },
-          contexts: [{ key: "default", name: "default" }],
+          currentContext: {
+            key: "default",
+            name: "default",
+            description: "Default",
+          },
+          contexts: [
+            { key: "default", name: "default", description: "Default" },
+          ],
         }}
       />,
     );
@@ -355,6 +370,41 @@ describe("SideNavigation", () => {
       ".ds.side-navigation-context-switcher",
     );
     expect(switcher).not.toHaveAttribute("data-expanded");
-    expect(switcher?.parentElement).toBe(rootEl);
+    expect(switcher?.parentElement).toHaveClass("side-navigation-content");
+    expect(switcher?.parentElement?.parentElement).toBe(rootEl);
+  });
+
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("starts every group but the first with a divider", () => {
+    const grouped: NavRoot = {
+      key: "root",
+      items: [
+        { key: "a", items: [{ url: "/a", label: "A" }] },
+        { key: "empty", items: [] },
+        { key: "b", label: "B", items: [{ url: "/b", label: "B1" }] },
+        { key: "c", items: [{ url: "/c", label: "C" }] },
+      ],
+    };
+    const { container } = render(<SideNavigation root={grouped} />);
+    const groups = container.querySelectorAll(".ds.side-navigation-group");
+    // The empty group renders nothing and does not count as the first.
+    expect(groups).toHaveLength(3);
+    expect(groups[0].querySelector(":scope > hr")).toBeNull();
+    for (const group of [groups[1], groups[2]]) {
+      const divider = group.firstElementChild;
+      expect(divider?.tagName).toBe("HR");
+      expect(divider).toHaveClass("divider");
+    }
+  });
+
+  it("always renders the footer, empty without footerRoot", () => {
+    const { container } = render(<SideNavigation root={root} />);
+    const rootEl = container.firstElementChild as HTMLElement;
+    const footer = rootEl.lastElementChild;
+    expect(footer?.tagName).toBe("FOOTER");
+    expect(footer).toHaveClass("ds", "side-navigation-footer");
+    expect(footer?.childElementCount).toBe(0);
+    // Skip link, header, content, footer: one of each region.
+    expect(rootEl.children).toHaveLength(4);
   });
 });

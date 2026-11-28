@@ -9,7 +9,7 @@ const componentCssClassName = "ds side-navigation-context-switcher";
 
 /**
  * One renderer for both entry shapes the switcher puts in the menu: a
- * context (name, optional description/badge, the current one marked) and
+ * context (name, description, optional badge, the current one marked) and
  * the "create context" action (icon + label). `MenuItem` carries none of
  * those fields; this local type, not casts at each read site, carries
  * them through construction and the renderer.
@@ -48,7 +48,7 @@ const ContextItemContent = ({
       className={["content", isCurrent && "current"].filter(Boolean).join(" ")}
     >
       <span className="name">{item.label}</span>
-      {description ? <span className="description">{description}</span> : null}
+      <span className="description">{description}</span>
       {badge ? <span className="badge">{badge}</span> : null}
     </span>
   );
@@ -63,8 +63,9 @@ const ContextItemContent = ({
  * `SideNavigation.GroupHeader` as a sibling above the dropdown field.
  *
  * Not part of the `NavRoot`/`NavGroup` content-tree data model — it
- * embeds via `SideNavigation`'s `contextSwitcher` prop slot, its region
- * class owning the collapsed-rail hide.
+ * embeds via `SideNavigation`'s `contextSwitcher` prop slot and renders
+ * inside Content, before the `<nav>` landmark, hiding with Content on the
+ * collapsed rail.
  *
  * @implements ds:apps.subcomponent.side_navigation-context_switcher
  */

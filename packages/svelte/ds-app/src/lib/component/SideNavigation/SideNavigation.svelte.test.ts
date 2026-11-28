@@ -167,7 +167,7 @@ describe("SideNavigation", () => {
   });
 
   it("always renders the footer region, empty without footerRoot", async () => {
-    // Difference from React: the anatomy gives the Footer cardinality 1.
+    // The anatomy gives the Footer cardinality 1.
     const page = await render(SideNavigation, { root });
     const footer = componentRoot(page).querySelector(
       ":scope > footer.ds.side-navigation-footer",
@@ -362,9 +362,8 @@ describe("SideNavigation", () => {
   });
 
   it("renders the ContextSwitcher at the top of the content region, outside the nav landmark", async () => {
-    // Difference from React: the anatomy places the context switcher inside
-    // SideNavigation.Content, before the Nav; React renders it as a sibling
-    // region between Header and Content.
+    // The anatomy places the context switcher inside SideNavigation.Content,
+    // before the Nav.
     const page = await render(SideNavigation, { root, contextSwitcher });
     const switcher = page.container.querySelector(
       ".ds.side-navigation-context-switcher",

@@ -2,7 +2,8 @@
 # SideNavigation — apps-tier navigation pattern. The single navigation
 # landmark is the Content <nav>; the root is a plain layout container.
 # Full-height vertical shell partitioning its space among
-# Header (required), Content (required, grows), and Footer (optional).
+# Header, Content (grows; holds the optional context switcher before the
+# <nav>) and Footer, each exactly once (an empty Footer still renders).
 # Data-driven: Content and Footer each render a WD405 Item tree.
 #
 # The collapsed state hides the Content edge; footer items degrade to
@@ -27,11 +28,6 @@ node:
         cardinality: "1"
         slotName: header
     - node:
-        uri: apps.subcomponent.side_navigation-context_switcher
-      relation:
-        cardinality: "0..1"
-        slotName: context-switcher
-    - node:
         uri: apps.subcomponent.side_navigation-content
       relation:
         cardinality: "1"
@@ -39,5 +35,5 @@ node:
     - node:
         uri: apps.subcomponent.side_navigation-footer
       relation:
-        cardinality: "0..1"
+        cardinality: "1"
         slotName: footer

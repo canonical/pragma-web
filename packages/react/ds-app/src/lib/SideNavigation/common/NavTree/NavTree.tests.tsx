@@ -23,6 +23,27 @@ describe("NavTree", () => {
     );
   });
 
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("gives every rendered group but the first a divider", () => {
+    const root: NavRoot = {
+      key: "root",
+      items: [
+        { key: "skipped", items: [] },
+        { key: "one", items: [{ url: "/one", label: "One" }] },
+        { key: "two", items: [{ url: "/two", label: "Two" }] },
+      ],
+    };
+    const { container } = render(<NavTree root={root} />);
+    const groups = Array.from(
+      container.querySelectorAll(".ds.side-navigation-group"),
+    );
+    expect(
+      groups.map(
+        (group) => group.querySelector(":scope > hr.divider") !== null,
+      ),
+    ).toEqual([false, true]);
+  });
+
   it("does not warn about React keys", () => {
     const consoleError = vi
       .spyOn(console, "error")

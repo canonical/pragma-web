@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import ContextSwitcher from "./ContextSwitcher.js";
 import type { ContextSwitcherItem } from "./types.js";
 
-const contexts: ContextSwitcherItem[] = [{ key: "acme", name: "Acme Corp" }];
+const contexts: ContextSwitcherItem[] = [
+  { key: "acme", name: "Acme Corp", description: "Main account" },
+];
 
 describe("ContextSwitcher SSR", () => {
   it("renders without hydration errors", () => {
@@ -12,5 +14,6 @@ describe("ContextSwitcher SSR", () => {
     );
     expect(html).toContain("ds side-navigation-context-switcher");
     expect(html).toContain("Acme Corp");
+    expect(html).toContain('<span class="description">Main account</span>');
   });
 });

@@ -53,19 +53,24 @@ it with the design-system component once Svelte has one.
     onopenchange?.(next);
   };
 
+  // Counts focus requests, so a request that had to wait never overrides a
+  // later one.
+  let focusRequest = 0;
+
   const focusRow = async (position: number) => {
     highlighted = position;
+    const request = ++focusRequest;
     await tick();
     const row =
       surfaceRef?.querySelectorAll<HTMLElement>('[role="menuitem"]')[position];
-    // The surface's visibility transition starts hidden, and a hidden row
-    // cannot take focus: wait frame by frame (at most ten) until it shows.
-    // React's menu defers its focus the same way.
-    for (let frame = 0; row && frame < 10; frame += 1) {
-      if (getComputedStyle(row).visibility === "visible") break;
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+    // The open surface shows at once (see styles.css), so the row can take
+    // focus now. Should a style still hide it, wait for the surface's running
+    // transitions to finish instead of counting frames.
+    if (row && getComputedStyle(row).visibility !== "visible") {
+      const running = surfaceRef?.getAnimations() ?? [];
+      await Promise.allSettled(running.map((animation) => animation.finished));
     }
-    row?.focus();
+    if (request === focusRequest && open) row?.focus();
   };
 
   const show = () => {

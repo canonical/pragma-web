@@ -32,6 +32,27 @@ describe("Group", () => {
     ).not.toBeInTheDocument();
   });
 
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("starts with an unstyled hr.divider when divider is set", () => {
+    const { container } = render(
+      <Group divider label="Hardware">
+        <li>Machines</li>
+      </Group>,
+    );
+    const divider = container.firstElementChild?.firstElementChild;
+    expect(divider?.tagName).toBe("HR");
+    expect(divider?.className).toBe("divider");
+  });
+
+  it("renders no divider by default", () => {
+    const { container } = render(
+      <Group>
+        <li>Machines</li>
+      </Group>,
+    );
+    expect(container.querySelector("hr")).toBeNull();
+  });
+
   it("applies the base and custom class", () => {
     const { container } = render(<Group className="custom-class" />);
     const el = container.firstElementChild;

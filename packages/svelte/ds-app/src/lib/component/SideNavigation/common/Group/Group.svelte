@@ -16,7 +16,8 @@ Starts with a divider when `divider` is set (every group but the first).
 
   let {
     label,
-    divider = false,
+    // The divider is hidden for now (operator, 2026-11-28); restore the render below.
+    divider: _divider = false,
     children,
     class: className,
     ...rest
@@ -24,7 +25,7 @@ Starts with a divider when `divider` is set (every group but the first).
 </script>
 
 <section class={[componentCssClassName, className]} {...rest}>
-	{#if divider}<hr class="divider" />{/if}
+	<!-- {#if divider}<hr class="divider" />{/if} -->
 	{#if label != null}<GroupHeader children={label} />{/if}
 	<ul class="list">{@render children?.()}</ul>
 </section>

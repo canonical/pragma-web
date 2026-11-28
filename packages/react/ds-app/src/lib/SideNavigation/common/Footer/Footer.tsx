@@ -64,8 +64,9 @@ const FooterRow = ({
 };
 
 /**
- * SideNavigation.Footer — optional region pinned to the bottom, reserved
- * for user-related content. Data-only: `root` is the footer's only data
+ * SideNavigation.Footer — the region pinned to the bottom, reserved for
+ * user-related content. It always renders; without items it is an empty
+ * `<footer>`. Data-only: `root` is the footer's only data
  * surface — free-form leaves (`LeafFooterItem`, buttons via
  * `control`/`onClick`) and depth-1 expandables (`ExpandableFooterItem`,
  * whose children disclose through the same native `<details>` disclosure

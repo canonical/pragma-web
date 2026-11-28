@@ -13,4 +13,16 @@ describe("Group SSR", () => {
     expect(html).toContain("Hardware");
     expect(html).toContain("Machines");
   });
+
+  // Skipped while the divider is hidden (operator, 2026-11-28).
+  it.skip("renders the divider before the header", () => {
+    const html = renderToString(
+      <Group divider label="Hardware">
+        <li>Machines</li>
+      </Group>,
+    );
+    expect(html).toContain(
+      '<section class="ds side-navigation-group"><hr class="divider"/><span class="ds side-navigation-group-header"',
+    );
+  });
 });

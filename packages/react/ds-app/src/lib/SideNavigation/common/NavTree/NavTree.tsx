@@ -3,7 +3,7 @@ import { getItemId } from "@canonical/ds-utils";
 import type { LinkComponent } from "@canonical/react-ds-global";
 import { useNavigationTree } from "@canonical/react-hooks";
 import type React from "react";
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import type { _AnyNavNode } from "../../types.js";
 import { Group } from "../Group/index.js";
 import { Item } from "../Item/index.js";
@@ -100,71 +100,68 @@ const NavTree = ({
     if (match) selectItem(match);
   }, [currentUrl, index, selectItem]);
 
-  const sections = nav.annotatedRoot.items ?? [];
+  // Empty groups render nothing, so they are dropped before the loop: the
+  // divider index then counts rendered groups only.
+  const sections = (nav.annotatedRoot.items ?? []).filter(
+    (section) => (section.items ?? []).length > 0,
+  );
 
   return (
     <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       {...props}
     >
-      {/* Loop 1 — root's direct children: groups. */}
-      {sections.map((section) => {
-        const sectionId = getItemId(section);
+      {/* Loop 1 — root's direct children: groups. Every group but the
+          first starts with a divider. */}
+      {sections.map((section, sectionIndex) => (
+        <Group
+          key={getItemId(section)}
+          label={section.label}
+          divider={sectionIndex > 0}
+        >
+          {/* Loop 2 — a group's entries: leaf rows or expandable items */}
+          {(section.items ?? []).map((entry, entryIndex) => {
+            const children = entry.items ?? [];
 
-        const entries = section.items ?? [];
+            if (children.length > 0) {
+              const {
+                parentUrl: _parentUrl,
+                depth: _depth,
+                items: _items,
+                key: _key,
+                slot: _slot,
+                url: _url,
+                label,
+                ...expandableFields
+              } = entry;
+              return (
+                <ItemExpandable
+                  key={stableKey(entry, entryIndex)}
+                  {...expandableFields}
+                  heading={label}
+                  defaultExpanded={nav.getNodeStatus(entry).inSelectedBranch}
+                >
+                  {children.map((child, childIndex) =>
+                    renderEntry(
+                      child,
+                      nav.getNodeStatus(child).selected,
+                      LinkComponent,
+                      childIndex,
+                    ),
+                  )}
+                </ItemExpandable>
+              );
+            }
 
-        return (
-          <Fragment key={sectionId}>
-            {entries.length > 0 && (
-              <Group label={section.label}>
-                {/* Loop 2 — a group's entries: leaf rows or expandable items */}
-                {entries.map((entry, entryIndex) => {
-                  const children = entry.items ?? [];
-
-                  if (children.length > 0) {
-                    const {
-                      parentUrl: _parentUrl,
-                      depth: _depth,
-                      items: _items,
-                      key: _key,
-                      slot: _slot,
-                      url: _url,
-                      label,
-                      ...expandableFields
-                    } = entry;
-                    return (
-                      <ItemExpandable
-                        key={stableKey(entry, entryIndex)}
-                        {...expandableFields}
-                        heading={label}
-                        defaultExpanded={
-                          nav.getNodeStatus(entry).inSelectedBranch
-                        }
-                      >
-                        {children.map((child, childIndex) =>
-                          renderEntry(
-                            child,
-                            nav.getNodeStatus(child).selected,
-                            LinkComponent,
-                            childIndex,
-                          ),
-                        )}
-                      </ItemExpandable>
-                    );
-                  }
-
-                  return renderEntry(
-                    entry,
-                    nav.getNodeStatus(entry).selected,
-                    LinkComponent,
-                    entryIndex,
-                  );
-                })}
-              </Group>
-            )}
-          </Fragment>
-        );
-      })}
+            return renderEntry(
+              entry,
+              nav.getNodeStatus(entry).selected,
+              LinkComponent,
+              entryIndex,
+            );
+          })}
+        </Group>
+      ))}
     </div>
   );
 };

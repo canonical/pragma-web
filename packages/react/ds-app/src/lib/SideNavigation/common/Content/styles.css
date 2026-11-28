@@ -56,5 +56,14 @@
         flex: 0 0 auto;
       }
     }
+
+    /* The navigation landmark inside the region (anatomy:
+       SideNavigation.Content > Nav). The context switcher sits before it,
+       outside the landmark; the groups keep the region's 0.5rem rhythm. */
+    & > nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--dimension-100);
+    }
   }
 }
