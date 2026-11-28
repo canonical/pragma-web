@@ -28,16 +28,12 @@ afterEach(() => {
 
 describe("useChipLayout", () => {
   it("counts the chips and those past the line's end", () => {
-    const { result } = renderHook(() =>
-      useChipLayout({ contentRef: createRow(3, 130) }),
-    );
+    const { result } = renderHook(() => useChipLayout(createRow(3, 130)));
     expect(result.current.hiddenCount).toBe(1);
   });
 
   it("counts the chips on later rows while the field wraps", () => {
-    const { result } = renderHook(() =>
-      useChipLayout({ contentRef: createRow(3, 130, true) }),
-    );
+    const { result } = renderHook(() => useChipLayout(createRow(3, 130, true)));
     expect(result.current.hiddenCount).toBe(2);
   });
 
@@ -57,7 +53,7 @@ describe("useChipLayout", () => {
         ) as DOMRect;
       },
     );
-    const { result } = renderHook(() => useChipLayout({ contentRef }));
+    const { result } = renderHook(() => useChipLayout(contentRef));
     expect(result.current.hiddenCount).toBe(0);
   });
 
@@ -72,7 +68,7 @@ describe("useChipLayout", () => {
         ) as DOMRect;
       },
     );
-    const { result } = renderHook(() => useChipLayout({ contentRef }));
+    const { result } = renderHook(() => useChipLayout(contentRef));
     expect(result.current.hiddenCount).toBe(1);
   });
 
@@ -80,7 +76,7 @@ describe("useChipLayout", () => {
     let renders = 0;
     const { result } = renderHook(() => {
       renders += 1;
-      return useChipLayout({ contentRef: { current: null } });
+      return useChipLayout({ current: null });
     });
     const before = renders;
     act(() => result.current.measure());
@@ -90,7 +86,7 @@ describe("useChipLayout", () => {
 
   it("marks the clipped chips, and unmarks them once they fit", () => {
     const contentRef = createRow(3, 130);
-    const { result } = renderHook(() => useChipLayout({ contentRef }));
+    const { result } = renderHook(() => useChipLayout(contentRef));
     const items = [...contentRef.current.querySelectorAll("li")];
     expect(items.map((item) => item.hasAttribute("data-clipped"))).toEqual([
       false,
@@ -122,7 +118,7 @@ describe("useChipLayout", () => {
       },
     );
     const contentRef = createRow(1, 130);
-    const { result, unmount } = renderHook(() => useChipLayout({ contentRef }));
+    const { result, unmount } = renderHook(() => useChipLayout(contentRef));
     expect(observe).toHaveBeenCalledWith(contentRef.current);
     contentRef.current
       .querySelector("ul")
@@ -143,7 +139,7 @@ describe("useChipLayout", () => {
       configurable: true,
     });
     const contentRef = createRow(1, 130);
-    const { result, unmount } = renderHook(() => useChipLayout({ contentRef }));
+    const { result, unmount } = renderHook(() => useChipLayout(contentRef));
     contentRef.current
       .querySelector("ul")
       ?.append(document.createElement("li"), document.createElement("li"));

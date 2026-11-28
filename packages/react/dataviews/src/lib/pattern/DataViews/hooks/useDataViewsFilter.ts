@@ -1,5 +1,4 @@
 import type {
-  Collection,
   FilterHandle,
   FilterHandles,
   PredicateOperator,
@@ -9,7 +8,10 @@ import type {
 import { useContext } from "react";
 import Context from "../Context.js";
 import { findFilterHandle } from "../common/utils/index.js";
-import type { UseDataViewsFilterResult } from "./types.js";
+import type {
+  UseDataViewsFilterProps,
+  UseDataViewsFilterResult,
+} from "./types.js";
 import useFilterHandle from "./useFilterHandle.js";
 
 /** The applied type of one filter address, from the collection's fields. */
@@ -42,9 +44,12 @@ export default function useDataViewsFilter<
   TOperator extends keyof FilterHandles<TFields>[TField] & PredicateOperator,
   TRow extends object = RowRecord,
 >(
-  collection: Collection<TFields, TRow>,
-  field: TField,
-  operator: TOperator,
+  ...[collection, field, operator]: UseDataViewsFilterProps<
+    TFields,
+    TField,
+    TOperator,
+    TRow
+  >
 ): UseDataViewsFilterResult<AppliedAt<TFields, TField, TOperator>> {
   const root = useContext(Context);
   if (root === undefined) {

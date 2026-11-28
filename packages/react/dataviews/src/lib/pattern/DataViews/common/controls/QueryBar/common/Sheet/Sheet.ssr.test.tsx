@@ -14,8 +14,8 @@ const renderSheet = (query: string, href?: string): string => {
       : { location: createMemoryLocation({ href }) },
   );
   function Connected(): React.ReactElement {
-    const group = useQueryGroup({ provider: provider as never });
-    const { regionRef, announce } = useSheetAnnouncer({ announce: () => {} });
+    const group = useQueryGroup(provider as never);
+    const { regionRef, announce } = useSheetAnnouncer(() => {});
     return (
       <Sheet
         id="sheet"

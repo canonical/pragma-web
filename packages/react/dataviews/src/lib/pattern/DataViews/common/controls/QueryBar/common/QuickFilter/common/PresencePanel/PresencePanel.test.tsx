@@ -40,12 +40,15 @@ function Host({
   readonly named: boolean;
   readonly onCommit: () => void;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "owner"),
     [],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   return (
     <PresencePanel
       definition={{ field: "owner", kind: "presence" }}

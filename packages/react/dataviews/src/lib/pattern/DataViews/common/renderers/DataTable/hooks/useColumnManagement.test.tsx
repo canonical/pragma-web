@@ -36,13 +36,13 @@ const mountHook = (
   Object.assign(headerRow, { current: row });
   const announce = vi.fn<(message: ReactNode) => void>();
   const hook = renderHook(() =>
-    useColumnManagement({
+    useColumnManagement(
       provider,
-      columns: declared,
+      declared,
       headerRow,
-      messages: resolveMessages(),
+      resolveMessages(),
       announce,
-    }),
+    ),
   );
   return { provider, hook, announce };
 };

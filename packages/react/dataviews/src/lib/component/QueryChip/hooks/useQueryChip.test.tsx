@@ -17,17 +17,15 @@ describe("useQueryChip", () => {
   it("makes the Entry the item, and the group named by the label", () => {
     const { result } = renderHook(
       () =>
-        useQueryChip({
-          id: "chip",
-          label: "status",
-          disabled: false,
-          children: [
+        useQueryChip(
+          [
             <Segment key="field" onActivate={vi.fn()}>
               status
             </Segment>,
             <Entry key="entry" value="" onValueChange={vi.fn()} label="V" />,
           ],
-        }),
+          { id: "chip", label: "status" },
+        ),
       { wrapper },
     );
     expect(result.current.parts.map((part) => part.context.isItem)).toEqual([
@@ -44,12 +42,10 @@ describe("useQueryChip", () => {
   it("makes a read-only chip's remove control the item, with its reason", () => {
     const { result } = renderHook(
       () =>
-        useQueryChip({
+        useQueryChip(<Segment description="Refused: no">cpu</Segment>, {
           id: "chip",
           criticality: "error",
-          disabled: false,
           removeLabel: "Remove",
-          children: <Segment description="Refused: no">cpu</Segment>,
         }),
       { wrapper },
     );

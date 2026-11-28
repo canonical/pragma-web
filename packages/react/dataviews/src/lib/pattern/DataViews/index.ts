@@ -15,7 +15,9 @@ export type { DataViewsSearchProps } from "./common/controls/Search/index.js";
 export type { DataViewsSortPanelProps } from "./common/controls/SortPanel/index.js";
 export type { DataViewsDataTableProps } from "./common/renderers/DataTable/index.js";
 export type {
+  UseDataViewsFilterProps,
   UseDataViewsFilterResult,
+  UseDataViewsProps,
   UseDataViewsResult,
 } from "./hooks/index.js";
 export { useDataViews, useDataViewsFilter } from "./hooks/index.js";

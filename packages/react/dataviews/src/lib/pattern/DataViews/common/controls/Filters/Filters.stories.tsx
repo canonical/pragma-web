@@ -20,10 +20,10 @@ import type {
   Machine,
   MachineProviderConfig,
 } from "../../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import "../../../../../../storybook/noScripts.css";
+import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
 import DataViews from "../../../Provider.js";
 import {
   DataTable,

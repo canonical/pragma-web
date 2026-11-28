@@ -11,8 +11,9 @@ import type { RovingProviderProps } from "./types.js";
  */
 export default function Provider({
   children,
-  ...props
+  activeItem,
+  onActiveItemChange,
 }: RovingProviderProps): ReactElement {
-  const state = useProviderState(props);
+  const state = useProviderState(activeItem, onActiveItemChange);
   return <Context.Provider value={state}>{children}</Context.Provider>;
 }

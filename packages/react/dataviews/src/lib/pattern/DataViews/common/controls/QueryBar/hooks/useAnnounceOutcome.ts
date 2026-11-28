@@ -12,14 +12,12 @@ import type {
  * else when the provider next settles. A later outcome replaces one still
  * waiting, so only the last is said.
  *
- * @param props - The provider and the root's announcer.
  * @returns The function that says an outcome.
  * @note Impure: subscribes to the provider's state while an outcome waits.
  */
-export default function useAnnounceOutcome({
-  provider,
-  announce,
-}: UseAnnounceOutcomeProps): UseAnnounceOutcomeResult {
+export default function useAnnounceOutcome(
+  ...[provider, announce]: UseAnnounceOutcomeProps
+): UseAnnounceOutcomeResult {
   const waiting = useRef<((count: Count) => string) | null>(null);
 
   const sayIfSettled = useCallback((): void => {

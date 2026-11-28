@@ -17,7 +17,7 @@ export default function HiddenQueryFields({
   readDestination,
   omit,
 }: HiddenQueryFieldsProps): ReactElement {
-  const spelled = useDestination({ provider, readDestination });
+  const spelled = useDestination(provider, readDestination);
   const fields = useMemo(
     () =>
       listHiddenFields(

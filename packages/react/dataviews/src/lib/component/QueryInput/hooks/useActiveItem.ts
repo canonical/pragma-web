@@ -8,17 +8,16 @@ import type { UseActiveItemProps, UseActiveItemResult } from "./types.js";
  * the item holding the stop is gone or disabled, as after a chip's removal,
  * the stop falls back to the entry, so the toolbar stays in the tab order.
  *
- * @param props - The host's item and change handler, both optional, and the
- * toolbar the items sit in.
  * @returns The item that holds the stop, and its setter.
  * @note Impure: reads the toolbar's items after each render.
  */
-export default function useActiveItem({
-  activeItem,
-  onActiveItemChange,
-  contentRef,
-  isMounted,
-}: UseActiveItemProps): UseActiveItemResult {
+export default function useActiveItem(
+  ...[
+    contentRef,
+    isMounted,
+    { activeItem, onActiveItemChange } = {},
+  ]: UseActiveItemProps
+): UseActiveItemResult {
   const [ownItem, setOwnItem] = useState(ENTRY_ITEM_ID);
   const current = activeItem ?? ownItem;
   const setActiveItem = useCallback(

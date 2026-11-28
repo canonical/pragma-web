@@ -6,11 +6,10 @@ import useVirtualRows from "./useVirtualRows.js";
 
 /** A host that reads the hook but never attaches the body it hands back. */
 function Detached(): ReactElement {
-  useVirtualRows({
-    entries: listDisplayEntries({ rowIds: ["a"], status: null }),
-    estimatedRowHeight: 32,
-    model: { entries: [], ids: [], findRecord: () => undefined },
-    tracks: undefined,
+  useVirtualRows(listDisplayEntries({ rowIds: ["a"], status: null }), 32, {
+    entries: [],
+    ids: [],
+    findRecord: () => undefined,
   });
   return <div />;
 }

@@ -8,7 +8,7 @@ describe("useProviderState", () => {
     const first = (props: QueryEntryInputProps) => props;
     const second = (props: QueryEntryInputProps) => props;
     const { result, rerender } = renderHook(
-      ({ getInputProps }) => useProviderState({ getInputProps }),
+      ({ getInputProps }) => useProviderState(getInputProps),
       { initialProps: { getInputProps: first } },
     );
     const value = result.current;

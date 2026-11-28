@@ -102,10 +102,10 @@ export default function AddFilterWalk({
     walk.field === null ? undefined : schema.findField(walk.field);
   const label = walk.field === null ? "" : labels.readFieldLabel(walk.field);
   const isListedValue = walk.step === "value" && definition?.kind === "choices";
-  const facets = useSuggestedFacets({
+  const facets = useSuggestedFacets(
     provider,
-    field: isListedValue ? walk.field : null,
-  });
+    isListedValue ? walk.field : null,
+  );
   const { step } = walk;
   const isOpen = step !== "closed";
   // A choice whose options are the server's lists none until the first

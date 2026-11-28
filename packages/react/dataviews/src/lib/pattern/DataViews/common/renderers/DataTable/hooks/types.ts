@@ -27,21 +27,21 @@ import type {
   SortPrecedence,
 } from "../common/index.js";
 
-/** What the column management hook reads: the provider, the declared columns and the header row. */
+/**
+ * What the column management hook reads: the provider, the declared columns,
+ * the header row taking a hidden column's focus, and the words and announcer
+ * a change is said through.
+ */
 export type UseColumnManagementProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = {
-  readonly provider: DataViewsProvider<TFields, TRow>;
-  /** The columns as declared, in their declared order. */
-  readonly columns: readonly DataTableColumn[];
-  /** The header row, whose controls take the focus a hidden column leaves. */
-  readonly headerRow: RefObject<HTMLTableRowElement | null>;
-  /** The words a change to the columns is announced in. */
-  readonly messages: DataViewsMessages;
-  /** Say, through the table's announcer, what a change to the columns did. */
-  readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
-};
+> = readonly [
+  provider: DataViewsProvider<TFields, TRow>,
+  columns: readonly DataTableColumn[],
+  headerRow: RefObject<HTMLTableRowElement | null>,
+  messages: DataViewsMessages,
+  announce: (message: ReactNode, topic?: AnnouncerTopic) => void,
+];
 
 /** The table's column management, as its menus read it. */
 export type UseColumnManagementResult = {
@@ -65,15 +65,15 @@ export type UseColumnManagementResult = {
   readonly listDestinations: () => SettingsDestinations | null;
 };
 
-/** What one table's geometry is resolved from. */
-export type UseTableGeometryProps = {
-  /** The table's column layout: each column's declared and overridden sizing. */
-  readonly layout: ColumnLayout;
-  /** The table's grid interaction, whose live resize is previewed. */
-  readonly interaction: GridInteraction;
-  /** The ids of the columns shown, in the arrangement's order. */
-  readonly columnIds: readonly string[];
-};
+/**
+ * What one table's geometry is resolved from: its column layout, its grid
+ * interaction, and the shown columns' ids.
+ */
+export type UseTableGeometryProps = readonly [
+  layout: ColumnLayout,
+  interaction: GridInteraction,
+  columnIds: readonly string[],
+];
 
 /** One table's resolved geometry. */
 export type UseTableGeometryResult = {
@@ -99,33 +99,34 @@ export type UseTableGeometryResult = {
   readonly widths: readonly number[];
 };
 
-/** What the arrangement hook takes: the presentation that arranges the declared columns. */
-export type UseColumnArrangementProps = {
-  readonly presentation: Presentation;
-  /** The columns as declared, in their declared order. */
-  readonly columns: readonly DataTableColumn[];
-};
+/**
+ * What the arrangement hook takes: the presentation, then the columns it
+ * arranges, in their declared order.
+ */
+export type UseColumnArrangementProps = readonly [
+  presentation: Presentation,
+  columns: readonly DataTableColumn[],
+];
 
 /** The columns a table renders, in the arrangement's order, the hidden ones left out. */
 export type UseColumnArrangementResult = readonly DataTableColumn[];
 
-/** What the header row's sort hook reads: the provider, the columns shown and the query in force. */
+/**
+ * What the header row's sort hook reads: the provider, the columns shown,
+ * the applied query's slice and window, and the words and announcer an
+ * activation's outcome is said through.
+ */
 export type UseHeaderSortProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = {
-  readonly provider: DataViewsProvider<TFields, TRow>;
-  /** The columns the presentation shows, in its order. */
-  readonly columns: readonly DataTableColumn[];
-  /** The applied query's slice. */
-  readonly slice: Slice;
-  /** The applied query's window. */
-  readonly window: ResultWindow;
-  /** The words an activation's outcome is shown and announced in. */
-  readonly messages: DataViewsMessages;
-  /** Say, through the table's announcer, what an activation did. */
-  readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
-};
+> = readonly [
+  provider: DataViewsProvider<TFields, TRow>,
+  columns: readonly DataTableColumn[],
+  slice: Slice,
+  window: ResultWindow,
+  messages: DataViewsMessages,
+  announce: (message: ReactNode, topic?: AnnouncerTopic) => void,
+];
 
 /** What the header row's sort hook gives each header. */
 export type UseHeaderSortResult = {

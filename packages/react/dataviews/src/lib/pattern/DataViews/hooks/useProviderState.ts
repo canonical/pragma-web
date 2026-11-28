@@ -28,10 +28,9 @@ import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
 export default function useProviderState<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-  messages,
-}: UseProviderStateProps<TFields, TRow>): UseProviderStateResult {
+>(
+  ...[provider, { messages } = {}]: UseProviderStateProps<TFields, TRow>
+): UseProviderStateResult {
   if (!isDataViewsProvider(provider)) {
     throw new Error(
       "DataViews requires a provider created by createDataViewsProvider",
@@ -44,7 +43,7 @@ export default function useProviderState<
     () => createFilterInputs({ host: readProviderHost(widest) }),
     [widest],
   );
-  const words = useMessages(messages);
+  const words = useMessages({ messages });
   const { ref, announce } = useAnnouncer();
   useEffect(() => provider.observe(), [provider]);
   useEffect(() => inputs.observe(), [inputs]);

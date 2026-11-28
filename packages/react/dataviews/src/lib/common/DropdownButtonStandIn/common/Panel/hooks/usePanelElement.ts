@@ -1,6 +1,6 @@
 import type { ToggleEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PanelState, UsePanelElementResult } from "./types.js";
+import type { UsePanelElementProps, UsePanelElementResult } from "./types.js";
 
 /**
  * Reads the focused element of the tree `node` sits in: a document, or a
@@ -21,7 +21,7 @@ function findActiveElement(node: Node): Element | null {
  * @returns The ref callback for the element and its two toggle listeners.
  */
 export default function usePanelElement(
-  panel: PanelState,
+  ...[panel]: UsePanelElementProps
 ): UsePanelElementResult {
   const { elementRef, isOpen, setOpen, setFocusIntent, triggerId } = panel;
   // The effects read the element from state, so they run again once it

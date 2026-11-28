@@ -17,10 +17,9 @@ import type {
  * hidden. Held at one reference while the visible columns are the same,
  * so a width change alone re-renders no header and re-mints no layout.
  */
-export default function useColumnArrangement({
-  presentation,
-  columns,
-}: UseColumnArrangementProps): UseColumnArrangementResult {
+export default function useColumnArrangement(
+  ...[presentation, columns]: UseColumnArrangementProps
+): UseColumnArrangementResult {
   // Rebuilt only with the declared columns, so it runs once per
   // publication of the presentation, and once per render that passes new
   // columns.
@@ -31,5 +30,8 @@ export default function useColumnArrangement({
         .map(({ column }) => column),
     [columns],
   );
-  return useDataViewsValue(presentation.state, selectVisible, areColumnsEqual);
+  return useDataViewsValue(presentation.state, {
+    select: selectVisible,
+    isEqual: areColumnsEqual,
+  });
 }

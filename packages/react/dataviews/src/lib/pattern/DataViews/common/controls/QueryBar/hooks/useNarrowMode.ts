@@ -27,17 +27,12 @@ const readRemPx = (document: Document): number =>
  * stylesheet hides the chips; this only follows the same width, through a
  * `ResizeObserver`, which reports at most once a frame.
  *
- * @param props - The bar's root and entry, and what moves the stop off the
- *   chips.
  * @returns Whether the bar is narrow; false until a size is reported.
  * @note Impure: observes the root's size, and moves focus.
  */
-export default function useNarrowMode({
-  rootRef,
-  entryRef,
-  onNarrow,
-  onWide,
-}: UseNarrowModeProps): UseNarrowModeResult {
+export default function useNarrowMode(
+  ...[rootRef, entryRef, onNarrow, onWide]: UseNarrowModeProps
+): UseNarrowModeResult {
   const [isNarrow, setNarrow] = useState(false);
   const leaveChips = useStableCallback(onNarrow);
   const returnToChips = useStableCallback(onWide);

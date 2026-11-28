@@ -1,8 +1,8 @@
 import type { Decorator } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import DataViews from "../../lib/pattern/DataViews/Provider.js";
+import useMachineProvider from "../machines/hooks/useMachineProvider.js";
 import type { MachineProviderConfig } from "../machines/index.js";
-import useMachineProvider from "../machines/useMachineProvider.js";
 import pickStoryWords from "../pickStoryWords.js";
 import type { StoryWords } from "../types.js";
 

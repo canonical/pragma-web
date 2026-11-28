@@ -93,11 +93,10 @@ const createQueryGroup = (
  * channel, and its commands. A private stand-in for `store.query`, with the
  * same members, removed when the store lands. One group per provider.
  *
- * @param props - The root's provider.
  * @returns The query group.
  */
-export default function useQueryGroup({
-  provider,
-}: UseQueryGroupProps): UseQueryGroupResult {
+export default function useQueryGroup(
+  ...[provider]: UseQueryGroupProps
+): UseQueryGroupResult {
   return useMemo(() => createQueryGroup(provider), [provider]);
 }

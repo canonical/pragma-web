@@ -26,14 +26,13 @@ export type UseVirtualRowsResult = {
   readonly onBlur: (event: FocusEvent<HTMLTableSectionElement>) => void;
 };
 
-/** What one virtualized body displays, and what its rows' heights hang on. */
-export type UseVirtualRowsProps = {
-  /** The entries, in display order. */
-  readonly entries: readonly DisplayEntry[];
-  /** The height a row is placed at until it is measured, in pixels. */
-  readonly estimatedRowHeight: number;
-  /** The row model, whose replaced records may have new heights. */
-  readonly model: RowModel<object>;
-  /** The published tracks, whose change re-wraps every row. */
-  readonly tracks: string | undefined;
-};
+/** What one virtualized body takes. */
+export type UseVirtualRowsProps = readonly [
+  entries: readonly DisplayEntry[],
+  estimatedRowHeight: number,
+  model: RowModel<object>,
+  options?: {
+    /** The published tracks, whose change re-wraps every row. */
+    readonly tracks?: string | undefined;
+  },
+];

@@ -9,7 +9,7 @@ const Commands = ({
   saveDisabled = false,
   showSave = true,
 }) => {
-  const focus = usePanelFocus({ pending });
+  const focus = usePanelFocus(pending);
   return (
     // biome-ignore lint/a11y/useSemanticElements: the saved views group their parts as this div does
     <div

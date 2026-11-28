@@ -20,8 +20,7 @@ describe("useLinkFocusHandoff", () => {
   it("hands the link's focus to the button of the same name", () => {
     const root = createRoot();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.innerHTML =
@@ -38,8 +37,7 @@ describe("useLinkFocusHandoff", () => {
     onTestFinished(() => root.remove());
     root.querySelectorAll("a")[1]?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.innerHTML =
@@ -56,8 +54,7 @@ describe("useLinkFocusHandoff", () => {
     onTestFinished(() => root.remove());
     root.querySelectorAll("a")[1]?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.innerHTML =
@@ -75,8 +72,7 @@ describe("useLinkFocusHandoff", () => {
     root.querySelector("summary")?.setAttribute("tabindex", "0");
     root.querySelector<HTMLElement>("summary")?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.innerHTML = '<input data-roving-item="entry" aria-label="Filter">';
@@ -92,8 +88,7 @@ describe("useLinkFocusHandoff", () => {
     onTestFinished(() => root.remove());
     root.querySelector("button")?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.querySelector("button")?.remove();
@@ -102,8 +97,7 @@ describe("useLinkFocusHandoff", () => {
     // With no control left, the panel itself.
     root.querySelector("input")?.focus();
     const empty = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root
@@ -124,8 +118,7 @@ describe("useLinkFocusHandoff", () => {
     onTestFinished(() => root.remove());
     root.querySelector<HTMLElement>('[type="submit"]')?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.querySelector('[type="submit"]')?.remove();
@@ -141,8 +134,7 @@ describe("useLinkFocusHandoff", () => {
     onTestFinished(() => root.remove());
     root.querySelector("input")?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     rerender({ hydrated: true });
@@ -157,8 +149,7 @@ describe("useLinkFocusHandoff", () => {
     const input = root.querySelector("input");
     input?.focus();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     rerender({ hydrated: true });
@@ -168,8 +159,7 @@ describe("useLinkFocusHandoff", () => {
   it("moves nothing when no button takes the name, or no link held focus", () => {
     const root = createRoot();
     const { rerender } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: root }, hydrated),
       { initialProps: { hydrated: false } },
     );
     root.innerHTML = '<button type="button">Other</button>';
@@ -179,8 +169,7 @@ describe("useLinkFocusHandoff", () => {
     document.body.append(elsewhere);
     onTestFinished(() => elsewhere.remove());
     const { rerender: again } = renderHook(
-      ({ hydrated }) =>
-        useLinkFocusHandoff({ rootRef: { current: elsewhere }, hydrated }),
+      ({ hydrated }) => useLinkFocusHandoff({ current: elsewhere }, hydrated),
       { initialProps: { hydrated: false } },
     );
     again({ hydrated: true });

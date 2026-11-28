@@ -114,9 +114,12 @@ export default function Sheet({
   const formId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const chips = useDataViewsValue(group.state, listChipClauses, isSameChips);
-  const count = useAnswerCountStandIn({ provider });
-  const announceOutcome = useAnnounceOutcome({ provider, announce });
+  const chips = useDataViewsValue(group.state, {
+    select: listChipClauses,
+    isEqual: isSameChips,
+  });
+  const count = useAnswerCountStandIn(provider);
+  const announceOutcome = useAnnounceOutcome(provider, announce);
   // Whether the sheet is writing a commit of its own, which says its own
   // outcome; any other commit made inside it, as the filters form's, says
   // the results it brings.

@@ -2,27 +2,28 @@ import type { FocusEvent, ReactNode, Ref } from "react";
 import type { QueryChipPartContextValue } from "../common/types.js";
 import type { QueryChipCriticality, QueryChipRemoveEvent } from "../types.js";
 
-/** The chip's props the hook works from. */
-export type UseQueryChipProps = {
-  /** The chip's parts. */
-  children: ReactNode;
-  /** The chip's id, which names its toolbar item. */
-  id?: string | undefined;
-  /** The whole clause, spoken. */
-  label?: string | undefined;
-  /** The chip's Criticality value. */
-  criticality?: QueryChipCriticality | undefined;
-  /** Whether the chip is disabled. */
-  disabled: boolean;
-  /** Called by the remove control. */
-  onRemove?: ((event: QueryChipRemoveEvent) => void) | undefined;
-  /** The remove link's address. */
-  removeHref?: string | undefined;
-  /** The remove control's accessible name. */
-  removeLabel?: string | undefined;
-  /** The host's ref to the chip's root. */
-  ref?: Ref<HTMLSpanElement> | undefined;
-};
+/** What the hook works from: the chip's parts, then its options. */
+export type UseQueryChipProps = readonly [
+  children: ReactNode,
+  options?: {
+    /** Whether the chip is disabled. */
+    disabled?: boolean | undefined;
+    /** The chip's id, which names its toolbar item. */
+    id?: string | undefined;
+    /** The whole clause, spoken. */
+    label?: string | undefined;
+    /** The chip's Criticality value. */
+    criticality?: QueryChipCriticality | undefined;
+    /** Called by the remove control. */
+    onRemove?: ((event: QueryChipRemoveEvent) => void) | undefined;
+    /** The remove link's address. */
+    removeHref?: string | undefined;
+    /** The remove control's accessible name. */
+    removeLabel?: string | undefined;
+    /** The host's ref to the chip's root. */
+    ref?: Ref<HTMLSpanElement> | undefined;
+  },
+];
 
 /** One part, with what the chip tells it. */
 export type UseQueryChipPart = {

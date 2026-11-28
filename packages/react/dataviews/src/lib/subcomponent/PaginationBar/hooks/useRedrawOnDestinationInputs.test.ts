@@ -12,7 +12,7 @@ describe("useRedrawOnDestinationInputs", () => {
     let renders = 0;
     renderHook(() => {
       renders += 1;
-      useRedrawOnDestinationInputs({ provider });
+      useRedrawOnDestinationInputs(provider);
     });
     const drawn = renders;
     const host = readProviderHost(provider);
@@ -36,7 +36,7 @@ describe("useRedrawOnDestinationInputs", () => {
     let renders = 0;
     renderHook(() => {
       renders += 1;
-      useRedrawOnDestinationInputs({ provider });
+      useRedrawOnDestinationInputs(provider);
     });
     const drawn = renders;
     const { slice, window } = provider.state.get();

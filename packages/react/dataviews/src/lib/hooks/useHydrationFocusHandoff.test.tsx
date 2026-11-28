@@ -11,7 +11,7 @@ const Swapped = ({
 }: {
   readonly hydrated: boolean;
 }): ReactElement => {
-  const { link, button } = useHydrationFocusHandoff({ hydrated });
+  const { link, button } = useHydrationFocusHandoff(hydrated);
   return hydrated ? (
     <button ref={button} type="button">
       Move

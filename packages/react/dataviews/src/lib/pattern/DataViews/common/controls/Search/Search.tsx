@@ -58,7 +58,7 @@ export default function Search({
       "DataViews.Search requires a source that declares search; this provider's declares none",
     );
   }
-  const applied = useAppliedSearch({ provider });
+  const applied = useAppliedSearch(provider);
   const generatedId = useId();
   const inputId = id ?? generatedId;
   return (

@@ -13,11 +13,13 @@ const isSameIds = (a: UseClauseIdsResult, b: UseClauseIdsResult): boolean =>
  * that clause's chip, which reads its own conjunct. An id names a
  * clause's address, so the held clauses point at what each chip reads.
  *
- * @param props - The query group.
  * @returns The chips' clauses.
  */
-export default function useClauseIds({
-  group,
-}: UseClauseIdsProps): UseClauseIdsResult {
-  return useDataViewsValue(group.state, listChipClauses, isSameIds);
+export default function useClauseIds(
+  ...[group]: UseClauseIdsProps
+): UseClauseIdsResult {
+  return useDataViewsValue(group.state, {
+    select: listChipClauses,
+    isEqual: isSameIds,
+  });
 }

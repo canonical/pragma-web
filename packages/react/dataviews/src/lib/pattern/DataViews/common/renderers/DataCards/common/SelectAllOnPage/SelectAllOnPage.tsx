@@ -27,7 +27,7 @@ export default function SelectAllOnPage({
 }: SelectAllOnPageProps): ReactElement {
   const messages = useContext(MessagesContext);
   const ids = useDataViewsValue(displayed);
-  const { checked, mixed, toggle } = useSelectAllOnPage({ selection, ids });
+  const { checked, mixed, toggle } = useSelectAllOnPage(selection, ids);
   const inputId = useId();
   // A checkbox's mixed state is a property, not an attribute, and React
   // writes no property it was not given. The ref is rebuilt whenever the

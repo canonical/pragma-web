@@ -5,9 +5,7 @@ import useSheetAnnouncer from "./useSheetAnnouncer.js";
 describe("useSheetAnnouncer", () => {
   it("speaks through the root until the sheet's region is there, then through it", () => {
     const announce = vi.fn();
-    const { result, rerender } = renderHook(() =>
-      useSheetAnnouncer({ announce }),
-    );
+    const { result, rerender } = renderHook(() => useSheetAnnouncer(announce));
     const first = result.current.announce;
     first("Added status is ready.");
     expect(announce).toHaveBeenCalledWith("Added status is ready.", undefined);

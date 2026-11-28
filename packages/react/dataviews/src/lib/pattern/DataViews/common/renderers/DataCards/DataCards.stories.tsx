@@ -10,6 +10,7 @@ import createEmptySource from "../../../../../../storybook/machines/createEmptyS
 import createFailingSource from "../../../../../../storybook/machines/createFailingSource.js";
 import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../../../../storybook/machines/fixtures.js";
+import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
 import readHostName from "../../../../../../storybook/machines/readHostName.js";
 import readPaginationSummary from "../../../../../../storybook/machines/readPaginationSummary.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
@@ -19,7 +20,6 @@ import type {
   MachineFields,
   MachineProviderConfig,
 } from "../../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
 import type {
@@ -169,7 +169,9 @@ const nameMachine = (machine: Machine) => machine.name;`,
 /** A status field drawn by its own cell, reading the record through its scope. */
 function StatusCell({ value }: DisplayFieldCellProps): ReactElement {
   const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, (record) => record.note);
+  const note = useDataViewsValue(cell.record, {
+    select: (record) => record.note,
+  });
   return <span title={note}>{String(value).toUpperCase()}</span>;
 }
 
@@ -199,7 +201,9 @@ export const CustomCell: Story = {
     imports: spikeImports,
     declarations: `function StatusCell({ value }: DisplayFieldCellProps) {
   const cell = useDataViewsCell(machineCollection);
-  const note = useDataViewsValue(cell.record, (record) => record.note);
+  const note = useDataViewsValue(cell.record, {
+    select: (record) => record.note,
+  });
   return <span title={note}>{String(value).toUpperCase()}</span>;
 }
 

@@ -12,7 +12,7 @@ function Panel({
   readonly disabled?: readonly string[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  useFocusRescue({ containerRef: ref });
+  useFocusRescue(ref);
   return (
     <>
       <div className="ds filter-button-panel" tabIndex={-1} data-testid="panel">

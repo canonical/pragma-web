@@ -9,6 +9,7 @@ import {
 import getHiddenButton from "../../../storybook/getHiddenButton.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import createUncountedSource from "../../../storybook/machines/createUncountedSource.js";
+import useMachineProvider from "../../../storybook/machines/hooks/useMachineProvider.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
@@ -16,7 +17,6 @@ import type {
   MachineProvider,
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
-import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import {
   DataTable,

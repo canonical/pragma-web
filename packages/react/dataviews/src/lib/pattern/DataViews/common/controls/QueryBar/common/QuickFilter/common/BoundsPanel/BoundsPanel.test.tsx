@@ -46,12 +46,15 @@ function Host({
   readonly onCommit: (refusals: readonly SourceRefusal[]) => void;
   readonly onInvalid: (message: string) => void;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, field),
     [field],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   const definition = provider.collection.schema.findField(field) as Extract<
     SchemaFieldDefinition,
     { readonly kind: "number" | "date" }

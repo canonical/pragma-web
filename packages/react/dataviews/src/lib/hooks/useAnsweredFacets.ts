@@ -37,8 +37,8 @@ const readAnswered = <TRow extends object>(
 export default function useAnsweredFacets<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-}: UseAnsweredFacetsProps<TFields, TRow>): UseAnsweredFacetsResult {
-  return useDataViewsValue(provider.state, readAnswered);
+>(
+  ...[provider]: UseAnsweredFacetsProps<TFields, TRow>
+): UseAnsweredFacetsResult {
+  return useDataViewsValue(provider.state, { select: readAnswered });
 }

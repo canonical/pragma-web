@@ -30,10 +30,9 @@ import type {
  *
  * @note Impure: reads the disclosure's open state in a layout effect.
  */
-export default function useMoreFiltersPin({
-  marks,
-  listShownFields,
-}: UseMoreFiltersPinProps): UseMoreFiltersPinResult {
+export default function useMoreFiltersPin(
+  ...[marks, listShownFields]: UseMoreFiltersPinProps
+): UseMoreFiltersPinResult {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const hydrated = useIsHydrated();
   const [pin, setPin] = useState<{

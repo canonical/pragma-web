@@ -1,10 +1,23 @@
 import { act, renderHook } from "@testing-library/react";
-import type { FocusEvent } from "react";
+import type { FocusEvent, RefObject } from "react";
 import { describe, expect, it, vi } from "vitest";
-import type { UseSuggestionsProps } from "./types.js";
+import type { QueryInputOption } from "../common/types.js";
 import useSuggestions from "./useSuggestions.js";
 
-const props: UseSuggestionsProps = {
+/** The hook's inputs by name, so a test overrides one. */
+type Inputs = {
+  options: QueryInputOption[];
+  value: string;
+  loading: boolean;
+  hasEmptyText: boolean;
+  hasFooter: boolean;
+  isMounted: boolean;
+  disabled: boolean;
+  baseId: string;
+  rootRef: RefObject<HTMLElement | null>;
+};
+
+const props: Inputs = {
   options: [
     { id: "a", label: "a" },
     { id: "b", label: "b", disabled: true },
@@ -19,14 +32,27 @@ const props: UseSuggestionsProps = {
   rootRef: { current: null },
 };
 
-/** Renders the hook before scripts run, then after, as a page loads. */
-const mount = (overrides: Partial<UseSuggestionsProps> = {}) => {
-  const view = renderHook(
-    (current: UseSuggestionsProps) => useSuggestions(current),
+/** The hook, called with the inputs by name. */
+const useNamedSuggestions = (inputs: Inputs) =>
+  useSuggestions(
+    inputs.options,
+    inputs.value,
+    inputs.isMounted,
+    inputs.baseId,
+    inputs.rootRef,
     {
-      initialProps: { ...props, ...overrides },
+      loading: inputs.loading,
+      hasEmptyText: inputs.hasEmptyText,
+      hasFooter: inputs.hasFooter,
+      disabled: inputs.disabled,
     },
   );
+
+/** Renders the hook before scripts run, then after, as a page loads. */
+const mount = (overrides: Partial<Inputs> = {}) => {
+  const view = renderHook((current: Inputs) => useNamedSuggestions(current), {
+    initialProps: { ...props, ...overrides },
+  });
   view.rerender({ ...props, ...overrides, isMounted: true });
   return view;
 };
@@ -50,8 +76,26 @@ describe("useSuggestions", () => {
     expect(result.current.anchorName).toBe("--query-input-r1");
   });
 
+  it("reads as enabled and loaded, with no empty text or footer, by default", () => {
+    const { result, rerender } = renderHook(
+      ({ options }: { options: QueryInputOption[] }) =>
+        useSuggestions(options, "", true, ":r1:", { current: null }),
+      { initialProps: { options: props.options } },
+    );
+    act(() =>
+      result.current.getEntryProps("own", {}).onFocus?.(createFocusEvent()),
+    );
+    expect(result.current.hasFocus).toBe(true);
+    expect(result.current.isOpen).toBe(true);
+    expect(
+      result.current.getEntryProps("own", {})["aria-describedby"],
+    ).toBeUndefined();
+    rerender({ options: [] });
+    expect(result.current.isOpen).toBe(false);
+  });
+
   it("stays closed before scripts run, even with focus", () => {
-    const { result } = renderHook(() => useSuggestions(props));
+    const { result } = renderHook(() => useNamedSuggestions(props));
     act(() =>
       result.current.getEntryProps("own", {}).onFocus?.(createFocusEvent()),
     );

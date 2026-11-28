@@ -12,13 +12,12 @@ const LIST_SELECTOR = ':scope > [role="list"]';
  * after each render, when the row or a chip changes size, when fonts load,
  * and when the host asks.
  *
- * @param props - The content row.
  * @returns The hidden count and the measure function.
  * @note Impure: reads layout, and observes the row's size.
  */
-export default function useChipLayout({
-  contentRef,
-}: UseChipLayoutProps): UseChipLayoutResult {
+export default function useChipLayout(
+  ...[contentRef]: UseChipLayoutProps
+): UseChipLayoutResult {
   const [hiddenCount, setHiddenCount] = useState(0);
   const observerRef = useRef<ResizeObserver | null>(null);
   // The count last set, so a measure that changes nothing sets no state.

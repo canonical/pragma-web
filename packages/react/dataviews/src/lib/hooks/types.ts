@@ -4,8 +4,8 @@
  * scripts have taken over, the focus a server's link hands to the button
  * replacing it, the focus a disabled control strands, and the words a root
  * speaks. Each hook declares its result type here, and its props type where
- * it takes arguments: a config object, or a labelled tuple for a hook whose
- * arguments are positional.
+ * it takes arguments, as a labelled tuple: required inputs positional,
+ * optional ones in a trailing options object.
  */
 
 import type {
@@ -23,17 +23,42 @@ import type { FocusEvent, ReactNode, Ref, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
 /**
- * What `useDataViewsValue` takes with a selector: the channel, the `select`
- * that reads it, and an optional `isEqual` over what `select` returns.
+ * What `useDataViewsValue` takes over the whole snapshot: the channel, then
+ * an optional `isEqual`.
+ */
+export type UseDataViewsValueWholeProps<T> = readonly [
+  channel: ReadonlyChannel<T>,
+  options?: {
+    readonly select?: undefined;
+    /** Whether the next snapshot says the same as the one held. */
+    readonly isEqual?: (previous: T, next: T) => boolean;
+  },
+];
+
+/**
+ * What `useDataViewsValue` takes through a selector: the channel, then
+ * `select` and an optional `isEqual`.
+ */
+export type UseDataViewsValueSelectedProps<T, TSelected> = readonly [
+  channel: ReadonlyChannel<T>,
+  options: {
+    /** Reads the part of the snapshot a render needs. */
+    readonly select: (value: T) => TSelected;
+    /** Whether the next value says the same as the one held. */
+    readonly isEqual?: (previous: TSelected, next: TSelected) => boolean;
+  },
+];
+
+/**
+ * What `useDataViewsValue` takes: the channel, then optional `select` and
+ * `isEqual`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type UseDataViewsValueProps<T, TSelected> = readonly [
-  channel: ReadonlyChannel<T>,
-  select: (value: T) => TSelected,
-  isEqual?: (previous: TSelected, next: TSelected) => boolean,
-];
+export type UseDataViewsValueProps<T, TSelected = T> =
+  | UseDataViewsValueWholeProps<T>
+  | UseDataViewsValueSelectedProps<T, TSelected>;
 
 /**
  * What `useDataViewsValue` returns: the channel's current value, or the part
@@ -75,13 +100,14 @@ export type UseDataViewsCellResult<TRow extends object = RowRecord> = {
   readonly selected: ReadonlyChannel<boolean>;
 };
 
-/** What `useSelectAllOnPage` takes: the selection, and the page it acts on. */
-export type UseSelectAllOnPageProps = {
-  /** The collection's selection, which the toggle changes. */
-  readonly selection: Selection;
-  /** The identities on the page — the scope the control acts on. */
-  readonly ids: readonly string[];
-};
+/**
+ * What `useSelectAllOnPage` takes: the selection, and the page's identities it
+ * acts on.
+ */
+export type UseSelectAllOnPageProps = readonly [
+  selection: Selection,
+  ids: readonly string[],
+];
 
 /**
  * What `useSelectAllOnPage` returns: whether every record on the page is
@@ -98,10 +124,7 @@ export type UseSelectAllOnPageResult = {
 };
 
 /** What `useHydrationFocusHandoff` takes: whether scripts have taken over. */
-export type UseHydrationFocusHandoffProps = {
-  /** Whether scripts have taken over, from `useIsHydrated`. */
-  readonly hydrated: boolean;
-};
+export type UseHydrationFocusHandoffProps = readonly [hydrated: boolean];
 
 /**
  * What `useHydrationFocusHandoff` returns: the ref for the link a server
@@ -115,10 +138,9 @@ export type UseHydrationFocusHandoffResult = {
 };
 
 /** What `useFocusRescue` takes: the control stranded focus goes to. */
-export type UseFocusRescueProps = {
-  /** The control that takes the focus a disabled or removed control held. */
-  readonly fallback: RefObject<HTMLElement | null>;
-};
+export type UseFocusRescueProps = readonly [
+  fallback: RefObject<HTMLElement | null>,
+];
 
 /**
  * What `useFocusRescue` returns: the handlers to spread on the group whose
@@ -132,12 +154,15 @@ export type UseFocusRescueResult = {
 };
 
 /**
- * What `useMergedRef` takes: the caller's ref, if any, and the part's own
- * attach, which may answer its cleanup.
+ * What `useMergedRef` takes: the part's own attach, which may answer its
+ * cleanup, then the caller's ref, if any.
  */
 export type UseMergedRefProps<TElement> = readonly [
-  ref: Ref<TElement> | undefined,
   attach: (node: TElement) => (() => void) | undefined,
+  options?: {
+    /** The caller's ref, merged beside the part's own attach. */
+    readonly ref?: Ref<TElement> | undefined;
+  },
 ];
 
 /**
@@ -157,10 +182,7 @@ export type UseAnsweredFacetsProps<
   TFields extends
     readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = {
-  /** The provider whose result answers the applied filter and search. */
-  readonly provider: DataViewsProvider<TFields, TRow>;
-};
+> = readonly [provider: DataViewsProvider<TFields, TRow>];
 
 /** The facets answering the applied filter and search, by field, or null. */
 export type UseAnsweredFacetsResult = Readonly<Record<string, Facet>> | null;
@@ -188,7 +210,12 @@ export type UseFacetsResult = {
 };
 
 /** What `useMessages` takes: the application's messages, if any. */
-export type UseMessagesProps = readonly [messages?: Partial<DataViewsMessages>];
+export type UseMessagesProps = readonly [
+  options?: {
+    /** The application's messages, over the English record. */
+    readonly messages?: Partial<DataViewsMessages> | undefined;
+  },
+];
 
 /**
  * What `useMessages` returns: every message a root speaks, the application's

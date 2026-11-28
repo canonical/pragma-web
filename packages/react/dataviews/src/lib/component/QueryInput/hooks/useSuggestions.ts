@@ -50,22 +50,25 @@ const leaveToHost = (event: KeyboardEvent<HTMLInputElement>): void => {
  * it open. Keys the combobox does not handle reach the entry's own handler,
  * which is the host's.
  *
- * @param props - The options, the choice handler and what the list can show.
  * @returns The list state, downshift's list getters and the entry merger.
  */
-export default function useSuggestions({
-  options,
-  onOptionSelect,
-  onHighlightChange,
-  value,
-  loading,
-  hasEmptyText,
-  hasFooter,
-  isMounted,
-  disabled,
-  baseId,
-  rootRef,
-}: UseSuggestionsProps): UseSuggestionsResult {
+export default function useSuggestions(
+  ...[
+    options,
+    value,
+    isMounted,
+    baseId,
+    rootRef,
+    {
+      loading = false,
+      hasEmptyText = false,
+      hasFooter = false,
+      disabled = false,
+      onOptionSelect,
+      onHighlightChange,
+    } = {},
+  ]: UseSuggestionsProps
+): UseSuggestionsResult {
   const [focusedEntry, setFocusedEntry] = useState<EntryKind | null>(null);
   const [isDismissed, setDismissed] = useState(false);
   // Kept by id, so a highlight never names another option after a change.

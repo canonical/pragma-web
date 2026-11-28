@@ -51,11 +51,9 @@ const mount = ({ query, href, alter, dialogProps }: MountConfig = {}) => {
   });
   const onOpenChange = vi.fn();
   function Harness(): ReactElement {
-    const group = useQueryGroup({ provider: provider as never });
+    const group = useQueryGroup(provider as never);
     const root = { announce: vi.fn() };
-    const { regionRef, announce } = useSheetAnnouncer({
-      announce: root.announce,
-    });
+    const { regionRef, announce } = useSheetAnnouncer(root.announce);
     const [isOpen, setOpen] = useState(false);
     return (
       <>
@@ -149,8 +147,8 @@ describe("Sheet", () => {
   it("reads Show results while no count is known", () => {
     const { provider } = createMachineProvider();
     function Harness(): ReactElement {
-      const group = useQueryGroup({ provider: provider as never });
-      const { regionRef, announce } = useSheetAnnouncer({ announce: vi.fn() });
+      const group = useQueryGroup(provider as never);
+      const { regionRef, announce } = useSheetAnnouncer(vi.fn());
       return (
         <Sheet
           id="sheet"

@@ -69,7 +69,7 @@ export default function SortPanel({
 }: DataViewsSortPanelProps): ReactElement {
   const { provider, messages, announce } = useDataViewsRoot("SortPanel");
   // The terms alone: a result arriving re-renders no panel.
-  const sort = useAppliedSort({ provider });
+  const sort = useAppliedSort(provider);
   // Its buttons work only once scripts run: the server and the hydrating
   // render offer links instead.
   const hydrated = useIsHydrated();
@@ -139,7 +139,7 @@ export default function SortPanel({
       root.current = null;
     };
   }, []);
-  const attach = useMergedRef(ref, attachRoot);
+  const attach = useMergedRef(attachRoot, { ref });
   useLayoutEffect(() => {
     const control = focused.current;
     // The section renders on every path, and React attaches its ref before

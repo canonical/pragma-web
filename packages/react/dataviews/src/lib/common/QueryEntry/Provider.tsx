@@ -12,8 +12,8 @@ import type { QueryEntryProviderProps } from "./types.js";
  */
 export default function Provider({
   children,
-  ...props
+  getInputProps,
 }: QueryEntryProviderProps): ReactElement {
-  const state = useProviderState(props);
+  const state = useProviderState(getInputProps);
   return <Context.Provider value={state}>{children}</Context.Provider>;
 }

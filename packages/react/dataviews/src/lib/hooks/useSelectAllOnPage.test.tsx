@@ -12,7 +12,7 @@ describe("useSelectAllOnPage", () => {
   it("is neither checked nor mixed over an empty page, and selects nothing", () => {
     const { provider } = createMachineProvider();
     const { result } = renderHook(() =>
-      useSelectAllOnPage({ selection: provider.selection, ids: [] }),
+      useSelectAllOnPage(provider.selection, []),
     );
     expect(result.current.checked).toBe(false);
     expect(result.current.mixed).toBe(false);
@@ -27,7 +27,7 @@ describe("useSelectAllOnPage", () => {
     provider.selection.add(["elsewhere"]);
     const page = ["m-1", "m-2"];
     const { result } = renderHook(() =>
-      useSelectAllOnPage({ selection: provider.selection, ids: page }),
+      useSelectAllOnPage(provider.selection, page),
     );
     act(() => {
       result.current.toggle();
@@ -42,7 +42,7 @@ describe("useSelectAllOnPage", () => {
     provider.selection.add(["elsewhere", "m-1", "m-2"]);
     const page = ["m-1", "m-2"];
     const { result } = renderHook(() =>
-      useSelectAllOnPage({ selection: provider.selection, ids: page }),
+      useSelectAllOnPage(provider.selection, page),
     );
     expect(result.current.checked).toBe(true);
     act(() => {
@@ -56,7 +56,7 @@ describe("useSelectAllOnPage", () => {
     provider.selection.add(["m-1"]);
     const page = ["m-1", "m-2"];
     const { result } = renderHook(() =>
-      useSelectAllOnPage({ selection: provider.selection, ids: page }),
+      useSelectAllOnPage(provider.selection, page),
     );
     expect(result.current.checked).toBe(false);
     expect(result.current.mixed).toBe(true);
@@ -70,7 +70,7 @@ describe("useSelectAllOnPage", () => {
     const { provider } = createMachineProvider();
     const page = ["m-1"];
     const { result, rerender } = renderHook(() =>
-      useSelectAllOnPage({ selection: provider.selection, ids: page }),
+      useSelectAllOnPage(provider.selection, page),
     );
     const first = result.current;
     rerender();

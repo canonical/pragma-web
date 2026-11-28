@@ -6,17 +6,21 @@ import type {
   QueryInputOption,
 } from "../common/types.js";
 
-/** The props of {@link useActiveItem}. */
-export type UseActiveItemProps = {
-  /** The item the host says holds the stop, when it controls it. */
-  activeItem?: string | undefined;
-  /** Called with the item that claims the stop. */
-  onActiveItemChange?: ((itemId: string) => void) | undefined;
-  /** The toolbar, whose items carry `data-roving-item`. */
-  contentRef: RefObject<HTMLElement | null>;
-  /** Whether scripts have run, so the items are roving. */
-  isMounted: boolean;
-};
+/**
+ * The props of {@link useActiveItem}: the toolbar, whose items carry
+ * `data-roving-item`, whether scripts have run, then the host's item and
+ * change handler.
+ */
+export type UseActiveItemProps = readonly [
+  contentRef: RefObject<HTMLElement | null>,
+  isMounted: boolean,
+  options?: {
+    /** The item the host says holds the stop, when it controls it. */
+    activeItem?: string | undefined;
+    /** Called with the item that claims the stop. */
+    onActiveItemChange?: ((itemId: string) => void) | undefined;
+  },
+];
 
 /** What {@link useActiveItem} returns. */
 export type UseActiveItemResult = {
@@ -26,11 +30,13 @@ export type UseActiveItemResult = {
   setActiveItem: (itemId: string) => void;
 };
 
-/** The props of {@link useChipLayout}. */
-export type UseChipLayoutProps = {
-  /** The content row, which holds the chips' list and the entry. */
-  contentRef: RefObject<HTMLElement | null>;
-};
+/**
+ * The props of {@link useChipLayout}: the content row, which holds the chips'
+ * list and the entry.
+ */
+export type UseChipLayoutProps = readonly [
+  contentRef: RefObject<HTMLElement | null>,
+];
 
 /** What {@link useChipLayout} returns. */
 export type UseChipLayoutResult = {
@@ -40,31 +46,28 @@ export type UseChipLayoutResult = {
   measure: () => void;
 };
 
-/** The props of {@link useSuggestions}. */
-export type UseSuggestionsProps = {
-  /** The suggestions. */
-  options: QueryInputOption[];
-  /** Called with an option's id when it is chosen. */
-  onOptionSelect?: ((optionId: string) => void) | undefined;
-  /** Called with the highlighted option's id, or undefined, as it changes. */
-  onHighlightChange?: ((optionId: string | undefined) => void) | undefined;
-  /** The free-text entry's value. */
-  value: string;
-  /** Whether the suggestions are loading. */
-  loading: boolean;
-  /** Whether there is empty text to show. */
-  hasEmptyText: boolean;
-  /** Whether there is a footer hint, which describes the focused entry. */
-  hasFooter: boolean;
-  /** Whether scripts have run. */
-  isMounted: boolean;
-  /** Whether the field is disabled, which closes the list and ignores choices. */
-  disabled: boolean;
-  /** A unique base for the listbox, option, footer and anchor names. */
-  baseId: string;
-  /** QueryInput's root, inside which focus moves between the entries. */
-  rootRef: RefObject<HTMLElement | null>;
-};
+/** What {@link useSuggestions} takes. */
+export type UseSuggestionsProps = readonly [
+  suggestions: QueryInputOption[],
+  value: string,
+  isMounted: boolean,
+  baseId: string,
+  rootRef: RefObject<HTMLElement | null>,
+  options?: {
+    /** Whether the suggestions are loading. */
+    loading?: boolean | undefined;
+    /** Whether there is text to show when nothing matches. */
+    hasEmptyText?: boolean | undefined;
+    /** Whether there is a footer hint. */
+    hasFooter?: boolean | undefined;
+    /** Whether the field is disabled. */
+    disabled?: boolean | undefined;
+    /** Called with an option's id when it is chosen. */
+    onOptionSelect?: ((optionId: string) => void) | undefined;
+    /** Called with the highlighted option's id, or undefined, as it changes. */
+    onHighlightChange?: ((optionId: string | undefined) => void) | undefined;
+  },
+];
 
 /** What {@link useSuggestions} returns. */
 export type UseSuggestionsResult = {

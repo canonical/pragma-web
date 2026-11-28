@@ -21,11 +21,13 @@ const isSameCount = (a: Count, b: Count): boolean =>
  * the same renders nothing. It stands in for the store's answer group
  * until that lands, with the same reading.
  *
- * @param props - The provider whose result is counted.
  * @returns The count; unknown while none answers the applied query.
  */
-export default function useAnswerCountStandIn({
-  provider,
-}: UseAnswerCountStandInProps): UseAnswerCountStandInResult {
-  return useDataViewsValue(provider.state, readLiveCount, isSameCount);
+export default function useAnswerCountStandIn(
+  ...[provider]: UseAnswerCountStandInProps
+): UseAnswerCountStandInResult {
+  return useDataViewsValue(provider.state, {
+    select: readLiveCount,
+    isEqual: isSameCount,
+  });
 }

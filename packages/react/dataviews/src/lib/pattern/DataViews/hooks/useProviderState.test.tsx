@@ -46,9 +46,7 @@ const makeFixture = (location?: QueryLocation) => {
 describe("useProviderState", () => {
   it("refuses a provider createDataViewsProvider did not create", () => {
     const failure = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() =>
-      renderHook(() => useProviderState({ provider: {} as never })),
-    ).toThrow(
+    expect(() => renderHook(() => useProviderState({} as never))).toThrow(
       "DataViews requires a provider created by createDataViewsProvider",
     );
     failure.mockRestore();
@@ -56,7 +54,7 @@ describe("useProviderState", () => {
 
   it("observes the provider for as long as the root is mounted", () => {
     const { source, provider } = makeFixture();
-    const hook = renderHook(() => useProviderState({ provider }));
+    const hook = renderHook(() => useProviderState(provider));
     expect(source.calls).toHaveLength(1);
     hook.unmount();
     expect(source.readLatest().releases).toBe(1);
@@ -65,8 +63,7 @@ describe("useProviderState", () => {
   it("speaks the words it is handed, over English", () => {
     const { provider } = makeFixture();
     const hook = renderHook(() =>
-      useProviderState({
-        provider,
+      useProviderState(provider, {
         messages: { statusNoData: "Nothing here yet." },
       }),
     );
@@ -77,7 +74,7 @@ describe("useProviderState", () => {
 
   it("holds one value while nothing it carries changes", () => {
     const { provider } = makeFixture();
-    const hook = renderHook(() => useProviderState({ provider }));
+    const hook = renderHook(() => useProviderState(provider));
     const first = hook.result.current;
     hook.rerender();
     expect(hook.result.current).toBe(first);
@@ -87,7 +84,7 @@ describe("useProviderState", () => {
   it("ends the typing session of every filter record at once", () => {
     const recorded = createRecordingLocation({ href: "/machines" });
     const { provider } = makeFixture(recorded.location);
-    const hook = renderHook(() => useProviderState({ provider }));
+    const hook = renderHook(() => useProviderState(provider));
     const { filters, endSessions } = hook.result.current;
     const from = findFilterHandle<number>(filters, "cpu", "gte");
     const before = recorded.writes.length;

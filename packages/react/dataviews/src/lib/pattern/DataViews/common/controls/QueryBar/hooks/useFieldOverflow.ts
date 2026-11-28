@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import type { UseFieldOverflowProps } from "./types.js";
+import type { UseFieldOverflowProps, UseFieldOverflowResult } from "./types.js";
 
 /** The property the bar's rows below the field are moved down by. */
 const PROPERTY = "--data-views-query-bar-field-overflow";
@@ -8,13 +8,11 @@ const PROPERTY = "--data-views-query-bar-field-overflow";
  * How far the focused field reaches past its resting line, kept on the
  * bar's root as a length, so the rows below it move down by as much and
  * the field never covers them.
- *
- * @param props - The bar's root.
  */
 // @note Impure: observes the field's size and sets a property on the root.
-export default function useFieldOverflow({
-  rootRef,
-}: UseFieldOverflowProps): void {
+export default function useFieldOverflow(
+  ...[rootRef]: UseFieldOverflowProps
+): UseFieldOverflowResult {
   useLayoutEffect(() => {
     const root = rootRef.current;
     const input = root?.querySelector<HTMLElement>(".ds.query-input");

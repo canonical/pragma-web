@@ -53,7 +53,7 @@ const mount = (
     snapshot: { query, presentation: {} },
   });
   const Chip = () => {
-    const group = useQueryGroup({ provider: fixture.provider as never });
+    const group = useQueryGroup(fixture.provider as never);
     return (
       <QueryInput
         label="Filter"

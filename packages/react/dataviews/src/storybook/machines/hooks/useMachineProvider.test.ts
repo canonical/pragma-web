@@ -1,8 +1,8 @@
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createEmptySource from "./createEmptySource.js";
-import { machineCollection } from "./fixtures.js";
+import createEmptySource from "../createEmptySource.js";
+import { machineCollection } from "../fixtures.js";
 import useMachineProvider from "./useMachineProvider.js";
 
 describe("useMachineProvider", () => {

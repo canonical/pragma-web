@@ -64,7 +64,10 @@ const RangeChip = ({
       return lower === undefined || upper === undefined ? null : [lower, upper];
     };
   }, [clause]);
-  const bounds = useDataViewsValue(group.state, read, isSameBounds);
+  const bounds = useDataViewsValue(group.state, {
+    select: read,
+    isEqual: isSameBounds,
+  });
   const hydrated = useIsHydrated();
   const editedOperator = edit?.draft.origin?.ref?.operator;
   if (bounds === null) return null;

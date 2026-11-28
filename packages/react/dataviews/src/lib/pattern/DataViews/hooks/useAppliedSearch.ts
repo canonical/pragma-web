@@ -13,8 +13,8 @@ const selectSearch = (state: DataViewsState): string =>
  *
  * @note Impure: subscribes to the provider's state while mounted.
  */
-export default function useAppliedSearch({
-  provider,
-}: UseAppliedSearchProps): UseAppliedSearchResult {
-  return useDataViewsValue(provider.state, selectSearch);
+export default function useAppliedSearch(
+  ...[provider]: UseAppliedSearchProps
+): UseAppliedSearchResult {
+  return useDataViewsValue(provider.state, { select: selectSearch });
 }

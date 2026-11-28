@@ -48,7 +48,7 @@ describe("useRovingItem", () => {
           {children}
         </Provider>
       );
-      const { result } = renderHook(() => useRovingItem({ id: undefined }), {
+      const { result } = renderHook(() => useRovingItem(), {
         wrapper,
       });
       expect(result.current).toBeUndefined();

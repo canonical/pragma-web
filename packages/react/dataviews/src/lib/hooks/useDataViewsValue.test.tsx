@@ -63,7 +63,7 @@ describe("useDataViewsValue", () => {
     let renders = 0;
     const { result } = renderHook(() => {
       renders += 1;
-      return useDataViewsValue(channel, (state) => state.width);
+      return useDataViewsValue(channel, { select: (state) => state.width });
     });
     expect(result.current).toBe(100);
     act(() => channel.set({ width: 100, reason: "failed" }));
@@ -129,7 +129,7 @@ describe("useDataViewsValue", () => {
       let renders = 0;
       const { result } = renderHook(() => {
         renders += 1;
-        return useDataViewsValue(channel, listIds);
+        return useDataViewsValue(channel, { select: listIds });
       });
       expect(result.current).toEqual([1, 2]);
       expect(renders).toBe(1);
@@ -144,7 +144,7 @@ describe("useDataViewsValue", () => {
       const channel = createFakeChannel(createListing());
       const select = vi.fn(selectIds);
       const { result, rerender } = renderHook(() =>
-        useDataViewsValue(channel, select, areIdListsEqual),
+        useDataViewsValue(channel, { select, isEqual: areIdListsEqual }),
       );
       const first = result.current;
       const calls = select.mock.calls.length;
@@ -159,7 +159,7 @@ describe("useDataViewsValue", () => {
       const isEqual = vi.fn(areIdListsEqual);
       const Probe = () => (
         <output>
-          {useDataViewsValue(channel, listIds, isEqual).join(",")}
+          {useDataViewsValue(channel, { select: listIds, isEqual }).join(",")}
         </output>
       );
       const container = document.createElement("div");
@@ -188,7 +188,7 @@ describe("useDataViewsValue", () => {
       const channel = createFakeChannel(createListing());
       const isEqual = vi.fn(areIdListsEqual);
       const { result } = renderHook(() =>
-        useDataViewsValue(channel, selectIds, isEqual),
+        useDataViewsValue(channel, { select: selectIds, isEqual }),
       );
       expect(result.current).toEqual([1, 2]);
       expect(isEqual).not.toHaveBeenCalled();
@@ -199,7 +199,10 @@ describe("useDataViewsValue", () => {
       let renders = 0;
       const { result } = renderHook(() => {
         renders += 1;
-        return useDataViewsValue(channel, selectIds, areIdListsEqual);
+        return useDataViewsValue(channel, {
+          select: selectIds,
+          isEqual: areIdListsEqual,
+        });
       });
       const first = result.current;
       act(() => channel.set(createListing({ page: 2 })));
@@ -210,11 +213,10 @@ describe("useDataViewsValue", () => {
     it("holds an inline selection while an inline isEqual says it is the same", () => {
       const channel = createFakeChannel(createListing({ ids: [1, 2] }));
       const { result } = renderHook(() =>
-        useDataViewsValue(
-          channel,
-          (listing) => [...listing.ids],
-          (previous, next) => previous.length === next.length,
-        ),
+        useDataViewsValue(channel, {
+          select: (listing) => [...listing.ids],
+          isEqual: (previous, next) => previous.length === next.length,
+        }),
       );
       const first = result.current;
       expect(first).toEqual([1, 2]);
@@ -229,7 +231,10 @@ describe("useDataViewsValue", () => {
       let renders = 0;
       const { result } = renderHook(() => {
         renders += 1;
-        return useDataViewsValue(channel, selectIds, areIdListsEqual);
+        return useDataViewsValue(channel, {
+          select: selectIds,
+          isEqual: areIdListsEqual,
+        });
       });
       const first = result.current;
       act(() => channel.set(createListing({ ids: [1, 3] })));
@@ -241,7 +246,8 @@ describe("useDataViewsValue", () => {
     it("keeps the held value across a new select that reads an equal value", () => {
       const channel = createFakeChannel(createListing({ other: [1, 2] }));
       const { result, rerender } = renderHook(
-        ({ select }) => useDataViewsValue(channel, select, areIdListsEqual),
+        ({ select }) =>
+          useDataViewsValue(channel, { select, isEqual: areIdListsEqual }),
         { initialProps: { select: selectIds } },
       );
       const first = result.current;
@@ -252,7 +258,8 @@ describe("useDataViewsValue", () => {
     it("reads through a new select in the render that passes it", () => {
       const channel = createFakeChannel(createListing());
       const { result, rerender } = renderHook(
-        ({ select }) => useDataViewsValue(channel, select, areIdListsEqual),
+        ({ select }) =>
+          useDataViewsValue(channel, { select, isEqual: areIdListsEqual }),
         { initialProps: { select: selectIds } },
       );
       expect(result.current).toEqual([1, 2]);
@@ -263,7 +270,8 @@ describe("useDataViewsValue", () => {
     it("decides by a new isEqual against the held value", () => {
       const channel = createFakeChannel(createListing());
       const { result, rerender } = renderHook(
-        ({ isEqual }) => useDataViewsValue(channel, selectIds, isEqual),
+        ({ isEqual }) =>
+          useDataViewsValue(channel, { select: selectIds, isEqual }),
         { initialProps: { isEqual: (): boolean => true } },
       );
       act(() => channel.set(createListing({ ids: [4] })));
@@ -276,7 +284,11 @@ describe("useDataViewsValue", () => {
       const first = createFakeChannel(createListing());
       const second = createFakeChannel(createListing({ page: 7 }));
       const { result, rerender } = renderHook(
-        ({ channel }) => useDataViewsValue(channel, selectIds, areIdListsEqual),
+        ({ channel }) =>
+          useDataViewsValue(channel, {
+            select: selectIds,
+            isEqual: areIdListsEqual,
+          }),
         { initialProps: { channel: first } },
       );
       const held = result.current;
@@ -288,7 +300,11 @@ describe("useDataViewsValue", () => {
       const first = createFakeChannel(createListing());
       const second = createFakeChannel(createListing({ ids: [5] }));
       const { result, rerender } = renderHook(
-        ({ channel }) => useDataViewsValue(channel, selectIds, areIdListsEqual),
+        ({ channel }) =>
+          useDataViewsValue(channel, {
+            select: selectIds,
+            isEqual: areIdListsEqual,
+          }),
         { initialProps: { channel: first } },
       );
       expect(result.current).toEqual([1, 2]);
@@ -304,7 +320,12 @@ describe("useDataViewsValue", () => {
       const channel = createFakeChannel(createListing());
       const seen: (readonly number[])[] = [];
       const Probe = (): null => {
-        seen.push(useDataViewsValue(channel, selectIds, areIdListsEqual));
+        seen.push(
+          useDataViewsValue(channel, {
+            select: selectIds,
+            isEqual: areIdListsEqual,
+          }),
+        );
         return null;
       };
       // Publishes after the commit and before the probe's passive effects,
@@ -331,7 +352,10 @@ describe("useDataViewsValue", () => {
       const committed = new Set<readonly number[]>();
       const { result } = renderHook(
         () => {
-          const value = useDataViewsValue(channel, selectIds, isEqual);
+          const value = useDataViewsValue(channel, {
+            select: selectIds,
+            isEqual,
+          });
           useEffect(() => {
             committed.add(value);
           }, [value]);
@@ -361,7 +385,7 @@ describe("useDataViewsValue", () => {
       }: {
         readonly select: (snapshot: Listing) => readonly number[];
       }): null => {
-        const value = useDataViewsValue(channel, select, isEqual);
+        const value = useDataViewsValue(channel, { select, isEqual });
         useEffect(() => {
           committed.add(value);
           shown = value;
@@ -413,7 +437,10 @@ describe("useDataViewsValue", () => {
       const commits: (readonly (readonly number[] | undefined)[])[] = [];
       let published = false;
       const Probe = ({ name }: { readonly name: string }): null => {
-        const value = useDataViewsValue(channel, selectIds, areIdListsEqual);
+        const value = useDataViewsValue(channel, {
+          select: selectIds,
+          isEqual: areIdListsEqual,
+        });
         useLayoutEffect(() => {
           latest.set(name, value);
         });

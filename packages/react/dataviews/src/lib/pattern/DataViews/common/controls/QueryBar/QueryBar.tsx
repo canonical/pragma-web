@@ -267,9 +267,7 @@ export default function QueryBar({
     announce: announceToRoot,
   } = useDataViewsRoot("QueryBar");
   // While the sheet is open, the bar speaks through the sheet's region.
-  const { regionRef, announce } = useSheetAnnouncer({
-    announce: announceToRoot,
-  });
+  const { regionRef, announce } = useSheetAnnouncer(announceToRoot);
   const { schema } = provider.collection;
   const { capabilities } = provider;
   // Each quick filter with the arrangement it takes, each field once.
@@ -308,7 +306,7 @@ export default function QueryBar({
     }
   }
   const labels = readLabelsStandIn();
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const hydrated = useIsHydrated();
   // Whether the location spells addresses, which every baseline link needs.
   const hasHref = useMemo(
@@ -322,33 +320,31 @@ export default function QueryBar({
   // Each quick filter's panel, held so they hide as the sheet shows.
   const { collectPanel, hidePanels } = useQuickFilterPanels();
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const { session, dispatch } = useQueryBarSession({ provider, rootRef });
-  const clauses = useClauseIds({ group });
+  const { session, dispatch } = useQueryBarSession(provider, rootRef);
+  const clauses = useClauseIds(group);
   const readContradictions = useMemo(
     () => (state: QueryStateStandIn) => findContradictions(state.slice, schema),
     [schema],
   );
-  const refusedIssues = useDataViewsValue(
-    group.state,
-    readRefusedIssues,
-    isSameRefusedIssues,
-  );
-  const contradictions = useDataViewsValue(
-    group.state,
-    readContradictions,
-    isSameContradictions,
-  );
+  const refusedIssues = useDataViewsValue(group.state, {
+    select: readRefusedIssues,
+    isEqual: isSameRefusedIssues,
+  });
+  const contradictions = useDataViewsValue(group.state, {
+    select: readContradictions,
+    isEqual: isSameContradictions,
+  });
   // The contradictions already said, so each new one is said once; those
   // a link arrived with are shown, not said.
   const saidRef = useRef<ReadonlySet<string> | null>(null);
-  const announceOutcome = useAnnounceOutcome({ provider, announce });
-  useFieldOverflow({ rootRef });
-  useLinkFocusHandoff({ rootRef, hydrated });
+  const announceOutcome = useAnnounceOutcome(provider, announce);
+  useFieldOverflow(rootRef);
+  useLinkFocusHandoff(rootRef, hydrated);
   // Narrow, the chips are hidden: the stop leaves them for the entry.
-  const isNarrow = useNarrowMode({
+  const isNarrow = useNarrowMode(
     rootRef,
     entryRef,
-    onNarrow: () => {
+    () => {
       if (sessionRef.current.activeItem !== ENTRY) moveStop(ENTRY);
       // The search chip is hidden too: an empty entry shows the search.
       const applied = readAppliedSearch(group.state.get());
@@ -356,7 +352,7 @@ export default function QueryBar({
         dispatch({ type: "typeText", text: applied });
       }
     },
-    onWide: () => {
+    () => {
       // Widened with the sheet open, as a phone turned: the summary that
       // opened it is gone, so the sheet closes and focus goes to the entry.
       const sheet = rootRef.current?.ownerDocument.getElementById(sheetId);
@@ -370,10 +366,12 @@ export default function QueryBar({
         dispatch({ type: "typeText", text: "" });
       }
     },
-  });
+  );
   // Narrow, the entry holding the applied search follows it as it moves
   // elsewhere, as the sheet's removal or Back does.
-  const appliedSearch = useDataViewsValue(group.state, readAppliedSearch);
+  const appliedSearch = useDataViewsValue(group.state, {
+    select: readAppliedSearch,
+  });
   const appliedSearchRef = useRef(appliedSearch);
   // @note Impure: moves the entry's text with the applied search.
   useEffect(() => {
@@ -463,7 +461,7 @@ export default function QueryBar({
       ? editedDefinition.field
       : null;
   const isListedValue = listedField !== null;
-  const facets = useSuggestedFacets({ provider, field: listedField });
+  const facets = useSuggestedFacets(provider, listedField);
   // A typed value's text as its Entry opens on it: the held value spelled.
   const heldOperand =
     isEditing && part === "value" && draft?.kind === "predicate"

@@ -72,12 +72,15 @@ const QuickFilter = ({
   const hydrated = useIsHydrated();
   const wordsId = useId();
   const bodyRef = useRef<HTMLDivElement>(null);
-  useFocusRescue({ containerRef: bodyRef });
+  useFocusRescue(bodyRef);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, field),
     [field],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   const definition = provider.collection.schema.findField(field);
   /* v8 ignore next 3 -- unreachable: the bar refuses a field the schema lacks */
   if (definition === undefined) {

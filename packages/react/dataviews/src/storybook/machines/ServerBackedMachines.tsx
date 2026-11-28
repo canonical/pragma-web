@@ -7,8 +7,8 @@ import {
   SERVER_BACKED_FACETS,
   SERVER_BACKED_PARTS,
 } from "./constants.js";
+import { useMachineProvider } from "./hooks/index.js";
 import type { Machine } from "./types.js";
-import useMachineProvider from "./useMachineProvider.js";
 
 /** How one server-backed screen is set up. Read once, when it mounts. */
 type ServerBackedMachinesProps = StoryWords & {

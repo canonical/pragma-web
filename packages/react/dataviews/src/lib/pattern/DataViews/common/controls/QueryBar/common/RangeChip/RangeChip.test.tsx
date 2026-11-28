@@ -49,7 +49,7 @@ const mount = (props: Partial<RangeChipProps> = {}) => {
     snapshot: { query: "cores__gte=2&cores__lte=8", presentation: {} },
   });
   const Chip = (extra: Partial<RangeChipProps>) => {
-    const group = useQueryGroup({ provider: fixture.provider as never });
+    const group = useQueryGroup(fixture.provider as never);
     return (
       <QueryInput
         label="Filter"

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import type { UseFocusRescueProps } from "./types.js";
+import type { UseFocusRescueProps, UseFocusRescueResult } from "./types.js";
 
 /** What Tab reaches among a panel's controls, in document order. */
 const FOCUSABLE = [
@@ -21,12 +21,11 @@ const listFocusable = (container: HTMLElement): HTMLElement[] => [
  * control that now stands in its place, or else the one before it, or else
  * the panel itself, never to the page.
  *
- * @param props - The element holding the panel's controls.
  */
 // @note Impure: reads and moves focus.
-export default function useFocusRescue({
-  containerRef,
-}: UseFocusRescueProps): void {
+export default function useFocusRescue(
+  ...[containerRef]: UseFocusRescueProps
+): UseFocusRescueResult {
   // The control that last took focus, and its place among the controls.
   const held = useRef<{
     readonly element: HTMLElement;

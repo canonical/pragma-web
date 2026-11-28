@@ -106,20 +106,21 @@ const listShownIds = (
 export default function useColumnManagement<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({
-  provider,
-  columns,
-  headerRow,
-  messages,
-  announce,
-}: UseColumnManagementProps<TFields, TRow>): UseColumnManagementResult {
+>(
+  ...[
+    provider,
+    columns,
+    headerRow,
+    messages,
+    announce,
+  ]: UseColumnManagementProps<TFields, TRow>
+): UseColumnManagementResult {
   const { presentation } = provider;
   const declared = useStableValue(columns, areColumnsEqual);
   // The arrangement alone: a change to the reason re-renders no table.
-  const arrangement = useDataViewsValue(
-    presentation.state,
-    (shown) => shown.presentation,
-  );
+  const arrangement = useDataViewsValue(presentation.state, {
+    select: (shown) => shown.presentation,
+  });
   // The list last handed out, whose offers objects a new list keeps where a
   // column's changes hold. Written during render: the latest list is what
   // every later render compares with, so a discarded render writing it
@@ -151,7 +152,9 @@ export default function useColumnManagement<
   );
   // The viewer's own changes where a change is written now: what a reset can
   // clear, so an open view's saved arrangement beneath never keeps it on.
-  const own = useDataViewsValue(presentation.state, (shown) => shown.own);
+  const own = useDataViewsValue(presentation.state, {
+    select: (shown) => shown.own,
+  });
   const resettable = useMemo(
     () => Object.keys(resetColumnArrangement({ presentation: own })).length > 0,
     [own],

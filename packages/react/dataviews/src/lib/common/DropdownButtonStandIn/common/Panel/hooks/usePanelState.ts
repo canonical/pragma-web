@@ -14,11 +14,9 @@ import type {
  * @param anchorName The trigger's CSS anchor name.
  * @returns The shared state.
  */
-export default function usePanelState({
-  panelId,
-  triggerId,
-  anchorName,
-}: UsePanelStateProps): UsePanelStateResult {
+export default function usePanelState(
+  ...[panelId, triggerId, anchorName]: UsePanelStateProps
+): UsePanelStateResult {
   const elementRef = useRef<HTMLDivElement>(null);
   const [isOpen, setOpen] = useState(false);
   const [focusIntent, setFocusIntent] = useState<PanelFocusIntent>("first");

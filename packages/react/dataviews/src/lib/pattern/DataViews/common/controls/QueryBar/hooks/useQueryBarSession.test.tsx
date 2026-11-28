@@ -36,7 +36,7 @@ const mount = () => {
   const location = createMemoryLocation({ href: "/machines" });
   const rooted = renderInRoot(
     "QueryBar",
-    (provider) => useQueryBarSession({ provider, rootRef: { current: root } }),
+    (provider) => useQueryBarSession(provider, { current: root }),
     { location },
   );
   return { ...rooted, root, location };

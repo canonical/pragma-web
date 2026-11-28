@@ -14,6 +14,7 @@ import createMachineSource from "../../../../../../storybook/machines/createMach
 import createOneTermSource from "../../../../../../storybook/machines/createOneTermSource.js";
 import createPendingSource from "../../../../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../../../../storybook/machines/fixtures.js";
+import useMachineProvider from "../../../../../../storybook/machines/hooks/useMachineProvider.js";
 import readHostName from "../../../../../../storybook/machines/readHostName.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
 import type {
@@ -23,7 +24,6 @@ import type {
   MachineProviderConfig,
   SortableField,
 } from "../../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import {
   useDataViewsCell,

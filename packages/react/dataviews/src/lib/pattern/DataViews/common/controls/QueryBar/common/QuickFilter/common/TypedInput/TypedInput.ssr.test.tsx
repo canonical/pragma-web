@@ -19,7 +19,7 @@ function Host({
   readonly provider: Provider;
   readonly named: boolean;
 }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   return (
     <TypedInput
       definition={

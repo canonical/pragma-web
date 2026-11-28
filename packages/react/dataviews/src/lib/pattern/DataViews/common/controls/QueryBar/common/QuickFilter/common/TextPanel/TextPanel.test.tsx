@@ -20,12 +20,15 @@ import TextPanel from "./TextPanel.js";
 type Provider = DataViewsProvider<readonly SchemaFieldDefinition[]>;
 
 function Host({ provider }: { readonly provider: Provider }) {
-  const group = useQueryGroup({ provider });
+  const group = useQueryGroup(provider);
   const select = useMemo(
     () => (state: QueryStateStandIn) => listFieldConjuncts(state, "name"),
     [],
   );
-  const conjuncts = useDataViewsValue(group.state, select, isSameConjuncts);
+  const conjuncts = useDataViewsValue(group.state, {
+    select: select,
+    isEqual: isSameConjuncts,
+  });
   return (
     <TextPanel
       definition={{ field: "name", kind: "text" }}

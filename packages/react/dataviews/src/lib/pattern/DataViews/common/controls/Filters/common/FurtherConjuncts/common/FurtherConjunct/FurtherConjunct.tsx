@@ -35,7 +35,7 @@ export default function FurtherConjunct({
 }: FurtherConjunctProps): ReactElement {
   const { messages } = useDataViewsRoot("Filters");
   const hydrated = useIsHydrated();
-  const { link, button } = useHydrationFocusHandoff({ hydrated });
+  const { link, button } = useHydrationFocusHandoff(hydrated);
   const values = spellWireValues({ field, operator, operands });
   // Presence reads as a phrase of its own, never as the value a link
   // spells it with: the phrase is the field's label.

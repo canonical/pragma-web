@@ -46,9 +46,7 @@ describe("useFieldOverflow", () => {
       },
     );
     const { root, grow } = createRoot(40, 40);
-    const { unmount } = renderHook(() =>
-      useFieldOverflow({ rootRef: { current: root } }),
-    );
+    const { unmount } = renderHook(() => useFieldOverflow({ current: root }));
     expect(
       root.style.getPropertyValue("--data-views-query-bar-field-overflow"),
     ).toBe("0px");
@@ -67,15 +65,15 @@ describe("useFieldOverflow", () => {
   it("leaves the rows where they rest without an observer or a field", () => {
     vi.stubGlobal("ResizeObserver", undefined);
     const { root } = createRoot(40, 96);
-    renderHook(() => useFieldOverflow({ rootRef: { current: root } }));
+    renderHook(() => useFieldOverflow({ current: root }));
     expect(
       root.style.getPropertyValue("--data-views-query-bar-field-overflow"),
     ).toBe("");
-    renderHook(() => useFieldOverflow({ rootRef: { current: null } }));
+    renderHook(() => useFieldOverflow({ current: null }));
     const bare = document.createElement("div");
-    renderHook(() => useFieldOverflow({ rootRef: { current: bare } }));
+    renderHook(() => useFieldOverflow({ current: bare }));
     bare.innerHTML = '<div class="ds query-input"></div>';
-    renderHook(() => useFieldOverflow({ rootRef: { current: bare } }));
+    renderHook(() => useFieldOverflow({ current: bare }));
     expect(
       bare.style.getPropertyValue("--data-views-query-bar-field-overflow"),
     ).toBe("");

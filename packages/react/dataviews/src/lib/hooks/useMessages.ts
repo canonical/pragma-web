@@ -31,7 +31,7 @@ const areMessagesEqual = (
  * is one such comparison rather than two.
  */
 export default function useMessages(
-  ...[messages = NO_MESSAGES]: UseMessagesProps
+  ...[{ messages = NO_MESSAGES } = {}]: UseMessagesProps
 ): UseMessagesResult {
   const given = useStableValue(messages, areMessagesEqual);
   return useMemo(() => resolveMessages(given), [given]);

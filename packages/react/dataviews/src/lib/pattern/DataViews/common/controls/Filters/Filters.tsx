@@ -363,10 +363,10 @@ export default function Filters({
 }: DataViewsFiltersProps): ReactElement {
   const { provider, filters, messages, endSessions } =
     useDataViewsRoot("Filters");
-  const facets = useFacets({ provider });
+  const facets = useFacets(provider);
   const listSeenOptions = useSeenServerOptions(facets.latest);
-  const restricted = useRestrictedFields({ provider });
-  const standing = useStandingOperators({ provider });
+  const restricted = useRestrictedFields(provider);
+  const standing = useStandingOperators(provider);
   const issues = useDataViewsValue(provider.issues);
   // The controls submit every filter themselves, and the refused clauses
   // the query is withheld for are left out: submitting the form removes
@@ -402,13 +402,9 @@ export default function Filters({
   const isShown = (field: string): boolean =>
     marked.includes(field) || restricted.has(field) || held === field;
   const { pinned, detailsRef, handleSummaryClick, handleToggle } =
-    useMoreFiltersPin({
-      marks,
-      listShownFields: () =>
-        schema.fields
-          .map(({ field }) => field)
-          .filter((field) => isShown(field)),
-    });
+    useMoreFiltersPin(marks, () =>
+      schema.fields.map(({ field }) => field).filter((field) => isShown(field)),
+    );
   const isOutside = (field: string): boolean =>
     !hasPrimary || (pinned === null ? isShown(field) : pinned.has(field));
   // Each field's server options listed once a render, for its placement and

@@ -43,7 +43,10 @@ const RefusedChip = ({
       },
     [clause.id],
   );
-  const issue = useDataViewsValue(group.state, read, isSameIssue);
+  const issue = useDataViewsValue(group.state, {
+    select: read,
+    isEqual: isSameIssue,
+  });
   const hydrated = useIsHydrated();
   // A refusal cleared reads nothing until the bar drops its chip.
   if (issue === null) return null;

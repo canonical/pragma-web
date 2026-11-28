@@ -13,9 +13,9 @@ import type {
  *
  * @note Impure: moves focus to the button in a layout effect.
  */
-export default function useHydrationFocusHandoff({
-  hydrated,
-}: UseHydrationFocusHandoffProps): UseHydrationFocusHandoffResult {
+export default function useHydrationFocusHandoff(
+  ...[hydrated]: UseHydrationFocusHandoffProps
+): UseHydrationFocusHandoffResult {
   const link = useRef<HTMLAnchorElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const linkHadFocus = useRef(false);

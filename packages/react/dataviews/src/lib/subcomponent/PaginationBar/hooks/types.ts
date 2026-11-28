@@ -8,10 +8,7 @@ import type {
 export type UseRedrawOnDestinationInputsProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = {
-  /** The provider whose open view and location the destinations read. */
-  readonly provider: DataViewsProvider<TFields, TRow>;
-};
+> = readonly [provider: DataViewsProvider<TFields, TRow>];
 
 /** What the redraw hook returns: nothing, since it only redraws. */
 export type UseRedrawOnDestinationInputsResult = undefined;

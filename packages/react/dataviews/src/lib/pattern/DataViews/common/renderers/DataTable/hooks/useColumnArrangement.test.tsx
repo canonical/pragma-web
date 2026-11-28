@@ -20,7 +20,7 @@ const mount = (columns: readonly DataTableColumn[]) => {
   const hook = renderHook(
     ({ declared }) => {
       renders += 1;
-      return useColumnArrangement({ presentation, columns: declared });
+      return useColumnArrangement(presentation, declared);
     },
     { initialProps: { declared: columns } },
   );

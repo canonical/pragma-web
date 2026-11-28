@@ -6,10 +6,7 @@
 import type { FocusEvent, MouseEvent, RefObject, SyntheticEvent } from "react";
 
 /** What the focus hook takes: the state that holds the focus back. */
-export type UsePanelFocusProps = {
-  /** Whether a command is in flight; the focus waits for it to settle. */
-  readonly pending: boolean;
-};
+export type UsePanelFocusProps = readonly [pending: boolean];
 
 /** What the focus hook returns: its handlers and the refs the focus moves between. */
 export type UsePanelFocusResult = {

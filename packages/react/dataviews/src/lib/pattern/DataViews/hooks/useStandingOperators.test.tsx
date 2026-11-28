@@ -11,7 +11,7 @@ import useStandingOperators from "./useStandingOperators.js";
 /** A root over the machine provider, and the hook reading through it. */
 const mount = () => {
   const rooted = renderInRoot("Filters", (provider) =>
-    useStandingOperators({ provider }),
+    useStandingOperators(provider),
   );
   return { ...rooted, host: readProviderHost(rooted.provider) };
 };

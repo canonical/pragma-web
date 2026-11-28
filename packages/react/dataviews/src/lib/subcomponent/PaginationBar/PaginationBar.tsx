@@ -113,7 +113,7 @@ export default function PaginationBar<
       "PaginationBar requires a provider created by createDataViewsProvider",
     );
   }
-  const messages = useMessages(given);
+  const messages = useMessages({ messages: given });
   // Observed for as long as the bar is mounted: a standalone bar is a mount
   // that reads the provider, and the ref-count makes a bar inside a root
   // that already observes cost nothing.
@@ -134,7 +134,7 @@ export default function PaginationBar<
   // The destinations carry the saved view open beside the query and the
   // location's other parameters, either of which can move without the
   // query: the bar redraws when either does.
-  useRedrawOnDestinationInputs({ provider });
+  useRedrawOnDestinationInputs(provider);
   /** A window of the current query, spelled as the location carries it. */
   const spell = (moved: Partial<ResultWindow>): URLSearchParams | null =>
     spellQuery({
@@ -170,7 +170,7 @@ export default function PaginationBar<
   // the page select. Tracked on the navigation group, where focus events
   // reach it from any control — a router's own link included.
   const pageSelect = useRef<HTMLSelectElement>(null);
-  const trackFocus = useFocusRescue({ fallback: pageSelect });
+  const trackFocus = useFocusRescue(pageSelect);
 
   // The token goes with the page it addresses: a cursor source reaches its
   // next page only through the one its current page handed back, and an
