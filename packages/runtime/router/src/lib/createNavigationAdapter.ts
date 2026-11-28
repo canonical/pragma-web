@@ -26,6 +26,7 @@ interface NavigateEventLike {
   readonly destination: { readonly url: string };
   readonly canIntercept: boolean;
   readonly hashChange: boolean;
+  readonly downloadRequest: string | null;
   intercept(options?: NavigationInterceptOptionsLike): void;
 }
 
@@ -80,16 +81,18 @@ export default function createNavigationAdapter(
     return new URL(navigationWindow.location.href);
   }
 
-  function notify(): void {
-    const location = getLocation();
-
+  function notify(location: URL = getLocation()): void {
     for (const subscriber of subscribers) {
       subscriber(new URL(location.href));
     }
   }
 
   function handleNavigate(event: NavigateEventLike): void {
-    if (!event.canIntercept || event.hashChange) {
+    if (
+      !event.canIntercept ||
+      event.hashChange ||
+      event.downloadRequest !== null
+    ) {
       return;
     }
 
@@ -112,7 +115,7 @@ export default function createNavigationAdapter(
     // ScrollManager and FocusManager already did for a real navigation.
     // That also matches the History API adapter, where the browser does
     // neither.  Navigations the browser starts (back/forward, reload, a link
-    // the router did not handle) keep the browser's defaults.
+    // the router did not start) keep the browser's defaults.
     event.intercept({
       handler: () =>
         Promise.resolve(trackedLoad).then(
@@ -124,11 +127,14 @@ export default function createNavigationAdapter(
         : undefined),
     });
 
-    if (
-      event.navigationType === "traverse" ||
-      event.navigationType === "reload"
-    ) {
-      notify();
+    // Notify for every navigation the router did not start itself, so a
+    // plain link, Back/Forward or a reload loads its route.  The event's
+    // destination is the address being navigated to: `location.href` still
+    // names the page being left during the event.  A navigation the router
+    // asked for is notified by navigate() after navigation.navigate()
+    // returns, when location.href already names the destination.
+    if (!navigatingForRouter) {
+      notify(new URL(event.destination.url));
     }
   }
 
