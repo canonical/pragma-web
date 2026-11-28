@@ -1,0 +1,19 @@
+/* The application's one stylesheet, and the order it is built in.
+ *
+ * The cascade sorts by layer, and the layer order is fixed by the first
+ * `@layer` statement a browser sees, so this file is the first thing the root
+ * layout imports.
+ *
+ *   1. fonts       `@font-face` only.
+ *   2. styles      the layer statement, the tokens, the reset, the modifiers.
+ *   3. components  the form package's stylesheet. The other Svelte components
+ *                  import their own stylesheets.
+ *   4. stand-ins   the blocks the Svelte design system does not ship yet.
+ *   5. app         this application's own CSS, last.
+ */
+
+@import url("@canonical/styles/fonts");
+@import url("@canonical/styles");
+@import url("@canonical/svelte-ds-global-form/index.css");
+@import url("./standins.css");
+@import url("./app.css");

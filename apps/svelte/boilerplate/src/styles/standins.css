@@ -1,0 +1,11 @@
+/* The stylesheets of the blocks `@canonical/svelte-ds-*` does not ship yet,
+ * copied from the React packages so the Svelte markup, which carries the same
+ * classes, renders as React's does. Each file names its source; delete it, and
+ * its import here, when the Svelte block lands. */
+
+@import url("./standins/Card.css");
+@import url("./standins/Icon.css");
+@import url("./standins/InlineCode.css");
+@import url("./standins/SidePanel.css");
+@import url("./standins/Tile.css");
+@import url("./standins/Timeline.css");

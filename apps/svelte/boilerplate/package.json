@@ -17,15 +17,19 @@
     "check:biome": "biome check",
     "check:biome:fix": "biome check --write",
     "check:ts": "APP_SPA=1 svelte-kit sync && APP_SPA=1 svelte-check --tsconfig ./tsconfig.spa.json && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "test": "bun run build:spa && bun run build:storybook && node --test test/spa.test.js && bun run build && node --test test/app.test.js"
+    "test": "bun run test:unit && bun run test:browser",
+    "test:unit": "vitest run",
+    "test:browser": "bun run build:spa && bun run build:storybook && node --test test/spa.test.js && bun run build && node --test test/app.test.js"
   },
   "dependencies": {
     "@canonical/ds-assets": "^0.47.0",
+    "@canonical/ds-types": "^0.47.0",
+    "@canonical/ds-utils": "^0.47.0",
     "@canonical/i18n-core": "^0.47.0",
     "@canonical/styles": "^0.47.0",
     "@canonical/svelte-ds-app": "^0.47.0",
-    "@canonical/svelte-ds-global-form": "^0.47.0",
-    "@canonical/svelte-ds-global": "^0.47.0"
+    "@canonical/svelte-ds-global": "^0.47.0",
+    "@canonical/svelte-ds-global-form": "^0.47.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
@@ -43,7 +47,8 @@
     "svelte": "5.57.3",
     "svelte-check": "^4.4.5",
     "typescript": "~6.0.3",
-    "vite": "8.3.5"
+    "vite": "8.3.5",
+    "vitest": "^5.0.0"
   },
   "engines": {
     "node": "^22.13.0 || ^24.0.0 || ^26.0.0"

@@ -1,0 +1,107 @@
+/* Copied from packages/react/ds-global/src/lib/component/Tile (styles.css files, in tree order) until the Svelte design
+ * system ships Tile. Delete this file when it does. */
+
+/* common/Content/styles.css */
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * Tile.Content styles
+   * @implements ds:global.subcomponent.tile-content
+   *
+   * DSL anatomy mapping:
+   * - layout.type: stack, layout.direction: vertical -> flex column
+   * - spacing.padding.top: dimension/100, spacing.padding.bottom: dimension/200,
+   *   spacing.internal.horizontal: dimension/200 -> top 100, bottom 200,
+   *   sides 200. With a header above (padding-bottom 100), the two sections read
+   *   as top 100 / sides 200 / bottom 200 with the sections meeting in between.
+   */
+  :root {
+    --tile-content-padding-top: var(--dimension-100);
+    --tile-content-padding-bottom: var(--dimension-200);
+    --tile-content-padding-inline: var(--dimension-200);
+    --tile-content-gap: var(--dimension-100);
+  }
+
+  .ds.tile-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tile-content-gap);
+
+    padding-block-start: var(--tile-content-padding-top);
+    padding-block-end: var(--tile-content-padding-bottom);
+    padding-inline: var(--tile-content-padding-inline);
+  }
+}
+
+/* common/Header/styles.css */
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * Tile.Header styles
+   * @implements ds:global.subcomponent.tile-header
+   *
+   * DSL anatomy mapping:
+   * - layout.type: flow, layout.direction: horizontal -> flex row
+   * - layout.align: center -> align-items: center
+   * - spacing.internal.vertical: dimension/100, spacing.internal.horizontal:
+   *   dimension/200 -> padding 100 (block) / 200 (inline). The header's block
+   *   padding is 100 top and bottom; the content below adds its own top padding.
+   */
+  :root {
+    --tile-header-padding-block: var(--dimension-100);
+    --tile-header-padding-inline: var(--dimension-200);
+    --tile-header-gap: var(--dimension-100);
+  }
+
+  .ds.tile-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding-block: var(--tile-header-padding-block);
+    padding-inline: var(--tile-header-padding-inline);
+    gap: var(--tile-header-gap);
+
+    font-weight: var(--typography-weight-semibold, 600);
+  }
+}
+
+/* styles.css */
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * Tile styles
+   * @implements ds:global.component.tile
+   *
+   * The Tile always provides a surface: the component adds `.surface`, so the
+   * surface channel is established on this element (and steps when tiles/surfaces
+   * nest). It paints that background so it stands out on the page (dashboards,
+   * bento layouts). It shares the Card radius and has no border of its own. It is
+   * a static container — no cursor, hover, or focus affordance.
+   *
+   * DSL anatomy mapping:
+   * - layout.type: stack, layout.direction: vertical -> flex column
+   * - appearance.background: color/surface/tile -> the surface background channel
+   * - appearance.radius: radius/card -> shared card radius (--dimension-radius-medium)
+   */
+  :root {
+    /* Shared with Card. --dimension-radius-medium is currently 0; intended 9. */
+    --tile-border-radius: var(--dimension-radius-medium);
+  }
+
+  .ds.tile {
+    display: flex;
+    flex-direction: column;
+
+    /* Tile is a surface: it paints its own background (stands out on the page). */
+    background: var(--surface-color-background, var(--color-background));
+
+    border-radius: var(--tile-border-radius);
+
+    /* Clip section corners (e.g. full-bleed content) to the tile radius. */
+    overflow: hidden;
+  }
+}

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
-import { test } from "node:test";
+import { after, before, test } from "node:test";
 import { chromium } from "playwright";
 
 const serve = async (directory) => {
@@ -42,23 +42,59 @@ const serve = async (directory) => {
   return server;
 };
 
-test("static fallback supports cold routes and a client-only contact demo", async () => {
-  const server = await serve("build-spa");
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const browser = await chromium.launch({
+let browser;
+
+before(async () => {
+  browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
     headless: true,
   });
+});
+
+after(async () => {
+  await browser?.close();
+});
+
+/** Serves `directory` and runs `check` with a fresh page and the base URL. */
+async function withServer(directory, check) {
+  const server = await serve(directory);
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const context = await browser.newContext();
   try {
-    const page = await browser.newPage();
+    await check(await context.newPage(), base, context);
+  } finally {
+    await context.close();
+    await new Promise((resolve) => server.close(resolve));
+  }
+}
+
+const htmlClass = (page) => page.locator("html").getAttribute("class");
+
+test("the SPA applies the theme on select and restores it from the cookie", async () => {
+  await withServer("build-spa", async (page, base, context) => {
     await page.goto(`${base}/`);
-    assert.equal(await page.getByRole("link", { name: /GraphQL/i }).count(), 0);
-    await page.getByLabel("Theme").selectOption("dark");
+    await page.getByRole("heading", { name: "Home" }).waitFor();
+    assert.equal(await page.getByRole("button", { name: "Apply" }).count(), 0);
+    await page.getByLabel("Color theme").selectOption("dark");
+    assert.equal(await htmlClass(page), "app comfortable dark");
+    assert.equal(
+      (await context.cookies()).find((cookie) => cookie.name === "theme")
+        ?.value,
+      "dark",
+    );
     await page.reload();
     await page.waitForFunction(() =>
       document.documentElement.classList.contains("dark"),
     );
-    assert.equal(await page.getByLabel("Theme").inputValue(), "dark");
+    assert.equal(await page.getByLabel("Color theme").inputValue(), "dark");
+    await page.getByLabel("Color theme").selectOption("system");
+    assert.equal(await htmlClass(page), "app comfortable");
+  });
+});
+
+test("the SPA switches the language live and restores it from the cookie", async () => {
+  await withServer("build-spa", async (page, base) => {
+    await page.goto(`${base}/`);
     await page.getByLabel("Language").selectOption("ar");
     await page.waitForFunction(
       () =>
@@ -71,159 +107,114 @@ test("static fallback supports cold routes and a client-only contact demo", asyn
         document.documentElement.lang === "ar" &&
         document.documentElement.dir === "rtl",
     );
-    await page.getByLabel("اللغة").selectOption("en");
-    await page.waitForFunction(
-      () =>
-        document.documentElement.lang === "en" &&
-        document.documentElement.dir === "ltr",
-    );
-    await page.goto(`${base}/account`);
-    await page.getByRole("heading", { name: "Demo login" }).waitFor();
-    await page.getByRole("button", { name: "Enter demo account" }).click();
-    await page.getByRole("heading", { name: "Demo account" }).waitFor();
-    const cold = await page.goto(`${base}/catalog/compute`);
-    assert.equal(cold.status(), 200);
-    assert.equal(
-      (await page.request.get(`${base}/icons/information.svg`)).status(),
-      200,
-    );
-    await page.getByRole("heading", { name: "Compute" }).waitFor();
-    await page.goto(`${base}/contact`);
-    await page.getByRole("heading", { name: "Contact us" }).waitFor();
-    await page.getByRole("button", { name: "Send" }).click();
-    await page.locator("#email .field-error").waitFor();
-    await page.getByLabel("Email").fill("test@example.com");
-    await page.getByLabel("Message").fill("Hello");
-    await page.getByRole("button", { name: "Send" }).click();
-    await page.getByText("The draft is valid. Nothing was sent.").waitFor();
-    await page.goto(`${base}/dashboard/settings`);
-    assert.equal(
-      await page
-        .getByRole("navigation", { name: "Dashboard navigation" })
-        .getByRole("link", { name: "Settings" })
-        .getAttribute("aria-current"),
-      "page",
-    );
-    await page.getByLabel("Language").selectOption("fr");
-    const frenchNav = page.getByRole("navigation", {
-      name: "Navigation du tableau de bord",
-    });
-    await frenchNav.getByText("Aide", { exact: true }).click();
-    assert.equal(
-      await frenchNav
-        .getByRole("link", { name: "Informations légales" })
-        .getAttribute("href"),
-      "https://ubuntu.com/legal",
-    );
-    await page.getByLabel("Langue").selectOption("en");
-    await page.getByLabel("Display name").fill("");
-    await page.getByRole("button", { name: "Save" }).click();
-    await page.getByRole("link", { name: "Enter a display name." }).waitFor();
-    await page.getByLabel("Display name").fill("SPA user");
-    await page.getByLabel("Default bridge").selectOption("ovn-1");
-    await page.getByLabel("Maximum instances").fill("11");
-    await page.getByRole("button", { name: "Save" }).click();
-    await page.getByText("Settings saved.").waitFor();
-    await page.reload();
-    assert.equal(
-      await page.getByLabel("Display name").inputValue(),
-      "SPA user",
-    );
-    assert.equal(await page.getByLabel("Default bridge").inputValue(), "ovn-1");
-    await page.goto(`${base}/dashboard`);
-    const releaseCard = page
-      .getByRole("article")
-      .filter({ has: page.getByRole("heading", { name: "Ubuntu 20.04 LTS" }) });
-    await releaseCard.getByRole("link", { name: "Create an instance" }).click();
-    await page.getByLabel("Release").waitFor();
-    assert.equal(await page.getByLabel("Release").inputValue(), "focal");
-    await page.keyboard.press("Escape");
-    await page.goto(`${base}/dashboard/instances`);
-    await page.locator(".instance-panel summary").click();
-    await page.getByRole("button", { name: "Create demo instance" }).click();
-    await page.getByRole("alert").waitFor();
-    await page.getByLabel("Instance name").fill("spa-01");
-    await page.getByLabel("Release").selectOption("jammy");
-    await page.getByLabel("Enable Pro").check();
-    await page.getByLabel("Cloud-init user data").fill("#cloud-config");
-    await page.getByRole("button", { name: "Create demo instance" }).click();
-    await page.locator("#details").waitFor();
-    await page.reload();
-    await page.getByRole("button", { name: "spa-01" }).click();
-    await page.getByRole("button", { name: "Remove demo instance" }).click();
-    await page.getByRole("dialog").waitFor();
-    await page.keyboard.press("Escape");
-    await page.getByRole("dialog").waitFor({ state: "hidden" });
-    assert.equal(
-      await page
-        .getByRole("button", { name: "Remove demo instance" })
-        .evaluate((element) => element === document.activeElement),
-      true,
-    );
-    await page.getByRole("button", { name: "Remove demo instance" }).click();
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: "Remove demo instance" })
-      .click();
-    await page.getByText("No demo instances yet.").waitFor();
-    await page.getByRole("link", { name: "Project preview" }).click();
-    await page.getByLabel("Project name").fill("Alpha");
-    await page.getByText("Preview: Alpha").waitFor();
-    await page.getByRole("button", { name: "Preview phone" }).click();
-    await page.getByRole("alert").waitFor();
-    assert.equal(
-      await page
-        .locator("#preview-phone input[name=number]")
-        .getAttribute("aria-invalid"),
-      "true",
-    );
-    await page.getByLabel("Country code").selectOption("GB");
-    await page.getByLabel("Phone number", { exact: true }).fill("1234567");
-    await page.getByRole("button", { name: "Preview phone" }).click();
-    await page.getByText("Phone preview: +441234567").waitFor();
-    const missing = await page.goto(`${base}/missing`);
-    assert.equal(missing.status(), 200);
-    await page.getByRole("heading", { name: "404" }).waitFor();
-  } finally {
-    await browser.close();
-    await new Promise((resolve) => server.close(resolve));
-  }
+    await page.getByLabel("اللغة").selectOption("fr");
+    await page.getByRole("link", { name: "Accueil" }).first().waitFor();
+  });
 });
 
-test("built Storybook stories respond to locale globals", async () => {
-  const server = await serve("storybook-static");
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH || undefined,
-    headless: true,
+test("the SPA serves every route from the fallback", async () => {
+  await withServer("build-spa", async (page, base) => {
+    for (const [path, heading] of [
+      ["/guides/router-core", "router-core"],
+      ["/catalog", "Catalog"],
+      ["/contact", "Contact"],
+      ["/dashboard", "Overview"],
+      ["/dashboard/instances", "Instances"],
+      ["/dashboard/settings", "Settings"],
+      ["/account?auth=1", "Account"],
+    ]) {
+      const response = await page.goto(`${base}${path}`);
+      assert.equal(response.status(), 200, path);
+      await page.getByRole("heading", { name: heading, level: 1 }).waitFor();
+    }
+    await page.goto(`${base}/catalog`);
+    await page.getByText("— showing 4 of 6 products.").waitFor();
+    await page.goto(`${base}/`);
+    await page.getByText("Streamed in after a delay").waitFor();
+    assert.equal(
+      (await page.request.get(`${base}/icons/plus.svg`)).status(),
+      200,
+    );
   });
-  try {
-    const page = await browser.newPage();
+});
+
+test("the SPA redirects the account, the legacy home and shows the 404", async () => {
+  await withServer("build-spa", async (page, base) => {
+    await page.goto(`${base}/account`);
+    await page.waitForURL(`${base}/login?from=%2Faccount`);
+    await page.getByRole("heading", { name: "Login" }).waitFor();
+    await page.goto(`${base}/home`);
+    await page.waitForURL(`${base}/`);
+    await page.goto(`${base}/missing`);
+    await page.getByRole("heading", { name: "Page not found" }).waitFor();
+    await page.goto(`${base}/guides/Not_Kebab`);
+    await page.getByRole("heading", { name: "Page not found" }).waitFor();
+  });
+});
+
+test("the SPA dashboard creates an instance and confirms a deletion", async () => {
+  await withServer("build-spa", async (page, base) => {
+    await page.goto(`${base}/dashboard`);
+    await page.getByRole("button", { name: "Create instance" }).click();
+    await page.waitForURL(`${base}/dashboard/instances`);
+    await page
+      .locator("header")
+      .getByRole("button", { name: "Create instance" })
+      .click();
+    const panel = page.getByRole("dialog", { name: "Create instance" });
+    await panel.getByLabel("Instance name").fill("spa-01");
+    await panel.getByRole("button", { name: "Create instance" }).click();
+    await page.getByRole("heading", { name: "spa-01" }).waitFor();
+    await page
+      .getByRole("navigation", { name: "Dashboard" })
+      .getByRole("link", { name: "Settings" })
+      .click();
+    await page.getByRole("button", { name: "Delete project" }).click();
+    await page.getByRole("dialog", { name: "Delete project?" }).waitFor();
+    await page.keyboard.press("Escape");
+    await page
+      .getByRole("dialog", { name: "Delete project?" })
+      .waitFor({ state: "hidden" });
+  });
+});
+
+test("the built Storybook holds the React app's stories, in every locale", async () => {
+  await withServer("storybook-static", async (page, base) => {
+    const index = await (await page.request.get(`${base}/index.json`)).json();
+    const stories = Object.values(index.entries)
+      .filter((entry) => entry.type === "story")
+      .map((entry) => `${entry.title}/${entry.name}`)
+      .sort();
+    assert.deepEqual(stories, [
+      "Catalog/ProductList/Default",
+      "Catalog/ProductList/EmptyCatalog",
+      "ExampleComponent/Default",
+      "LazyComponent/Default",
+      "common/ApplicationShell/Default",
+      "common/ApplicationShell/WithoutFooter",
+      "common/TopBar/Default",
+    ]);
+    const idOf = (title, name) =>
+      Object.values(index.entries).find(
+        (entry) => entry.title === title && entry.name === name,
+      ).id;
+
     await page.goto(
-      `${base}/iframe.html?id=contact-contact--empty&globals=locale:fr`,
+      `${base}/iframe.html?id=${idOf("common/TopBar", "Default")}&globals=locale:fr`,
     );
-    await page.getByRole("heading", { name: "Nous contacter" }).waitFor();
+    await page.getByRole("link", { name: "Accueil" }).waitFor();
     await page.goto(
-      `${base}/iframe.html?id=contact-contact--server-validation&globals=locale:ar`,
+      `${base}/iframe.html?id=${idOf("common/ApplicationShell", "Default")}&globals=locale:ar`,
     );
-    await page.getByRole("heading", { name: "اتصل بنا" }).waitFor();
+    await page.getByRole("heading", { name: "Page content" }).waitFor();
     assert.equal(await page.locator("[dir=rtl]").count(), 1);
-    assert.match(
-      await page.locator("#email .field-error").textContent(),
-      /بريد إلكتروني/,
-    );
-    await page.goto(`${base}/iframe.html?id=contact-contact--arabic`);
-    await page.getByRole("heading", { name: "اتصل بنا" }).waitFor();
-    assert.equal(await page.locator("[dir=rtl]").count(), 1);
     await page.goto(
-      `${base}/iframe.html?id=catalog-catalog--default&globals=locale:fr`,
+      `${base}/iframe.html?id=${idOf("Catalog/ProductList", "Default")}&globals=locale:fr`,
     );
-    await page.getByRole("link", { name: "Calcul" }).waitFor();
-    await page.goto(`${base}/iframe.html?id=dashboard-dashboard--default`);
-    await page.getByRole("heading", { name: "Dashboard", level: 1 }).waitFor();
-    await page.getByText("Welcome, Demo.").waitFor();
-  } finally {
-    await browser.close();
-    await new Promise((resolve) => server.close(resolve));
-  }
+    await page.getByText("D'autres produits sont disponibles.").waitFor();
+    await page.goto(
+      `${base}/iframe.html?id=${idOf("LazyComponent", "Default")}`,
+    );
+    await page.getByText("Streamed in after a delay").waitFor();
+  });
 });

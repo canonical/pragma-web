@@ -1,0 +1,461 @@
+/* Copied from packages/react/ds-app/src/lib/SidePanel (styles.css files, in tree order) until the Svelte design
+ * system ships SidePanel. Delete this file when it does. */
+
+/* common/Content/styles.css */
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps {
+  .ds.side-panel-content {
+    /*
+      Natural height by default: the footer follows the content, so its actions
+      stay next to the text they refer to instead of being pushed to the bottom
+      edge of a short panel. Shrinks when the content is taller than the space
+      the header and footer leave — `overflow` below drops a flex item's
+      automatic minimum size to zero, so it can shrink below its content.
+    */
+    flex: 0 1 auto;
+
+    /* Opt-in: take the space the header and footer leave, so a short panel fills. */
+    &.fill {
+      flex-grow: 1;
+    }
+
+    /*
+      The scroll region, and the only one: the header and footer sit outside it
+      in the panel's flex column, so they stay visible without sticky
+      positioning.
+    */
+    overflow-y: auto;
+    /* Don't hand the scroll to the page behind once the content bottoms out. */
+    overscroll-behavior: contain;
+
+    /*
+      The scroll region's edges — 2px lines marking the boundaries the header
+      and footer meet the pane at, painted only while content is hidden past
+      that edge. CSS-first: the `@supports` block at the end of this sheet
+      animates these borders against the pane's own scroll progress in the
+      engines that ship scroll-driven animations — with or without
+      JavaScript. The engines without fall back to measurement:
+      `useScrollOverflow` publishes the two edge states as
+      `data-overflow-top` / `data-overflow-bottom` (see Content.tsx), and the
+      selectors below switch the border colours on them. Engines with neither
+      paint nothing: without a measurement there is nothing to say which
+      edges overflow, and a line that cannot tell the truth is worse than
+      none.
+
+      The borders are always reserved — animation or attributes switch their
+      colour, never their width — so the lines appearing or disappearing
+      never shifts the pane. And a scroll container's borders are part of its
+      box, not its content: they stay pinned at the edges while the pane
+      scrolls. A border spans the padding box, so with the pane's inline
+      padding the lines run edge to edge across the panel while the text
+      stays in its column. The colour is the panel's to own:
+      `--side-panel-color-border` is declared in the panel's `:root` block.
+    */
+    border-block: var(--side-panel-overflow-line-thickness) solid transparent;
+
+    &[data-overflow-top] {
+      border-block-start-color: var(--side-panel-color-border);
+    }
+
+    &[data-overflow-bottom] {
+      border-block-end-color: var(--side-panel-color-border);
+    }
+
+    /*
+      Inline padding, not margin: the pane must span the full panel width, so
+      its scrollbar hugs the panel edge and the focus ring below reaches it,
+      while the padding keeps the text clear of both.
+    */
+    padding-block: var(--side-panel-content-padding-block);
+    padding-inline: var(--side-panel-padding-inline);
+
+    /*
+      Focusable (Content.tsx sets `tabIndex`) so keyboard users can scroll it.
+      The panel clips its overflow, and the pane reaches the panel edges, so an
+      outset ring would be cut off: draw it inside the pane instead. The ring is
+      declared in full, because only a known width can be inset by exactly that
+      much — the user-agent ring's width varies by browser.
+    */
+    &:focus-visible {
+      outline: var(--side-panel-focus-ring-width) solid
+        var(--side-panel-color-focus-ring);
+      outline-offset: calc(-1 * var(--side-panel-focus-ring-width));
+    }
+  }
+
+  /*
+    The primary mechanism, with or without JavaScript: in the engines that
+    ship scroll-driven animations the pane animates the same borders against
+    its OWN scroll progress — the engine does the measuring. Content.tsx
+    probes the same capability and stands the `useScrollOverflow` hook down
+    when it holds, so nothing is measured twice and no edge attributes
+    appear in the markup; in the engines this `@supports` test excludes, the
+    hook's attributes own the lines instead (selectors above). Engines with
+    neither mechanism paint nothing.
+
+    Each animation is narrowed to a single pixel of the scroll range by
+    `animation-range`, so the colour change reads as a switch, not a fade:
+
+    - `side-panel-line-top` runs across the FIRST pixel — before it the pane
+      sits at the top and nothing is hidden above, so the line stays
+      transparent; past it, content is hidden above and the line holds the
+      border colour (`both` fills the range's far side).
+    - `side-panel-line-bottom` runs across the LAST pixel — before it there
+      is still content below, so `both` fills the near side and the line
+      holds the border colour; across it the pane bottoms out and the line
+      turns transparent.
+  */
+  @supports (animation-timeline: scroll()) {
+    .ds.side-panel-content {
+      animation:
+        side-panel-line-top linear both,
+        side-panel-line-bottom linear both;
+      animation-timeline: scroll(self block), scroll(self block);
+      animation-range:
+        0px 1px,
+        calc(100% - 1px) 100%;
+    }
+  }
+
+  @keyframes side-panel-line-top {
+    from {
+      border-block-start-color: transparent;
+    }
+    to {
+      border-block-start-color: var(--side-panel-color-border);
+    }
+  }
+
+  @keyframes side-panel-line-bottom {
+    from {
+      border-block-end-color: var(--side-panel-color-border);
+    }
+    to {
+      border-block-end-color: transparent;
+    }
+  }
+}
+
+/* common/Footer/styles.css */
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps {
+  .ds.side-panel-footer {
+    /*
+      Never shrinks. It stays visible because only the content pane scrolls —
+      the footer sits beside it in the panel's flex column, not over it.
+    */
+    flex: none;
+
+    padding-inline: var(--side-panel-padding-inline);
+
+    /*
+      Actions start at the inline-start edge, and the consumer renders the
+      primary action first: order in the markup is order on screen.
+    */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--side-panel-footer-gap);
+    flex-wrap: wrap;
+
+    padding-block: var(--side-panel-footer-padding-block);
+  }
+}
+
+/* common/Header/styles.css */
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps {
+  .ds.side-panel-header {
+    /*
+      Title type — heading-2 for now. The tier is provisional: to change it,
+      swap the tier in these five lines and nothing else.
+
+      Declared here, not on :root: a var() inside a custom property resolves
+      where it is declared, and the typography tokens are redefined per
+      context (.app, .site, .docs). On :root these would capture the
+      page-level tier; here they resolve inside the panel's own context.
+    */
+    --side-panel-title-font-family: var(--typography-heading-2-font-family);
+    --side-panel-title-font-size: var(--typography-heading-2-font-size);
+    --side-panel-title-font-weight: var(--typography-heading-2-font-weight);
+    --side-panel-title-letter-spacing: var(
+      --typography-heading-2-letter-spacing
+    );
+    --side-panel-title-line-height: var(
+      --typography-heading-2-line-height-dimension
+    );
+
+    /*
+      Never shrinks. It stays visible because only the content pane scrolls —
+      the header sits beside it in the panel's flex column, not over it.
+    */
+    flex: none;
+
+    display: flex;
+    /*
+      Baseline-aligned: the close button sits on the title's baseline. The
+      browser lines the two baselines up itself, so nothing here needs to know
+      where the typography engine puts the title's baseline or where Button's
+      density seat puts its own.
+    */
+    align-items: baseline;
+    gap: var(--side-panel-header-gap);
+
+    padding-block: var(--side-panel-header-padding-block);
+    /*
+      Inline padding, not margin: nothing here needs the header's box itself
+      inset, and padding keeps it full panel width. The footer insets its
+      actions with padding the same way.
+    */
+    padding-inline: var(--side-panel-padding-inline);
+
+    /*
+      The title is heading text beside a control, not a control: its line box
+      is far taller than the density seat line, so the typography engine seats
+      it rather than the density seat. It carries `.p`, the engine's class hook
+      for an element that is not `p` or `h1`–`h6`; this rule feeds the engine
+      the title's type in place of the paragraph values `.p` brings.
+    */
+    > .title {
+      flex: 1 1 auto;
+      --font-size: var(--side-panel-title-font-size);
+      --font-weight: var(--side-panel-title-font-weight);
+      --line-height: var(--side-panel-title-line-height);
+      /* No element-owned space below, even inside an `.editorial` ancestor. */
+      --space-after: 0;
+      font-family: var(--side-panel-title-font-family);
+      letter-spacing: var(--side-panel-title-letter-spacing);
+    }
+
+    > .close {
+      flex: 0 0 auto;
+      /*
+        Button tightens padding-inline-start when it has an icon, which suits an
+        icon+label button but leaves an icon-only one lopsided (8px vs 16px).
+        Equalise both sides through Button's own custom-property API, as
+        Modal's header does.
+      */
+      --button-padding-inline-start: var(--dimension-100);
+      --button-padding-inline-end: var(--dimension-100);
+
+      /*
+        An icon-only button has no text, so it has no baseline of its own and
+        the browser would make one up from the icon's box. A zero-width
+        character gives it a line of text in its seat line, so its baseline
+        lands where a label's would. The pseudo-element is a flex item like the
+        icon, so the gap is cancelled to keep the button's size.
+
+        Temporary: remove once icon-only buttons carry a seated baseline of
+        their own.
+      */
+      &::before {
+        content: "\200b";
+        margin-inline-end: calc(-1 * var(--button-gap));
+      }
+    }
+  }
+}
+
+/* styles.css */
+/* Layer: ds.components.apps (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps {
+  /**
+   * SidePanel styles
+   *
+   * A NON-MODAL <dialog>: the application behind stays interactive. None of the
+   * top-layer conveniences apply, which is why this file does work a modal
+   * wouldn't — it positions and stacks the panel itself, and never styles
+   * `::backdrop` (a backdrop is only painted for a modal dialog, and faking one
+   * would cover the application and swallow its clicks).
+   */
+
+  /* Component properties — the documented override points. */
+  :root {
+    /*
+      design-tokens 0.8.1 ships no `size/*` token, so this is a literal.
+      The default panel width (465px).
+      TODO: replace with a token when one exists.
+    */
+    --side-panel-inline-size: 465px;
+    /*
+      ...and no `shadow/*` token either. The shadow is what separates the panel
+      from the live page, so unlike a modal we cannot drop it.
+      TODO: replace with a token when one exists.
+    */
+    --side-panel-box-shadow: 0 0 32px 0 rgba(0, 0, 0, 0.2);
+    /*
+      A non-modal dialog is not in the top layer, so stacking is ours to manage.
+      Matches the demo's Drawer so the two never fight.
+    */
+    --side-panel-z-index: 1000;
+
+    --side-panel-border-radius: var(--dimension-radius-medium);
+    /*
+      The colour of the scroll region's divider lines, kept muted.
+    */
+    --side-panel-color-border: var(--color-border-muted);
+    /*
+      The edge lines marking the scroll region when the content pane
+      overflows. The design calls for 2px; design-tokens ships no stroke
+      token at that width (the scale jumps from 1px to 3px), so this is a
+      literal.
+      TODO: replace with a token when one exists.
+    */
+    --side-panel-overflow-line-thickness: 2px;
+    /* One inline padding, read by the header, content and footer alike. */
+    --side-panel-padding-inline: var(--dimension-300);
+    /* Block padding of the two pinned regions, so the rhythm is tunable. */
+    --side-panel-header-padding-block: var(--dimension-200);
+    --side-panel-footer-padding-block: var(--dimension-200);
+    --side-panel-content-padding-block: var(--dimension-200);
+    /* Space between the header's title and close button. */
+    --side-panel-header-gap: var(--dimension-200);
+    /* Space between the footer's actions. */
+    --side-panel-footer-gap: var(--dimension-200);
+    /* Keyboard focus ring of the scrollable content pane, drawn inside it. */
+    --side-panel-focus-ring-width: var(--dimension-stroke-thickness-large);
+    --side-panel-color-focus-ring: var(--color-focus-ring);
+    --side-panel-transition-duration: var(--motion-duration-medium);
+    --side-panel-transition-easing-enter: var(--motion-easing-decelerate);
+    --side-panel-transition-easing-exit: var(--motion-easing-accelerate);
+  }
+
+  .ds.side-panel {
+    /*
+      Undo the user-agent dialog box. Each of these is set by the UA stylesheet,
+      so leaving one undeclared is not the same as it being absent: `position`
+      is `absolute`, `margin` is `auto` (which would centre the panel), both
+      max sizes are capped, and there is a ~3px border and 1em of padding.
+    */
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    margin: 0;
+    /*
+      No padding of its own. The inline padding lives on the header, content and
+      footer instead, so the content pane spans the full panel width and its
+      scrollbar hugs the panel edge rather than sitting inside the padding.
+    */
+    padding: 0;
+    border: none;
+    max-inline-size: none;
+    max-block-size: none;
+
+    /*
+      The UA also sets `height: fit-content`, which beats `inset-block: 0` and
+      leaves the panel only as tall as its content. `auto` hands the height back
+      to the insets, so the panel spans the full viewport.
+    */
+    block-size: auto;
+
+    /* Full height comes from `inset-block`, avoiding mobile viewport-unit games. */
+    inline-size: min(var(--side-panel-inline-size), 100vw);
+    z-index: var(--side-panel-z-index);
+    border-radius: var(--side-panel-border-radius);
+    box-shadow: var(--side-panel-box-shadow);
+
+    /*
+      The panel is focused when it opens so that reading starts inside it, but
+      it is a container rather than a control: a ring drawn for a pointer
+      click would read as a border, so pointer focus gets none. A keyboard
+      user must still see where focus landed, so `:focus-visible` draws the
+      panel's own ring — the same tokens as the content pane, and inset for
+      the same reason: the panel spans the viewport edges, so an outset ring
+      would be clipped. Its focusable children keep their own either way.
+    */
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--side-panel-focus-ring-width) solid
+        var(--side-panel-color-focus-ring);
+      outline-offset: calc(-1 * var(--side-panel-focus-ring-width));
+    }
+
+    /*
+      The panel does not scroll; the content pane does. The panel is a
+      full-height flex column (`display: flex` itself is scoped to `[open]`
+      below — declaring it unconditionally would beat the user-agent's
+      `display: none` on a closed dialog). `flex-direction` sits here rather
+      than under `[open]`: it is inert while closed, and the base rule stays
+      the single place the stack direction is declared.
+    */
+    flex-direction: column;
+    overflow: hidden;
+
+    /*
+      Two consequences worth knowing: the content pane is a scroll container,
+      so it clips its descendants, and the `transform` below makes the panel the
+      containing block for any `position: fixed` descendant. So an overlay that
+      escapes its box — ds-global's Popover and ContextualMenu position their
+      content with `position: fixed` — is both clipped and anchored to the
+      panel instead of the viewport. Documented in Provider.tsx; the fix belongs
+      upstream, in overlays that use the top layer rather than fixed
+      positioning.
+    */
+
+    /*
+      Read the surface channels HERE rather than in :root. A custom property
+      substitutes where it is declared, and at :root the surface channels are
+      unset — so a :root intermediate would collapse to the fallback forever.
+      Popover/styles.css in ds-global documents the same trap.
+    */
+    background-color: var(--surface-color-background, var(--color-background));
+    color: var(--surface-color-text, var(--color-text));
+
+    /* Closed state. `translate` is physical, so flip it when the panel docks left. */
+    --side-panel-translate-closed: 100%;
+    transform: translateX(var(--side-panel-translate-closed));
+
+    &:dir(rtl) {
+      --side-panel-translate-closed: -100%;
+    }
+
+    /*
+      `display` is transitioned discretely so the slide-out is seen before the
+      dialog is hidden. No `overlay` in the list: that property only applies to
+      top-layer elements, which a non-modal dialog is not.
+    */
+    transition-property: transform, display;
+    transition-duration: var(--side-panel-transition-duration);
+    transition-timing-function: var(--side-panel-transition-easing-exit);
+    transition-behavior: allow-discrete;
+
+    /*
+      A closed <dialog> is `display: none` by user-agent rule. Declaring display
+      unconditionally would beat that and leave the panel permanently visible, so
+      the stack layout is scoped to the open state.
+
+      Header, content, footer, top to bottom. The header and footer are
+      `flex: none`; the content pane shrinks to fit and scrolls, so the two
+      pinned regions stay visible without sticky positioning.
+    */
+    &[open] {
+      display: flex;
+      transform: translateX(0);
+      transition-timing-function: var(--side-panel-transition-easing-enter);
+
+      /* The frame the entry transition starts from. */
+      @starting-style {
+        transform: translateX(var(--side-panel-translate-closed));
+      }
+    }
+
+    /* Respect a reduced-motion preference: appear, don't slide. */
+    @media (prefers-reduced-motion: reduce) {
+      transition-property: display;
+
+      &[open] {
+        @starting-style {
+          transform: translateX(0);
+        }
+      }
+    }
+  }
+}

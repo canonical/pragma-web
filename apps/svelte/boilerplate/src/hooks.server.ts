@@ -1,20 +1,27 @@
 import { getDocumentAttributes, negotiateLocale } from "@canonical/i18n-core";
 import type { Handle } from "@sveltejs/kit";
-import { config } from "./i18n";
+import { i18nConfig } from "./i18n/index.js";
+import readTheme from "./lib/ThemeSelector/readTheme.js";
 
+/**
+ * Reads the request's theme and locale, and writes them into the document's
+ * `<html>` before first paint: the theme class, `lang` and `dir`. HTML is
+ * private and not stored, because both depend on the request's cookies.
+ */
 export const handle: Handle = async ({ event, resolve }) => {
-  const theme = event.cookies.get("theme");
-  event.locals.theme = theme === "light" || theme === "dark" ? theme : "";
-  event.locals.locale = negotiateLocale(config, {
-    cookieHeader: event.request.headers.get("cookie"),
+  const cookieHeader = event.request.headers.get("cookie");
+
+  event.locals.theme = readTheme(cookieHeader);
+  event.locals.locale = negotiateLocale(i18nConfig, {
+    cookieHeader,
     acceptLanguage: event.request.headers.get("accept-language"),
   });
-  const { lang, dir } = getDocumentAttributes(config, event.locals.locale);
+  const { lang, dir } = getDocumentAttributes(i18nConfig, event.locals.locale);
 
   const response = await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
-        .replace("%theme%", event.locals.theme)
+        .replace("%theme%", event.locals.theme ? ` ${event.locals.theme}` : "")
         .replace("%lang%", lang)
         .replace("%dir%", dir),
   });
