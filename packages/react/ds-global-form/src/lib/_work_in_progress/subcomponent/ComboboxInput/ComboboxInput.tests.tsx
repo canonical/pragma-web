@@ -598,6 +598,38 @@ describe("ComboboxInput selection behaviour", () => {
     expect(input).toHaveAttribute("aria-expanded", "true");
   });
 
+  it("resets a multiple selection to [], focuses the input and leaves the list closed", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <ComboboxInput
+        isMultiple
+        options={fruits}
+        value={["apple", "banana"]}
+        onChange={onChange}
+      />,
+    );
+    const input = screen.getByRole("combobox");
+    fireEvent.click(screen.getByRole("button", { name: "Clear selection" }));
+    expect(chipLabels(container)).toEqual([]);
+    expect(onChange).toHaveBeenCalledExactlyOnceWith([]);
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("opens the list on a multiple reset with openOnReset", () => {
+    render(
+      <ComboboxInput
+        isMultiple
+        options={fruits}
+        value={["apple"]}
+        openOnReset
+      />,
+    );
+    const input = screen.getByRole("combobox");
+    fireEvent.click(screen.getByRole("button", { name: "Clear selection" }));
+    expect(input).toHaveAttribute("aria-expanded", "true");
+  });
+
   it("reports an option with an empty value as no value", () => {
     const onChange = vi.fn();
     render(
